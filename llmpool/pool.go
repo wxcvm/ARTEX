@@ -138,8 +138,8 @@ func (p *Pool) Complete(ctx context.Context, req llm.CompletionRequest) (llm.Mes
 		}
 		if !shouldFailover(ctx, err) {
 			// Non-failover error (e.g. ctx cancel, deterministic 4xx): surface as-is
-			// without tripping health, matching Stream's non-failover path.
-			p.health.Pass(m.ID)
+			// without changing health, matching Stream's non-failover path. A
+			// cancelled or invalid request is not evidence that the profile recovered.
 			return llm.Message{}, "", llm.Usage{}, err
 		}
 		lastErr = err

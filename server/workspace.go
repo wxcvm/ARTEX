@@ -5,7 +5,6 @@ import (
 	"io"
 	"mime/multipart"
 	"net/http"
-	"net/url"
 	"os"
 	"path/filepath"
 	"sort"
@@ -220,8 +219,7 @@ func (s *Server) wsDownload(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	name := filepath.Base(abs)
-	// RFC 5987 filename* keeps non-ASCII names intact; plain filename is the fallback.
-	w.Header().Set("Content-Disposition", "attachment; filename=\""+sanitizeFilename(name)+"\"; filename*=UTF-8''"+url.PathEscape(name))
+	w.Header().Set("Content-Disposition", downloadDisposition(name))
 	http.ServeFile(w, r, abs)
 }
 
@@ -278,13 +276,4 @@ func saveUpload(hdr *multipart.FileHeader, dest string) error {
 	defer out.Close()
 	_, err = io.Copy(out, src)
 	return err
-}
-
-// sanitizeFilename strips characters unsafe for a Content-Disposition filename token.
-func sanitizeFilename(name string) string {
-	name = strings.ReplaceAll(name, "\"", "")
-	name = strings.ReplaceAll(name, "\\", "")
-	name = strings.ReplaceAll(name, "\n", "")
-	name = strings.ReplaceAll(name, "\r", "")
-	return name
 }

@@ -46,9 +46,12 @@ type Registry struct {
 	m  map[int64]*State
 
 	// persist / forget mirror state to the DB so a cooling-off window survives a
-	// restart. Both may be nil (no DB); both are called off the hot path.
-	persist func(id int64, st State)
-	forget  func(id int64)
+	// restart. Both may be nil (no DB). A single background writer calls them
+	// serially, without mu held; callbacks must finish their I/O before returning.
+	persist   func(id int64, st State)
+	forget    func(id int64)
+	pending   map[int64]struct{} // latest state only, bounded by changed profiles
+	flushDone chan struct{}      // non-nil while the background writer is running
 
 	// softTrip / cooldown are the operator-set overrides (0 = use the built-in
 	// default / ladder). They live here rather than being read per failure because
@@ -88,7 +91,8 @@ func (r *Registry) coolFor(trips int) time.Duration {
 	return backoff[len(backoff)-1]
 }
 
-// NewRegistry builds an empty registry. persist/forget may be nil.
+// NewRegistry builds an empty registry. persist/forget may be nil. Callbacks run
+// asynchronously and serially; use FlushPersistence to wait for pending writes.
 func NewRegistry(persist func(id int64, st State), forget func(id int64)) *Registry {
 	return &Registry{m: map[int64]*State{}, persist: persist, forget: forget}
 }
@@ -124,11 +128,8 @@ func (r *Registry) Pass(id int64) {
 		return // already clean — nothing to write
 	}
 	delete(r.m, id)
-	forget := r.forget
+	r.queuePersistenceLocked(id)
 	r.mu.Unlock()
-	if forget != nil {
-		forget(id)
-	}
 }
 
 // Trip records a failed call. hard=true marks a deterministic failure (no credit,
@@ -152,12 +153,8 @@ func (r *Registry) Trip(id int64, errMsg string, hard bool) (tripped bool) {
 		st.Fails = 0 // counted into this trip; start fresh for the half-open probe
 		tripped = true
 	}
-	snap := *st
-	persist := r.persist
+	r.queuePersistenceLocked(id)
 	r.mu.Unlock()
-	if persist != nil {
-		persist(id, snap)
-	}
 	return tripped
 }
 
@@ -165,11 +162,8 @@ func (r *Registry) Trip(id int64, errMsg string, hard bool) (tripped bool) {
 func (r *Registry) Reset(id int64) {
 	r.mu.Lock()
 	delete(r.m, id)
-	forget := r.forget
+	r.queuePersistenceLocked(id)
 	r.mu.Unlock()
-	if forget != nil {
-		forget(id)
-	}
 }
 
 // Snapshot returns a copy of all tracked state, for the status API.

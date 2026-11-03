@@ -2241,7 +2241,7 @@ func (s *Server) findingsExport(w http.ResponseWriter, r *http.Request) {
 	stamp := now.Format("20060102-150405")
 	setDownload := func(contentType, filename string) {
 		w.Header().Set("Content-Type", contentType)
-		w.Header().Set("Content-Disposition", fmt.Sprintf(`attachment; filename="%s"`, filename))
+		w.Header().Set("Content-Disposition", downloadDisposition(filename))
 	}
 
 	switch format {
