@@ -117,16 +117,12 @@ func (s *Server) applyTaskControlWithCause(t *Task, action string, pauseCause er
 		if lifecycle.Paused {
 			return out, fmt.Errorf("task is already paused")
 		}
-		wasQueued := lifecycle.Queued
-		wasEnginePaused := s.engine.IsPaused(t.ID)
 		if pauseCause == nil {
 			pauseCause = agent.AbortPausedByUser
 		}
-		s.engine.Pause(t.ID, pauseCause)
-		if err := s.m.ApplyTaskPause(t.ID); err != nil {
-			if !wasEnginePaused && !wasQueued {
-				s.engine.Resume(t)
-			}
+		if err := s.engine.pauseTaskWithCommit(t, pauseCause, func() error {
+			return s.m.ApplyTaskPause(t.ID)
+		}); err != nil {
 			return out, err
 		}
 		// Main Agent is independently cancellable. Only cancel its current turn

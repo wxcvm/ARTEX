@@ -13,7 +13,8 @@ import (
 )
 
 // Task-level timeout coordinator (see docs/task-timeout-and-settle-design.md §4/§8.5).
-// Absolute wall clock: one timer goroutine per task with a timeout; when it fires it drives
+// One timer goroutine per task with a timeout; user pauses suspend admission and
+// resume credits the persisted pause interval onto DeadlineAt. When due it drives
 // the ordered settle sequence:
 //   ① settling → ② workers stop claiming new intents / ③ planner drops normal notifies
 //   ④ wait for running workers to drain (bounded by grace) → ⑤ one final planner round → ⑥ set the terminal state (guarded)
@@ -30,12 +31,6 @@ func (e *Engine) isSettling(taskID string) bool {
 	v, _ := e.settling.Load(taskID)
 	b, _ := v.(bool)
 	return b
-}
-
-// markSettling flips settling on; returns true only for the first caller.
-func (e *Engine) markSettling(taskID string) bool {
-	_, loaded := e.settling.LoadOrStore(taskID, true)
-	return !loaded
 }
 
 // ---------- in-flight count (worker.Execute + planner.Plan), used for drain ----------
@@ -65,19 +60,11 @@ func (e *Engine) inflightCount(taskID string) int64 {
 
 // ---------- deadline ----------
 
-// taskDeadline returns the task's absolute deadline (unix). Prefers the in-process
-// map (stamped this session); falls back to the DB-loaded value (restart), seeding
-// the map. 0 = no timeout / not yet stamped.
+// taskDeadline reads the committed lifecycle mirror, never a second clock cache.
+// Resume and timeout revival can change it after the first run in this process.
+// 0 = no timeout / not yet stamped.
 func (e *Engine) taskDeadline(t *Task) int64 {
-	if v, ok := e.deadline.Load(t.ID); ok {
-		return v.(int64)
-	}
-	deadlineAt := t.lifecycleSnapshot().DeadlineAt
-	if deadlineAt > 0 {
-		e.deadline.Store(t.ID, deadlineAt)
-		return deadlineAt
-	}
-	return 0
+	return t.lifecycleSnapshot().DeadlineAt
 }
 
 // resetTimeoutRevival clears only the per-run timeout state after PostgreSQL has
@@ -87,7 +74,6 @@ func (e *Engine) taskDeadline(t *Task) int64 {
 // produced the timeout has already completed (or is in its final return path).
 func (e *Engine) resetTimeoutRevival(taskID string) {
 	e.settling.Delete(taskID)
-	e.deadline.Delete(taskID)
 	e.stamped.Delete(taskID)
 	e.coordStarted.Delete(taskID)
 }
@@ -108,7 +94,6 @@ func (e *Engine) stampFirstRun(t *Task) {
 		return
 	}
 	if dl > 0 {
-		e.deadline.Store(t.ID, dl)
 		log.Printf("[deadline] task %s first run, deadline at %s", t.ID, time.Unix(dl, 0).Format("2006-01-02 15:04:05"))
 	}
 }
@@ -147,43 +132,73 @@ func (e *Engine) startDeadlineCoordinator(ctx context.Context, t *Task) {
 	runTaskRoutine(rt, func(loopCtx context.Context) { e.deadlineCoordinator(loopCtx, t) })
 }
 
-// deadlineCoordinator waits until the task's absolute deadline, then runs the settle
-// sequence. Absolute wall clock: it keeps counting through pauses.
+// deadlineAction is decided while holding the same task transition lock as a
+// user pause and deadline updates. A deferred admission is NOT a terminal exit.
+type deadlineAction uint8
+
+const (
+	deadlineWait deadlineAction = iota
+	deadlineStop
+	deadlineSettle
+)
+
+func (e *Engine) nextDeadlineAction(t *Task, now time.Time) (deadlineAction, time.Duration) {
+	t.transitionMu.Lock()
+	defer t.transitionMu.Unlock()
+	e.deleteMu.RLock()
+	defer e.deleteMu.RUnlock()
+	state := t.lifecycleSnapshot()
+	if e.IsDeleting(t.ID) || isTerminalStatus(state.Status) || e.isSettling(t.ID) {
+		return deadlineStop, 0
+	}
+	// Queue-held time keeps its existing semantics. A persisted user pause or a
+	// non-queue execution barrier (including admission in progress) defers settle.
+	if state.Paused || (e.IsPaused(t.ID) && !state.Queued) || state.DeadlineAt <= 0 {
+		return deadlineWait, deadlinePollInterval
+	}
+	if remaining := time.Unix(state.DeadlineAt, 0).Sub(now); remaining > 0 {
+		return deadlineWait, min(remaining, deadlineMaxSleep)
+	}
+	// The transition lock makes check-and-claim atomic with pause commit/rollback.
+	e.settling.Store(t.ID, true)
+	return deadlineSettle, 0
+}
+
+// deadlineCoordinator uses production time/sleep; the callback seam lets the
+// coordinator's actual wait/resume behavior be tested with a virtual clock and
+// no model, database, or externally executed work.
 func (e *Engine) deadlineCoordinator(ctx context.Context, t *Task) {
+	e.coordinateDeadline(ctx, t, e.settleTask)
+}
+
+func (e *Engine) coordinateDeadline(ctx context.Context, t *Task, settle func(context.Context, *Task)) {
 	for {
 		select {
 		case <-ctx.Done():
 			return
 		default:
 		}
-		if isTerminalStatus(e.m.TaskStatus(t.ID)) {
-			return // already finished (goals met / failed) — nothing to time out
-		}
-		dl := e.taskDeadline(t)
-		if dl <= 0 {
-			if sleepCtx(ctx, deadlinePollInterval) { // not yet stamped (task hasn't really run)
-				return
-			}
-			continue
-		}
-		if remaining := time.Until(time.Unix(dl, 0)); remaining > 0 {
-			nap := remaining
-			if nap > deadlineMaxSleep {
-				nap = deadlineMaxSleep
-			}
+		action, nap := e.nextDeadlineAction(t, time.Now())
+		switch action {
+		case deadlineStop:
+			return
+		case deadlineWait:
 			if sleepCtx(ctx, nap) {
 				return
 			}
-			continue
+		case deadlineSettle:
+			if ctx.Err() == nil {
+				settle(ctx, t)
+			}
+			return
 		}
-		e.settleTask(ctx, t)
-		return
 	}
 }
 
-// settleTask runs the ordered settle sequence once (§4 steps ①–⑥).
+// settleTask runs the ordered settle sequence after nextDeadlineAction has
+// exclusively claimed it. Do not call without that admission.
 func (e *Engine) settleTask(ctx context.Context, t *Task) {
-	if !e.markSettling(t.ID) {
+	if ctx.Err() != nil || e.IsDeleting(t.ID) {
 		return
 	}
 	log.Printf("[deadline] task %s reached the timeout limit, entering the settle sequence", t.ID)
@@ -206,6 +221,9 @@ func (e *Engine) settleTask(ctx context.Context, t *Task) {
 
 	// ⑤ one final planner round (task-timeout words, final goal judgment, no new intents).
 	met := e.runFinalPlannerRound(ctx, t)
+	if ctx.Err() != nil {
+		return // shutdown is not a completed final assessment
+	}
 	if !e.beginTaskOperation(t.ID) {
 		return
 	}

@@ -70,6 +70,9 @@ type Task struct {
 	Guard                *guard.Guard           `json:"-"`
 	notify               chan struct{}
 	lifecycleMu          sync.RWMutex
+	// transitionMu serializes pause commit/rollback, clock updates, and timeout
+	// admission for this task. Never acquire it while holding taskStateMu or mu.
+	transitionMu         sync.Mutex
 	llmMu                sync.RWMutex
 
 	// pendingTriggers accumulates the concrete changes (worker done / finding) that
@@ -1173,6 +1176,8 @@ func (m *Manager) SetTaskPaused(id string, paused bool) error {
 // admission keeps its FIFO timestamp; a task that was explicitly paused and is
 // now re-queued receives a fresh tail position.
 func (m *Manager) ApplyTaskAdmission(id, expectedStatus, status string, queued bool, mode string, preservePosition bool) error {
+	unlock := m.lockTaskTransition(id)
+	defer unlock()
 	m.taskStateMu.Lock()
 	defer m.taskStateMu.Unlock()
 	n, err := strconv.ParseInt(id, 10, 64)
@@ -1375,6 +1380,8 @@ func (m *Manager) TaskStatus(id string) string {
 // StampTaskFirstRun stamps first_run_at + deadline_at on the first real run (idempotent
 // in DB) and mirrors deadline_at on the live handle. Returns the deadline unix (0 = no limit).
 func (m *Manager) StampTaskFirstRun(id string) (int64, error) {
+	unlock := m.lockTaskTransition(id)
+	defer unlock()
 	m.taskStateMu.Lock()
 	defer m.taskStateMu.Unlock()
 	n, err := strconv.ParseInt(id, 10, 64)
