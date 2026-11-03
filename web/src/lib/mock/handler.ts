@@ -34,6 +34,7 @@ import type {
   TrafficEvidenceSnapshot,
 } from "../types";
 import * as D from "./data";
+import { mockTaskOutcome, taskOutcomeScenario } from "./task-outcome-scenarios";
 
 const delay = (ms = 120) => new Promise((r) => setTimeout(r, ms));
 
@@ -1011,6 +1012,25 @@ export async function mockHandle<T>(method: string, rawPath: string, body?: Body
 
 function route(m: string, path: string, seg: string[], q: URLSearchParams, b: Record<string, unknown>): unknown {
   const task = q.get("task") ?? undefined;
+  const scenario = taskOutcomeScenario(seg[0] === "tasks" ? seg[1] : task ?? "");
+  if (m === "GET" && scenario) {
+    if (seg[0] === "tasks" && seg.length === 2) return scenario.task;
+    if (seg[0] === "tasks" && seg[2] === "outcome" && seg.length === 3) {
+      if (scenario.outcomeError) throw new Error(scenario.outcomeError);
+      return scenario.outcome;
+    }
+    if (path === "/stats") return D.stats(task, { tasks: [scenario.task], findings: scenario.findings, activeTask: scenario.task.id });
+    if (path === "/exploration/findings") {
+      return q.has("page")
+        ? { items: scenario.findings, total: scenario.findings.length, page: 1, page_size: scenario.findings.length }
+        : scenario.findings;
+    }
+  }
+  if (m === "GET" && seg[0] === "tasks" && seg[2] === "outcome" && seg.length === 3) {
+    const owner = mockTasks.find((item) => item.id === seg[1]);
+    if (!owner) throw new Error("task not found");
+    return mockTaskOutcome(owner, mockFindings.filter((item) => item.task_id === owner.id));
+  }
 
   if (path === "/chat/mentions" && m === "GET") {
     const kind = q.get("kind") ?? "";

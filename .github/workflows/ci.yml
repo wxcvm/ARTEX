@@ -46,6 +46,39 @@ jobs:
         run: go test -p 1 ./...
       - name: LLM health concurrency regression
         run: go test -race -count=10 ./llmpool
+      - name: PostgreSQL pause and revival integration
+        run: go test -race -count=20 ./server -run 'TestPauseShiftsTaskDeadlineOnResume|TestPauseCommitFailureCompensatesWithPostgres|TestTimedOutTaskRevivalResetsClockAndSettlingAcrossFIFO'
+
+  engineering:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-go@v5
+        with:
+          go-version-file: go.mod
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+      - run: python -m unittest discover -s scripts/benchmark -p test_engineering.py
+      - run: python scripts/benchmark/run_engineering.py --repeat 20 --race
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: deterministic-engineering
+          path: benchmark-results/engineering/
+
+  windows:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-go@v5
+        with:
+          go-version-file: go.mod
+      - run: go build ./...
+      - run: go test ./server -run 'TestTaskTransition|TestWebAPIEngineering|TestDownload' -count=20
 
   web:
     runs-on: ubuntu-latest

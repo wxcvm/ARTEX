@@ -1,5 +1,42 @@
 # ARTEX L3 benchmark
 
+## Separate deterministic engineering regression
+
+`run_engineering.py` is a separate **engineering**, not discovery, baseline. It uses
+loopback `httptest` servers, scripted model responses through the existing model
+pool, the existing MCP HTTP client and asset-pagination helper, task-control
+identity normalization, and the frontend outcome presentation tests. It does not
+run a planner against a target. No model key, database or cloud account is required.
+
+```bash
+python3 -m unittest discover -s scripts/benchmark -p test_engineering.py
+python3 scripts/benchmark/run_engineering.py --repeat 20 --race
+```
+
+Run these commands from the repository root. `--go`, `--node`, `--output` support
+portable toolchains and writable artifact directories. Python 3.10+, the Go version
+in `go.mod`, Node 22.18+ and a race-capable C toolchain are needed. No npm install
+is needed for the pure frontend outcome tests.
+
+Fixed cases: normal response, pagination, 401, 429, in-flight HTTP timeout,
+malformed JSON, large UTF-8 output, cancellation, duplicate batch-control IDs,
+and incomplete results. Duplicate-ID coverage is not a claim about finding
+deduplication. The request-timeout fixture uses the real HTTP client's one-second
+deadline; lifecycle races use virtual time and channels, not wall-clock sleeps.
+
+Each run creates immutable-named `report.md`, `results.json`, Go JSON events,
+Node TAP logs and SHA256-verified request/response evidence. Reports include HEAD,
+dirty worktree hash (including untracked source and missing tracked paths), case
+version, pass/fail/skip, duration and simulated call counts. Missing cases,
+skips, hash mismatch and command failure cannot pass. `execution_status` describes
+the harness, whereas `assessment_status` is explicitly a synthetic fixture result
+(`completed_no_findings`, `incomplete`, `environment_error`, or `not_applicable`).
+Real model calls are always zero and discovery score is null. Do not combine these
+reports with `run_bench.py` results below.
+
+PostgreSQL lifecycle integration, full frontend typecheck/build and real browser
+UI acceptance remain separate gates; this runner does not certify them.
+
 Measures whether the product can find and prove real vulnerabilities in a real
 application, unprompted, against an executable oracle. That is the "operation"
 level most model benchmarks do not reach: recognition benchmarks hand the model

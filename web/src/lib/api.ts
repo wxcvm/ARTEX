@@ -7,6 +7,7 @@ import type { ChatMention } from "@/lib/chat-mentions";
 import { downloadFilename } from "@/lib/download-filename";
 import { MOCK } from "@/lib/mock/enabled";
 import { mockHandle } from "@/lib/mock/handler";
+import { taskOutcomeScenarioReport } from "@/lib/mock/task-outcome-scenarios";
 import type {
   ActiveFindingRetest,
   Activity,
@@ -83,6 +84,7 @@ import type {
   SSTask,
   Stats,
   Task,
+  TaskOutcome,
   TaskArchive,
   TaskArchivePage,
   TaskAssetMutation,
@@ -249,6 +251,7 @@ export const api = {
   tasks: () =>
     get<{ tasks: Task[]; active: string }>("/tasks").then((r) => ({ tasks: arr(r.tasks), active: r.active ?? "" })),
   task: (id: string) => get<Task>(`/tasks/${encodeURIComponent(id)}`),
+  taskOutcome: (id: string) => get<TaskOutcome>(`/tasks/${encodeURIComponent(id)}/outcome`),
   createTask: (input: {
     name?: string;
     categoryId?: number;
@@ -873,7 +876,7 @@ export const api = {
   },
   notifyRetryDelivery: (id: number) => post<{ ok: boolean }>(`/notify/deliveries/${id}/retry`),
   report: async (task?: string) => {
-    if (MOCK) return mockReport(task);
+    if (MOCK) return taskOutcomeScenarioReport(task ?? "") ?? mockReport(task);
     const token = getToken();
     const r = await fetch(`/api/report${tq(task)}`, {
       headers: token ? { Authorization: `Bearer ${token}` } : {},
