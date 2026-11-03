@@ -11,6 +11,10 @@ AI autonomous penetration testing system (Go backend + Next.js frontend)
 
 ---
 
+## Engineering roadmap
+
+See the [autonomy engineering roadmap (Chinese)](AUTONOMY_ROADMAP.md) for the verified branch baseline, current capabilities, phased reliability work, and acceptance criteria. Planned capabilities are not represented as completed features.
+
 ## Screenshots
 
 

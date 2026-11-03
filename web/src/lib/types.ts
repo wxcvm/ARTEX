@@ -41,6 +41,30 @@ export interface Task {
   coverage_enabled?: boolean; // asset coverage feature switch (fixed at creation, on by default); false = do not compute/show coverage
 }
 
+// Existing GET /api/tasks/{id}/outcome response; a zero count is not a lifecycle status.
+export interface TaskOutcome {
+  task_id: number;
+  status: string;
+  category_id: number;
+  company_id: number;
+  findings: {
+    total: number;
+    confirmed: number;
+    open: number;
+    false_positive: number;
+    duplicate: number;
+    critical: number;
+    high: number;
+    medium: number;
+    low: number;
+  };
+  retests: { reproduced: number; fixed: number; inconclusive: number };
+  tokens: { input_tokens: number; output_tokens: number; cache_read_tokens: number; cache_write_tokens: number };
+  tool_calls: number;
+  skill_misses: number;
+  wall_seconds: number;
+}
+
 export interface TaskCategory {
   id: number;
   name: string;

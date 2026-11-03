@@ -142,7 +142,6 @@ type Engine struct {
 
 	// Task-level timeout (see docs/task-timeout-and-settle-design.md):
 	settling     sync.Map // taskID -> bool, the task has entered the settlement sequence (stop dispatching/claiming intents)
-	deadline     sync.Map // taskID -> int64 unix, absolute deadline (stamped on first run; 0/missing = no limit)
 	stamped      sync.Map // taskID -> bool, whether first_run_at has been stamped (once per process)
 	inflight     sync.Map // taskID -> *int64, count of in-flight planner.Plan + worker.Execute (for drain)
 	coordStarted sync.Map // taskID -> bool, whether the deadline coordinator has started (deduplicated across Run/reload)
@@ -285,7 +284,6 @@ func (e *Engine) StopTask(taskID string) {
 	e.dropCnt.Delete(taskID)
 	e.plannerRound.Delete(taskID)
 	e.settling.Delete(taskID)
-	e.deadline.Delete(taskID)
 	e.stamped.Delete(taskID)
 	e.inflight.Delete(taskID)
 	e.coordStarted.Delete(taskID)
@@ -314,6 +312,8 @@ func (e *Engine) Resume(t *Task) {
 	if t == nil {
 		return
 	}
+	t.transitionMu.Lock()
+	defer t.transitionMu.Unlock()
 	e.deleteMu.RLock()
 	defer e.deleteMu.RUnlock()
 	if e.IsDeleting(t.ID) {

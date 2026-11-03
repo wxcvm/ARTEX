@@ -17,8 +17,9 @@ import (
 //   - Circuit-breaker state is process-wide (s.llmHealth); rebuilding the pool does not clear it.
 
 // newLLMHealthRegistry builds the process-wide circuit-breaker registry, mirroring
-// state into PG so a cooling-off window survives a restart. Writes are async and
-// best-effort — the in-memory copy is authoritative.
+// state into PG so a cooling-off window survives a restart. Registry serializes
+// and coalesces writes asynchronously; callbacks must not spawn more goroutines.
+// Persistence is best-effort — the in-memory copy is authoritative.
 func newLLMHealthRegistry(pg *db.DB) *llmpool.Registry {
 	if pg == nil {
 		return llmpool.NewRegistry(nil, nil)
@@ -29,14 +30,14 @@ func newLLMHealthRegistry(pg *db.DB) *llmpool.Registry {
 			t := st.OpenUntil
 			h.OpenUntil = &t
 		}
-		go func() {
-			if err := pg.SaveLLMHealth(h); err != nil {
-				log.Printf("[llmpool] failed to persist circuit-breaker state: %v", err)
-			}
-		}()
+		if err := pg.SaveLLMHealth(h); err != nil {
+			log.Printf("[llmpool] failed to persist circuit-breaker state: %v", err)
+		}
 	}
 	forget := func(id int64) {
-		go func() { _ = pg.ClearLLMHealth(id) }()
+		if err := pg.ClearLLMHealth(id); err != nil {
+			log.Printf("[llmpool] failed to clear circuit-breaker state: %v", err)
+		}
 	}
 	reg := llmpool.NewRegistry(persist, forget)
 	// Restore only windows that haven't expired (LoadLLMHealth filters), so a

@@ -4,8 +4,10 @@
 // are passed through and formatted at the call site.
 
 import type { ChatMention } from "@/lib/chat-mentions";
+import { downloadFilename } from "@/lib/download-filename";
 import { MOCK } from "@/lib/mock/enabled";
 import { mockHandle } from "@/lib/mock/handler";
+import { taskOutcomeScenarioReport } from "@/lib/mock/task-outcome-scenarios";
 import type {
   ActiveFindingRetest,
   Activity,
@@ -82,6 +84,7 @@ import type {
   SSTask,
   Stats,
   Task,
+  TaskOutcome,
   TaskArchive,
   TaskArchivePage,
   TaskAssetMutation,
@@ -248,6 +251,7 @@ export const api = {
   tasks: () =>
     get<{ tasks: Task[]; active: string }>("/tasks").then((r) => ({ tasks: arr(r.tasks), active: r.active ?? "" })),
   task: (id: string) => get<Task>(`/tasks/${encodeURIComponent(id)}`),
+  taskOutcome: (id: string) => get<TaskOutcome>(`/tasks/${encodeURIComponent(id)}/outcome`),
   createTask: (input: {
     name?: string;
     categoryId?: number;
@@ -460,6 +464,7 @@ export const api = {
   },
   workspaceDownload: async (path: string) => {
     let blob: Blob;
+    let contentDisposition = "";
     if (MOCK) {
       blob = new Blob([`(demo) Sample download content of ${path}.`], { type: "text/plain" });
     } else {
@@ -468,12 +473,13 @@ export const api = {
         headers: { ...(token ? { Authorization: `Bearer ${token}` } : {}) },
       });
       if (!r.ok) throw new Error(`Download failed: ${r.status}`);
+      contentDisposition = r.headers.get("Content-Disposition") ?? "";
       blob = await r.blob();
     }
     const objUrl = URL.createObjectURL(blob);
     const a = document.createElement("a");
     a.href = objUrl;
-    a.download = path.split("/").pop() || "download";
+    a.download = downloadFilename(contentDisposition, path.split("/").pop() || "download");
     document.body.appendChild(a);
     a.click();
     a.remove();
@@ -585,8 +591,7 @@ export const api = {
     const blob = await r.blob();
     // Prefer the backend's Content-Disposition for the filename; fall back to a default name.
     const disp = r.headers.get("Content-Disposition") ?? "";
-    const m = disp.match(/filename="?([^"]+)"?/);
-    const filename = m?.[1] ?? `findings-export`;
+    const filename = downloadFilename(disp, `findings-export`);
     const url = URL.createObjectURL(blob);
     const a = document.createElement("a");
     a.href = url;
@@ -871,7 +876,7 @@ export const api = {
   },
   notifyRetryDelivery: (id: number) => post<{ ok: boolean }>(`/notify/deliveries/${id}/retry`),
   report: async (task?: string) => {
-    if (MOCK) return mockReport(task);
+    if (MOCK) return taskOutcomeScenarioReport(task ?? "") ?? mockReport(task);
     const token = getToken();
     const r = await fetch(`/api/report${tq(task)}`, {
       headers: token ? { Authorization: `Bearer ${token}` } : {},

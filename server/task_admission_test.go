@@ -248,7 +248,6 @@ func TestTimedOutTaskRevivalResetsClockAndSettlingAcrossFIFO(t *testing.T) {
 
 	s := newAdmissionTestServer(m, nil)
 	s.engine.settling.Store(task.ID, true)
-	s.engine.deadline.Store(task.ID, oldClock.DeadlineAt)
 	s.engine.stamped.Store(task.ID, true)
 	s.engine.coordStarted.Store(task.ID, true)
 
@@ -264,7 +263,7 @@ func TestTimedOutTaskRevivalResetsClockAndSettlingAcrossFIFO(t *testing.T) {
 	if s.engine.isSettling(task.ID) {
 		t.Fatal("timed-out task retained the old settling gate while queued")
 	}
-	if _, ok := s.engine.deadline.Load(task.ID); ok {
+	if s.engine.taskDeadline(task) != 0 {
 		t.Fatal("timed-out task retained the old in-memory deadline")
 	}
 	if _, ok := s.engine.stamped.Load(task.ID); ok {

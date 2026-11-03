@@ -10,6 +10,7 @@ import { toast } from "sonner";
 
 import { StatusBadge } from "@/components/status-badge";
 import { TaskLLMProfileChain } from "@/components/task-llm-profile-chain";
+import { TaskOutcomeCard } from "@/components/task-outcome-card";
 import { Alert, AlertDescription, AlertTitle } from "@/components/ui/alert";
 import {
   AlertDialog,
@@ -419,6 +420,7 @@ function TaskDetailInner() {
 
       {/* Tab content */}
       <div className="flex-1 p-4 lg:p-6">
+        {task.id === id && <TaskOutcomeCard key={id} task={task} />}
         <TabsContent value="sessions" className="mt-0">
           <SessionsTab taskId={id} taskPaused={task?.status === "paused"} />
         </TabsContent>
@@ -450,7 +452,7 @@ function TaskDetailInner() {
           <InterceptTab taskId={id} />
         </TabsContent>
         <TabsContent value="report" className="mt-0">
-          <ReportTab taskId={id} />
+          <ReportTab key={id} taskId={id} />
         </TabsContent>
       </div>
     </Tabs>
