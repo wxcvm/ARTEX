@@ -2,7 +2,7 @@ name: ci
 
 on:
   push:
-    branches: [main]
+    branches: [main, "codex/knowledge-*"]
   pull_request:
 
 jobs:
@@ -63,6 +63,10 @@ jobs:
         with:
           python-version: "3.12"
       - run: python -m unittest discover -s scripts/benchmark -p test_engineering.py
+      - name: Read-only knowledge exporter
+        run: python -m unittest discover -s scripts/knowledge -p "test_*.py"
+      - name: Knowledge catalog and authenticated API regression
+        run: go test -race -count=20 ./knowledge ./server -run "Test(ReadAndSearch|ReadRejectsInconsistentCatalog|ReadMissingAndNone|Knowledge)"
       - run: python scripts/benchmark/run_engineering.py --repeat 20 --race
       - uses: actions/upload-artifact@v4
         if: always()
@@ -78,7 +82,7 @@ jobs:
         with:
           go-version-file: go.mod
       - run: go build ./...
-      - run: go test ./server -run 'TestTaskTransition|TestWebAPIEngineering|TestDownload' -count=20
+      - run: go test ./server -run 'TestTaskTransition|TestWebAPIEngineering|TestDownload|TestKnowledge' -count=20
 
   web:
     runs-on: ubuntu-latest

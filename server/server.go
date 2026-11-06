@@ -661,6 +661,9 @@ func (s *Server) Handler() http.Handler {
 	mux.HandleFunc("POST /api/auth/change-password", s.authChangePassword)
 
 	mux.HandleFunc("GET /api/health", s.health)
+	mux.HandleFunc("GET /api/knowledge/status", s.knowledgeStatus)
+	mux.HandleFunc("GET /api/knowledge", s.knowledgeList)
+	mux.HandleFunc("GET /api/knowledge/entries/{id}", s.knowledgeEntry)
 	mux.HandleFunc("GET /api/stats", s.stats)
 	mux.HandleFunc("GET /api/logs", s.getLogs)
 	mux.HandleFunc("GET /api/logs/history", s.getLogsHistory)
