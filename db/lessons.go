@@ -203,7 +203,11 @@ func (d *DB) TaskLessons(ctx context.Context, taskID int64, limit int) ([]Lesson
 		WHERE l.status <> 'retired'
 		  AND (l.company_id IS NULL OR l.company_id=$1)
 		  AND (l.category_id IS NULL OR l.category_id=$2)
-		ORDER BY (l.company_id=$1) DESC, (l.category_id=$2) DESC,
+		-- The WHERE clause already ensures any non-NULL scope matches.
+		-- Comparing a NULL scope with $1/$2 produces NULL, and PostgreSQL
+		-- sorts NULLS FIRST for DESC: generic lessons used to outrank matches.
+		ORDER BY (l.company_id IS NOT NULL) DESC,
+		         (l.category_id IS NOT NULL) DESC,
 		         CASE l.kind WHEN 'positive' THEN 0 WHEN 'negative' THEN 1 ELSE 2 END,
 		         support DESC, l.id DESC
 		LIMIT $3`, companyID, categoryID, limit)
