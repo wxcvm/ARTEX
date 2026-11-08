@@ -67,7 +67,7 @@ SELECT skill, COUNT(*) AS calls,
 FROM skill_usage
 WHERE found
 GROUP BY skill
-ORDER BY COUNT(*) DESC, skill`, installed)
+ORDER BY COUNT(*) DESC, skill`)
 	if err != nil {
 		return nil, err
 	}
