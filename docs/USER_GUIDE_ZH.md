@@ -1,0 +1,533 @@
+# ARTEX 中文使用手册（安装、操作与排障）
+
+> 适用仓库：[wxcvm/ARTEX](https://github.com/wxcvm/ARTEX) 的 `main` 分支，依据 2026-11-09 的实际代码编写。界面目前主要使用英文，本手册保留按钮原名以便对照。版本升级后若菜单有变化，请优先参考当前界面与仓库源码。
+>
+> **重要：使用的是你的 fork 还是历史上游镜像？** 仓库默认的 `docker-compose.yml` 使用 `autumn27/artex:latest`，**并不自动包含本 fork 新合并的功能**。想使用本文提到的 Skills 缺口、Lesson 经验评估、SARIF 等最新功能，请采用**从本仓库源码构建**的方式，或配置并运行你自行构建的 fork 镜像。不要以为执行 `git pull` 后再运行默认 Docker 镜像就完成了升级。
+
+## 目录
+
+1. [快速选择安装方式](#1-快速选择安装方式)
+2. [Windows 11 从源码安装（推荐使用 fork 最新代码）](#2-windows-11-从源码安装推荐使用-fork-最新代码)
+3. [Linux / macOS 安装](#3-linux--macos-安装)
+4. [首次登录和界面导航](#4-首次登录和界面导航)
+5. [配置 AI 模型（云端、Ollama、本地兼容接口）](#5-配置-ai-模型云端ollama本地兼容接口)
+6. [第一个任务：从创建到查看结果](#6-第一个任务从创建到查看结果)
+7. [资产、流量、证据和漏洞复测](#7-资产流量证据和漏洞复测)
+8. [报告导出](#8-报告导出)
+9. [Agent、Skills、MCP 和工具管理](#9-agentskillsmcp-和工具管理)
+10. [历史经验（Lesson）与效果评估](#10-历史经验lesson与效果评估)
+11. [设置、数据、更新和备份](#11-设置数据更新和备份)
+12. [常见问题与检查清单](#12-常见问题与检查清单)
+13. [其他参考文档](#13-其他参考文档)
+
+本手册中的示例目标请替换为**你拥有或已获明确授权**的应用或测试环境。创建任务时应如实填写目标与工作范围；文档不会擅自为 ARTEX 加上新的程序级限制。
+
+---
+
+## 1. 快速选择安装方式
+
+| 使用场景 | 推荐入口 | 是否包含本 fork 的最新提交 |
+| --- | --- | --- |
+| Windows 11，想用最新代码 | [第 2 节](#2-windows-11-从源码安装推荐使用-fork-最新代码)：PowerShell 构建 | **是**，从当前仓库编译 |
+| Linux / macOS，想用最新代码 | [第 3 节](#3-linux--macos-安装)：本地编译 | **是**，从当前仓库编译 |
+| 只想快速体验上游历史镜像 | `docker compose up -d` | **否**，默认镜像不是本 fork |
+| 已经构建或发布了 fork 镜像 | `ARTEX_IMAGE` + `ARTEX_TAG` | **取决于镜像内容** |
+| 使用预编译压缩包 | [Releases](https://github.com/wxcvm/ARTEX/releases) | 取决于发布版本的构建提交 |
+
+**依赖清单：**
+
+- PostgreSQL：项目的任务、资产、漏洞等主要数据存在 PostgreSQL 中。仓库的 Docker Compose 使用 PostgreSQL 16。
+- Go：源码 `go.mod` 当前要求 **Go 1.26.3**；使用该版本或满足要求的更新版本。
+- Node.js + npm：构建网页前端所需；项目 CI 使用 Node.js **22**。
+- Git：拉取和更新仓库。
+- Docker / Docker Compose：可选，用来启动 PostgreSQL 或运行容器部署。
+- AI 模型服务：可在首次启动后由网页配置；无模型时无法完成依赖 LLM 的任务执行。
+
+Docker 与源码构建属于不同安装路径；**不要同时让两个实例占用 8787 端口**。
+
+## 2. Windows 11 从源码安装（推荐使用 fork 最新代码）
+
+以下使用 PowerShell，适合想运行最新 `wxcvm/ARTEX` 的用户。准备 Git、Go 1.26.3+、Node.js 22、Docker Desktop（启用后端/WSL 2）。如果 PostgreSQL 已安装，也可以使用自己的数据库，无须运行第 2.2 步。
+
+### 2.1 下载源代码并检查环境
+
+打开 PowerShell：
+
+```powershell
+git clone https://github.com/wxcvm/ARTEX.git
+cd ARTEX
+git branch --show-current
+go version
+node --version
+npm --version
+docker --version
+```
+
+确认在 `main` 分支上。以后用 `git pull --ff-only` 获取最新提交。
+
+### 2.2 启动本地 PostgreSQL
+
+以下命令**仅用于创建一个独立的本地 PostgreSQL 容器**，不启动历史上游 ARTEX 镜像。请把示例密码改成自己的值：
+
+```powershell
+docker run -d --name artex-guide-pg -e POSTGRES_USER=artex -e POSTGRES_PASSWORD=请修改为自己的密码 -e POSTGRES_DB=artex -p 127.0.0.1:5433:5432 -v artex-guide-pg:/var/lib/postgresql/data postgres:16-alpine
+docker logs artex-guide-pg
+```
+
+首次下载镜像后，等待数据库初始化完成。第二次开机如果容器已存在但没启动，使用：
+
+```powershell
+docker start artex-guide-pg
+```
+
+这里用主机端口 **5433**，对应容器内的 5432，避免与已经安装的 PostgreSQL 冲突。**不要重复执行 `docker run` 创建同名容器。**
+
+### 2.3 创建本地配置
+
+在仓库根目录执行：
+
+```powershell
+Copy-Item config.example.json config.json
+notepad config.json
+```
+
+将示例文件改为下面这种**最小有效配置**，并填入第 2.2 步设置的密码：
+
+```json
+{
+  "database": {
+    "host": "127.0.0.1",
+    "port": 5433,
+    "user": "artex",
+    "password": "请替换成自己的数据库密码",
+    "dbname": "artex",
+    "sslmode": "disable"
+  },
+  "skill_dir": "skills"
+}
+```
+
+注意：仓库原始的 `config.example.json` 里 `skill_dir` 示例为 Linux 路径 `/opt/artex/skills`。**在 Windows 上应改为 `skills`、改成 Windows 有效路径，或删掉此字段让程序使用默认目录**。`config.json` 是运行配置，不要提交到公共仓库。
+
+也可以用环境变量 `ARTEX_PG_DSN` 配置数据库；它优先于 `config.json` 的数据库字段。
+
+### 2.4 编译并启动带网页的程序
+
+在仓库根目录 PowerShell 执行：
+
+```powershell
+cd web
+npm ci
+npm run build:static
+cd ..
+
+New-Item -ItemType Directory -Force server\webui | Out-Null
+if (Test-Path server\webui\dist) { Remove-Item server\webui\dist -Recurse -Force }
+Copy-Item web\out server\webui\dist -Recurse -Force
+
+$env:CGO_ENABLED = "0"
+go build -tags embedui -o artex.exe ./cmd/artex
+.\start.bat
+```
+
+看到服务启动后，用浏览器打开 **http://localhost:8787**。`start.bat` 会在异常退出时按退避间隔重启程序；正常停止可在对应控制台中操作。不要同时再运行第二份 `artex.exe`。
+
+如果只想调试前端，可参考 README 的 `./dev.sh` 开发流程；正式想看到页面，编译时需要 `-tags embedui` 和已经复制好的前端静态文件。
+
+### 2.5 Windows 预编译包（可选）
+
+在 [本 fork 的 Releases](https://github.com/wxcvm/ARTEX/releases) 查找实际已发布、适合 Windows 的版本；**若没有新版本，不代表最新源码已有对应压缩包**。解压后保留 `artex.exe`、`start.bat`、`skills/`、`config.example.json` 等文件，配置有效的 `config.json`，然后运行 `start.bat`。首次使用仍需 PostgreSQL。
+
+## 3. Linux / macOS 安装
+
+### 3.1 最省步骤：仓库安装脚本
+
+```bash
+git clone https://github.com/wxcvm/ARTEX.git
+cd ARTEX
+./install.sh
+```
+
+脚本提供两种模式：
+
+- **1 · All-Docker**：配置 PostgreSQL 密码，启动 Docker Compose。默认运行**历史上游镜像**，除非 `.env` 的 `ARTEX_IMAGE` / `ARTEX_TAG` 已指向你自行构建的 fork 镜像。
+- **2 · Run locally (go build)**：连接已有 PostgreSQL 或通过 Docker 启动数据库，生成 `config.json`，在有 npm 的情况下构建嵌入式网页和 Go 程序。**这是直接运行当前仓库源码的便捷选项。**
+
+该脚本是 Bash 脚本；Windows 原生 PowerShell 请按第 2 节操作。脚本提示安装 Docker 时会执行相关安装操作，先确认环境和权限。
+
+### 3.2 手动构建 fork 代码
+
+前提：有已连通的 PostgreSQL，以及配置好的 `config.json` 或 `ARTEX_PG_DSN`。
+
+```bash
+git clone https://github.com/wxcvm/ARTEX.git
+cd ARTEX
+cd web
+npm ci
+npm run build:static
+cd ..
+mkdir -p server/webui
+rm -rf server/webui/dist
+cp -r web/out server/webui/dist
+CGO_ENABLED=0 go build -tags embedui -o artex ./cmd/artex
+./start.sh
+```
+
+启动地址默认是 `http://localhost:8787`。自定义 HTTP 监听地址可以使用 `./start.sh -addr :9000`；流量记录代理独立使用 `-proxy` 参数，例如 `./start.sh -addr :8787 -proxy 127.0.0.1:8788`。
+
+### 3.3 Docker Compose（镜像部署）
+
+```bash
+cp .env.example .env
+# 编辑 .env，填写 POSTGRES_PASSWORD，必要时设置 ARTEX_IMAGE / ARTEX_TAG
+docker compose up -d
+docker compose ps
+docker compose logs -f artex
+```
+
+`docker-compose.yml` 包含 `postgres` 与 `artex` 两个服务。默认映射 HTTP 8787，并将代理端口 8788 映射到宿主机回环地址；数据目录 `./data` 和 `./skills` 挂载到容器。数据库本体保存在 Docker 命名卷 `pgdata`。
+
+**特别提醒：** 只设置 `ARTEX_IMAGE=wxcvm/ARTEX` 并不意味着镜像仓库一定存在，也不意味着镜像已经包含最新代码。只有确认自行构建或发布的镜像名称与标签后，才能把它们写入 `.env`。
+
+如将 AI 服务运行在宿主机，而 ARTEX 运行在 Docker 容器，容器内部的 `127.0.0.1` **不是宿主机**。请使用容器实际可访问的主机名/IP，并用模型连接测试验证。
+
+## 4. 首次登录和界面导航
+
+1. 浏览器打开 `http://localhost:8787`（或你配置的域名和端口）。
+2. 首次安装进入 `/setup` 初始化管理员密码。之后通过登录页使用该账号；**不要寻找所谓“默认管理员密码”**。
+3. 左侧菜单的英文名称与主要功能如下；可用浏览器内置翻译辅助阅读。
+
+| 菜单 | 功能 |
+| --- | --- |
+| **Dashboard** | 总览、活动和 Token 统计 |
+| **Chat** | 与系统 Agent 对话、查看交互 |
+| **Tasks** | 创建、管理、暂停/恢复任务，查看执行过程和结果 |
+| **Findings** | 集中查看、筛选、管理漏洞并导出 |
+| **Traffic** | 查看网络流量记录 |
+| **Tool Execution** | 查看工具执行记录 |
+| **LLM Recording** | 查看模型调用记录 |
+| **Assets / Asset Sync** | 资产图谱、同步 ScopeSentry 等外部资产来源 |
+| **Workspace** | 管理任务工作目录中的文件 |
+| **System → LLM** | 配置模型 Profile、连接测试、激活模型与故障转移 |
+| **System → Agent / Skill / MCP / Tools** | 管理 Agent、技能、MCP 服务和工具 |
+| **System → Interception Rules / Approval Records** | 查看拦截规则与审批记录 |
+| **System → Notifications / Logs / System Settings** | 通知、日志与系统设置 |
+
+界面截图可参考根目录 `screenshots/`，例如 [任务列表](../screenshots/tasks.png)、[模型配置](../screenshots/llm.png)、[Agent 管理](../screenshots/agents.png)、[资产](../screenshots/assets.png)。
+
+## 5. 配置 AI 模型（云端、Ollama、本地兼容接口）
+
+### 5.1 创建模型 Profile
+
+1. 打开 **System → LLM**（`/system/llm`）。
+2. 点击新增模型配置（界面使用 **New model profile**）。
+3. 填写 **Name**（便于识别的名字）、**Format**（协议类型）、**Model**（模型 ID）、**Base URL**（需要时填写）和 **API Key**（服务要求时填写）。
+4. 使用 **Test connection** 测试连通性。
+5. 点击 **Create / Save** 保存，再在新模型卡片上点击 **Set as active** 激活。**创建 Profile 不会自动激活。**
+6. 创建任务时还可以为任务选择自己的模型 Profile；Agent 也可以单独绑定模型。
+
+支持的 Profile 格式包括 `anthropic`、`openai`、`openai-responses` 和 `ollama`。不同模型支持的上下文长度、思考参数和 Token 参数不同；先用对应服务的实际接口确认模型名与协议，再在 ARTEX 中测试。
+
+### 5.2 云端模型示例
+
+- OpenAI 兼容接口：`Format = openai`、`Model = 服务实际提供的模型 ID`、`Base URL = 服务实际的 API 前缀`、`API Key = 你的密钥`。
+- Anthropic 接口：`Format = anthropic`，填写对应模型和 Key。
+- Responses API：只有服务实际实现该接口时才选 `openai-responses`。
+
+环境变量 `OPENAI_API_KEY` / `ANTHROPIC_API_KEY` 也可以用于初始化默认模型配置；网页 Profile 是另一个配置入口。不要把 Key 发在 Issues、截图或日志里。
+
+### 5.3 Ollama 和本地模型
+
+如果 Ollama 与 ARTEX **都在同一台原生系统上运行**，可以先在命令行确认模型服务已启动并已加载模型，再创建 Profile：
+
+| 字段 | 示例 |
+| --- | --- |
+| Name | `Local Ollama` |
+| Format | `ollama` |
+| Base URL | `http://127.0.0.1:11434/v1` |
+| Model | Ollama 实际列出的模型名称 |
+| API Key | 本地 Ollama 可以为空 |
+
+对于 LM Studio 或其他 OpenAI 兼容服务器，选择它真正实现的协议与 API 地址；具体模型 ID、Key 是否必需、端口以服务的设置页为准。
+
+如果提示连接失败，先分清是 **服务未启动、模型未加载、模型名错误、端口不通、协议不匹配**，还是 **容器无法访问宿主机**。在 Docker 模式下不能照抄宿主机的 `127.0.0.1` 地址。
+
+### 5.4 多模型与故障转移
+
+**LLM Pool / Failover** 支持为未固定模型的 Agent 配置故障转移。至少有两个可用且参与池的模型配置时才有实际切换效果；显式绑定模型的 Agent 或任务不一定进入池。首次使用建议先验证单个 Profile 能正常响应，再设置模型池。
+
+## 6. 第一个任务：从创建到查看结果
+
+以下流程说明**如何使用界面**，不要求安装新插件。示例目标应替换成你拥有或获授权的对象。
+
+### 6.1 创建任务
+
+1. 进入左侧 **Tasks**（`/function/tasks`）。
+2. 点击右上角 **New task**，打开右侧任务抽屉。
+3. 填写任务名称（Name）、测试目标描述（Description）和希望完成的目标（Goal）。
+4. 按需要选择任务类别（Category）、公司/资产关系（Company/Assets）、任务模板及模型 Profile。没有现成模板也可以直接填写。
+5. 展开高级选项，按任务情况决定是否使用现有的时长、并发、初始任务、资产覆盖或其他已有设置；不熟悉时保留原值。
+6. 提交创建后回到任务列表，点开对应任务观察状态和执行记录。
+
+示例文本（用于**授权测试任务描述**，不是额外的程序限制）：
+
+- **Name**：`我的测试站点 · API 评估`
+- **Description**：`检查已授权的测试 API 服务，记录能验证的输入、响应和证据；测试范围由已绑定资产和任务描述确定。`
+- **Goal**：`梳理接口和访问控制检查结果，输出可复现的发现与处理建议。`
+
+### 6.2 状态与并发
+
+任务列表显示 `Created`、`Queued`、`Running`、`Paused`、`Completed`、`Failed`、`Timed out` 等状态。**Queued** 往往意味着当前任务并发额度已满，等待空位；**Paused** 可使用相应恢复操作；**Failed** 或 **Timed out** 应打开任务详情与日志定位问题，而非直接推断目标存在漏洞。
+
+任务列表提供搜索、状态/类别筛选、排序以及批量控制；任务并发上限可通过任务页面的 **Concurrency** 相关入口配置。注意不要把“任务数并发”与“每个任务的 Worker 数量”混淆，后者在 **System Settings** 中设置。
+
+### 6.3 任务详情页逐项看
+
+点开某个任务，右侧或详情页有这些标签（实际按英文显示）：
+
+| 标签 | 应该看什么 |
+| --- | --- |
+| **Sessions** | Planner、Worker、模型交互、执行过程 |
+| **Overview** | 任务概要和进展 |
+| **Exploration graph** | 探索目标、意图、事实与发现之间的关联 |
+| **Broadcast** | 任务内部的共享信息/广播 |
+| **Findings** | 当前任务发现的问题 |
+| **Retests** | 独立复测、结论和历史记录 |
+| **Test assets** | 本任务涉及的资产 |
+| **Credentials** | 任务使用的授权凭据配置 |
+| **Asset coverage** | 资产覆盖关系及测试进度 |
+| **Interception approval** | 需要审查的操作与审批记录 |
+| **Report** | Markdown 任务报告 |
+
+任务结果摘要卡显示发现数量、已确认项、待复核项、工具调用、调用过的 Skills 以及 Lesson 注入记录。对已完成的任务，可以在卡片上点击 **Compare similar completed tasks** 查看历史经验的观察性对比（见第 10 节）。
+
+## 7. 资产、流量、证据和漏洞复测
+
+### 7.1 Assets：资产图谱与范围
+
+进入 **Assets** 查看域名、子域名、IP、服务、应用、接口等资产及关联信息。任务详情里的 **Test assets** 与 **Asset coverage** 更偏向该任务的实际关联资产和覆盖情况。
+
+如果已有 ScopeSentry：打开 **Asset Sync**，填入 ScopeSentry 的地址与 API Key，根据页面选项选择项目或任务及要同步的资产类型，再执行导入。同步完成后，到 **Assets** 和相关任务详情核对结果。
+
+### 7.2 Traffic：流量记录
+
+ARTEX 使用独立流量记录代理，默认参数为 `-proxy 127.0.0.1:8788`，与 Web/API 的 8787 端口不是同一个端口。需要代理时先确认进程在监听，再按你的客户端设置相应代理地址。使用 HTTPS 流量记录时，证书信任与浏览器配置应依照实际部署环境进行。
+
+另外仓库带有 `extension/` 浏览器扩展。可以在 Chrome/Edge 扩展管理页开启开发者模式后加载该目录，在扩展弹窗配置 ARTEX 地址及有效会话 Token，针对正在使用的标签页启停捕获。文本请求/响应会进入本地流量存储，二进制响应可能被跳过。**不要把浏览器 Token 写进文档、截图或公开仓库。**
+
+### 7.3 Findings：漏洞记录与证据
+
+进入 **Findings**，可以根据页面的过滤项定位漏洞。进入详情查看影响资产、描述、状态以及流量证据的关联；若系统尚未确认问题，不要将其当成已验证结论。
+
+文档 [漏洞与流量证据关联](vulnerability-traffic-evidence.md) 介绍流量证据的详细处理方式。
+
+### 7.4 Retests：复测和结论
+
+在任务详情的 **Retests** 标签或单条漏洞详情的复测入口启动独立复测。可填写修复版本、测试条件等附加信息，随后前往相关 Session 查看过程。常见结果为 **Still reproducible**、**Fixed**、**Cannot confirm**。复测结果与原有漏洞记录关联，不能把“无法确认”自动解释为“漏洞已经修复”。
+
+## 8. 报告导出
+
+### 8.1 按任务查看 Markdown 报告
+
+打开 **Tasks → 任务详情 → Report**。这里会尝试加载 Markdown 报告，可以使用 **Refresh report / Retry report** 更新展示，或者点击 **Copy** 复制当前报告。
+
+**没有报告文件 ≠ 没有漏洞；报告加载失败 ≠ 任务失败。** 先看 Sessions、Findings 和日志是否有相应结果。
+
+### 8.2 从 Findings 批量导出
+
+打开 **Findings → Export findings**，按页面选项选择范围：
+
+- 当前筛选结果（Filtered）；
+- 全部记录（All）；
+- 手动选中的条目（Selected）。
+
+可选格式包括 **Markdown 单文件、Markdown ZIP、CSV、JSON、SARIF 2.1.0**。确认后点击 **Export**，浏览器下载生成的文件。CSV 适合表格分析，SARIF 适合支持该格式的代码安全/结果处理系统；它们不是漏洞复测的替代品。
+
+## 9. Agent、Skills、MCP 和工具管理
+
+### 9.1 Agent
+
+在 **System → Agent** 管理 Planner、Worker 及其他 Agent 的配置，查看可编辑的提示词、模型绑定和工具等选项。修改配置后可以先创建一个独立任务确认实际行为；并不是所有已经在运行的 Session 都会立即使用新配置。
+
+### 9.2 Skills：创建、上传、编辑与调用统计
+
+在 **System → Skill**（`/system/skills`）：
+
+1. 点击 **Create skill**；填写名称、描述、可选说明内容、关联 MCP 和可见 Agent，保存后检查该 Skill。
+2. 如已有 Skill 包，点击 **Upload archive** 上传包含 `SKILL.md` 的 ZIP。
+3. 点击左侧 Skill 树，查看/编辑技能文件，检查最近调用与 Agent 可见性。
+4. 在缺失 Skills 区域查看模型实际尝试调用却不存在的名称；点击该名称可打开预填名称的创建草稿。**草稿不会自动成为已审核、已配置好的技能。**
+
+代码库 `skills/<skill-name>/SKILL.md` 是单个 Skill 的主要描述文件；本地文件系统和界面编辑能力以当前部署模式为准。历史调用记录不会因为 Skill 安装或卸载而被清空，但“当前缺失”列表会排除已正常加载的 Skill。
+
+### 9.3 MCP：外部工具接入
+
+在 **System → MCP** 点击 **Add MCP**。页面支持本地 `stdio` 和远程 `http`（Streamable HTTP），并可查看/刷新已发现的 Tools、设置服务启用状态和 Agent 可见性。旧式 SSE 服务还可按后端支持情况配置 `sse` 传输；实际协议必须与 MCP 服务端匹配。
+
+常见排查顺序：确认服务地址/命令正确 → 服务端确实启动 → 传输协议匹配 → 认证信息正确 → 在 ARTEX 中刷新工具列表。**工具已注册不代表所有 Agent 都能看见**，还要检查可见性设置。
+
+### 9.4 其他系统入口
+
+- **System → Tools**：管理工具目录。
+- **System → Interception Rules / Approval Records**：查看现有审批相关设置和记录。
+- **System → Notifications**：通知设置。
+- **System → Logs**：检查后端日志；遇到模型连接、任务或工具错误优先查看此处。
+- **System → System Settings**：Worker 数量、网络/搜索、流量捕获以及其他全局设置。
+
+## 10. 历史经验（Lesson）与效果评估
+
+本 fork 已有可追溯的经验存储，基于已有任务的 Findings 和 Retests 提取候选经验；**无需另装记忆插件**。
+
+### 10.1 三种模式
+
+环境变量 `ARTEX_RSI_LESSONS` 控制启动时的经验模式：
+
+| 模式 | 行为 |
+| --- | --- |
+| 未设置 / `off` | 默认关闭经验选择与注入 |
+| `shadow` | 选择并记录本来会显示的经验，但不注入提示词 |
+| `inject` | 选择、记录并把经验块加入 Planner / Worker 提示词 |
+
+在 Linux/macOS 本地启动前，例如：
+
+```bash
+export ARTEX_RSI_LESSONS=shadow
+./start.sh
+```
+
+在 Windows PowerShell 本地启动前：
+
+```powershell
+$env:ARTEX_RSI_LESSONS = "shadow"
+.\start.bat
+```
+
+**Docker 注意事项：** 当前 `docker-compose.yml` 没有直接转发 `ARTEX_RSI_LESSONS`。仅把这一行写进 `.env` 不会自动传入容器；若确实需要在 Docker 中使用，应由部署者把变量加入 `artex` 服务的 `environment` 并重建/重启容器。改动环境变量影响新建或重新构建 Agent 的任务，不会重写旧任务的使用记录。
+
+### 10.2 任务经验与证据
+
+项目会在任务到达结束状态后提取可溯源的候选 Lesson；原始事实可追溯到 Findings 或复测记录。可通过现有接口查看或重新提取：
+
+```text
+GET  /api/tasks/{id}/lessons
+POST /api/tasks/{id}/lessons/extract
+GET  /api/tasks/{id}/outcome
+```
+
+这些是需要登录授权的 API；`{id}` 替换成真实任务 ID。不要在公共命令或截图中粘贴会话 Token。
+
+### 10.3 效果比较：怎样使用
+
+1. 进入一个 **Completed** 的任务详情。
+2. 在上方任务结果卡中点击 **Compare similar completed tasks**。
+3. 系统按**相同公司与任务类别**查询已完成、未归档任务，并按使用记录分为：
+   - **Lessons injected**：只记录了注入模式；
+   - **Shadow only**：只记录了 shadow 模式；
+   - **Both modes**：同任务出现两种模式；
+   - **No exposure recorded**：没有 Lesson 使用记录。
+4. 阅读每组任务数、每任务有效发现、误报占已审查结果的比例、每有效发现消耗的工具调用与 Token、每任务 Skill 加载数、任务耗时。
+5. 没有可比任务时显示空结果；有效发现数为零时，每有效发现的消耗指标显示 **—**，不会伪造一个效率值。
+
+对应 API：`GET /api/tasks/{id}/lessons/evaluation`。查询是**点击按钮后才进行**，不会随着结果卡的周期刷新自动重复计算。
+
+**怎样理解结果？** 这些数字描述的是历史任务记录，不是随机对照实验；模型、任务难度、目标覆盖面、任务配置都可能不同。“没有记录”不等于真正的未使用组，“用过 Lesson”也不表示 Lesson 导致漏洞被发现。当前功能不会根据比较结果自动采用、淘汰或修改任何 Lesson。
+
+详细原理参见 [RSI Lessons 技术说明](rsi-lessons.md)。
+
+## 11. 设置、数据、更新和备份
+
+### 11.1 主要文件和数据去向
+
+| 位置 | 用途 |
+| --- | --- |
+| `config.json` | 本地数据库连接与 Skill 路径 |
+| `.env` | Docker Compose 环境变量、数据库密码、镜像参数 |
+| `data/` | 本地运行状态、文件与部分运行记录 |
+| `skills/` | 本地技能目录 |
+| PostgreSQL | 任务、资产、漏洞、经验等关系数据 |
+| Docker 卷 `pgdata` | Compose 使用的 PostgreSQL 持久化数据 |
+
+不要把密码、Token 或包含敏感测试证据的文件直接提交到公开仓库。
+
+### 11.2 更新 fork 源码版
+
+本地源码构建方式：
+
+```bash
+git pull --ff-only
+cd web && npm ci && npm run build:static && cd ..
+rm -rf server/webui/dist
+cp -r web/out server/webui/dist
+CGO_ENABLED=0 go build -tags embedui -o artex ./cmd/artex
+# 停止旧进程，再重新运行 ./start.sh
+```
+
+Windows 依次运行 `git pull --ff-only`、`npm ci`、`npm run build:static`，重新复制静态文件，并按第 2.4 节编译 `artex.exe`，停止旧进程后运行 `start.bat`。
+
+Docker 模式可使用 `./update.sh` 或手动 `docker compose pull artex` / `docker compose up -d artex`；**该过程更新的是已配置的镜像，不会自动把本地 Go 源码编进容器**。如果镜像仍是 `autumn27/artex`，升级得到的仍是历史上游镜像线。
+
+数据库 schema 会在服务启动时按项目现有机制执行幂等初始化/更新。即使如此，涉及重大更新前也应保存数据库和目录副本。
+
+### 11.3 备份和恢复
+
+Docker Compose 部署可运行：
+
+```bash
+scripts/backup.sh --with-data
+# 或只备份数据库并指定保留数量
+scripts/backup.sh --keep 7
+```
+
+`--with-data` 保存数据库转储和 `data/` 压缩包；默认备份位置为 `backups/`。数据库恢复须在确认目标数据库与备份文件匹配后执行，可参考 [README 备份章节](../README.md#backups) 里的 `gunzip | docker compose exec -T postgres psql ...` 示例。**不要误用 `docker compose down -v`：`-v` 会移除数据库卷**。
+
+## 12. 常见问题与检查清单
+
+| 现象 | 先检查什么 |
+| --- | --- |
+| 打不开 `localhost:8787` | 服务进程/容器是否运行、8787 是否被占用、浏览器访问的是正确机器 |
+| 启动报数据库错误 | `config.json` 或 `ARTEX_PG_DSN`、PostgreSQL 是否 ready、端口和账号是否正确 |
+| Windows 提示 `artex.exe` 找不到 | 是否在仓库根目录编译、运行了 `go build`、是否与 `start.bat` 在同一目录 |
+| 浏览器只有 API 或没有前端 | 是否执行 `npm run build:static`、复制 `web/out` 到 `server/webui/dist`，以及是否带 `-tags embedui` 编译 |
+| Docker 看不到最新 fork 功能 | `.env` 的 `ARTEX_IMAGE` / `ARTEX_TAG` 仍指向历史上游；需使用实际从 fork 构建的镜像或本地源码版 |
+| 模型显示 No Key | 非 Ollama Profile 是否填写了有效 Key；本地服务是否选择了匹配格式 |
+| 模型 Test connection 失败 | API 地址、模型 ID、协议格式、服务运行状态及 Docker 内外网络 |
+| 任务一直 Queued | 查看 Tasks 页面任务并发额度和已有 Running 任务 |
+| 任务 Failed / Timed out | 看详情 Sessions、LLM Recording、Tool Execution、System → Logs |
+| Skill 不出现在列表 | `SKILL.md` 是否可解析、目录位置正确、部署的 `skill_dir` 是否仍指向旧路径 |
+| MCP 有服务但无工具 | 服务器运行情况、传输类型、刷新 Tools、Agent 可见性 |
+| Traffic 没有记录 | 是否启动代理/扩展并设置正确端口、HTTPS 捕获配置、是否确实有请求进入 |
+| Report 没内容 | 先核对 Findings、Sessions；无报告文件与无漏洞不是一回事 |
+| 比较面板没数据 | 同公司+同类别下是否有 Completed 且未归档的任务 |
+| 设置 `ARTEX_RSI_LESSONS` 后无变化 | 是否重建 Agent、是否只写入 `.env` 而没有传到 Docker 容器 |
+
+**最小排查命令：**
+
+Windows PowerShell：
+
+```powershell
+go version
+docker ps
+docker logs artex-guide-pg
+Get-NetTCPConnection -LocalPort 8787 -ErrorAction SilentlyContinue
+```
+
+Linux/macOS 的 Compose 部署：
+
+```bash
+docker compose ps
+docker compose logs --tail=100 artex
+docker compose logs --tail=100 postgres
+```
+
+想确认服务版本，可打开页面并检查启动日志中的 `version` / 运行平台信息；源码编译在未传入 release 版本参数时可能标为 `dev`，**不能单凭 `dev` 就认定不是最新代码**。
+
+## 13. 其他参考文档
+
+- [README：架构、部署、开发说明](../README.md)
+- [RSI Lessons：经验提取、使用模式与效果评估](rsi-lessons.md)
+- [漏洞与流量证据关联](vulnerability-traffic-evidence.md)
+- [自主化工程路线图](../AUTONOMY_ROADMAP.md)
+- [项目 Releases](https://github.com/wxcvm/ARTEX/releases)
+- [项目 Issues](https://github.com/wxcvm/ARTEX/issues)
+
+文档面向实际操作，不宣称所有外部模型、MCP、插件或部署环境都已经在该 fork 上完成兼容验证。如遇行为与文档不一致，优先通过当前 `main` 代码、浏览器页面和运行日志定位原因。
