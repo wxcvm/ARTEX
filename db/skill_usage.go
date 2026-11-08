@@ -116,7 +116,7 @@ SELECT skill, COUNT(*) AS calls,
        COALESCE(STRING_AGG(DISTINCT agent_key, ','), '') AS agents,
        MAX(ts) AS last_used
 FROM skill_usage
-WHERE NOT found AND skill <> ALL($2::text[])
+WHERE NOT found AND skill <> ALL($1::text[])
 GROUP BY skill
 ORDER BY COUNT(*) DESC, skill`, installed)
 	if err != nil {
