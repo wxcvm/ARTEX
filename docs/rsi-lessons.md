@@ -115,3 +115,30 @@ The task result card displays these facts as an observed usage trace. They are
 injection improved results. Neither Skill calls nor lesson exposure automatically
 change a finding's confirmation status. No schema migration, additional store,
 or new runtime dependency is required.
+
+## On-demand observational evaluation
+
+`GET /api/tasks/{id}/lessons/evaluation` compares completed, unarchived tasks
+with exactly the same company and task category as the selected task (including
+matching empty scopes). The task result card calls it **only when the comparison
+button is clicked**, not on its normal five-second outcome refresh.
+
+The API reuses `tasks`, `findings`, `tool_usage`, `skill_usage`,
+`activity`, and `rsi_lesson_usage`. Four mutually exclusive recorded modes
+keep mixed configurations distinct:
+
+- `inject`: lesson usage recorded with prompt injection, with no shadow usage;
+- `shadow`: lesson usage observed in shadow mode, with no injection;
+- `mixed`: both injection and shadow recorded for the same task;
+- `none`: no recorded lesson exposure, **not** an experimental control group.
+
+The report includes sample counts, confirmed and dismissed findings, tool
+calls, Skill loads/misses, token consumption and elapsed wall time. The UI
+shows pooled ratios for confirmed findings per task, false positives per
+reviewed disposition, and tool/Token usage per confirmed finding; a zero
+denominator displays an em dash rather than a misleading result.
+
+The cohorts are observational and task difficulty, target coverage, model
+configuration, and changed inputs can differ. **No causal improvement percentage
+is inferred**, and no action is automatically taken on any candidate lesson.
+There is no new database table, scheduled job, dependency or agent restriction.
