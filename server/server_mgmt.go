@@ -1053,7 +1053,12 @@ func (s *Server) fsMissingSkills(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	limit, _ := strconv.Atoi(r.URL.Query().Get("limit"))
-	missing, err := pg.MissingSkillStats(limit)
+	installed, err := s.installedSkillNames()
+	if err != nil {
+		writeErr(w, 500, "skill library unavailable")
+		return
+	}
+	missing, err := pg.MissingSkillStats(limit, installed...)
 	if err != nil {
 		writeErr(w, 500, err.Error())
 		return
