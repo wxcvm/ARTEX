@@ -8,6 +8,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"strings"
+	"unicode/utf8"
 )
 
 // The RSI lesson library is deterministic in this phase: it turns closed-task
@@ -46,7 +47,13 @@ func lessonText(s string, limit int) string {
 	}, s)
 	s = strings.Join(strings.Fields(s), " ")
 	if len(s) > limit {
-		s = s[:limit]
+		// Limits are byte budgets. Never truncate in the middle of a UTF-8
+		// rune: Chinese or other multibyte evidence must remain valid text.
+		end := limit
+		for end > 0 && !utf8.RuneStart(s[end]) {
+			end--
+		}
+		s = s[:end]
 	}
 	return s
 }
