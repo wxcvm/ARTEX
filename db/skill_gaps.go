@@ -15,12 +15,16 @@ type SkillGap struct {
 	LastSeen   int64  `json:"last_seen"`
 }
 
-// SkillGaps returns the aggregated miss report, highest miss count first.
+// SkillGaps returns the aggregated unresolved miss report, highest miss count first.
+// Installed skill names are excluded before LIMIT, without deleting the historical ledger.
 // Hits are the successful calls for the same key, so callers can compute a
 // miss rate without a second query.
-func (d *DB) SkillGaps(ctx context.Context, limit int) ([]SkillGap, error) {
+func (d *DB) SkillGaps(ctx context.Context, limit int, installed ...string) ([]SkillGap, error) {
 	if limit <= 0 {
 		limit = 50
+	}
+	if installed == nil {
+		installed = []string{}
 	}
 	rows, err := d.QueryContext(ctx, `
 		SELECT su.skill,
@@ -31,10 +35,11 @@ func (d *DB) SkillGaps(ctx context.Context, limit int) ([]SkillGap, error) {
 		       EXTRACT(EPOCH FROM MAX(su.ts))::bigint
 		FROM skill_usage su
 		LEFT JOIN tasks t ON t.id=su.task_id
+		WHERE su.skill <> ALL($2::text[])
 		GROUP BY 1,2,3
 		HAVING COUNT(*) FILTER (WHERE NOT su.found) > 0
 		ORDER BY misses DESC, 6 DESC, 1
-		LIMIT $1`, limit)
+		LIMIT $1`, limit, installed)
 	if err != nil {
 		return nil, err
 	}
