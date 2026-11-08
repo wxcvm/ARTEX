@@ -74,7 +74,21 @@ export function TaskOutcomeCard({ task }: { task: Task }) {
                 <div><dt className="text-muted-foreground">Confirmed / resolved / fixed</dt><dd>{current.data.findings.confirmed}</dd></div>
                 <div><dt className="text-muted-foreground">Pending review</dt><dd>{current.data.findings.open}</dd></div>
                 <div><dt className="text-muted-foreground">Tool calls</dt><dd>{current.data.tool_calls}</dd></div>
+                <div><dt className="text-muted-foreground">Skills loaded</dt><dd>{current.data.skills_used.length}</dd></div>
+                <div><dt className="text-muted-foreground">Prior lessons injected</dt><dd>{current.data.lesson_exposure.injected}</dd></div>
               </dl>
+              <div className="space-y-1 border-t pt-2 text-xs text-muted-foreground">
+                <p>Learning trace · observed usage, not a measure of effectiveness</p>
+                <p>
+                  Skills: {current.data.skills_used.length
+                    ? current.data.skills_used.map((skill) => `${skill.skill} (${skill.calls})`).join(", ")
+                    : "none recorded"}
+                </p>
+                <p>
+                  Prior lessons: {current.data.lesson_exposure.shadow} shadow-only,
+                  {" "}{current.data.lesson_exposure.injected} injected.
+                </p>
+              </div>
             </>
           )}
         </CardContent>
