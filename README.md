@@ -11,6 +11,14 @@ AI autonomous penetration testing system (Go backend + Next.js frontend)
 
 ---
 
+## 使用手册 / User guide (中文)
+
+**[📘 ARTEX 中文完整操作指南：Windows / Linux / Docker 安装、模型配置、创建任务、Skills / MCP、资产与报告、Lesson 评估、常见故障排查](docs/USER_GUIDE_ZH.md)**
+
+本 fork 的最新功能应从本仓库源码构建，或使用自行构建的 fork 镜像；默认 Docker Compose 镜像仍是历史上游版本。请先阅读指南中的[安装方式选择](docs/USER_GUIDE_ZH.md#1-快速选择安装方式)，避免版本不一致。
+
+---
+
 ## Engineering roadmap
 
 See the [autonomy engineering roadmap (Chinese)](AUTONOMY_ROADMAP.md) for the verified branch baseline, current capabilities, phased reliability work, and acceptance criteria. Planned capabilities are not represented as completed features.
