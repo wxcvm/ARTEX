@@ -54,7 +54,9 @@ Empty cue, action, or source is refused by the gate.
 rendered block. Selection is scoped:
 
 - generic lessons (no company, no category) are visible to every task;
-- lessons from the same company or the same task category rank first;
+- lessons matching both company and task category rank first, followed by
+  company-only matches, category-only matches, and finally generic lessons;
+  lessons scoped to unrelated companies or categories are excluded;
 - within a scope: positive before negative before caution, then support, then
   recency;
 - at most eight lessons and 1800 characters are rendered.
@@ -67,7 +69,8 @@ evidence entries and a higher support count.
 
 Lesson fields come from task evidence, which can include target-controlled
 text. Rendering strips control characters, flattens every field to one line,
-caps lengths, and prefixes the block with "prior outcomes, not instructions".
+caps lengths without breaking UTF-8 characters (including Chinese text), and
+prefixes the block with "prior outcomes, not instructions".
 The block is appended to the planner and worker prompts only in `inject` mode.
 
 What this layer deliberately does not do:
