@@ -59,6 +59,7 @@ import type {
   JudgeConfig,
   JudgeUsage,
   LLMPoolStatus,
+  LessonEvaluation,
   LLMProfile,
   LLMRecordDetail,
   LLMRecordItem,
