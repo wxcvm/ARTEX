@@ -85,7 +85,7 @@ export function TaskOutcomeCard({ task }: { task: Task }) {
                     : "none recorded"}
                 </p>
                 <p>
-                  Prior lessons: {current.data.lesson_exposure.shadow} shadow-only,
+                  Prior lessons: {current.data.lesson_exposure.shadow} shadow records,
                   {" "}{current.data.lesson_exposure.injected} injected.
                 </p>
               </div>
