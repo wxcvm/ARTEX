@@ -37,6 +37,20 @@ type TaskOutcomeTokens struct {
 	CacheWriteTokens int `json:"cache_write_tokens"`
 }
 
+// TaskOutcomeSkill is a procedure actually loaded during this task, not a
+// claimed cause of any subsequent finding.
+type TaskOutcomeSkill struct {
+	Skill string `json:"skill"`
+	Calls int    `json:"calls"`
+}
+
+// LessonExposure counts records of prior lessons considered in shadow mode
+// versus appended to this task's agent prompts in inject mode.
+type LessonExposure struct {
+	Shadow   int `json:"shadow"`
+	Injected int `json:"injected"`
+}
+
 // TaskOutcome is one task's production and cost baseline.
 type TaskOutcome struct {
 	TaskID      int64               `json:"task_id"`
@@ -48,6 +62,8 @@ type TaskOutcome struct {
 	Tokens      TaskOutcomeTokens   `json:"tokens"`
 	ToolCalls   int                 `json:"tool_calls"`
 	SkillMisses int                 `json:"skill_misses"`
+	SkillsUsed      []TaskOutcomeSkill `json:"skills_used"`
+	LessonExposure  LessonExposure     `json:"lesson_exposure"`
 	WallSeconds int64               `json:"wall_seconds"`
 }
 
@@ -115,5 +131,27 @@ func (d *DB) TaskOutcome(ctx context.Context, taskID int64) (TaskOutcome, error)
 		&o.Tokens.CacheReadTokens, &o.Tokens.CacheWriteTokens,
 		&o.ToolCalls, &o.SkillMisses, &o.WallSeconds,
 	)
+	if err != nil {
+		return o, err
+	}
+
+	// Reuse the existing Skill usage ledger: these are observed loads, not
+	// inferred success rates or proof that a Skill produced a finding.
+	skills, err := d.SkillCallsByTask(taskID)
+	if err != nil {
+		return o, err
+	}
+	o.SkillsUsed = make([]TaskOutcomeSkill, 0, len(skills))
+	for _, item := range skills {
+		o.SkillsUsed = append(o.SkillsUsed, TaskOutcomeSkill{Skill: item.Skill, Calls: item.Calls})
+	}
+
+	// The mode is persisted when the lesson was selected, so changing the
+	// environment flag later does not rewrite history.
+	err = d.QueryRowContext(ctx, `
+		SELECT COUNT(*) FILTER (WHERE mode='shadow'),
+		       COUNT(*) FILTER (WHERE mode='inject')
+		FROM rsi_lesson_usage WHERE task_id=$1`, taskID).Scan(
+		&o.LessonExposure.Shadow, &o.LessonExposure.Injected)
 	return o, err
 }
