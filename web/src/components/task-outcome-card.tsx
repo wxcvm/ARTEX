@@ -7,6 +7,7 @@ import { RefreshCwIcon } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { api } from "@/lib/api";
+import { LessonEvaluationPanel } from "@/components/lesson-evaluation-panel";
 import { isTaskOutcome, taskOutcomePresentation } from "@/lib/task-outcome";
 import type { Task, TaskOutcome } from "@/lib/types";
 
@@ -89,6 +90,9 @@ export function TaskOutcomeCard({ task }: { task: Task }) {
                   {" "}{current.data.lesson_exposure.injected} injected.
                 </p>
               </div>
+              {task.status === "done" && current.data.status === "done" && (
+                <LessonEvaluationPanel key={task.id} taskId={task.id} />
+              )}
             </>
           )}
         </CardContent>
