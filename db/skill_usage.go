@@ -101,20 +101,24 @@ ORDER BY COUNT(*) DESC, skill`)
 }
 
 // MissingSkillStats returns the skill names agents asked for that do not exist,
-// most-requested first — the "wished it existed" gap list. Names come from the model
-// so they are shown as-is (already length-capped at insert time).
-func (d *DB) MissingSkillStats(limit int) ([]SkillStat, error) {
+// most-requested first — the "wished it existed" gap list. Installed
+// names are excluded before paging, while old misses remain in the ledger.
+// Names come from the model and are already length-capped at insert time.
+func (d *DB) MissingSkillStats(limit int, installed ...string) ([]SkillStat, error) {
 	if limit <= 0 || limit > 200 {
 		limit = 20
+	}
+	if installed == nil {
+		installed = []string{}
 	}
 	rows, err := d.Query(`
 SELECT skill, COUNT(*) AS calls,
        COALESCE(STRING_AGG(DISTINCT agent_key, ','), '') AS agents,
        MAX(ts) AS last_used
 FROM skill_usage
-WHERE NOT found
+WHERE NOT found AND skill <> ALL($1::text[])
 GROUP BY skill
-ORDER BY COUNT(*) DESC, skill`)
+ORDER BY COUNT(*) DESC, skill`, installed)
 	if err != nil {
 		return nil, err
 	}
@@ -145,6 +149,21 @@ ORDER BY COUNT(*) DESC, skill`)
 		return nil, err
 	}
 	out = mergeArchivedSkillStats(out, archived, true)
+	// Archived history is merged after the SQL query. Exclude installed names
+	// here too; keep the historical ledger untouched.
+	if len(installed) > 0 {
+		resolved := make(map[string]bool, len(installed))
+		for _, name := range installed {
+			resolved[name] = true
+		}
+		filtered := out[:0]
+		for _, st := range out {
+			if !resolved[st.Skill] {
+				filtered = append(filtered, st)
+			}
+		}
+		out = filtered
+	}
 	if len(out) > limit {
 		out = out[:limit]
 	}

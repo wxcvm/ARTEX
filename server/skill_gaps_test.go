@@ -5,6 +5,8 @@ import (
 	"encoding/json"
 	"net/http"
 	"net/http/httptest"
+	"os"
+	"path/filepath"
 	"strconv"
 	"testing"
 )
@@ -33,7 +35,8 @@ INSERT INTO skill_usage(skill,agent_key,task_id,found) VALUES
 		t.Fatal(err)
 	}
 
-	s := New(context.Background(), m, t.TempDir(), t.TempDir(), t.TempDir())
+	skillDir := t.TempDir()
+	s := New(context.Background(), m, skillDir, t.TempDir(), t.TempDir())
 	token, err := signJWT(s.jwtKey)
 	if err != nil {
 		t.Fatal(err)
@@ -103,5 +106,50 @@ INSERT INTO skill_usage(skill,agent_key,task_id,found) VALUES
 	}
 	if rec := get("/api/skill-gaps?limit=abc"); rec.Code != http.StatusBadRequest {
 		t.Fatalf("bad limit status=%d want 400", rec.Code)
+	}
+
+	// Installing a real Skill resolves the backlog entry without erasing old
+	// usage rows. The other missing skill remains visible.
+	skillPath := filepath.Join(skillDir, "rsi-test-cloud")
+	if err := os.MkdirAll(skillPath, 0o755); err != nil {
+		t.Fatal(err)
+	}
+	md := "---\nname: rsi-test-cloud\ndescription: Review cloud configuration\n---\n# Review\n"
+	if err := os.WriteFile(filepath.Join(skillPath, "SKILL.md"), []byte(md), 0o644); err != nil {
+		t.Fatal(err)
+	}
+	rec = get("/api/skill-gaps")
+	if rec.Code != http.StatusOK {
+		t.Fatalf("resolved gap status=%d body=%s", rec.Code, rec.Body.String())
+	}
+	if err := json.Unmarshal(rec.Body.Bytes(), &out); err != nil {
+		t.Fatal(err)
+	}
+	foundGraphql := false
+	for _, g := range out.Gaps {
+		if g.Skill == "rsi-test-cloud" {
+			t.Fatal("installed skill still appears as a gap")
+		}
+		if g.Skill == "rsi-test-graphql" {
+			foundGraphql = true
+		}
+	}
+	if !foundGraphql {
+		t.Fatal("unresolved skill disappeared after installing another skill")
+	}
+	rec = get("/api/skills/missing?limit=200")
+	if rec.Code != http.StatusOK {
+		t.Fatalf("missing list status=%d body=%s", rec.Code, rec.Body.String())
+	}
+	var missing struct {
+		Items []struct { Skill string `json:"skill"` } `json:"missing"`
+	}
+	if err := json.Unmarshal(rec.Body.Bytes(), &missing); err != nil {
+		t.Fatal(err)
+	}
+	for _, m := range missing.Items {
+		if m.Skill == "rsi-test-cloud" {
+			t.Fatal("installed skill still listed as missing")
+		}
 	}
 }

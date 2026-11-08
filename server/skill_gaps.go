@@ -20,7 +20,13 @@ func (s *Server) skillGaps(w http.ResponseWriter, r *http.Request) {
 		}
 		limit = n
 	}
-	gaps, err := s.m.PG().SkillGaps(r.Context(), limit)
+	installed, err := s.installedSkillNames()
+	if err != nil {
+		log.Printf("[skills] failed to load library: %v", err)
+		writeErr(w, 500, "skill library unavailable")
+		return
+	}
+	gaps, err := s.m.PG().SkillGaps(r.Context(), limit, installed...)
 	if err != nil {
 		log.Printf("[skills] gap query failed: %v", err)
 		writeErr(w, 500, "skill gap query failed")
