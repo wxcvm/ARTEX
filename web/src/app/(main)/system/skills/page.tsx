@@ -340,6 +340,19 @@ export default function SkillsPage() {
   const [usageLoading, setUsageLoading] = React.useState(false);
   const [missing, setMissing] = React.useState<MissingSkill[]>([]);
 
+  // Turn a real missing call into an editable draft; never auto-install a
+  // procedure based on a model-generated skill name.
+  function draftMissingSkill(name: string) {
+    setNewName(name);
+    setNewDesc("");
+    setNewInst("");
+    setNewLicense("");
+    setNewCompat("");
+    setNewMcps([]);
+    setNewVisibility([]);
+    setNewOpen(true);
+  }
+
   // ── Data ──────────────────────────────────────────────────────────────────
   const load = React.useCallback(() => {
     api.agents().then(setAgents).catch(() => {});
@@ -713,7 +726,7 @@ export default function SkillsPage() {
             <PopoverTrigger asChild>
               <Button size="sm" variant="outline" className="ml-auto">
                 <AlertTriangleIcon className="size-3.5 text-amber-500" />
-                {missing.length} missed calls
+                {missing.length} missing skills
               </Button>
             </PopoverTrigger>
             <PopoverContent align="end" className="w-80">
@@ -722,11 +735,17 @@ export default function SkillsPage() {
               </p>
               <div className="space-y-1">
                 {missing.map((m) => (
-                  <div key={m.skill} className="flex items-center gap-2 text-sm">
+                  <button
+                    key={m.skill}
+                    type="button"
+                    onClick={() => draftMissingSkill(m.skill)}
+                    title={`Create a draft for ${m.skill}`}
+                    className="flex w-full items-center gap-2 rounded px-1 py-1 text-left text-sm hover:bg-muted"
+                  >
                     <code className="min-w-0 flex-1 truncate font-mono text-xs" title={m.skill}>{m.skill}</code>
                     <span className="shrink-0 text-xs tabular-nums text-muted-foreground">{m.calls} calls</span>
-                    <span className="shrink-0 text-xs text-muted-foreground">{fmtTime(m.last_used)}</span>
-                  </div>
+                    <PlusIcon className="size-3.5 shrink-0 text-muted-foreground" />
+                  </button>
                 ))}
               </div>
             </PopoverContent>
