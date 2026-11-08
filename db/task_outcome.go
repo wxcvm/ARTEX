@@ -61,10 +61,10 @@ type TaskOutcome struct {
 	Retests     TaskOutcomeRetests  `json:"retests"`
 	Tokens      TaskOutcomeTokens   `json:"tokens"`
 	ToolCalls   int                 `json:"tool_calls"`
-	SkillMisses int                 `json:"skill_misses"`
-	SkillsUsed      []TaskOutcomeSkill `json:"skills_used"`
-	LessonExposure  LessonExposure     `json:"lesson_exposure"`
-	WallSeconds int64               `json:"wall_seconds"`
+	SkillMisses     int                 `json:"skill_misses"`
+	SkillsUsed      []TaskOutcomeSkill  `json:"skills_used"`
+	LessonExposure  LessonExposure      `json:"lesson_exposure"`
+	WallSeconds     int64               `json:"wall_seconds"`
 }
 
 // TaskOutcome returns the outcome card for one live task. sql.ErrNoRows means
