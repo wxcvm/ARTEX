@@ -67,6 +67,28 @@ export interface TaskOutcome {
   lesson_exposure: { shadow: number; injected: number };
 }
 
+export interface LessonEvaluationGroup {
+  exposure: "inject" | "shadow" | "mixed" | "none";
+  tasks: number;
+  findings: number;
+  confirmed: number;
+  false_positive: number;
+  duplicate: number;
+  tool_calls: number;
+  skill_loads: number;
+  skill_misses: number;
+  input_tokens: number;
+  output_tokens: number;
+  wall_seconds: number;
+}
+
+export interface LessonEvaluation {
+  task_id: number;
+  category_id: number;
+  company_id: number;
+  groups: LessonEvaluationGroup[];
+}
+
 export interface TaskCategory {
   id: number;
   name: string;
