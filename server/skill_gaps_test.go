@@ -114,7 +114,7 @@ INSERT INTO skill_usage(skill,agent_key,task_id,found) VALUES
 	if err := os.MkdirAll(skillPath, 0o755); err != nil {
 		t.Fatal(err)
 	}
-	md := "---\\nname: rsi-test-cloud\\ndescription: Review cloud configuration\\n---\\n# Review\\n"
+	md := "---\nname: rsi-test-cloud\ndescription: Review cloud configuration\n---\n# Review\n"
 	if err := os.WriteFile(filepath.Join(skillPath, "SKILL.md"), []byte(md), 0o644); err != nil {
 		t.Fatal(err)
 	}
