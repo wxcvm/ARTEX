@@ -248,10 +248,10 @@ export default function FindingsPage() {
 
   // Export selection: tracked by finding_id (the standalone table's id), preserved across pages.
   const [selectedIds, setSelectedIds] = React.useState<Set<string>>(() => new Set());
-  // Export dialog state: scope (current filter / all / selected) × format (single md / per-finding md zip / csv / json).
+  // Export dialog state: scope (current filter / all / selected) × format (Markdown / CSV / JSON / SARIF).
   const [exportOpen, setExportOpen] = React.useState(false);
   const [exportScope, setExportScope] = React.useState<"filtered" | "all" | "selected">("filtered");
-  const [exportFormat, setExportFormat] = React.useState<"md-single" | "md-zip" | "csv" | "json">("md-single");
+  const [exportFormat, setExportFormat] = React.useState<"md-single" | "md-zip" | "csv" | "json" | "sarif">("md-single");
   const [exporting, setExporting] = React.useState(false);
 
   const toggleSelected = React.useCallback((id: string, checked: boolean) => {
@@ -1243,6 +1243,9 @@ export default function FindingsPage() {
                 </label>
                 <label htmlFor="export-format-json" className="flex items-center gap-2 text-sm">
                   <RadioGroupItem id="export-format-json" value="json" /> JSON (.json)
+                </label>
+                <label htmlFor="export-format-sarif" className="flex items-center gap-2 text-sm">
+                  <RadioGroupItem id="export-format-sarif" value="sarif" /> SARIF 2.1.0 (.sarif, security tool interchange)
                 </label>
               </RadioGroup>
             </div>
