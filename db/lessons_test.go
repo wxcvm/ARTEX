@@ -3,6 +3,7 @@ package db
 import (
 	"strings"
 	"testing"
+	"unicode/utf8"
 )
 
 func TestRenderLessonsDataNotInstructions(t *testing.T) {
@@ -32,5 +33,31 @@ func TestRenderLessonsDataNotInstructions(t *testing.T) {
 	capped := RenderLessons(lessons, 120)
 	if len(capped) > 160 {
 		t.Fatalf("cap not enforced: %d bytes", len(capped))
+	}
+}
+
+func TestLessonTextTruncatesAtRuneBoundary(t *testing.T) {
+	cases := []struct {
+		input string
+		limit int
+		want  string
+	}{
+		{input: "ABC中文", limit: 4, want: "ABC"},
+		{input: "中文", limit: 4, want: "中"},
+		{input: "中文", limit: 2, want: ""},
+		{input: "hello world", limit: 5, want: "hello"},
+	}
+	for _, tc := range cases {
+		got := lessonText(tc.input, tc.limit)
+		if got != tc.want {
+			t.Errorf("lessonText(%q, %d) = %q, want %q", tc.input, tc.limit, got, tc.want)
+		}
+		if !utf8.ValidString(got) || len(got) > tc.limit {
+			t.Errorf("invalid or oversized UTF-8 result: %q", got)
+		}
+	}
+	longChinese := lessonText(strings.Repeat("知", 60), lessonCueMax)
+	if !utf8.ValidString(longChinese) || len(longChinese) > lessonCueMax {
+		t.Fatalf("multilingual lesson cue corrupted: %q", longChinese)
 	}
 }
