@@ -9,6 +9,7 @@ import (
 	"sort"
 	"strings"
 	"time"
+	"unicode"
 
 	"github.com/Autumn-27/artex/db"
 )
@@ -141,6 +142,22 @@ func FindingFilename(f *db.DBFinding) string {
 	return name + ".md"
 }
 
+// safeCSVCell neutralizes formulas in untrusted text when a CSV file is opened
+// by spreadsheet software. csv.Writer handles quoting and separators; this
+// protects the cell value itself, including formulas after leading whitespace.
+func safeCSVCell(value string) string {
+	leading := strings.TrimLeftFunc(value, func(r rune) bool {
+		return unicode.IsSpace(r) || r == '\uFEFF' || r == '\u200B'
+	})
+	if leading != "" {
+		switch leading[0] {
+		case '=', '+', '-', '@':
+			return "'" + value
+		}
+	}
+	return value
+}
+
 // FindingsCSV renders a batch of findings as CSV (with a UTF-8 BOM so Excel detects the encoding correctly).
 // It omits the long report/evidence full text and keeps only summary-level fields; use Markdown/JSON export for full text.
 func FindingsCSV(fs []*db.DBFinding) []byte {
@@ -154,13 +171,13 @@ func FindingsCSV(fs []*db.DBFinding) []byte {
 	for _, f := range items {
 		_ = w.Write([]string{
 			fmt.Sprintf("%d", f.ID),
-			findingTitle(f),
-			f.VulnClass,
+			safeCSVCell(findingTitle(f)),
+			safeCSVCell(f.VulnClass),
 			nz(f.Severity, "info"),
 			nz(f.Status, "pending"),
-			f.TaskDescription,
+			safeCSVCell(f.TaskDescription),
 			f.CreatedAt.Format("2006-01-02 15:04:05"),
-			strings.TrimSpace(f.Summary),
+			safeCSVCell(strings.TrimSpace(f.Summary)),
 			fmt.Sprint(len(f.TrafficBindings)), findingTrafficIDs(f),
 		})
 	}
