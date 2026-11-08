@@ -68,7 +68,7 @@ export function LessonEvaluationPanel({ taskId }: { taskId: string }) {
             <p className="text-sm text-muted-foreground">No comparable completed tasks recorded.</p>
           ) : (
             <div className="overflow-x-auto">
-              <table className="w-full min-w-[680px] text-left text-xs tabular-nums">
+              <table className="w-full min-w-[760px] text-left text-xs tabular-nums">
                 <thead className="border-b text-muted-foreground">
                   <tr>
                     <th className="py-2 pr-3 font-medium">Lesson exposure</th>
@@ -77,7 +77,8 @@ export function LessonEvaluationPanel({ taskId }: { taskId: string }) {
                     <th className="py-2 pr-3 font-medium">False positives / reviewed</th>
                     <th className="py-2 pr-3 font-medium">Tools / confirmed</th>
                     <th className="py-2 pr-3 font-medium">Tokens / confirmed</th>
-                    <th className="py-2 font-medium">Skills / task</th>
+                    <th className="py-2 pr-3 font-medium">Skills / task</th>
+                    <th className="py-2 font-medium">Minutes / task</th>
                   </tr>
                 </thead>
                 <tbody>
@@ -94,7 +95,8 @@ export function LessonEvaluationPanel({ taskId }: { taskId: string }) {
                       <td className="py-2 pr-3">{per(
                         group.input_tokens + group.output_tokens, group.confirmed,
                       )}</td>
-                      <td className="py-2">{per(group.skill_loads, group.tasks)}</td>
+                      <td className="py-2 pr-3">{per(group.skill_loads, group.tasks)}</td>
+                      <td className="py-2">{per(group.wall_seconds / 60, group.tasks)}</td>
                     </tr>
                   ))}
                 </tbody>
