@@ -53,7 +53,24 @@ INSERT INTO tool_usage(tool_key,task_id) VALUES ('traffic_search',$1),('report_f
 		t.Fatal(err)
 	}
 	if _, err := m.pg.Exec(`
-INSERT INTO skill_usage(skill,task_id,found) VALUES ('api-recon',$1,true),('graphql-audit',$1,false)`, taskID); err != nil {
+INSERT INTO skill_usage(skill,task_id,found) VALUES
+ ('api-recon',$1,true),('api-recon',$1,true),('graphql-audit',$1,false)`, taskID); err != nil {
+		t.Fatal(err)
+	}
+
+	// The prior lesson was considered in two distinct modes; both records
+	// remain attributable to this task rather than to its findings.
+	var lessonID int64
+	if err := m.pg.QueryRow(`
+INSERT INTO rsi_lessons(dedupe_key,kind,cue,action)
+VALUES ($1,'positive','xss','Recheck reflected XSS') RETURNING id`,
+		"outcome-"+task.ID).Scan(&lessonID); err != nil {
+		t.Fatal(err)
+	}
+	defer func() { _, _ = m.pg.Exec(`DELETE FROM rsi_lessons WHERE id=$1`, lessonID) }()
+	if _, err := m.pg.Exec(`
+INSERT INTO rsi_lesson_usage(lesson_id,task_id,mode)
+VALUES ($1,$2,'shadow'), ($1,$2,'inject')`, lessonID, taskID); err != nil {
 		t.Fatal(err)
 	}
 
@@ -100,6 +117,12 @@ INSERT INTO skill_usage(skill,task_id,found) VALUES ('api-recon',$1,true),('grap
 	}
 	if got.SkillMisses != 1 {
 		t.Fatalf("skill_misses=%d want 1", got.SkillMisses)
+	}
+	if len(got.SkillsUsed) != 1 || got.SkillsUsed[0].Skill != "api-recon" || got.SkillsUsed[0].Calls != 2 {
+		t.Fatalf("skills_used=%+v want one api-recon with two loads", got.SkillsUsed)
+	}
+	if got.LessonExposure.Shadow != 1 || got.LessonExposure.Injected != 1 {
+		t.Fatalf("lesson_exposure=%+v want one shadow and one inject", got.LessonExposure)
 	}
 	if got.WallSeconds < 0 {
 		t.Fatalf("wall_seconds=%d", got.WallSeconds)

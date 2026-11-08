@@ -93,3 +93,22 @@ that did not on the same domain:
 
 Do not treat support as causal evidence. It counts corroborating task
 outcomes, not a controlled comparison.
+
+## Linking experience to actual Skill usage
+
+`GET /api/tasks/{id}/outcome` includes a compact **learning trace** alongside
+the existing findings, retests, tokens, and tool calls:
+
+- `skills_used`: names and counts of Skills successfully loaded by this
+  task (from the existing `skill_usage` ledger); failed/missing invocations
+  remain in `skill_misses` and are not counted as a loaded procedure.
+- `lesson_exposure.shadow`: prior-lesson records selected only for observation.
+- `lesson_exposure.injected`: prior-lesson records appended to the agent prompt.
+  These values come from the persisted `rsi_lesson_usage` mode, not the
+  process's current environment variable.
+
+The task result card displays these facts as an observed usage trace. They are
+**not** a claim that a particular Skill discovered a finding or that lesson
+injection improved results. Neither Skill calls nor lesson exposure automatically
+change a finding's confirmation status. No schema migration, additional store,
+or new runtime dependency is required.

@@ -63,6 +63,8 @@ export interface TaskOutcome {
   tool_calls: number;
   skill_misses: number;
   wall_seconds: number;
+  skills_used: { skill: string; calls: number }[];
+  lesson_exposure: { shadow: number; injected: number };
 }
 
 export interface TaskCategory {

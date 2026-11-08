@@ -76,7 +76,15 @@ export function isTaskOutcome(value: unknown): value is TaskOutcome {
     && counts(v, ["task_id", "category_id", "company_id", "tool_calls", "skill_misses", "wall_seconds"])
     && counts(v.findings, ["total", "confirmed", "open", "false_positive", "duplicate", "critical", "high", "medium", "low"])
     && counts(v.retests, ["reproduced", "fixed", "inconclusive"])
-    && counts(v.tokens, ["input_tokens", "output_tokens", "cache_read_tokens", "cache_write_tokens"]);
+    && counts(v.tokens, ["input_tokens", "output_tokens", "cache_read_tokens", "cache_write_tokens"])
+    && counts(v.lesson_exposure, ["shadow", "injected"])
+    && Array.isArray(v.skills_used)
+    && v.skills_used.every((item: unknown) => {
+      if (!item || typeof item !== "object") return false;
+      const row = item as Record<string, unknown>;
+      return typeof row.skill === "string" && row.skill.length > 0
+        && typeof row.calls === "number" && Number.isSafeInteger(row.calls) && row.calls >= 1;
+    });
   if (!valid) return false;
   const findings = v.findings as TaskOutcome["findings"];
   return findings.confirmed + findings.open + findings.false_positive + findings.duplicate <= findings.total

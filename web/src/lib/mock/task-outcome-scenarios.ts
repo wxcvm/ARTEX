@@ -40,6 +40,8 @@ export function mockTaskOutcome(task: Task, findings: Pick<Finding, "status" | "
     tool_calls: 0,
     skill_misses: 0,
     wall_seconds: 0,
+    skills_used: [],
+    lesson_exposure: { shadow: 0, injected: 0 },
   };
 }
 
