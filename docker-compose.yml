@@ -15,7 +15,9 @@ services:
     restart: unless-stopped
 
   artex:
-    image: autumn27/artex:${ARTEX_TAG:-latest}
+    # Override ARTEX_IMAGE with an image built from this fork; the legacy
+    # upstream image does not contain locally committed ARTEX changes.
+    image: ${ARTEX_IMAGE:-autumn27/artex}:${ARTEX_TAG:-latest}
     depends_on:
       postgres:
         condition: service_healthy

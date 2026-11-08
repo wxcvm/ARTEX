@@ -76,12 +76,14 @@ Sync asset data directly from [ScopeSentry](https://github.com/Autumn-27/ScopeSe
 
 ## Installation
 
+> **Fork note:** This repository is `wxcvm/ARTEX`. The default Docker Compose image is still the historical `autumn27/artex` image, **not** a build of this fork. To run your changes, compile this source locally or set `ARTEX_IMAGE` and `ARTEX_TAG` in `.env` to an image that you built/published from this source. No fork-specific Docker image is bundled with this repository.
+
 > Requires a **PostgreSQL** database; exploration requires an **LLM** (`ANTHROPIC_API_KEY` or `OPENAI_API_KEY`, which can also be configured in the UI).
 
 ### Option 1: one-click install script (recommended)
 
 ```bash
-git clone https://github.com/BaaRai/ARTEX.git
+git clone https://github.com/wxcvm/ARTEX.git
 cd ARTEX
 ./install.sh
 ```
@@ -96,10 +98,10 @@ Once installed, open **http://localhost:8787** (on first entry, `/setup` sets th
 ### Option 2: Docker Compose (manual)
 
 ```bash
-git clone https://github.com/BaaRai/ARTEX.git
+git clone https://github.com/wxcvm/ARTEX.git
 cd ARTEX
 cp .env.example .env          # set POSTGRES_PASSWORD, optionally ANTHROPIC_API_KEY
-docker compose up -d          # pulls the autumn27/artex image + postgres
+docker compose up -d          # pulls ARTEX_IMAGE (legacy upstream by default) + postgres
 # → http://localhost:8787
 ```
 
@@ -112,7 +114,7 @@ Legacy SSE servers usually establish the event stream with `GET /sse`, then rece
 
 ### Option 3: download prebuilt binaries (Releases)
 
-Download the zip for your platform from [Releases](https://github.com/BaaRai/ARTEX/releases); after extracting you get `artex` + `start.sh` (`start.bat` on Windows) + `skills/` + `config.example.json`:
+When a release is published, download the zip for your platform from [Releases](https://github.com/wxcvm/ARTEX/releases); after extracting you get `artex` + `start.sh` (`start.bat` on Windows) + `skills/` + `config.example.json`:
 
 ```bash
 cp config.example.json config.json   # fill in the database connection
@@ -204,7 +206,7 @@ docker image prune -f          # clean up old images (optional)
 
 ### Option 3: prebuilt binaries (Releases)
 
-Download the new version's zip from [Releases](https://github.com/BaaRai/ARTEX/releases), stop the old process, then overwrite `artex` and `skills/` (keep your `config.json` and `data/`), and restart:
+When available, download the new version's zip from [Releases](https://github.com/wxcvm/ARTEX/releases), stop the old process, then overwrite `artex` and `skills/` (keep your `config.json` and `data/`), and restart:
 
 ```bash
 cp -r <extracted dir>/skills ./ && cp <extracted dir>/artex ./
