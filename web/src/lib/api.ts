@@ -252,6 +252,8 @@ export const api = {
     get<{ tasks: Task[]; active: string }>("/tasks").then((r) => ({ tasks: arr(r.tasks), active: r.active ?? "" })),
   task: (id: string) => get<Task>(`/tasks/${encodeURIComponent(id)}`),
   taskOutcome: (id: string) => get<TaskOutcome>(`/tasks/${encodeURIComponent(id)}/outcome`),
+  taskLessonEvaluation: (id: string) =>
+    get<LessonEvaluation>(`/tasks/${encodeURIComponent(id)}/lessons/evaluation`),
   createTask: (input: {
     name?: string;
     categoryId?: number;
