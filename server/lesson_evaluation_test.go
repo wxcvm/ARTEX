@@ -83,7 +83,7 @@ WHERE id=$5`, categoryID, compID, done, archived, id); err != nil {
 
 	injected, expID := addTask("inject", companyID, true, false)
 	shadow, _ := addTask("shadow", companyID, true, false)
-	none, _ := addTask("none", companyID, true, false)
+	_, _ = addTask("none", companyID, true, false)
 	mixed, _ := addTask("mixed", companyID, true, false)
 	foreign, _ := addTask("foreign", otherCompanyID, true, false)
 	running, _ := addTask("running", companyID, false, false)
