@@ -2233,9 +2233,11 @@ func (s *Server) findingsExport(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	defer os.RemoveAll(stage)
-	if err = s.evidenceStore().StageFindingsExport(r.Context(), fs, stage, format == "md-zip"); err != nil {
-		evidenceError(w, err)
-		return
+	if format != "sarif" {
+		if err = s.evidenceStore().StageFindingsExport(r.Context(), fs, stage, format == "md-zip"); err != nil {
+			evidenceError(w, err)
+			return
+		}
 	}
 	now := time.Now()
 	stamp := now.Format("20060102-150405")
