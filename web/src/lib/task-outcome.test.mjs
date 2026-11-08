@@ -40,6 +40,9 @@ test("missing and invalid responses are never treated as zero findings", () => {
     { ...outcome, findings: { ...outcome.findings, total: -1 } },
     { ...outcome, findings: { ...outcome.findings, confirmed: 1 } },
     { ...outcome, findings: { ...outcome.findings, high: 1 } },
+    { ...outcome, skills_used: null },
+    { ...outcome, skills_used: [{ skill: "api-recon", calls: -1 }] },
+    { ...outcome, lesson_exposure: { shadow: 1, injected: -1 } },
   ]) {
     assert.equal(isTaskOutcome(invalid), false);
   }
