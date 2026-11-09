@@ -129,6 +129,7 @@ jobs:
           ./desktop/windows/build-installer.ps1 -Version 0.0.0-preview
       - name: Smoke test installer and upgrade
         shell: pwsh
+        timeout-minutes: 8
         run: ./desktop/windows/test-installer.ps1
       - uses: actions/upload-artifact@v4
         with:
