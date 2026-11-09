@@ -55,7 +55,11 @@ AI autonomous penetration testing system (Go backend + Next.js frontend)
 
 ```powershell
 ./desktop/windows/package.ps1
+# 再次本地构建，前端未变化时可复用缓存：
+./desktop/windows/package.ps1 -Incremental
 ```
+
+`-Incremental` 只影响本地桌面包的前端安装和静态构建；Go 后端及桌面客户端仍会编译。CI 和标准安装包构建保持原样。
 
 ---
 
