@@ -18,7 +18,7 @@ internal static class PostgresInstaller
             Process.Start(new ProcessStartInfo(OfficialDownloadPage) { UseShellExecute = true });
             return false;
         }
-        Process.Start(new ProcessStartInfo("cmd.exe")
+        using var installer = Process.Start(new ProcessStartInfo("cmd.exe")
         {
             UseShellExecute = true,
             Arguments = "/k winget install --id " + WingetPackage +
