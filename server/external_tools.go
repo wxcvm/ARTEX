@@ -45,6 +45,7 @@ type externalToolStatus struct {
 	Detail  string `json:"detail,omitempty"`
 	ManagedVersion string `json:"managed_version,omitempty"`
 	ManagedPath string `json:"managed_path,omitempty"`
+	PreviousVersion string `json:"previous_version,omitempty"`
 }
 
 type externalToolRoot struct {
@@ -125,9 +126,12 @@ func probeExternalTool(ctx context.Context, spec externalToolSpec, roots []exter
 	status := externalToolStatus{externalToolSpec: spec, Status: "missing"}
 	if local := os.Getenv("LOCALAPPDATA"); local != "" {
 		root := filepath.Join(local, "ARTEX", "tools")
-		if receipt := externalToolManagedReceipt(root, spec); receipt != nil {
+		if receipt, err := managedToolSlotReceipt(root, spec, "current"); err == nil && receipt != nil {
 			status.ManagedVersion = receipt.Version
 			status.ManagedPath = filepath.Join(root, spec.ID, "current", externalToolBinary(spec.Binary))
+		}
+		if receipt, err := managedToolSlotReceipt(root, spec, ".previous"); err == nil && receipt != nil {
+			status.PreviousVersion = receipt.Version
 		}
 	}
 	path, origin := externalToolExecutable(spec, roots)
