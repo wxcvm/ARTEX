@@ -27,6 +27,7 @@ function ToolItem({
   const [release, setRelease] = React.useState<ExternalToolRelease | null>(null);
   const [checking, setChecking] = React.useState(false);
   const [installing, setInstalling] = React.useState(false);
+  const [managing, setManaging] = React.useState(false);
   const [error, setError] = React.useState("");
   const supported = host === "windows/amd64";
   const alreadyManaged = !!release && tool.managed_version === release.version;
@@ -63,6 +64,45 @@ function ToolItem({
     }
   }
 
+  async function rollback() {
+    if (!tool.previous_version || !tool.managed_version) return;
+    if (!window.confirm(
+      "将 " + tool.name + " 从 " + tool.managed_version + " 恢复到 " + tool.previous_version +
+      "？当前版本会保留为上一版；正在运行此程序时请先结束运行。"
+    )) return;
+    setManaging(true);
+    setError("");
+    try {
+      const result = await api.rollbackExternalTool(tool.id);
+      toast.success(tool.name + " 已恢复到 " + result.version);
+      await onRefresh();
+    } catch (e) {
+      setError((e as Error).message);
+    } finally {
+      setManaging(false);
+    }
+  }
+
+  async function uninstall() {
+    if (!tool.managed_version) return;
+    if (!window.confirm(
+      "卸载 ARTEX 管理的 " + tool.name + " " + tool.managed_version +
+      " 和保留的上一版？\n自定义目录及 PATH 中的工具不会被删除。"
+    )) return;
+    setManaging(true);
+    setError("");
+    try {
+      await api.uninstallExternalTool(tool.id);
+      toast.success("已卸载 ARTEX 管理的 " + tool.name);
+      setRelease(null);
+      await onRefresh();
+    } catch (e) {
+      setError((e as Error).message);
+    } finally {
+      setManaging(false);
+    }
+  }
+
   return (
     <div className="flex flex-col gap-2 rounded-lg border p-4">
       <div className="flex flex-wrap items-center gap-2">
@@ -83,7 +123,28 @@ function ToolItem({
       <p className="text-muted-foreground text-xs">{tool.description}</p>
       {tool.version && <div className="break-all font-mono text-xs">{tool.version}</div>}
       {tool.managed_version && (
-        <div className="text-xs">ARTEX 管理版本：<span className="font-mono">{tool.managed_version}</span></div>
+        <div className="space-y-2">
+          <div className="text-xs">
+            ARTEX 管理版本：<span className="font-mono">{tool.managed_version}</span>
+            {tool.previous_version && (
+              <span className="text-muted-foreground ml-2">
+                上一版 <span className="font-mono">{tool.previous_version}</span>
+              </span>
+            )}
+          </div>
+          {supported && (
+            <div className="flex flex-wrap gap-2">
+              {tool.previous_version && (
+                <Button variant="outline" size="sm" disabled={managing || installing}
+                  onClick={() => void rollback()}>恢复上一版</Button>
+              )}
+              <Button variant="outline" size="sm" disabled={managing || installing}
+                onClick={() => void uninstall()}>
+                {managing ? "处理中…" : "卸载管理版本"}
+              </Button>
+            </div>
+          )}
+        </div>
       )}
       {tool.path && (
         <div className="text-muted-foreground break-all font-mono text-xs" title={tool.path}>
@@ -97,7 +158,7 @@ function ToolItem({
       <div className="mt-auto space-y-2 pt-2">
         {supported ? (
           <>
-            <Button size="sm" variant="outline" disabled={checking || installing} onClick={() => void checkRelease()}>
+            <Button size="sm" variant="outline" disabled={checking || installing || managing} onClick={() => void checkRelease()}>
               <RefreshCwIcon className={checking ? "animate-spin" : ""} />
               {checking ? "查询官方发布…" : "查看官方最新版"}
             </Button>
@@ -105,7 +166,7 @@ function ToolItem({
               <div className="space-y-2 rounded-md bg-muted/50 p-2 text-xs">
                 <div className="flex flex-wrap items-center justify-between gap-2">
                   <span>官方 {release.version} · {(release.size_bytes / 1048576).toFixed(1)} MiB</span>
-                  <Button size="sm" disabled={installing || alreadyManaged} onClick={() => void install()}>
+                  <Button size="sm" disabled={installing || managing || alreadyManaged} onClick={() => void install()}>
                     <DownloadIcon className={installing ? "animate-pulse" : ""} />
                     {alreadyManaged ? "已安装本版本" : installing ? "下载并校验中…" : tool.managed_version ? "更新到此版本" : "下载并安装"}
                   </Button>
@@ -197,7 +258,7 @@ export function ExternalToolsPanel({ onOpenCustom }: { onOpenCustom: () => void 
           <p>
             “版本检查通过”仅说明命令能够返回版本；手动安装的文件不代表来源已验证。
             官方按需安装会使用 GitHub Release 提供的 SHA-256 校验下载内容，但<strong>不等于发布者代码签名</strong>。
-            更新只替换 ARTEX 管理目录中的版本并保留上一版，不会自动执行扫描。若要让 Agent 调用某个程序，
+            更新只替换 ARTEX 管理目录中的版本并保留上一版；可恢复旧版或卸载受管理的程序，不会删除你自定义目录中的文件，也不会自动执行扫描。若要让 Agent 调用某个程序，
             可在现有自定义工具中明确配置，避免自动创建重复的 Agent 工具。
           </p>
           <Button size="sm" variant="outline" onClick={onOpenCustom}>
