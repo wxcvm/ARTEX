@@ -7,6 +7,8 @@ ARTEX Windows 桌面客户端（便携版）
    按照 docs\USER_GUIDE_ZH.md 配置已有 PostgreSQL。
 3. 双击 ARTEX.Desktop.exe。首次启动会尝试连接现有 ARTEX，
    或自动启动同目录的 artex.exe（默认 127.0.0.1:8787）。
+   若没有 config.json 且未设置 ARTEX_PG_DSN，会自动弹出数据库连接向导；
+   保存后继续启动（不会覆盖已有配置）。
 4. 完成首次管理员设置和模型配置，即可在独立桌面窗口操作。
 
 使用说明：

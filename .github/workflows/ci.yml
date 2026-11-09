@@ -119,6 +119,10 @@ jobs:
       - name: Build portable Windows desktop bundle
         shell: pwsh
         run: ./desktop/windows/package.ps1 -SkipWebBuild -Version preview
+      - name: Smoke test native desktop window and WebView2 navigation
+        shell: pwsh
+        timeout-minutes: 3
+        run: ./desktop/windows/test-desktop-smoke.ps1
       - uses: actions/upload-artifact@v4
         with:
           name: artex-windows-desktop-preview

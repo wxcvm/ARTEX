@@ -1,4 +1,5 @@
 using System.Diagnostics;
+using System.Net.Sockets;
 using System.Drawing;
 using System.Text.Json;
 using System.Windows.Forms;
@@ -20,6 +21,7 @@ public sealed class MainForm : Form
     private StreamWriter? backendLog;
     private bool exiting;
     private bool ready;
+    private int connecting;
 
     private static string LocalData =>
         Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), "ARTEX");
@@ -89,19 +91,39 @@ public sealed class MainForm : Form
 
     private async Task ConnectAsync(CancellationToken cancel)
     {
-        if (cancel.IsCancellationRequested) return;
+        if (cancel.IsCancellationRequested || Interlocked.Exchange(ref connecting, 1) != 0) return;
 
         try
         {
             status.Text = "正在连接本机 ARTEX 服务…";
             if (!await IsHealthyAsync(cancel))
             {
-                if (ownedBackend is { HasExited: false })
-                    throw new InvalidOperationException("后端仍在运行，但尚未响应健康检查。请查看后端日志。");
+                if (ownedBackend is { HasExited: true })
+                {
+                    ownedBackend.Dispose();
+                    ownedBackend = null;
+                }
 
-                StartBackend();
-                status.Text = "已启动本机后端，正在连接数据库和等待服务就绪…";
+                if (ownedBackend is null)
+                {
+                    if (await IsPortOccupiedAsync(cancel))
+                        throw new InvalidOperationException(
+                            "本机 8787 端口已被其他服务占用，但它不是 ARTEX。请检查占用端口的程序后重试。");
 
+                    if (DatabaseSetupForm.NeedsConfiguration)
+                    {
+                        using var setup = new DatabaseSetupForm();
+                        if (setup.ShowDialog(this) != DialogResult.OK)
+                        {
+                            status.Text = "未配置数据库 · 点击“重新连接”继续设置";
+                            return;
+                        }
+                    }
+
+                    StartBackend();
+                }
+
+                status.Text = "正在等待本机 ARTEX 后端就绪…";
                 var deadline = DateTime.UtcNow.AddSeconds(60);
                 while (!await IsHealthyAsync(cancel))
                 {
@@ -145,6 +167,7 @@ public sealed class MainForm : Form
         }
         catch (Exception ex)
         {
+            if (cancel.IsCancellationRequested) return;
             status.Text = "连接失败 · 可点击“重新连接”重试";
             var message = ex.Message + "\n\n" +
                 "请确认已配置 PostgreSQL（config.json 或 ARTEX_PG_DSN），" +
@@ -152,6 +175,21 @@ public sealed class MainForm : Form
                 "如需排查，打开配置目录或查看：" + LogPath;
             MessageBox.Show(this, message, "ARTEX 启动失败", MessageBoxButtons.OK, MessageBoxIcon.Error);
         }
+        finally
+        {
+            Interlocked.Exchange(ref connecting, 0);
+        }
+    }
+
+    private static async Task<bool> IsPortOccupiedAsync(CancellationToken cancel)
+    {
+        using var client = new TcpClient();
+        try
+        {
+            await client.ConnectAsync(System.Net.IPAddress.Loopback, 8787, cancel);
+            return true;
+        }
+        catch (SocketException) { return false; }
     }
 
     private void StartBackend()
@@ -267,8 +305,15 @@ public sealed class MainForm : Form
         // service remains running when a desktop window closes.
         if (ownedBackend is not null)
         {
-            if (!ownedBackend.HasExited)
-                ownedBackend.Kill(entireProcessTree: true);
+            try
+            {
+                if (!ownedBackend.HasExited)
+                    ownedBackend.Kill(entireProcessTree: true);
+            }
+            catch (InvalidOperationException)
+            {
+                // The child can exit between HasExited and Kill.
+            }
             ownedBackend.Dispose();
         }
         lock (logLock)

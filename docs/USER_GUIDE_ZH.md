@@ -145,7 +145,7 @@ go build -tags embedui -o artex.exe ./cmd/artex
 1. 打开本仓库 [Actions](https://github.com/wxcvm/ARTEX/actions) 的最新成功 CI，下载 `artex-windows-desktop-preview` 制品；或从正式 [Releases](https://github.com/wxcvm/ARTEX/releases) 下载 `ARTEX-Windows-Desktop-amd64.zip`。**只有相关 CI / Release 已成功生成时才会存在该下载项。**
 2. 将 ZIP **完整解压**到可写目录（例如 `D:\Apps\ARTEX`），不要只复制桌面 EXE。
 3. 如果没有设置 `ARTEX_PG_DSN`，复制 `config.example.json` 为 `config.json`，按照第 2.2、2.3 节配置一个已有的 PostgreSQL。
-4. 双击 `ARTEX.Desktop.exe`。它会连接本机已运行的 ARTEX；若没有，则启动同目录的 `artex.exe` 并等待健康检查。首次使用在窗口里完成管理员初始化及模型配置。
+4. 双击 `ARTEX.Desktop.exe`。它会连接本机已运行的 ARTEX；若没有，则启动同目录的 `artex.exe` 并等待健康检查。**如果没有 `config.json` 且没有 `ARTEX_PG_DSN`，桌面客户端会打开首次数据库配置向导**，填入已有 PostgreSQL 的主机、端口、用户、密码和数据库名即可生成 `config.json`。手册第 2.2 节的 Docker 示例使用主机端口 **5433**；普通 PostgreSQL 的默认端口是 **5432**。向导不会覆盖已存在的配置，也不负责安装 PostgreSQL。随后在窗口里完成管理员初始化及模型配置。
 5. 窗口右上角关闭或最小化会收进系统托盘；通过窗口的 **退出** 或托盘菜单 **退出 ARTEX** 才真正关闭客户端。如果后端是由此客户端启动，退出也会停止后端，正在执行的任务可能中断；连接到已经启动的后端时则不会关闭它。
 
 桌面版压缩包包含自包含 .NET 客户端、WebView2 组件、内嵌前端的 Go 后端、`skills/`、配置模板和中文手册；Win11 通常已有 WebView2 Runtime，若没有请从微软官方安装。桌面版**仍需独立 PostgreSQL**；不负责替你安装数据库。WebView2 用户数据和后端日志在 `%LOCALAPPDATA%\ARTEX\`，后端监听地址默认为 `127.0.0.1:8787`。
