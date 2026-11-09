@@ -56,11 +56,27 @@ func run() int {
 		proxy   = flag.String("proxy", "127.0.0.1:8788", "traffic recording proxy address (empty to disable)")
 		checkDB = flag.Bool("check-db", false, "check PostgreSQL connectivity without starting the server or applying schema changes")
 		createDB = flag.Bool("create-db", false, "explicitly create the configured PostgreSQL database if it is missing; do not apply schema")
+		setupAppDB = flag.Bool("setup-app-db", false, "create a dedicated login role and database owned by it (new setups only)")
 	)
 	flag.Parse()
-	if *checkDB && *createDB {
+	if (*checkDB && *createDB) || (*checkDB && *setupAppDB) || (*createDB && *setupAppDB) {
 		fmt.Fprintln(os.Stderr, "use only one database action at a time")
 		return 2
+	}
+	if *setupAppDB {
+		ctx, cancel := context.WithTimeout(context.Background(), 15*time.Second)
+		defer cancel()
+		dsn, _, err := db.DSN()
+		if err == nil {
+			err = provisionDedicatedDatabase(ctx, dsn,
+				os.Getenv("ARTEX_APP_DB_USER"), os.Getenv("ARTEX_APP_DB_PASSWORD"))
+		}
+		if err != nil {
+			fmt.Fprintf(os.Stderr, "PostgreSQL app role setup failed: %v\n", err)
+			return 1
+		}
+		fmt.Println("PostgreSQL dedicated role and database ready")
+		return 0
 	}
 	if *createDB {
 		ctx, cancel := context.WithTimeout(context.Background(), 12*time.Second)
