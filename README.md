@@ -28,7 +28,7 @@ AI autonomous penetration testing system (Go backend + Next.js frontend)
 - **下载**：GitHub Actions 的 `artex-windows-desktop-preview` 构建产物，或正式打 tag 后 [Releases](https://github.com/wxcvm/ARTEX/releases) 的 `ARTEX-Windows-Desktop-amd64.zip`。
 - **安装**：解压完整 ZIP，在 `config.json` 中配置 PostgreSQL（或设置 `ARTEX_PG_DSN`），双击 `ARTEX.Desktop.exe`。不用单独安装 .NET，Windows 需要 WebView2 Runtime（Win11 通常已有）。
 - **行为**：本机已有 ARTEX 服务时会复用；否则启动压缩包里的 `artex.exe`。关闭窗口收进托盘；通过“退出”结束桌面程序及它自行启动的后端。原浏览器模式继续可用。
-- **注意**：这是便携桌面客户端，不是安装器；不包含 PostgreSQL，也不会强制改变原有 Web/Agent 能力。配置及操作见 [中文操作指南](docs/USER_GUIDE_ZH.md#26-windows-桌面客户端便携版)。
+- **注意**：便携 ZIP 和安装版是两个独立的分发形式；都不包含 PostgreSQL，也不会改变原有 Web/Agent 能力。配置及操作见 [中文操作指南](docs/USER_GUIDE_ZH.md#26-windows-桌面客户端便携版)。
 
 ### 安装版（新增）
 
