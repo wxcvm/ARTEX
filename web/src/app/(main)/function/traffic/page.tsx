@@ -7,6 +7,7 @@ import {
   ArrowUpNarrowWideIcon,
   ChevronLeftIcon,
   ChevronRightIcon,
+  CopyIcon,
   EraserIcon,
   FilterXIcon,
   ListChecksIcon,
@@ -44,7 +45,7 @@ import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip
 import { api } from "@/lib/api";
 import { useStoredSortPreference } from "@/lib/sort-preference";
 import type { TrafficDetail, TrafficExchange, TrafficHost, TrafficResp } from "@/lib/types";
-import { cn } from "@/lib/utils";
+import { cn, copyText } from "@/lib/utils";
 
 function fmtTime(ts: string) {
   return new Date(ts).toLocaleString("zh-CN", {
@@ -113,6 +114,11 @@ const STATUS_BUCKETS = ["2xx", "3xx", "4xx", "5xx"];
 
 export default function TrafficPage() {
   const [selectedFlows, setSelectedFlows] = React.useState<Set<string>>(() => new Set());
+
+  const copyTrafficID = async (id: string) => {
+    if (await copyText(id)) toast.success("已复制流量 ID");
+    else toast.error("复制失败，请手动选择流量 ID");
+  };
   const [linking, setLinking] = React.useState(false);
   const [page, setPage] = React.useState(0);
   const [size, setSize] = React.useState(50);
@@ -644,6 +650,7 @@ export default function TrafficPage() {
                     onSort={toggleSort}
                     className="w-36"
                   />
+                  <TableHead className="w-32">ID</TableHead>
                   <TableHead className="w-44">host</TableHead>
                   <TableHead className="w-20">Method</TableHead>
                   <TableHead>URL</TableHead>
@@ -690,6 +697,22 @@ export default function TrafficPage() {
                       />
                     </TableCell>
                     <TableCell className="text-xs text-muted-foreground tabular-nums">{fmtTime(e.ts)}</TableCell>
+                    <TableCell className="max-w-32">
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        className="h-auto max-w-full gap-1 px-1 font-mono text-xs"
+                        title={`复制完整流量 ID：${e.id}`}
+                        aria-label={`复制流量 ID ${e.id}`}
+                        onClick={(event) => {
+                          event.stopPropagation();
+                          void copyTrafficID(e.id);
+                        }}
+                      >
+                        <CopyIcon className="size-3 shrink-0" />
+                        <span className="truncate">{e.id}</span>
+                      </Button>
+                    </TableCell>
                     <TableCell className="font-mono text-xs">{e.host}</TableCell>
                     <TableCell>
                       <MethodBadge method={e.method} />
@@ -708,7 +731,7 @@ export default function TrafficPage() {
                 ))}
                 {exchanges.length === 0 && (
                   <TableRow>
-                    <TableCell colSpan={8} className="py-12 text-center text-sm text-muted-foreground">
+                    <TableCell colSpan={9} className="py-12 text-center text-sm text-muted-foreground">
                       {traffic === null ? "Loading…" : "No matching traffic."}
                     </TableCell>
                   </TableRow>
@@ -736,6 +759,16 @@ export default function TrafficPage() {
                   <Badge variant="secondary" className={cn("font-mono tabular-nums", statusTone(selected.status))}>
                     {selected.status}
                   </Badge>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    className="h-7 gap-1 font-mono text-xs"
+                    title={`复制完整流量 ID：${selected.id}`}
+                    onClick={() => void copyTrafficID(selected.id)}
+                  >
+                    <CopyIcon className="size-3" />
+                    <span className="max-w-32 truncate">{selected.id}</span>
+                  </Button>
                   <span className="ml-auto text-xs text-muted-foreground tabular-nums">{fmtTime(selected.ts)}</span>
                 </div>
                 <SheetTitle className="break-all font-mono">{selected.host}</SheetTitle>
