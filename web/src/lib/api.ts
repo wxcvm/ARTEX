@@ -1103,6 +1103,11 @@ export const api = {
   // ---- tools (built-in tool catalog) ----
   tools: () => get<{ tools: Tool[] }>("/tools").then((r) => arr(r.tools)),
   externalTools: () => get<ExternalToolInventory>("/tools/packages"),
+  externalToolRelease: (id: string) => get<ExternalToolRelease>(`/tools/packages/${encodeURIComponent(id)}/release`),
+  installExternalTool: (id: string, version: string, sha256: string) =>
+    post<{ ok: boolean; version: string; sha256: string; path: string }>(
+      `/tools/packages/${encodeURIComponent(id)}/install`, { version, sha256 },
+    ),
   saveTool: (key: string, patch: Pick<Tool, "description" | "schema" | "agents" | "enabled">) =>
     put<{ ok: boolean }>(`/tools/${key}`, patch),
   resetTool: (key: string) => post<{ ok: boolean }>(`/tools/${key}/reset`, {}),
