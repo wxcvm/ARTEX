@@ -303,6 +303,17 @@ docker compose logs -f artex
 - Anthropic 接口：`Format = anthropic`，填写对应模型和 Key。
 - Responses API：只有服务实际实现该接口时才选 `openai-responses`。
 
+**Base URL 填写规则（常见连接失败原因）：**
+
+| Profile Format | Base URL 示例 | ARTEX/模型 SDK 请求时追加的路径 |
+| --- | --- | --- |
+| `anthropic` | `https://api.anthropic.com`（末尾不要 `/v1`） | `/v1/messages` |
+| `openai` | `https://api.openai.com/v1` | `/chat/completions` |
+| `openai-responses` | `https://api.openai.com/v1` | `/responses` |
+| `ollama` | `http://127.0.0.1:11434/v1` | `/chat/completions` |
+
+例如 Anthropic 的 Base URL 若错误地填为 `https://api.anthropic.com/v1`，实际路径就可能变成 `/v1/v1/messages`。使用其他云平台或中转服务时，以它实际兼容的协议和 API 前缀为准，不要将以上域名当作所有服务的通用地址。
+
 环境变量 `OPENAI_API_KEY` / `ANTHROPIC_API_KEY` 也可以用于初始化默认模型配置；网页 Profile 是另一个配置入口。不要把 Key 发在 Issues、截图或日志里。
 
 ### 5.3 Ollama 和本地模型
