@@ -5,6 +5,7 @@ import { ArrowUpRightIcon, DownloadIcon, RefreshCwIcon } from "lucide-react";
 import { toast } from "sonner";
 
 import { api } from "@/lib/api";
+import { OfflineToolsPanel } from "@/components/offline-tools-panel";
 import type { ExternalToolInventory, ExternalToolRelease, ExternalToolStatus } from "@/lib/types";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
@@ -245,6 +246,7 @@ export function ExternalToolsPanel({ onOpenCustom }: { onOpenCustom: () => void 
       <CardContent className="space-y-4">
         {error && <p role="alert" className="text-destructive text-sm">检测失败：{error}</p>}
         {loading && !inventory && <p className="text-muted-foreground text-sm">正在检测本机外部工具…</p>}
+        <OfflineToolsPanel host={inventory?.host ?? ""} managedCount={items.filter((tool) => tool.managed_version).length} onRefresh={refresh} />
         {items.length > 0 && (
           <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-3">
             {items.map((tool) => <ToolItem key={tool.id} tool={tool} host={inventory?.host ?? ""} onRefresh={refresh} />)}
