@@ -1298,6 +1298,28 @@ export interface Tool {
   calls?: number; // persistent runtime invocation count (older APIs may omit it)
 }
 
+// Host-installed external binaries (separate from Agent tools and MCP).
+export interface ExternalToolStatus {
+  id: string;
+  name: string;
+  binary: string;
+  category: string;
+  description: string;
+  source: string;
+  version_args: string[];
+  docker_reference_version?: string;
+  status: "missing" | "installed" | "unverified";
+  path?: string;
+  origin?: "custom" | "managed" | "bundled" | "path";
+  version?: string;
+  detail?: string;
+}
+
+export interface ExternalToolInventory {
+  host: string;
+  tools: ExternalToolStatus[];
+}
+
 // ---- Stats ----
 export interface Stats {
   assets: number;
