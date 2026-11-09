@@ -1,0 +1,87 @@
+{
+  "schema_version": 1,
+  "tools": [
+    {
+      "id": "nuclei",
+      "name": "Nuclei",
+      "binary": "nuclei",
+      "category": "recon",
+      "description": "模板驱动的安全检测",
+      "source": "https://github.com/projectdiscovery/nuclei",
+      "version_args": [
+        "-version"
+      ],
+      "docker_reference_version": "v3.11.1"
+    },
+    {
+      "id": "httpx",
+      "name": "HTTPx",
+      "binary": "httpx",
+      "category": "recon",
+      "description": "HTTP 服务发现与响应探测",
+      "source": "https://github.com/projectdiscovery/httpx",
+      "version_args": [
+        "-version"
+      ],
+      "docker_reference_version": "v1.12.0"
+    },
+    {
+      "id": "subfinder",
+      "name": "Subfinder",
+      "binary": "subfinder",
+      "category": "recon",
+      "description": "被动子域名发现",
+      "source": "https://github.com/projectdiscovery/subfinder",
+      "version_args": [
+        "-version"
+      ],
+      "docker_reference_version": "v2.17.0"
+    },
+    {
+      "id": "katana",
+      "name": "Katana",
+      "binary": "katana",
+      "category": "recon",
+      "description": "Web 端点爬取与发现",
+      "source": "https://github.com/projectdiscovery/katana",
+      "version_args": [
+        "-version"
+      ],
+      "docker_reference_version": "v1.8.0"
+    },
+    {
+      "id": "ffuf",
+      "name": "ffuf",
+      "binary": "ffuf",
+      "category": "recon",
+      "description": "Web 内容与参数模糊测试",
+      "source": "https://github.com/ffuf/ffuf",
+      "version_args": [
+        "-V"
+      ],
+      "docker_reference_version": "v2.3.0"
+    },
+    {
+      "id": "naabu",
+      "name": "Naabu",
+      "binary": "naabu",
+      "category": "recon",
+      "description": "TCP 端口发现；部分 Windows 模式依赖 Npcap",
+      "source": "https://github.com/projectdiscovery/naabu",
+      "version_args": [
+        "-version"
+      ]
+    },
+    {
+      "id": "dnsx",
+      "name": "DNSx",
+      "binary": "dnsx",
+      "category": "recon",
+      "description": "DNS 查询与解析",
+      "source": "https://github.com/projectdiscovery/dnsx",
+      "version_args": [
+        "-version"
+      ]
+    }
+  ]
+}
