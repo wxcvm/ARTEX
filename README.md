@@ -28,7 +28,22 @@ AI autonomous penetration testing system (Go backend + Next.js frontend)
 - **下载**：GitHub Actions 的 `artex-windows-desktop-preview` 构建产物，或正式打 tag 后 [Releases](https://github.com/wxcvm/ARTEX/releases) 的 `ARTEX-Windows-Desktop-amd64.zip`。
 - **安装**：解压完整 ZIP，在 `config.json` 中配置 PostgreSQL（或设置 `ARTEX_PG_DSN`），双击 `ARTEX.Desktop.exe`。不用单独安装 .NET，Windows 需要 WebView2 Runtime（Win11 通常已有）。
 - **行为**：本机已有 ARTEX 服务时会复用；否则启动压缩包里的 `artex.exe`。关闭窗口收进托盘；通过“退出”结束桌面程序及它自行启动的后端。原浏览器模式继续可用。
-- **注意**：这是便携桌面客户端，不是安装器；不包含 PostgreSQL，也不会强制改变原有 Web/Agent 能力。配置及操作见 [中文操作指南](docs/USER_GUIDE_ZH.md#26-windows-桌面客户端便携版)。
+- **注意**：便携 ZIP 和安装版是两个独立的分发形式；都不包含 PostgreSQL，也不会改变原有 Web/Agent 能力。配置及操作见 [中文操作指南](docs/USER_GUIDE_ZH.md#26-windows-桌面客户端便携版)。
+
+### 安装版（新增）
+
+下载 CI 构建产物 **`artex-windows-setup-preview`**，或发布版中的 **`ARTEX-Windows-Setup-amd64.exe`**，双击运行即可选择安装目录（包括 D 盘）。安装器使用现有 ARTEX 图标，并创建开始菜单入口、可选的桌面快捷方式和 Windows“已安装的应用”卸载项；普通用户安装不要求管理员权限。
+
+**升级数据保护**：同一安装位置的 `config.json`、`data/` 和已有 `skills/` 不会被覆盖，卸载后保留配置和已修改的 Skills；需要完全清理时可以自行删除剩余数据。安装器不会安装 PostgreSQL 或替换现有便携版。此版本未配置代码签名，Windows 可能显示未知发布者提示。
+
+**安装版和便携版功能相同**：安装版适合开始菜单和卸载管理，便携 ZIP 适合放进自选目录并直接运行。已经有便携版时无需强制迁移。
+
+生成安装包（先运行便携包构建，再用 Inno Setup 6 编译）：
+
+```powershell
+./desktop/windows/package.ps1
+./desktop/windows/build-installer.ps1 -Version 0.0.0-preview
+```
 
 单独构建桌面包（Windows PowerShell，需 Go 1.26.3、Node.js 22、.NET 10 SDK）：
 
