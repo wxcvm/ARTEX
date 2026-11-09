@@ -2389,6 +2389,9 @@ function route(m: string, path: string, seg: string[], q: URLSearchParams, b: Re
   // ── tools ──
   if (path === "/tools" && m === "GET") return { tools: D.tools };
 
+  if (seg[0] === "tools" && seg[1] === "packages" && seg.length === 4) {
+    throw new Error("演示模式没有真实 Windows 后端，不能查询或安装官方工具");
+  }
   if (path === "/tools/packages" && m === "GET") {
     const known = [
       ["nuclei", "Nuclei", "projectdiscovery/nuclei"],
