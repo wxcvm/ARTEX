@@ -1226,8 +1226,12 @@ export const api = {
   deleteSkillPath: (skill: string, path: string) => del<{ deleted: string }>(`/skills/${skill}/files/${path}`),
   skillUsage: (name: string, limit = 50) =>
     get<{ calls: SkillCall[] }>(`/skills/${name}/usage?limit=${limit}`).then((r) => arr(r.calls)),
-  missingSkills: (limit = 20) =>
-    get<{ missing: MissingSkill[] }>(`/skills/missing?limit=${limit}`).then((r) => arr(r.missing)),
+  missingSkills: (page = 1, limit = 20) =>
+    get<{ missing: MissingSkill[]; total: number; total_calls: number }>(
+      `/skills/missing?page=${page}&limit=${limit}`,
+    ).then((r) => ({
+      missing: arr(r.missing), total: r.total ?? 0, totalCalls: r.total_calls ?? 0,
+    })),
 
   // ---- visibility (MCP resource side) ---- (agent ids are strings per spec)
   resourceVisibility: (kind: string, id: number) =>
