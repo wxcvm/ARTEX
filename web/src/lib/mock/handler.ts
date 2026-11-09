@@ -2388,6 +2388,29 @@ function route(m: string, path: string, seg: string[], q: URLSearchParams, b: Re
 
   // ── tools ──
   if (path === "/tools" && m === "GET") return { tools: D.tools };
+
+  if (path === "/tools/packages" && m === "GET") {
+    const known = [
+      ["nuclei", "Nuclei", "projectdiscovery/nuclei"],
+      ["httpx", "HTTPx", "projectdiscovery/httpx"],
+      ["subfinder", "Subfinder", "projectdiscovery/subfinder"],
+      ["katana", "Katana", "projectdiscovery/katana"],
+      ["ffuf", "ffuf", "ffuf/ffuf"],
+      ["naabu", "Naabu", "projectdiscovery/naabu"],
+      ["dnsx", "DNSx", "projectdiscovery/dnsx"],
+    ];
+    return {
+      host: "demo/simulated",
+      tools: known.map(([id, name, repo]) => ({
+        id, name, binary: id, category: "recon",
+        description: "演示环境未检测真实后端主机",
+        source: "https://github.com/" + repo,
+        version_args: ["-version"],
+        status: "missing",
+      })),
+    };
+  }
+
   if (path === "/tools/custom" && m === "POST") return { key: String(b.key ?? "custom-tool") };
   if (path === "/tools/custom/test") return { output: "(demo) Sample tool execution output.", is_error: false };
 
