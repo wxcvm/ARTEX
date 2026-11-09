@@ -1103,6 +1103,24 @@ export const api = {
   // ---- tools (built-in tool catalog) ----
   tools: () => get<{ tools: Tool[] }>("/tools").then((r) => arr(r.tools)),
   externalTools: () => get<ExternalToolInventory>("/tools/packages"),
+  exportOfflineTools: async (): Promise<Blob> => {
+    if (MOCK) throw new Error("演示模式无法导出实际工具");
+    const token = getToken();
+    const response = await fetch("/api/tools/packages/offline/export", {
+      headers: token ? { Authorization: `Bearer ${token}` } : {},
+    });
+    if (!response.ok) {
+      const payload = await response.json().catch(() => ({})) as { error?: string };
+      throw new Error(payload.error || `离线包导出失败：HTTP ${response.status}`);
+    }
+    return response.blob();
+  },
+  importOfflineTools: (file: File) =>
+    http<{ ok: boolean; installed: string[] }>("/tools/packages/offline/import", {
+      method: "POST",
+      headers: { "Content-Type": "application/zip" },
+      body: file,
+    }),
   externalToolRelease: (id: string) => get<ExternalToolRelease>(`/tools/packages/${encodeURIComponent(id)}/release`),
   installExternalTool: (id: string, version: string, sha256: string) =>
     post<{ ok: boolean; version: string; sha256: string; path: string }>(
