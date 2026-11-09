@@ -93,7 +93,11 @@ func run() int {
 		skillDir = abs
 	}
 	log.Printf("[config] skill directory: %s", skillDir)
-	srv := server.New(ctx, mgr, skillDir, *dataDir, config.BaseDir())
+	jwtKeyDir := config.BaseDir()
+	if override := os.Getenv("ARTEX_JWT_KEY_DIR"); override != "" {
+		jwtKeyDir = override
+	}
+	srv := server.New(ctx, mgr, skillDir, *dataDir, jwtKeyDir)
 	httpSrv := &http.Server{
 		Addr:              *addr,
 		Handler:           srv.Handler(),
