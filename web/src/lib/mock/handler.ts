@@ -2434,7 +2434,16 @@ function route(m: string, path: string, seg: string[], q: URLSearchParams, b: Re
 
   // ── skills ──
   if (path === "/skills" && m === "GET") return { skills: D.skills };
-  if (path === "/skills/missing") return { missing: D.missingSkills };
+  if (path === "/skills/missing") {
+    const page = Math.max(1, Math.floor(Number(q.get("page")) || 1));
+    const limit = Math.min(200, Math.max(1, Math.floor(Number(q.get("limit")) || 20)));
+    const all = D.missingSkills;
+    return {
+      missing: all.slice((page - 1) * limit, page * limit),
+      total: all.length,
+      total_calls: all.reduce((count, item) => count + item.calls, 0),
+    };
+  }
   if (seg[0] === "skills" && seg[2] === "usage") return { calls: D.skillCalls };
   if (path === "/skills" && m === "POST") return { name: String(b.name ?? "new-skill") };
   if (seg[0] === "skills" && seg[2] === "files" && seg.length === 3) return { files: ["SKILL.md"] };

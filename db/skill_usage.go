@@ -104,9 +104,20 @@ ORDER BY COUNT(*) DESC, skill`)
 // most-requested first — the "wished it existed" gap list. Installed
 // names are excluded before paging, while old misses remain in the ledger.
 // Names come from the model and are already length-capped at insert time.
+// MissingSkillStats preserves the legacy first-page API for existing callers.
 func (d *DB) MissingSkillStats(limit int, installed ...string) ([]SkillStat, error) {
+	items, _, _, err := d.MissingSkillStatsPage(limit, 1, installed...)
+	return items, err
+}
+
+// MissingSkillStatsPage reports the full unresolved skill count and missed-call
+// total, including archived tasks, before returning only the requested page.
+func (d *DB) MissingSkillStatsPage(limit, page int, installed ...string) ([]SkillStat, int, int, error) {
 	if limit <= 0 || limit > 200 {
 		limit = 20
+	}
+	if page < 1 {
+		page = 1
 	}
 	if installed == nil {
 		installed = []string{}
@@ -120,7 +131,7 @@ WHERE NOT found AND skill <> ALL($1::text[])
 GROUP BY skill
 ORDER BY COUNT(*) DESC, skill`, installed)
 	if err != nil {
-		return nil, err
+		return nil, 0, 0, err
 	}
 	defer rows.Close()
 	out := []SkillStat{}
@@ -129,7 +140,7 @@ ORDER BY COUNT(*) DESC, skill`, installed)
 		var agents string
 		var lastUsed sql.NullTime
 		if err := rows.Scan(&s.Skill, &s.Calls, &agents, &lastUsed); err != nil {
-			return nil, err
+			return nil, 0, 0, err
 		}
 		s.Agents = []string{}
 		if agents != "" {
@@ -142,11 +153,11 @@ ORDER BY COUNT(*) DESC, skill`, installed)
 		out = append(out, s)
 	}
 	if err := rows.Err(); err != nil {
-		return nil, err
+		return nil, 0, 0, err
 	}
 	archived, err := d.archivedTaskAggregates()
 	if err != nil {
-		return nil, err
+		return nil, 0, 0, err
 	}
 	out = mergeArchivedSkillStats(out, archived, true)
 	// Archived history is merged after the SQL query. Exclude installed names
@@ -164,10 +175,21 @@ ORDER BY COUNT(*) DESC, skill`, installed)
 		}
 		out = filtered
 	}
-	if len(out) > limit {
-		out = out[:limit]
+	// Compute totals after including archived history and excluding installed
+	// skills, but before slicing to one page.
+	total, calls := len(out), 0
+	for _, item := range out {
+		calls += item.Calls
 	}
-	return out, nil
+	if total == 0 || page > (total-1)/limit+1 {
+		return []SkillStat{}, total, calls, nil
+	}
+	from := (page - 1) * limit
+	to := from + limit
+	if to > total {
+		to = total
+	}
+	return out[from:to], total, calls, nil
 }
 
 // SkillCall is one row of a skill's recent-call list (detail panel).

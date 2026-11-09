@@ -26,6 +26,7 @@ import {
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
 import { Button } from "@/components/ui/button";
+import { TablePagination } from "@/components/table-pagination";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
@@ -146,11 +147,13 @@ type PendingDelete =
 // requests — this is pure aggregation over props.
 function SkillsOverview({
   skills,
-  missing,
+  missingTotal,
+  missingCalls,
   onSelect,
 }: {
   skills: SkillItem[];
-  missing: MissingSkill[];
+  missingTotal: number;
+  missingCalls: number;
   onSelect: (name: string) => void;
 }) {
   const agg = React.useMemo(() => {
@@ -162,17 +165,15 @@ function SkillsOverview({
       .filter((s) => s.last_used)
       .sort((a, b) => (a.last_used! < b.last_used! ? 1 : -1))
       .slice(0, 6);
-    const missingCalls = missing.reduce((n, m) => n + m.calls, 0);
-    return {
+     return {
       totalCalls,
       usedCount: used.length,
       ranked,
       topCalls: ranked[0]?.calls ?? 0,
       neverUsed,
       recent,
-      missingCalls,
     };
-  }, [skills, missing]);
+  }, [skills]);
 
   if (skills.length === 0) {
     return (
@@ -186,7 +187,7 @@ function SkillsOverview({
     { label: "Total skills", value: skills.length, hint: `${agg.usedCount} have been called` },
     { label: "Total calls", value: agg.totalCalls },
     { label: "Unused", value: agg.neverUsed.length, hint: agg.neverUsed.length > 0 ? "never loaded by any agent" : "all used" },
-    { label: "Missed calls", value: agg.missingCalls, hint: missing.length > 0 ? `${missing.length} missing skills` : "none" },
+    { label: "Missed calls", value: missingCalls, hint: missingTotal > 0 ? `${missingTotal} missing skills` : "none" },
   ];
 
   return (
@@ -339,6 +340,10 @@ export default function SkillsPage() {
   const [usageCalls, setUsageCalls] = React.useState<SkillCall[]>([]);
   const [usageLoading, setUsageLoading] = React.useState(false);
   const [missing, setMissing] = React.useState<MissingSkill[]>([]);
+  const [missingPage, setMissingPage] = React.useState(1);
+  const [missingTotal, setMissingTotal] = React.useState(0);
+  const [missingCalls, setMissingCalls] = React.useState(0);
+  const [missingRevision, setMissingRevision] = React.useState(0);
 
   // Turn a real missing call into an editable draft; never auto-install a
   // procedure based on a model-generated skill name.
@@ -355,9 +360,9 @@ export default function SkillsPage() {
 
   // ── Data ──────────────────────────────────────────────────────────────────
   const load = React.useCallback(() => {
+    setMissingRevision((rev) => rev + 1);
     api.agents().then(setAgents).catch(() => {});
     api.mcpServers().then(setMcpOptions).catch(() => {});
-    api.missingSkills().then(setMissing).catch(() => {});
     api.skills().then((ss) => {
       setSkills(ss);
       ss.forEach((s) =>
@@ -369,6 +374,24 @@ export default function SkillsPage() {
   }, []);
 
   React.useEffect(() => { load(); }, [load]);
+
+  React.useEffect(() => {
+    if (!missingRevision) return;
+    let active = true;
+    api.missingSkills(missingPage)
+      .then(({ missing: items, total, totalCalls }) => {
+        if (!active) return;
+        setMissing(items);
+        setMissingTotal(total);
+        setMissingCalls(totalCalls);
+        const lastPage = Math.max(1, Math.ceil(total / 20));
+        if (missingPage > lastPage) setMissingPage(lastPage);
+      })
+      .catch(() => {
+        // Preserve the last successfully loaded totals until refresh.
+      });
+    return () => { active = false; };
+  }, [missingPage, missingRevision]);
 
   // ── Upload a .zip skill ───────────────────────────────────────────────────
   async function uploadZip(file: File, overwrite = false) {
@@ -721,19 +744,19 @@ export default function SkillsPage() {
           <p className="text-muted-foreground text-xs">Skill library · agentskills.io spec · visibility granted per agent</p>
         </div>
         {/* Gap list: skills agents invoke by name but missing from the library — direct evidence of what to add. */}
-        {missing.length > 0 && (
+        {missingTotal > 0 && (
           <Popover>
             <PopoverTrigger asChild>
               <Button size="sm" variant="outline" className="ml-auto">
                 <AlertTriangleIcon className="size-3.5 text-amber-500" />
-                {missing.length} missing skills
+                {missingTotal} missing skills
               </Button>
             </PopoverTrigger>
             <PopoverContent align="end" className="w-80">
               <p className="mb-2 text-xs text-muted-foreground">
                 Skills agents invoke by name that do not exist in the library. Sorted by invocation count.
               </p>
-              <div className="space-y-1">
+              <div className="max-h-80 space-y-1 overflow-y-auto">
                 {missing.map((m) => (
                   <button
                     key={m.skill}
@@ -748,6 +771,14 @@ export default function SkillsPage() {
                   </button>
                 ))}
               </div>
+              <TablePagination
+                page={missingPage}
+                pageSize={20}
+                total={missingTotal}
+                onPageChange={setMissingPage}
+                onPageSizeChange={() => setMissingPage(1)}
+                pageSizeOptions={[20]}
+              />
             </PopoverContent>
           </Popover>
         )}
@@ -857,7 +888,8 @@ export default function SkillsPage() {
           {!selected && (
             <SkillsOverview
               skills={skills}
-              missing={missing}
+              missingTotal={missingTotal}
+              missingCalls={missingCalls}
               onSelect={(name) => setSelected({ skill: name, path: null })}
             />
           )}
