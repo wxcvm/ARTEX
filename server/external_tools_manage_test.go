@@ -99,3 +99,13 @@ func TestExternalToolInvalidReceiptDoesNotDelete(t *testing.T) {
 	if err := uninstallManagedExternalTool(root, spec); err == nil { t.Fatal("invalid receipt should be rejected") }
 	if got := readToolContents(t, current); got != "user file" { t.Fatalf("unverified file deleted: %q", got) }
 }
+
+func TestExternalToolPreviousBackupIsNotActive(t *testing.T) {
+	root := t.TempDir()
+	spec := externalToolSpec{ID: "artex-inventory-backup-test", Binary: "artex-inventory-backup-test"}
+	writeManagedToolFixture(t, root, spec, ".previous", "v1.0.0", "saved backup")
+	path, origin := externalToolExecutable(spec, []externalToolRoot{{dir: root, origin: "managed"}})
+	if path != "" || origin != "" {
+		t.Fatalf("backup presented as active executable: %q (%q)", path, origin)
+	}
+}
