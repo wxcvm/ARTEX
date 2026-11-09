@@ -67,6 +67,7 @@ import type {
   LLMRetryPolicy,
   LLMTask,
   ExternalToolInventory,
+  ExternalToolRelease,
   MCPServer,
   MCPTool,
   MissingSkill,
