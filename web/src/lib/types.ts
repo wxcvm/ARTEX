@@ -1315,6 +1315,7 @@ export interface ExternalToolStatus {
   detail?: string;
   managed_version?: string;
   managed_path?: string;
+  previous_version?: string;
 }
 
 export interface ExternalToolRelease {
