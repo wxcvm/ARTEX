@@ -21,6 +21,8 @@ AI autonomous penetration testing system (Go backend + Next.js frontend)
 
 ---
 
+**外部工具管理（第一阶段）**：系统 → Tools → External binaries 已支持本机 nuclei、httpx、subfinder、katana、ffuf、naabu、dnsx 的路径与版本检测；支持 `ARTEX_TOOL_DIRS`（Windows 使用分号分隔多个目录），不会自动下载安装或修改 Agent 绑定。详情见 [中文操作指南](docs/USER_GUIDE_ZH.md#28-windows-外部工具检测tool-manager-第一阶段)。
+
 ## Windows 桌面客户端 / Native desktop (Windows 11)
 
 除传统浏览器界面外，本 fork 提供 **ARTEX.Desktop.exe** 原生 Windows 桌面窗口（WinForms + WebView2）。与传统 Web UI 使用同一个 Go 后端、任务和配置，支持启动/连接本地服务、托盘、刷新、重新连接以及在浏览器中打开。
