@@ -11,6 +11,9 @@ const nextConfig = {
   // Prevent a parent directory's lockfile from affecting root inference and asset path generation.
   turbopack: { root: fileURLToPath(new URL(".", import.meta.url)) },
   reactCompiler: true,
+  // Allow repeatable builds with a stable ID. Release jobs may set ARTEX_BUILD_ID
+  // to the commit SHA so different deployments remain distinguishable.
+  generateBuildId: async () => process.env.ARTEX_BUILD_ID || "artex",
   // Allow accessing dev resources (HMR) from LAN IPs; add or remove as needed.
   // In dev, allow any IPv4 origin to access /_next/* and HMR (unaffected by LAN IP changes).
   // Note: Next forbids a bare "*" for security; use segmented wildcards — "*.*.*.*" matches any IPv4.
