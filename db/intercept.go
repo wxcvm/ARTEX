@@ -37,7 +37,7 @@ type InterceptPending struct {
 	ToolInput      json.RawMessage `json:"tool_input"`
 	Status         string          `json:"status"`
 	DecisionSource string          `json:"decision_source"`
-	Reason         string          `json:"reason"` // rule message or model decision reason (prefixed with [Model])
+	Reason         string          `json:"reason"` // rule message or model decision reason (prefixed with ModelReasonPrefix)
 	DecidedAt      *time.Time      `json:"decided_at"`
 	CreatedAt      time.Time       `json:"created_at"`
 }
@@ -225,10 +225,21 @@ func scanInterceptApprovalRow(rows interface{ Scan(...any) error }, r *Intercept
 	)
 }
 
+// ModelReasonPrefix is written by the LLM fallback judge and read by approval history.
+const ModelReasonPrefix = "[model]"
+
+const legacyModelReasonPrefix = "[模型]"
+
+func isModelReason(reason string) bool {
+	return strings.HasPrefix(strings.ToLower(reason), ModelReasonPrefix) ||
+		strings.HasPrefix(reason, legacyModelReasonPrefix)
+}
+
 // Keep legacy rows without decision_source consistent with their displayed source.
+// The SQL checks mirror isModelReason, including the historical Chinese prefix.
 const approvalDecisionSource = `COALESCE(NULLIF(ip.decision_source,''), CASE
  WHEN ip.rule_id IS NOT NULL THEN 'rule'
- WHEN ip.reason LIKE '[Model]%' THEN 'model' ELSE 'unknown' END)`
+ WHEN lower(ip.reason) LIKE '` + ModelReasonPrefix + `%' OR ip.reason LIKE '` + legacyModelReasonPrefix + `%' THEN 'model' ELSE 'unknown' END)`
 
 const approvalRowColumns = `ip.id, ip.rule_id, ip.conversation_id, ip.task_id, ip.agent_name,
        ip.tool_name, ip.tool_input, ip.status, ip.reason, ip.decided_at, ip.created_at, ` + approvalDecisionSource + `,
@@ -248,7 +259,7 @@ func interceptSource(ruleID int64, reason string) string {
 	if ruleID != 0 {
 		return "rule"
 	}
-	if strings.HasPrefix(reason, "[Model]") {
+	if isModelReason(reason) {
 		return "model"
 	}
 	return "unknown"
