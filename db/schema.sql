@@ -1084,7 +1084,7 @@ CREATE TABLE IF NOT EXISTS intercept_pending (
     tool_input      JSONB NOT NULL DEFAULT '{}',
     status          TEXT NOT NULL DEFAULT 'pending'
                         CHECK (status IN ('pending', 'allowed', 'denied', 'timeout')),
-    -- Decision reason: the rule message when a rule hits; the model's short reason (with the [Model] prefix) for an LLM fallback decision.
+    -- Decision reason: the rule message when a rule hits; the model's short reason (with the [model] prefix) for an LLM fallback decision.
     reason          TEXT NOT NULL DEFAULT '',
     decided_at      TIMESTAMPTZ,
     created_at      TIMESTAMPTZ NOT NULL DEFAULT NOW()
@@ -1097,7 +1097,11 @@ ALTER TABLE intercept_pending ADD COLUMN IF NOT EXISTS reason TEXT NOT NULL DEFA
 ALTER TABLE intercept_pending ADD COLUMN IF NOT EXISTS audit JSONB;
 ALTER TABLE intercept_pending ADD COLUMN IF NOT EXISTS decision_source TEXT NOT NULL DEFAULT '';
 UPDATE intercept_pending SET decision_source=CASE WHEN rule_id IS NOT NULL THEN 'rule'
- WHEN reason LIKE '[Model]%' THEN 'model' ELSE 'unknown' END WHERE decision_source='';
+ WHEN lower(reason) LIKE '[model]%' OR reason LIKE '[模型]%' THEN 'model' ELSE 'unknown' END WHERE decision_source='';
+-- Repair existing decisions misclassified before model reason prefixes were unified.
+UPDATE intercept_pending SET decision_source='model'
+ WHERE decision_source='unknown' AND rule_id IS NULL
+   AND (lower(reason) LIKE '[model]%' OR reason LIKE '[模型]%');
 
 -- =====================================================================
 -- L. Finding persistence

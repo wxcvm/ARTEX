@@ -476,17 +476,25 @@ func (i *Interceptor) Judge(ctx context.Context, tool string, arguments json.Raw
 	out.ProfileID = cfg.ProfileID
 	configJSON, _ := json.Marshal(cfg)
 	out.ConfigDigest = digestInput(configJSON)
-	if out.Message == "" {
-		out.Message = "[model] " + judgeActionLabel(out.Action)
-	} else if !strings.HasPrefix(out.Message, "[model]") {
-		out.Message = "[model] " + out.Message
-	}
+	out.Message = JudgeReason(out.Action, out.Message)
 	if out.Action == "ask" {
 		out.TimeoutEnabled = true
 		out.TimeoutSeconds = cfg.AskTimeoutSeconds
 		out.TimeoutAction = cfg.AskTimeoutAction
 	}
 	return out, true
+}
+
+// JudgeReason tags every LLM fallback verdict consistently with the database
+// classifier. Empty model explanations use the effective action label.
+func JudgeReason(action, message string) string {
+	if message == "" {
+		return db.ModelReasonPrefix + " " + judgeActionLabel(action)
+	}
+	if !strings.HasPrefix(message, db.ModelReasonPrefix) {
+		return db.ModelReasonPrefix + " " + message
+	}
+	return message
 }
 
 func judgeActionLabel(action string) string {
