@@ -292,8 +292,9 @@ docker compose logs -f artex
 2. 点击新增模型配置（界面使用 **New model profile**）。
 3. 填写 **Name**（便于识别的名字）、**Format**（协议类型）、**Model**（模型 ID）、**Base URL**（需要时填写）和 **API Key**（服务要求时填写）。
 4. 使用 **Test connection** 测试连通性。
-5. 点击 **Create / Save** 保存，再在新模型卡片上点击 **Set as active** 激活。**创建 Profile 不会自动激活。**
-6. 创建任务时还可以为任务选择自己的模型 Profile；Agent 也可以单独绑定模型。
+5. 如果中转网关需要自定义请求标识，在 **Custom User-Agent (optional)** 填写其要求的 User-Agent；留空保持原有默认值。该字段会随 Profile 保存，并用于连接测试，不接受无效 HTTP 控制字符。
+6. 点击 **Create / Save** 保存，再在新模型卡片上点击 **Set as active** 激活。**创建 Profile 不会自动激活。**
+7. 创建任务时还可以为任务选择自己的模型 Profile；Agent 也可以单独绑定模型。
 
 支持的 Profile 格式包括 `anthropic`、`openai`、`openai-responses` 和 `ollama`。不同模型支持的上下文长度、思考参数和 Token 参数不同；先用对应服务的实际接口确认模型名与协议，再在 ARTEX 中测试。
 
