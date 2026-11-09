@@ -21,6 +21,23 @@ AI autonomous penetration testing system (Go backend + Next.js frontend)
 
 ---
 
+## Windows 桌面客户端 / Native desktop (Windows 11)
+
+除传统浏览器界面外，本 fork 提供 **ARTEX.Desktop.exe** 原生 Windows 桌面窗口（WinForms + WebView2）。与传统 Web UI 使用同一个 Go 后端、任务和配置，支持启动/连接本地服务、托盘、刷新、重新连接以及在浏览器中打开。
+
+- **下载**：GitHub Actions 的 `artex-windows-desktop-preview` 构建产物，或正式打 tag 后 [Releases](https://github.com/wxcvm/ARTEX/releases) 的 `ARTEX-Windows-Desktop-amd64.zip`。
+- **安装**：解压完整 ZIP，在 `config.json` 中配置 PostgreSQL（或设置 `ARTEX_PG_DSN`），双击 `ARTEX.Desktop.exe`。不用单独安装 .NET，Windows 需要 WebView2 Runtime（Win11 通常已有）。
+- **行为**：本机已有 ARTEX 服务时会复用；否则启动压缩包里的 `artex.exe`。关闭窗口收进托盘；通过“退出”结束桌面程序及它自行启动的后端。原浏览器模式继续可用。
+- **注意**：这是便携桌面客户端，不是安装器；不包含 PostgreSQL，也不会强制改变原有 Web/Agent 能力。配置及操作见 [中文操作指南](docs/USER_GUIDE_ZH.md#26-windows-桌面客户端便携版)。
+
+单独构建桌面包（Windows PowerShell，需 Go 1.26.3、Node.js 22、.NET 10 SDK）：
+
+```powershell
+./desktop/windows/package.ps1
+```
+
+---
+
 ## Engineering roadmap
 
 See the [autonomy engineering roadmap (Chinese)](AUTONOMY_ROADMAP.md) for the verified branch baseline, current capabilities, phased reliability work, and acceptance criteria. Planned capabilities are not represented as completed features.

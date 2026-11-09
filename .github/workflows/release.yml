@@ -77,9 +77,33 @@ jobs:
           name: bin-linux-${{ matrix.goarch }}
           path: dist/artex-linux-${{ matrix.goarch }}/artex
 
-  # ③ Collect all zips → create the GitHub Release
+  # ③ Native Windows desktop shell + bundled Go backend and web UI.
+  desktop:
+    needs: frontend
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-go@v5
+        with:
+          go-version-file: go.mod
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: "10.0.x"
+      - uses: actions/download-artifact@v4
+        with:
+          name: web-dist
+          path: server/webui/dist
+      - name: Package native Windows desktop
+        shell: pwsh
+        run: ./desktop/windows/package.ps1 -SkipWebBuild -Version "${{ github.ref_name }}"
+      - uses: actions/upload-artifact@v4
+        with:
+          name: pkg-windows-desktop-amd64
+          path: dist/ARTEX-Windows-Desktop-amd64.zip
+
+  # ④ Collect all zips → create the GitHub Release
   release:
-    needs: binaries
+    needs: [binaries, desktop]
     runs-on: ubuntu-latest
     steps:
       - uses: actions/download-artifact@v4
@@ -98,7 +122,7 @@ jobs:
           generate_release_notes: false
           body: "See CHANGELOG.md for the list of changes in this release."
 
-  # ④ Multi-arch image → push to Docker Hub (reuses the Linux binaries built by the
+  # ⑤ Multi-arch image → push to Docker Hub (reuses the Linux binaries built by the
   #    binaries job; the image only installs tools + ships the binary; arm64 only needs
   #    to emulate the apt layer, so builds are much faster)
   # Publishing the image needs Docker Hub credentials and a namespace we own, so the
