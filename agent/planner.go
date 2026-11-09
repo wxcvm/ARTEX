@@ -291,17 +291,21 @@ func truncOutput(s string, n int) string {
 	return string(r[:n]) + " …(truncated; full text via get_worker_output)"
 }
 
-// renderGraphOverview folds the pre-computed graph_overview snapshot into the
-// wake-up prompt so the planner starts each round with the full situation in
-// hand — saving the round-trip it would otherwise spend calling the tool. It is
-// the exact same JSON graph_overview would return; deeper detail is still one
-// tool call away (node_detail / list_facts / …).
+// renderGraphOverview prefetches the same structured data as graph_overview.
+// For larger snapshots, a read-only presentation can reduce repeated tokens;
+// the tool itself still returns unmodified JSON for exact decisions and details.
 func renderGraphOverview(data map[string]any) string {
-	b, err := json.Marshal(data)
+	full, err := json.Marshal(data)
 	if err != nil {
-		return "" // fall back to the model calling graph_overview itself
+		return ""
 	}
-	return "\n\n[This round's situation (graph_overview pre-fetched; identical to what calling that tool would return; call node_detail/list_facts etc. on demand for details)]:\n" + string(b)
+	compact := plannerOverviewText(data)
+	const compactPrefix = "\n\n[This round's situation (read-only compact graph_overview; call graph_overview for complete structured data, expand_digest/node_detail for history)]:\n"
+	const fullPrefix = "\n\n[This round's situation (full graph_overview JSON pre-fetched; call node_detail/list_facts for details)]:\n"
+	if compact != "" && len(compact)+len(compactPrefix) < len(full)+len(fullPrefix) {
+		return compactPrefix + compact
+	}
+	return fullPrefix + string(full)
 }
 
 // plannerDefaultTmpl is the built-in EDITABLE body (section [A]) of the planner
@@ -319,7 +323,7 @@ Task goal: {{.Goal}}
 
 **Decision flow for each wake**:
 
-1. **The full situation is attached below this prompt** (it IS the graph_overview return — no need to call it again): task (original title + goal/root node), asset counts, goals+states, open/running/recent_done intents, sites_without_endpoints (sites with no endpoints — a hint of possibly unexplored directions), facts (exploration-fact count, a different kind from findings), recent_facts ({id,summary,confidence?}).
+1. **This round's situation is attached below this prompt** (a shorter read-only presentation when it saves tokens, otherwise the original graph_overview JSON): task, goals and states, running/open/recent_done intents, facts and findings, recent_facts, historical Digests and source IDs. The compact form may omit older rows; call graph_overview for the complete structured snapshot, expand_digest(id) for folded history, or node_detail(id) for full evidence. Missing from the compact view does NOT mean untested.
    - **Scope**: exploration nodes (goals/intents/facts/findings) belong only to this task; **the asset graph is global and shared** (one copy across tasks; asset counts are global-in-scope, not task-private) — ignore assets unrelated to this task when they appear.
    - **Lineage**: every intent carries parents (upstream: which facts/intents it derived from) and yields (downstream: which facts/findings it produced); each recent_fact carries from_intent; use these to understand "which direction produced which facts, and whether they synthesize into a new direction".
    - **Negative/doubtful observations** ("port closed" / "not injectable" etc. in recent_facts) are a worker's observations, not verdicts: before trusting one, check evidence via node_detail(id) — treat the direction as tentatively sealed only when the evidence is solid, confidence=observed, and the means are exhausted; if evidence is missing, it's just "looks like it / probed only once", or confidence=inferred, treat it as [not yet proven] — if it's in scope and no other intent covers it, by default dispatch ONE re-examination intent to confirm or refute it (**at most one re-examination per negative direction**; if it stays negative after that with reasonable evidence, respect the conclusion and don't dispatch again).
