@@ -46,6 +46,7 @@ internal sealed class DatabaseSetupForm : Form
     };
     private readonly Button detectLocal = new() { Text = "检测本机", Width = 94, Height = 30 };
     private readonly Button startLocal = new() { Text = "启动所选服务", Width = 112, Height = 30, Enabled = false };
+    private readonly Button installLocal = new() { Text = "安装 PostgreSQL", Width = 140, Height = 30 };
     private readonly CancellationTokenSource discoveryLifetime = new();
     private readonly bool editExisting;
 
@@ -98,9 +99,11 @@ internal sealed class DatabaseSetupForm : Form
         };
         detectLocal.Click += async (_, _) => await DetectLocalAsync();
         startLocal.Click += async (_, _) => await StartLocalAsync();
+        installLocal.Click += (_, _) => InstallPostgreSQL();
         diagnostics.Controls.Add(detectLocal);
         diagnostics.Controls.Add(localServices);
         diagnostics.Controls.Add(startLocal);
+        diagnostics.Controls.Add(installLocal);
         layout.Controls.Add(diagnostics, 0, 7);
         layout.SetColumnSpan(diagnostics, 2);
         layout.Controls.Add(discoveryStatus, 0, 8);
@@ -149,6 +152,30 @@ internal sealed class DatabaseSetupForm : Form
         };
     }
 
+    private void InstallPostgreSQL()
+    {
+        if (MessageBox.Show(this,
+            "将启动 PostgreSQL 16 的官方 Windows 交互安装流程。\\n" +
+            "安装程序需要联网下载、Windows 管理员授权，并由你设置数据库管理员密码。\\n" +
+            "ARTEX 不会代填密码，也不会修改已有 PostgreSQL。是否继续？",
+            "安装 PostgreSQL",
+            MessageBoxButtons.YesNo, MessageBoxIcon.Question) != DialogResult.Yes)
+            return;
+        try
+        {
+            var launched = PostgresInstaller.LaunchInstallation();
+            if ((host.Text.Trim() is "127.0.0.1" or "localhost") && user.Text.Trim() == "artex")
+                user.Text = "postgres";
+            discoveryStatus.Text = launched
+                ? "安装窗口已打开。完成安装、记住设置的 postgres 密码，再点击“检测本机”。"
+                : "系统未找到 WinGet，已打开 PostgreSQL 官方下载页。安装完成后点击“检测本机”。";
+        }
+        catch (Exception ex)
+        {
+            discoveryStatus.Text = "无法打开安装器：" + ex.Message;
+        }
+    }
+
     private async Task DetectLocalAsync()
     {
         if (discoveryLifetime.IsCancellationRequested) return;
@@ -178,7 +205,7 @@ internal sealed class DatabaseSetupForm : Form
             {
                 discoveryStatus.Text = localServices.Items.Count > 0
                     ? "已发现已安装的 PostgreSQL 服务，但常用端口尚未响应。可选择服务启动，或填写自定义端口。"
-                    : "未在 5432 / 5433 发现 PostgreSQL。可填写远程数据库，或先安装并启动本地服务。";
+                    : "未检测到 PostgreSQL。可点“安装 PostgreSQL”打开官方安装器，或填写远程数据库。";
             }
         }
         catch (OperationCanceledException) when (discoveryLifetime.IsCancellationRequested) { }
