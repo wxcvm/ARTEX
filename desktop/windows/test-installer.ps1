@@ -8,9 +8,11 @@ $setup = Join-Path $root (Join-Path $OutputDir "ARTEX-Windows-Setup-amd64.exe")
 $installed = Join-Path $env:RUNNER_TEMP "ARTEX Installer Smoke"
 $shortcut = Join-Path $env:APPDATA "Microsoft/Windows/Start Menu/Programs/ARTEX/ARTEX.lnk"
 
-function Run-Setup([string]$path, [string]$args) {
-    $p = Start-Process -FilePath $path -ArgumentList $args -Wait -PassThru
+function Run-Setup([string]$path, [string]$arguments) {
+    Write-Host "[ARTEX] Running setup: $path"
+    $p = Start-Process -FilePath $path -ArgumentList $arguments -Wait -PassThru
     if ($p.ExitCode -ne 0) { throw "Setup exited $($p.ExitCode): $path" }
+    Write-Host "[ARTEX] Setup finished successfully."
 }
 
 if (-not (Test-Path $setup)) { throw "Missing installer: $setup" }
