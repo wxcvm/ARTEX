@@ -169,6 +169,7 @@ public sealed class MainForm : Form
         catch (Exception ex)
         {
             if (cancel.IsCancellationRequested) return;
+            ready = false;
             status.Text = "连接失败 · 可点击“数据库配置”修正连接或“重新连接”重试";
             var message = ex.Message + "\n\n" +
                 "可以点击工具栏“数据库配置”修改连接。请确认 PostgreSQL（config.json 或 ARTEX_PG_DSN），" +
@@ -202,7 +203,7 @@ public sealed class MainForm : Form
                 ownedBackend.Dispose();
                 ownedBackend = null;
             }
-            if (!owned && ready)
+            if (!owned && ready && ownedBackend is null)
             {
                 MessageBox.Show(this, "数据库配置已保存。当前连接的是外部启动的 ARTEX 服务，" +
                     "桌面客户端不会关闭它；请自行重启外部后端使新配置生效。",
