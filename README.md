@@ -19,6 +19,8 @@ AI autonomous penetration testing system (Go backend + Next.js frontend)
 
 本 fork 的最新功能应从本仓库源码构建，或使用自行构建的 fork 镜像；默认 Docker Compose 镜像仍是历史上游版本。请先阅读指南中的[安装方式选择](docs/USER_GUIDE_ZH.md#1-快速选择安装方式)，避免版本不一致。
 
+**Docker 登录状态持久化（来自 BaaRai 上游）**：本 fork 的后端支持用 `ARTEX_JWT_KEY_DIR` 指定 JWT 密钥目录；`docker-compose.yml` 将 `/app/keys` 映射至仓库的 `./keys`，避免重建容器时密钥丢失和用户被迫重新登录。`keys/` 已加入 Git 与 Docker 构建忽略名单。**需使用包含该修复的 fork 镜像/二进制才生效**；历史上游镜像可能不会使用此环境变量。已有容器升级前，请查看[中文指南的密钥迁移说明](docs/USER_GUIDE_ZH.md#33-docker-compose镜像部署)。
+
 ---
 
 **外部工具管理**：系统 → Tools → External binaries 支持本机 nuclei、httpx、subfinder、katana、ffuf、naabu、dnsx 的路径与版本检测；Windows x64 可在页面查看官方 GitHub Release 并按需下载安装，通过 GitHub API 的 SHA-256 校验 ZIP，升级保留上一版，支持在管理页面一键恢复上一版或卸载受管理版本。还可将已管理的工具导出成带 EXE SHA-256 清单的离线 ZIP，再到另一台 Windows x64 主机导入；离线端无需访问 GitHub。不覆盖 `ARTEX_TOOL_DIRS` 自定义目录、不改 PATH 或 Agent 绑定，也不自动下载其他依赖。详情见 [中文操作指南](docs/USER_GUIDE_ZH.md#28-windows-外部工具检测tool-manager-第一阶段)。
