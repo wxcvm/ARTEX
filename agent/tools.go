@@ -455,6 +455,9 @@ func (t *ToolSet) graphOverviewData() map[string]any {
 	hints, _ := t.ts.ListByKind(db.KindHint, 50)
 	hsum := make([]map[string]any, 0, len(hints))
 	for _, h := range hints {
+		if h.State != "active" {
+			continue // only actionable human guidance belongs in each round
+		}
 		var p map[string]any
 		_ = json.Unmarshal(h.Payload, &p)
 		hint := map[string]any{"id": h.ID, "state": h.State, "text": p["text"]}
@@ -511,6 +514,14 @@ func (t *ToolSet) graphOverviewData() map[string]any {
 			}
 			recentDone = append(recentDone, n) // newest first (all is id-DESC); folded ones are dropped, output truncated to the latest N
 		}
+	}
+	// Fetch by state instead of searching only the newest 300 intents.
+	// A long-running older intent must remain visible even after many results.
+	if live, total, err := t.ts.NodesPage(db.NodeFilter{
+		Kinds: []string{db.KindIntent}, States: []string{"running"},
+	}, 1, 200); err == nil {
+		running = live
+		out["running_intents_total"] = total
 	}
 	out["running_intents"] = compactIntents(running, parentsOf, yieldsOf)
 	// done_intents_total: the total number of finished intents (done/blocked/exhausted),
@@ -832,6 +843,9 @@ func (t *ToolSet) relatedTaskOverviews() []map[string]any {
 		hints, _ := ts.ListByKind(db.KindHint, relatedOverviewMaxHintsPerSource)
 		hintSummary := make([]map[string]any, 0, len(hints))
 		for _, hint := range hints {
+			if hint.State != "active" {
+				continue
+			}
 			var payload map[string]any
 			_ = json.Unmarshal(hint.Payload, &payload)
 			hintSummary = append(hintSummary, inheritedMap(map[string]any{
