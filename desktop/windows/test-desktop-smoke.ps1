@@ -21,10 +21,13 @@ try {
         $listener = [System.Net.Sockets.TcpListener]::new([System.Net.IPAddress]::Loopback, 8787)
         $listener.Start()
         try {
-            while ($true) {
+            $running = $true
+            while ($running) {
+                if (-not $listener.Pending()) { Start-Sleep -Milliseconds 50; continue }
                 $client = $listener.AcceptTcpClient()
                 try {
                     $stream = $client.GetStream()
+                    $stream.ReadTimeout = 1000
                     $reader = [IO.StreamReader]::new($stream, [Text.Encoding]::UTF8, $false, 1024, $true)
                     $request = $reader.ReadLine()
                     if (-not $request) { continue }
@@ -34,6 +37,7 @@ try {
                         if ($null -eq $header -or $header.Length -eq 0) { break }
                     }
                     Add-Content -LiteralPath $file -Value $route
+                    if ($route -eq "/__shutdown") { $running = $false }
                     if ($route -eq "/api/health") {
                         $body = '{"ok":true,"service":"artex","version":"smoke"}'
                         $type = "application/json"
@@ -99,7 +103,11 @@ finally {
         $desktop.Dispose()
     }
     if ($server) {
-        Stop-Job $server -ErrorAction SilentlyContinue
+        if ($serverReady) {
+            try { Invoke-WebRequest -Uri "http://127.0.0.1:8787/__shutdown" -TimeoutSec 2 | Out-Null } catch {}
+        }
+        $finished = Wait-Job -Job $server -Timeout 5
+        if (-not $finished) { Stop-Job $server -ErrorAction SilentlyContinue }
         Remove-Job $server -Force -ErrorAction SilentlyContinue
     }
     Remove-Item -LiteralPath $requestLog -ErrorAction SilentlyContinue
