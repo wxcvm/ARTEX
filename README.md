@@ -23,6 +23,8 @@ AI autonomous penetration testing system (Go backend + Next.js frontend)
 
 ---
 
+**MCP 远程协议兼容**：ARTEX 的 Streamable HTTP 客户端会优先提出 `2025-11-25`，接受服务端协商的旧版（包括 `2025-03-26`），或在明确提示协议不受支持时尝试 `2025-06-18`；初始化后发送协商得到的版本头。旧版 SSE 通道仍沿用原协议，不修改 MCP 连接、工具或 Agent 的既有配置。
+
 **外部工具管理**：系统 → Tools → External binaries 支持本机 nuclei、httpx、subfinder、katana、ffuf、naabu、dnsx 的路径与版本检测；Windows x64 可在页面查看官方 GitHub Release 并按需下载安装，通过 GitHub API 的 SHA-256 校验 ZIP，升级保留上一版，支持在管理页面一键恢复上一版或卸载受管理版本。还可将已管理的工具导出成带 EXE SHA-256 清单的离线 ZIP，再到另一台 Windows x64 主机导入；离线端无需访问 GitHub。不覆盖 `ARTEX_TOOL_DIRS` 自定义目录、不改 PATH 或 Agent 绑定，也不自动下载其他依赖。详情见 [中文操作指南](docs/USER_GUIDE_ZH.md#28-windows-外部工具检测tool-manager-第一阶段)。
 
 ## Windows 桌面客户端 / Native desktop (Windows 11)
