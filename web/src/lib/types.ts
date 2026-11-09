@@ -1313,6 +1313,17 @@ export interface ExternalToolStatus {
   origin?: "custom" | "managed" | "bundled" | "path";
   version?: string;
   detail?: string;
+  managed_version?: string;
+  managed_path?: string;
+}
+
+export interface ExternalToolRelease {
+  id: string;
+  version: string;
+  asset: string;
+  size_bytes: number;
+  sha256: string;
+  source: string;
 }
 
 export interface ExternalToolInventory {

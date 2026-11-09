@@ -43,6 +43,8 @@ type externalToolStatus struct {
 	Origin  string `json:"origin,omitempty"` // custom | managed | bundled | path
 	Version string `json:"version,omitempty"`
 	Detail  string `json:"detail,omitempty"`
+	ManagedVersion string `json:"managed_version,omitempty"`
+	ManagedPath string `json:"managed_path,omitempty"`
 }
 
 type externalToolRoot struct {
@@ -96,7 +98,7 @@ func externalToolRoots() []externalToolRoot {
 func externalToolExecutable(spec externalToolSpec, roots []externalToolRoot) (string, string) {
 	binary := externalToolBinary(spec.Binary)
 	for _, root := range roots {
-		candidates := []string{filepath.Join(root.dir, binary), filepath.Join(root.dir, spec.ID, binary)}
+		candidates := []string{filepath.Join(root.dir, binary), filepath.Join(root.dir, spec.ID, binary), filepath.Join(root.dir, spec.ID, "current", binary)}
 		// Versioned Tool Manager layout: tools/<id>/<version>/<binary>.
 		versioned, _ := filepath.Glob(filepath.Join(root.dir, spec.ID, "*", binary))
 		sort.Sort(sort.Reverse(sort.StringSlice(versioned)))
@@ -121,6 +123,13 @@ func externalToolExecutable(spec externalToolSpec, roots []externalToolRoot) (st
 // arguments. No targets are supplied; this is inventory, not a scan.
 func probeExternalTool(ctx context.Context, spec externalToolSpec, roots []externalToolRoot) externalToolStatus {
 	status := externalToolStatus{externalToolSpec: spec, Status: "missing"}
+	if local := os.Getenv("LOCALAPPDATA"); local != "" {
+		root := filepath.Join(local, "ARTEX", "tools")
+		if receipt := externalToolManagedReceipt(root, spec); receipt != nil {
+			status.ManagedVersion = receipt.Version
+			status.ManagedPath = filepath.Join(root, spec.ID, "current", externalToolBinary(spec.Binary))
+		}
+	}
 	path, origin := externalToolExecutable(spec, roots)
 	if path == "" {
 		return status

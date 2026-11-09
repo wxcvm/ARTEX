@@ -1,10 +1,11 @@
 "use client";
 
 import * as React from "react";
-import { ArrowUpRightIcon, RefreshCwIcon } from "lucide-react";
+import { ArrowUpRightIcon, DownloadIcon, RefreshCwIcon } from "lucide-react";
+import { toast } from "sonner";
 
 import { api } from "@/lib/api";
-import type { ExternalToolInventory, ExternalToolStatus } from "@/lib/types";
+import type { ExternalToolInventory, ExternalToolRelease, ExternalToolStatus } from "@/lib/types";
 import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
@@ -16,7 +17,52 @@ const originName: Record<string, string> = {
   path: "系统 PATH",
 };
 
-function ToolItem({ tool }: { tool: ExternalToolStatus }) {
+function ToolItem({
+  tool, host, onRefresh,
+}: {
+  tool: ExternalToolStatus;
+  host: string;
+  onRefresh: () => Promise<void>;
+}) {
+  const [release, setRelease] = React.useState<ExternalToolRelease | null>(null);
+  const [checking, setChecking] = React.useState(false);
+  const [installing, setInstalling] = React.useState(false);
+  const [error, setError] = React.useState("");
+  const supported = host === "windows/amd64";
+  const alreadyManaged = !!release && tool.managed_version === release.version;
+
+  async function checkRelease() {
+    setChecking(true);
+    setError("");
+    try {
+      setRelease(await api.externalToolRelease(tool.id));
+    } catch (e) {
+      setError((e as Error).message);
+    } finally {
+      setChecking(false);
+    }
+  }
+
+  async function install() {
+    if (!release) return;
+    const sizeMiB = (release.size_bytes / 1048576).toFixed(1);
+    if (!window.confirm(
+      "从官方 GitHub 下载 " + tool.name + " " + release.version + "（" + sizeMiB + " MiB）？\n" +
+      "下载后校验 SHA-256，再安装到 ARTEX 用户工具目录；不会覆盖自定义目录、修改 PATH 或绑定 Agent。"
+    )) return;
+    setInstalling(true);
+    setError("");
+    try {
+      await api.installExternalTool(tool.id, release.version, release.sha256);
+      toast.success(tool.name + " " + release.version + " 已安装并通过下载摘要校验");
+      await onRefresh();
+    } catch (e) {
+      setError((e as Error).message);
+    } finally {
+      setInstalling(false);
+    }
+  }
+
   return (
     <div className="flex flex-col gap-2 rounded-lg border p-4">
       <div className="flex flex-wrap items-center gap-2">
@@ -36,13 +82,48 @@ function ToolItem({ tool }: { tool: ExternalToolStatus }) {
       </div>
       <p className="text-muted-foreground text-xs">{tool.description}</p>
       {tool.version && <div className="break-all font-mono text-xs">{tool.version}</div>}
+      {tool.managed_version && (
+        <div className="text-xs">ARTEX 管理版本：<span className="font-mono">{tool.managed_version}</span></div>
+      )}
       {tool.path && (
         <div className="text-muted-foreground break-all font-mono text-xs" title={tool.path}>
           {tool.path}
         </div>
       )}
       {tool.detail && <p className="text-muted-foreground text-xs">{tool.detail}</p>}
-      <div className="mt-auto flex items-center justify-between gap-2 pt-2">
+      {tool.managed_version && tool.origin === "custom" && (
+        <p className="text-muted-foreground text-xs">自定义目录优先于 ARTEX 管理目录，界面显示的是实际优先匹配的版本。</p>
+      )}
+      <div className="mt-auto space-y-2 pt-2">
+        {supported ? (
+          <>
+            <Button size="sm" variant="outline" disabled={checking || installing} onClick={() => void checkRelease()}>
+              <RefreshCwIcon className={checking ? "animate-spin" : ""} />
+              {checking ? "查询官方发布…" : "查看官方最新版"}
+            </Button>
+            {release && (
+              <div className="space-y-2 rounded-md bg-muted/50 p-2 text-xs">
+                <div className="flex flex-wrap items-center justify-between gap-2">
+                  <span>官方 {release.version} · {(release.size_bytes / 1048576).toFixed(1)} MiB</span>
+                  <Button size="sm" disabled={installing || alreadyManaged} onClick={() => void install()}>
+                    <DownloadIcon className={installing ? "animate-pulse" : ""} />
+                    {alreadyManaged ? "已安装本版本" : installing ? "下载并校验中…" : tool.managed_version ? "更新到此版本" : "下载并安装"}
+                  </Button>
+                </div>
+                <p className="text-muted-foreground break-all font-mono" title={release.sha256}>
+                  GitHub SHA-256：{release.sha256}
+                </p>
+              </div>
+            )}
+          </>
+        ) : (
+          <p className="text-muted-foreground text-xs">
+            当前仅 Windows x64 后端提供自动安装；本机检测与手动配置仍可使用。
+          </p>
+        )}
+        {error && <p role="alert" className="text-destructive text-xs">{error}</p>}
+      </div>
+      <div className="flex items-center justify-between gap-2 pt-1">
         <a
           href={tool.source}
           target="_blank"
@@ -105,7 +186,7 @@ export function ExternalToolsPanel({ onOpenCustom }: { onOpenCustom: () => void 
         {loading && !inventory && <p className="text-muted-foreground text-sm">正在检测本机外部工具…</p>}
         {items.length > 0 && (
           <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-3">
-            {items.map((tool) => <ToolItem key={tool.id} tool={tool} />)}
+            {items.map((tool) => <ToolItem key={tool.id} tool={tool} host={inventory?.host ?? ""} onRefresh={refresh} />)}
           </div>
         )}
         <div className="text-muted-foreground space-y-2 border-t pt-4 text-xs leading-relaxed">
@@ -114,8 +195,9 @@ export function ExternalToolsPanel({ onOpenCustom }: { onOpenCustom: () => void 
             安装目录内的 tools/ 与 data/tools/ → 系统 PATH。Windows 可用分号分隔多个自定义路径。
           </p>
           <p>
-            “版本检查通过”仅说明命令能够返回版本，<strong>不代表文件来源或 SHA-256 已被验证</strong>；
-            这不是安装、更新或执行扫描的入口。若要让 Agent 调用某个程序，
+            “版本检查通过”仅说明命令能够返回版本；手动安装的文件不代表来源已验证。
+            官方按需安装会使用 GitHub Release 提供的 SHA-256 校验下载内容，但<strong>不等于发布者代码签名</strong>。
+            更新只替换 ARTEX 管理目录中的版本并保留上一版，不会自动执行扫描。若要让 Agent 调用某个程序，
             可在现有自定义工具中明确配置，避免自动创建重复的 Agent 工具。
           </p>
           <Button size="sm" variant="outline" onClick={onOpenCustom}>

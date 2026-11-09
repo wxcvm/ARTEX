@@ -21,7 +21,7 @@ AI autonomous penetration testing system (Go backend + Next.js frontend)
 
 ---
 
-**外部工具管理（第一阶段）**：系统 → Tools → External binaries 已支持本机 nuclei、httpx、subfinder、katana、ffuf、naabu、dnsx 的路径与版本检测；支持 `ARTEX_TOOL_DIRS`（Windows 使用分号分隔多个目录），不会自动下载安装或修改 Agent 绑定。详情见 [中文操作指南](docs/USER_GUIDE_ZH.md#28-windows-外部工具检测tool-manager-第一阶段)。
+**外部工具管理**：系统 → Tools → External binaries 支持本机 nuclei、httpx、subfinder、katana、ffuf、naabu、dnsx 的路径与版本检测；Windows x64 可在页面查看官方 GitHub Release 并按需下载安装，通过 GitHub API 的 SHA-256 校验 ZIP，升级保留上一版。不覆盖 `ARTEX_TOOL_DIRS` 自定义目录、不改 PATH 或 Agent 绑定，也不自动下载其他依赖。详情见 [中文操作指南](docs/USER_GUIDE_ZH.md#28-windows-外部工具检测tool-manager-第一阶段)。
 
 ## Windows 桌面客户端 / Native desktop (Windows 11)
 
