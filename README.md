@@ -55,7 +55,11 @@ AI autonomous penetration testing system (Go backend + Next.js frontend)
 
 ```powershell
 ./desktop/windows/package.ps1
+# 再次本地构建，前端未变化时可复用缓存：
+./desktop/windows/package.ps1 -Incremental
 ```
+
+`-Incremental` 只影响本地桌面包的前端安装和静态构建；Go 后端及桌面客户端仍会编译。CI 和标准安装包构建保持原样。
 
 ---
 
@@ -187,6 +191,8 @@ CGO_ENABLED=0 go build -tags embedui -o artex ./cmd/artex
 ### Option 5: build cross-platform release archives
 
 `build.sh` first builds and embeds the frontend, then strips debug info via the Go linker, and compresses the release files into zips. Release mode generates zips for Linux amd64/arm64, macOS amd64/arm64, and Windows amd64 by default:
+
+For repeated **local source builds**, use `ARTEX_INCREMENTAL=1 ./build.sh`. The builder reuses the embedded frontend when its source/config files have not changed, and skips `npm ci` if the installed dependencies are current. Backend compilation still runs. `./build.sh --release` retains the full frontend build even when incremental mode is set; omit `ARTEX_INCREMENTAL` to force a fresh local frontend build.
 
 ```bash
 ./build.sh --release

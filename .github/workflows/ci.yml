@@ -26,6 +26,8 @@ jobs:
       ARTEX_PG_DSN: postgres://artex:testpass@localhost:5432/artextest?sslmode=disable
     steps:
       - uses: actions/checkout@v4
+      - name: Check release build script syntax
+        run: bash -n build.sh
       - uses: actions/setup-go@v5
         with:
           go-version-file: go.mod

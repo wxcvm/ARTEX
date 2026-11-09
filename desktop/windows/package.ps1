@@ -1,24 +1,62 @@
 param(
     [string]$Version = "dev",
     [string]$OutputDir = "dist",
-    [switch]$SkipWebBuild
+    [switch]$SkipWebBuild,
+    [switch]$Incremental
 )
 
 $ErrorActionPreference = "Stop"
 $root = (Resolve-Path (Join-Path $PSScriptRoot "../..")).Path
 Set-Location $root
 
-if (-not $SkipWebBuild) {
+# WSARTEX-inspired fast local builds. CI/release packaging keeps the default
+# full-build behavior; SkipWebBuild still takes precedence.
+function Test-FrontendFresh {
+    $export = Join-Path $root "server/webui/dist"
+    $index = Join-Path $export "index.html"
+    if (-not (Test-Path $index) -or -not (Test-Path (Join-Path $export "_next"))) { return $false }
+    $stamp = (Get-Item $index).LastWriteTimeUtc
+    foreach ($relative in @(
+        "web/src", "web/public", "web/package.json", "web/package-lock.json",
+        "web/next.config.mjs", "web/postcss.config.mjs", "web/tsconfig.json",
+        "web/tsconfig.scripts.json", "web/components.json", "web/biome.json",
+        "web/.env", "web/.env.local", "web/.env.production"
+    )) {
+        $path = Join-Path $root $relative
+        if (-not (Test-Path $path)) { continue }
+        $item = Get-Item $path
+        $files = if ($item.PSIsContainer) { Get-ChildItem $path -Recurse -File } else { @($item) }
+        foreach ($file in $files) {
+            if ($file.LastWriteTimeUtc -gt $stamp) { return $false }
+        }
+    }
+    return $true
+}
+
+if (-not $SkipWebBuild -and $Incremental -and (Test-FrontendFresh)) {
+    Write-Host "[ARTEX] Frontend unchanged; reusing server/webui/dist"
+} elseif (-not $SkipWebBuild) {
     Push-Location (Join-Path $root "web")
     try {
-        & npm ci
-        if ($LASTEXITCODE -ne 0) { throw "npm ci failed" }
+        $marker = Join-Path $root "web/node_modules/.package-lock.json"
+        $lock = Join-Path $root "web/package-lock.json"
+        $manifest = Join-Path $root "web/package.json"
+        $depsFresh = $Incremental -and (Test-Path $marker) -and
+            ((Get-Item $marker).LastWriteTimeUtc -ge (Get-Item $lock).LastWriteTimeUtc) -and
+            ((Get-Item $marker).LastWriteTimeUtc -ge (Get-Item $manifest).LastWriteTimeUtc)
+        if (-not $depsFresh) {
+            & npm ci
+            if ($LASTEXITCODE -ne 0) { throw "npm ci failed" }
+        } else {
+            Write-Host "[ARTEX] Node dependencies unchanged; skipping npm ci"
+        }
         & npm run build:static
         if ($LASTEXITCODE -ne 0) { throw "web static export failed" }
     } finally {
         Pop-Location
     }
     $export = Join-Path $root "web/out"
+    if (-not (Test-Path (Join-Path $export "index.html"))) { throw "web/out/index.html not found" }
     $embed = Join-Path $root "server/webui/dist"
     if (Test-Path $embed) { Remove-Item -Path $embed -Recurse -Force }
     Copy-Item -Path $export -Destination $embed -Recurse -Force
