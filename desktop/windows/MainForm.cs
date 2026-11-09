@@ -48,6 +48,7 @@ public sealed class MainForm : Form
         toolbar.Items.Add(Button("刷新", () => browser.CoreWebView2?.Reload()));
         toolbar.Items.Add(new ToolStripSeparator());
         toolbar.Items.Add(Button("在浏览器打开", OpenInBrowser));
+        toolbar.Items.Add(Button("数据库配置", EditDatabaseConfiguration));
         toolbar.Items.Add(Button("打开配置目录", () =>
             Process.Start(new ProcessStartInfo("explorer.exe", "\"" + AppContext.BaseDirectory.TrimEnd('\\') + "\"")
             { UseShellExecute = true })));
@@ -168,9 +169,10 @@ public sealed class MainForm : Form
         catch (Exception ex)
         {
             if (cancel.IsCancellationRequested) return;
-            status.Text = "连接失败 · 可点击“重新连接”重试";
+            ready = false;
+            status.Text = "连接失败 · 可点击“数据库配置”修正连接或“重新连接”重试";
             var message = ex.Message + "\n\n" +
-                "请确认已配置 PostgreSQL（config.json 或 ARTEX_PG_DSN），" +
+                "可以点击工具栏“数据库配置”修改连接。请确认 PostgreSQL（config.json 或 ARTEX_PG_DSN），" +
                 "并已安装 Microsoft Edge WebView2 Runtime。\n" +
                 "如需排查，打开配置目录或查看：" + LogPath;
             MessageBox.Show(this, message, "ARTEX 启动失败", MessageBoxButtons.OK, MessageBoxIcon.Error);
@@ -178,6 +180,42 @@ public sealed class MainForm : Form
         finally
         {
             Interlocked.Exchange(ref connecting, 0);
+        }
+    }
+
+    private void EditDatabaseConfiguration()
+    {
+        if (lifetime.IsCancellationRequested || Volatile.Read(ref connecting) != 0) return;
+        var owned = ownedBackend is { HasExited: false };
+        if (owned && MessageBox.Show(this,
+            "保存新的数据库连接后，将重新启动此桌面窗口管理的 ARTEX 后端。" +
+            "\n正在执行的任务可能中断。是否继续？",
+            "修改数据库配置", MessageBoxButtons.YesNo, MessageBoxIcon.Question) != DialogResult.Yes)
+            return;
+        try
+        {
+            using var setup = new DatabaseSetupForm(editExisting: true);
+            if (setup.ShowDialog(this) != DialogResult.OK) return;
+            if (owned)
+            {
+                ownedBackend!.Kill(entireProcessTree: true);
+                ownedBackend.WaitForExit(5000);
+                ownedBackend.Dispose();
+                ownedBackend = null;
+            }
+            if (!owned && ready && ownedBackend is null)
+            {
+                MessageBox.Show(this, "数据库配置已保存。当前连接的是外部启动的 ARTEX 服务，" +
+                    "桌面客户端不会关闭它；请自行重启外部后端使新配置生效。",
+                    "数据库配置", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                return;
+            }
+            _ = ConnectAsync(lifetime.Token);
+        }
+        catch (Exception ex)
+        {
+            MessageBox.Show(this, "无法编辑数据库配置：" + ex.Message,
+                "数据库配置", MessageBoxButtons.OK, MessageBoxIcon.Error);
         }
     }
 
