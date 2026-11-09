@@ -1108,6 +1108,10 @@ export const api = {
     post<{ ok: boolean; version: string; sha256: string; path: string }>(
       `/tools/packages/${encodeURIComponent(id)}/install`, { version, sha256 },
     ),
+  rollbackExternalTool: (id: string) =>
+    post<{ ok: boolean; version: string }>(`/tools/packages/${encodeURIComponent(id)}/rollback`, {}),
+  uninstallExternalTool: (id: string) =>
+    del<{ ok: boolean }>(`/tools/packages/${encodeURIComponent(id)}/managed`),
   saveTool: (key: string, patch: Pick<Tool, "description" | "schema" | "agents" | "enabled">) =>
     put<{ ok: boolean }>(`/tools/${key}`, patch),
   resetTool: (key: string) => post<{ ok: boolean }>(`/tools/${key}/reset`, {}),
