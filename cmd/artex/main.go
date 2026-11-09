@@ -55,8 +55,28 @@ func run() int {
 		dataDir = flag.String("data", filepath.Join(config.BaseDir(), "data"), "data directory for SQLite stores (default: data/ next to the executable)")
 		proxy   = flag.String("proxy", "127.0.0.1:8788", "traffic recording proxy address (empty to disable)")
 		checkDB = flag.Bool("check-db", false, "check PostgreSQL connectivity without starting the server or applying schema changes")
+		createDB = flag.Bool("create-db", false, "explicitly create the configured PostgreSQL database if it is missing; do not apply schema")
 	)
 	flag.Parse()
+	if *checkDB && *createDB {
+		fmt.Fprintln(os.Stderr, "use only one database action at a time")
+		return 2
+	}
+	if *createDB {
+		ctx, cancel := context.WithTimeout(context.Background(), 12*time.Second)
+		defer cancel()
+		created, err := createConfiguredDatabase(ctx)
+		if err != nil {
+			fmt.Fprintf(os.Stderr, "PostgreSQL database creation failed: %v\n", err)
+			return 1
+		}
+		if created {
+			fmt.Println("PostgreSQL database created")
+		} else {
+			fmt.Println("PostgreSQL database already exists (unchanged)")
+		}
+		return 0
+	}
 	if *checkDB {
 		ctx, cancel := context.WithTimeout(context.Background(), 7*time.Second)
 		defer cancel()
@@ -149,7 +169,6 @@ func shutdownContext(signalCtx context.Context) (context.Context, context.Cancel
 	return ctx, shutdown
 }
 
-	
 // checkDatabaseConnection only authenticates and pings. Unlike db.Open, it does
 // not create databases, apply migrations, or modify any existing records.
 func checkDatabaseConnection(ctx context.Context) error {
