@@ -208,32 +208,37 @@ func activateOfflineTool(root string, item stagedOfflineTool) error {
     if _, err := os.Lstat(backup); err == nil {
         return errors.New("incomplete earlier offline activation; inspect .offline-replaced-previous")
     } else if !errors.Is(err, os.ErrNotExist) { return err }
-    hadPrev, hadCurrent := false, false
+    _, currentErr := os.Lstat(current)
+    if currentErr != nil && !errors.Is(currentErr, os.ErrNotExist) { return currentErr }
+    hadCurrent := currentErr == nil
+    if !hadCurrent {
+        // A missing current version does not invalidate an older saved backup.
+        if err := os.Rename(item.ready, current); err != nil { return err }
+        return nil
+    }
+    hadPrev := false
     if _, err := os.Lstat(previous); err == nil {
         if err := os.Rename(previous, backup); err != nil { return err }
         hadPrev = true
     } else if !errors.Is(err, os.ErrNotExist) { return err }
-    if _, err := os.Lstat(current); err == nil {
-        if err := os.Rename(current, previous); err != nil {
-            if hadPrev { _ = os.Rename(backup, previous) }
-            return err
-        }
-        hadCurrent = true
-    } else if !errors.Is(err, os.ErrNotExist) {
+    if err := os.Rename(current, previous); err != nil {
         if hadPrev { _ = os.Rename(backup, previous) }
         return err
     }
     if err := os.Rename(item.ready, current); err != nil {
-        if hadCurrent { _ = os.Rename(previous, current) }
+        _ = os.Rename(previous, current)
         if hadPrev { _ = os.Rename(backup, previous) }
         return fmt.Errorf("failed to activate %s (is the EXE running?): %w", item.spec.ID, err)
     }
     if hadPrev {
-        // Remove only old managed content. Personal files stay in the hidden
-        // backup directory instead of being silently deleted.
+        // The oldest managed executable is replaced by the formerly current
+        // one. Any unrelated user files are kept in a separate hidden folder.
         _ = os.Remove(filepath.Join(backup, item.spec.Binary+".exe"))
         _ = os.Remove(filepath.Join(backup, "receipt.json"))
-        _ = os.Remove(backup)
+        if err := os.Remove(backup); err != nil {
+            preserved := filepath.Join(idDir, ".offline-preserved-"+time.Now().UTC().Format("20060102150405.000000000"))
+            _ = os.Rename(backup, preserved)
+        }
     }
     return nil
 }
