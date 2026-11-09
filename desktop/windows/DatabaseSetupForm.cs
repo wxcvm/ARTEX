@@ -1,5 +1,6 @@
 using System.Diagnostics;
 using System.Drawing;
+using System.Security.Cryptography;
 using System.Text.Json;
 using System.Text.Json.Nodes;
 using System.Windows.Forms;
@@ -47,6 +48,7 @@ internal sealed class DatabaseSetupForm : Form
     private readonly Button detectLocal = new() { Text = "检测本机", Width = 94, Height = 30 };
     private readonly Button startLocal = new() { Text = "启动所选服务", Width = 112, Height = 30, Enabled = false };
     private readonly Button installLocal = new() { Text = "安装 PostgreSQL", Width = 140, Height = 30 };
+    private readonly Button provisionApp = new() { Text = "初始化专用账户", Width = 135, Height = 30 };
     private readonly CancellationTokenSource discoveryLifetime = new();
     private readonly bool editExisting;
 
@@ -56,8 +58,8 @@ internal sealed class DatabaseSetupForm : Form
         Text = editExisting ? "ARTEX · 修改数据库配置" : "ARTEX · 首次数据库配置";
         Icon = System.Drawing.Icon.ExtractAssociatedIcon(Application.ExecutablePath) ?? SystemIcons.Application;
         StartPosition = FormStartPosition.CenterParent;
-        ClientSize = new Size(610, 485);
-        MinimumSize = new Size(570, 445);
+        ClientSize = new Size(760, 485);
+        MinimumSize = new Size(730, 455);
         FormBorderStyle = FormBorderStyle.FixedDialog;
         MaximizeBox = false;
         MinimizeBox = false;
@@ -132,10 +134,12 @@ internal sealed class DatabaseSetupForm : Form
         test.Click += async (_, _) => await RunDatabaseActionAsync(test, "-check-db");
         var create = new Button { Text = "创建目标数据库", Width = 124, Height = 30 };
         create.Click += async (_, _) => await RunDatabaseActionAsync(create, "-create-db");
+        provisionApp.Click += async (_, _) => await ProvisionDedicatedAccountAsync();
         var cancel = new Button { Text = "稍后配置", Width = 100, Height = 30, DialogResult = DialogResult.Cancel };
         buttons.Controls.Add(save);
         buttons.Controls.Add(test);
         buttons.Controls.Add(create);
+        buttons.Controls.Add(provisionApp);
         buttons.Controls.Add(cancel);
         layout.Controls.Add(buttons, 0, 10);
         layout.SetColumnSpan(buttons, 2);
@@ -250,6 +254,96 @@ internal sealed class DatabaseSetupForm : Form
         finally
         {
             if (!IsDisposed) startLocal.Enabled = localServices.SelectedItem is not null;
+        }
+    }
+
+    private async Task ProvisionDedicatedAccountAsync()
+    {
+        var adminDsn = CurrentDsn();
+        if (adminDsn is null) return;
+        var dbName = database.Text.Trim();
+        if (MessageBox.Show(this,
+            $"将使用当前填写的管理员账号“{user.Text.Trim()}”在 PostgreSQL 上创建专用账户 artex，" +
+            $"并创建归它所有的数据库“{dbName}”。\\n" +
+            "专用账户密码将随机生成；已有数据库的所有权与已有账户密码不会改变。" +
+            "\\n完成后会将向导账号切换为 artex。确认继续？",
+            "初始化 ARTEX 专用账户",
+            MessageBoxButtons.YesNo, MessageBoxIcon.Question) != DialogResult.Yes)
+            return;
+
+        var executable = Path.Combine(AppContext.BaseDirectory, "artex.exe");
+        if (!File.Exists(executable))
+        {
+            MessageBox.Show(this, "找不到 artex.exe，请使用完整 Windows 桌面包。",
+                "初始化专用账户", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            return;
+        }
+        var newPassword = Convert.ToHexString(RandomNumberGenerator.GetBytes(24));
+        provisionApp.Enabled = false;
+        discoveryStatus.Text = "正在创建 ARTEX 专用账户及其数据库…";
+        try
+        {
+            var start = new ProcessStartInfo(executable)
+            {
+                WorkingDirectory = AppContext.BaseDirectory,
+                UseShellExecute = false,
+                CreateNoWindow = true,
+                RedirectStandardError = true,
+                RedirectStandardOutput = true,
+            };
+            start.ArgumentList.Add("-setup-app-db");
+            // Admin credentials and generated app password are never command
+            // line arguments or written to a temporary configuration file.
+            start.Environment["ARTEX_PG_DSN"] = adminDsn;
+            start.Environment["ARTEX_APP_DB_USER"] = "artex";
+            start.Environment["ARTEX_APP_DB_PASSWORD"] = newPassword;
+            using var process = Process.Start(start) ??
+                throw new InvalidOperationException("无法启动专用账户初始化程序。");
+            using var timeout = CancellationTokenSource.CreateLinkedTokenSource(discoveryLifetime.Token);
+            timeout.CancelAfter(TimeSpan.FromSeconds(20));
+            try
+            {
+                await process.WaitForExitAsync(timeout.Token);
+            }
+            catch (OperationCanceledException)
+            {
+                if (!process.HasExited) process.Kill(entireProcessTree: true);
+                throw;
+            }
+            if (IsDisposed || discoveryLifetime.IsCancellationRequested) return;
+            if (process.ExitCode == 0)
+            {
+                user.Text = "artex";
+                password.Text = newPassword;
+                discoveryStatus.Text = "ARTEX 专用账户与数据库已就绪，已切换到专用账户。请点击“保存并连接”。";
+                MessageBox.Show(this,
+                    "已创建专用账户 artex，数据库归它所有。\\n" +
+                    "向导已填入随机生成的专用密码，请点击“保存并连接”以保存配置。\\n" +
+                    "PostgreSQL 管理员密码不会保存到 ARTEX 配置中。",
+                    "专用账户已就绪", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                return;
+            }
+            var details = await process.StandardError.ReadToEndAsync(timeout.Token);
+            if (password.Text.Length > 0)
+                details = details.Replace(password.Text, "***", StringComparison.Ordinal)
+                    .Replace(Uri.EscapeDataString(password.Text), "***", StringComparison.Ordinal);
+            discoveryStatus.Text = "专用账户初始化未完成，请检查管理员账号及数据库状态。";
+            MessageBox.Show(this,
+                details.Length > 650 ? details[..650] : details,
+                "专用账户初始化失败", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+        }
+        catch (OperationCanceledException) when (discoveryLifetime.IsCancellationRequested) { }
+        catch (OperationCanceledException)
+        {
+            if (!IsDisposed) discoveryStatus.Text = "初始化超时，请检查 PostgreSQL 服务。";
+        }
+        catch (Exception ex)
+        {
+            if (!IsDisposed) discoveryStatus.Text = "专用账户初始化未完成：" + ex.Message;
+        }
+        finally
+        {
+            if (!IsDisposed) provisionApp.Enabled = true;
         }
     }
 
