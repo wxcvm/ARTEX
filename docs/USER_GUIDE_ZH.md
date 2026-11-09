@@ -152,6 +152,25 @@ go build -tags embedui -o artex.exe ./cmd/artex
 
 如果只想使用原浏览器版，继续执行 `start.bat` 打开 `http://localhost:8787`，两种方式互不替代。
 
+### 2.7 Windows 安装版（可选 D 盘、升级和卸载）
+
+除了上一节的便携 ZIP，本 fork 还提供 **`ARTEX-Windows-Setup-amd64.exe`** 标准 Windows 安装程序，基于 Inno Setup 6。CI 成功后可在 [GitHub Actions](https://github.com/wxcvm/ARTEX/actions) 下载 `artex-windows-setup-preview`；正式 tag 发布时可在 [Releases](https://github.com/wxcvm/ARTEX/releases) 获得安装版。**请确认你下载的是成功构建的安装包。**
+
+1. 双击 `ARTEX-Windows-Setup-amd64.exe`，按向导选择安装目录。默认安装在当前用户的 LocalAppData Programs 目录；可自行改为 `D:\Apps\ARTEX` 等位置。普通用户安装不需要管理员权限。
+2. 安装器创建开始菜单 **ARTEX** 快捷方式，可在向导里选择是否创建桌面快捷方式；在 Windows 设置的“已安装的应用”里可以正常卸载。
+3. 安装完成后按第 2.3 节配置 PostgreSQL 的 `config.json`（或者提供 `ARTEX_PG_DSN`），再从开始菜单打开 ARTEX。安装器不包含数据库，也不启动自动后台服务。
+4. 后续运行新安装包会复用同一安装标识和原安装目录，替换程序文件，但**不会覆盖现有 `config.json` 和用户修改过的 `skills/`**。要获取更新的内置 Skills，可单独检查新版本内容并手动同步所需文件。
+5. 卸载时会移除主程序、开始菜单快捷方式和安装记录，但保留已有配置与 Skills（以及用户数据目录）。需要彻底清理时，请自行检查原安装目录和 `%LOCALAPPDATA%\ARTEX\` 后再决定是否删除。
+
+**便携版和安装版可以择一使用**：无需同时安装；浏览器方式也继续可用。安装包目前未配置 Authenticode 代码签名，因此 Windows 可能提示“未知发布者”；这并不代表程序已被签名验证。安装、升级前请确认下载来源为本仓库。
+
+本地源码生成两种 Windows 包（需 Go 1.26.3、Node.js 22、.NET 10 SDK；安装版额外需要 Inno Setup 6）：
+
+```powershell
+./desktop/windows/package.ps1
+./desktop/windows/build-installer.ps1 -Version 0.0.0-preview
+```
+
 ## 3. Linux / macOS 安装
 
 ### 3.1 最省步骤：仓库安装脚本
