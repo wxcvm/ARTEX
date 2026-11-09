@@ -612,3 +612,8 @@ docker compose logs --tail=100 postgres
 - [项目 Issues](https://github.com/wxcvm/ARTEX/issues)
 
 文档面向实际操作，不宣称所有外部模型、MCP、插件或部署环境都已经在该 fork 上完成兼容验证。如遇行为与文档不一致，优先通过当前 `main` 代码、浏览器页面和运行日志定位原因。
+
+
+### 漏洞详情 Markdown 导出
+
+漏洞详情页顶部提供「导出 Markdown」，可打包漏洞基本信息、摘要、PoC、详细报告、HTTP 流量证据预览、复测记录与溯源节点。若关联记录读取失败，会提示错误而不生成缺漏报告；二进制或截断正文会明确标注。

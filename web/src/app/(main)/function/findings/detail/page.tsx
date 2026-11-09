@@ -9,6 +9,7 @@ import { ArrowLeftIcon, ArrowUpRightIcon, ShieldAlertIcon } from "lucide-react";
 import { toast } from "sonner";
 
 import { CopyButton } from "@/components/copy-button";
+import { FindingReportExportButton } from "@/components/finding-report-export-button";
 import { FindingRetestPanel } from "@/components/finding-retest-panel";
 import { FindingTrafficPanel } from "@/components/finding-traffic-panel";
 import { Markdown } from "@/components/markdown";
@@ -147,6 +148,7 @@ function FindingDetailInner() {
           <Separator orientation="vertical" className="mx-1 h-4" />
           <StatusBadge domain="severity" value={finding.severity} dot />
           <StatusBadge domain="finding" value={finding.status} dot />
+          <FindingReportExportButton key={id} findingId={id} contextTask={contextTaskId || undefined} />
           {finding.inherited && finding.source_task_id && (
             <Badge variant="outline">Source task #{finding.source_task_id} · read-only</Badge>
           )}
