@@ -103,7 +103,14 @@ func externalToolExecutable(spec externalToolSpec, roots []externalToolRoot) (st
 		// Versioned Tool Manager layout: tools/<id>/<version>/<binary>.
 		versioned, _ := filepath.Glob(filepath.Join(root.dir, spec.ID, "*", binary))
 		sort.Sort(sort.Reverse(sort.StringSlice(versioned)))
-		candidates = append(candidates, versioned...)
+		for _, candidate := range versioned {
+			// Backups and interrupted swaps are not active executables.
+			folder := filepath.Base(filepath.Dir(candidate))
+			if strings.HasPrefix(folder, ".") || folder == "current" {
+				continue
+			}
+			candidates = append(candidates, candidate)
+		}
 		for _, candidate := range candidates {
 			fi, err := os.Stat(candidate)
 			if err == nil && fi.Mode().IsRegular() && (runtime.GOOS == "windows" || fi.Mode()&0111 != 0) {
