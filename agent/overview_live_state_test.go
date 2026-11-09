@@ -1,10 +1,6 @@
 package agent
 
-import (
-    "testing"
-
-    "github.com/Autumn-27/artex/db"
-)
+import "testing"
 
 func TestGraphOverviewKeepsOlderRunningIntentAndActiveHints(t *testing.T) {
     d := testDB(t)
@@ -12,7 +8,7 @@ func TestGraphOverviewKeepsOlderRunningIntentAndActiveHints(t *testing.T) {
 
     task, err := d.CreateTask("overview state fixture", "verify active work", nil, 0, 0)
     if err != nil { t.Fatal(err) }
-    t.Cleanup(func() { _ = d.DeleteTask(task.ID) })
+    defer func() { _ = d.DeleteTask(task.ID) }()
     store := d.Exploration(task.ExplorationID)
 
     runningID, err := store.AddIntent(map[string]any{"summary": "older work still running"}, 1, nil, "planner")
@@ -47,6 +43,3 @@ func TestGraphOverviewKeepsOlderRunningIntentAndActiveHints(t *testing.T) {
     }
 }
 
-// Preserve the compile-time DB import and avoid accidental adoption of a
-// separate fixture implementation for this package.
-var _ = db.KindIntent
