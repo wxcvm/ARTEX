@@ -1,12 +1,13 @@
 using System.Diagnostics;
 using System.Drawing;
 using System.Text.Json;
+using System.Text.Json.Nodes;
 using System.Windows.Forms;
 
 namespace Artex.Desktop;
 
-// First-launch helper for ARTEX's existing config.json format. PostgreSQL
-// remains an external service; the dialog neither installs nor modifies it.
+// First-launch and repair helper for ARTEX's config.json. Existing settings
+// outside the edited database fields are preserved when saving.
 internal sealed class DatabaseSetupForm : Form
 {
     internal static string ConfigPath
@@ -46,10 +47,12 @@ internal sealed class DatabaseSetupForm : Form
     private readonly Button detectLocal = new() { Text = "检测本机", Width = 94, Height = 30 };
     private readonly Button startLocal = new() { Text = "启动所选服务", Width = 112, Height = 30, Enabled = false };
     private readonly CancellationTokenSource discoveryLifetime = new();
+    private readonly bool editExisting;
 
-    internal DatabaseSetupForm()
+    internal DatabaseSetupForm(bool editExisting = false)
     {
-        Text = "ARTEX · 首次数据库配置";
+        this.editExisting = editExisting;
+        Text = editExisting ? "ARTEX · 修改数据库配置" : "ARTEX · 首次数据库配置";
         Icon = System.Drawing.Icon.ExtractAssociatedIcon(Application.ExecutablePath) ?? SystemIcons.Application;
         StartPosition = FormStartPosition.CenterParent;
         ClientSize = new Size(610, 485);
@@ -71,8 +74,9 @@ internal sealed class DatabaseSetupForm : Form
 
         var intro = new Label
         {
-            Text = "首次运行需要连接 PostgreSQL。请填写你已有的数据库连接信息。" +
-                   "\n如果使用手册中的 Docker 示例，端口改为 5433。",
+            Text = (editExisting ? "修改 PostgreSQL 连接信息。保存后需要重启后端。" :
+                "首次运行需要连接 PostgreSQL。请填写连接信息。") +
+                "\nDocker 手册示例端口是 5433；ARTEX_PG_DSN 环境变量优先于此配置。",
             AutoSize = true,
             Dock = DockStyle.Fill,
         };
@@ -122,10 +126,13 @@ internal sealed class DatabaseSetupForm : Form
         var save = new Button { Text = "保存并连接", Width = 110, Height = 30 };
         save.Click += (_, _) => Save();
         var test = new Button { Text = "测试数据库连接", Width = 124, Height = 30 };
-        test.Click += async (_, _) => await TestConnectionAsync(test);
+        test.Click += async (_, _) => await RunDatabaseActionAsync(test, "-check-db");
+        var create = new Button { Text = "创建目标数据库", Width = 124, Height = 30 };
+        create.Click += async (_, _) => await RunDatabaseActionAsync(create, "-create-db");
         var cancel = new Button { Text = "稍后配置", Width = 100, Height = 30, DialogResult = DialogResult.Cancel };
         buttons.Controls.Add(save);
         buttons.Controls.Add(test);
+        buttons.Controls.Add(create);
         buttons.Controls.Add(cancel);
         layout.Controls.Add(buttons, 0, 10);
         layout.SetColumnSpan(buttons, 2);
@@ -133,6 +140,7 @@ internal sealed class DatabaseSetupForm : Form
         AcceptButton = save;
         CancelButton = cancel;
         Controls.Add(layout);
+        if (editExisting && File.Exists(ConfigPath)) LoadExistingConfiguration();
         Shown += async (_, _) => await DetectLocalAsync();
         FormClosed += (_, _) =>
         {
@@ -160,8 +168,8 @@ internal sealed class DatabaseSetupForm : Form
 
             if (found is int detectedPort)
             {
-                if (host.Text.Trim() is "127.0.0.1" or "localhost" &&
-                    port.Text.Trim() is "5432" or "5433")
+                if (!editExisting && (host.Text.Trim() is "127.0.0.1" or "localhost") &&
+                    (port.Text.Trim() is "5432" or "5433"))
                     port.Text = detectedPort.ToString();
                 discoveryStatus.Text = $"发现本机 PostgreSQL，端口 {detectedPort}。" +
                     " 仅确认服务可连接，账号和密码仍需填写。";
@@ -218,7 +226,7 @@ internal sealed class DatabaseSetupForm : Form
         }
     }
 
-    private async Task TestConnectionAsync(Button button)
+    private string? CurrentDsn()
     {
         var hostname = host.Text.Trim();
         var username = user.Text.Trim();
@@ -226,30 +234,39 @@ internal sealed class DatabaseSetupForm : Form
         if (hostname.Length == 0 || username.Length == 0 || dbName.Length == 0 ||
             !int.TryParse(port.Text, out var portNumber) || portNumber is < 1 or > 65535)
         {
-            MessageBox.Show(this, "请先填写服务器、用户名、数据库名和有效的端口。",
-                "连接测试", MessageBoxButtons.OK, MessageBoxIcon.Warning);
-            return;
+            MessageBox.Show(this, "请填写服务器、用户名、数据库名和有效端口（1–65535）。",
+                "数据库连接", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+            return null;
         }
-        var executable = Path.Combine(AppContext.BaseDirectory, "artex.exe");
-        if (!File.Exists(executable))
-        {
-            MessageBox.Show(this, "找不到后端 artex.exe，请使用完整 Windows 桌面包。",
-                "连接测试", MessageBoxButtons.OK, MessageBoxIcon.Error);
-            return;
-        }
-
-        // Send the credentials to the bundled Go PostgreSQL driver via a child
-        // process environment variable. Neither the command line nor a temp
-        // config file contains the password.
         var hostForUri = hostname.Contains(':') && !hostname.StartsWith('[')
             ? "[" + hostname + "]" : hostname;
-        var dsn = "postgres://" + Uri.EscapeDataString(username) + ":" +
+        return "postgres://" + Uri.EscapeDataString(username) + ":" +
             Uri.EscapeDataString(password.Text) + "@" + hostForUri + ":" + portNumber +
             "/" + Uri.EscapeDataString(dbName) + "?sslmode=" +
             Uri.EscapeDataString(sslMode.Text.Trim() is "" ? "disable" : sslMode.Text.Trim());
+    }
+
+    private async Task RunDatabaseActionAsync(Button button, string command)
+    {
+        var dsn = CurrentDsn();
+        if (dsn is null) return;
+        var create = command == "-create-db";
+        if (create && MessageBox.Show(this,
+            $"要在 PostgreSQL 上创建数据库“{database.Text.Trim()}”吗？\n" +
+            "仅在数据库不存在、当前账号具备 CREATEDB 权限时创建。不会修改已有数据库、账户或密码。",
+            "确认创建数据库", MessageBoxButtons.YesNo, MessageBoxIcon.Question) != DialogResult.Yes)
+            return;
+        var executable = Path.Combine(AppContext.BaseDirectory, "artex.exe");
+        if (!File.Exists(executable))
+        {
+            MessageBox.Show(this, "找不到 artex.exe，请使用完整 Windows 桌面包。",
+                "数据库连接", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            return;
+        }
 
         button.Enabled = false;
-        discoveryStatus.Text = "正在使用 ARTEX 后端验证 PostgreSQL 账号与数据库…";
+        discoveryStatus.Text = create ? "正在创建目标数据库（已存在时不修改）…" :
+            "正在验证 PostgreSQL 账号与数据库连接…";
         try
         {
             var start = new ProcessStartInfo(executable)
@@ -260,39 +277,85 @@ internal sealed class DatabaseSetupForm : Form
                 RedirectStandardError = true,
                 RedirectStandardOutput = true,
             };
-            start.ArgumentList.Add("-check-db");
+            start.ArgumentList.Add(command);
+            // No password in process command line or temporary configuration.
             start.Environment["ARTEX_PG_DSN"] = dsn;
             using var process = Process.Start(start) ??
-                throw new InvalidOperationException("无法启动连接检查程序。");
+                throw new InvalidOperationException("无法启动数据库检查程序。");
             using var timeout = CancellationTokenSource.CreateLinkedTokenSource(discoveryLifetime.Token);
-            timeout.CancelAfter(TimeSpan.FromSeconds(12));
-            await process.WaitForExitAsync(timeout.Token);
-            var errorText = await process.StandardError.ReadToEndAsync(timeout.Token);
+            timeout.CancelAfter(TimeSpan.FromSeconds(17));
+            try
+            {
+                await process.WaitForExitAsync(timeout.Token);
+            }
+            catch (OperationCanceledException)
+            {
+                if (!process.HasExited) process.Kill(entireProcessTree: true);
+                throw;
+            }
+            var details = process.ExitCode == 0
+                ? await process.StandardOutput.ReadToEndAsync(timeout.Token)
+                : await process.StandardError.ReadToEndAsync(timeout.Token);
             if (IsDisposed || discoveryLifetime.IsCancellationRequested) return;
             if (process.ExitCode == 0)
             {
-                discoveryStatus.Text = "PostgreSQL 连接验证成功。现在可以保存并连接。";
+                discoveryStatus.Text = create
+                    ? (details.Contains("already exists") ? "目标数据库已存在，未做修改。" :
+                        "数据库创建成功。可测试连接，再保存配置。")
+                    : "PostgreSQL 连接验证成功。可以保存并连接。";
                 return;
             }
-            if (password.Text.Length != 0)
-                errorText = errorText.Replace(password.Text, "***", StringComparison.Ordinal)
+            if (password.Text.Length > 0)
+                details = details.Replace(password.Text, "***", StringComparison.Ordinal)
                     .Replace(Uri.EscapeDataString(password.Text), "***", StringComparison.Ordinal);
-            discoveryStatus.Text = "PostgreSQL 连接失败，请检查配置。";
-            MessageBox.Show(this, errorText.Length > 600 ? errorText[..600] : errorText,
-                "数据库连接检查失败", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+            discoveryStatus.Text = create ? "创建数据库未成功。" : "数据库连接失败，请检查配置。";
+            MessageBox.Show(this, details.Length > 650 ? details[..650] : details,
+                create ? "创建数据库失败" : "数据库连接检查失败",
+                MessageBoxButtons.OK, MessageBoxIcon.Warning);
         }
         catch (OperationCanceledException) when (discoveryLifetime.IsCancellationRequested) { }
         catch (OperationCanceledException)
         {
-            if (!IsDisposed) discoveryStatus.Text = "连接测试超时；检查数据库服务或网络连接。";
+            if (!IsDisposed) discoveryStatus.Text = "操作超时，请检查 PostgreSQL 服务和连接信息。";
         }
         catch (Exception ex)
         {
-            if (!IsDisposed) discoveryStatus.Text = "连接检查未完成：" + ex.Message;
+            if (!IsDisposed) discoveryStatus.Text = "数据库操作未完成：" + ex.Message;
         }
         finally
         {
             if (!IsDisposed) button.Enabled = true;
+        }
+    }
+
+    private void LoadExistingConfiguration()
+    {
+        var json = JsonNode.Parse(File.ReadAllText(ConfigPath)) as JsonObject
+            ?? throw new InvalidDataException("config.json 必须是有效的 JSON 对象。");
+        var db = json["database"] as JsonObject
+            ?? throw new InvalidDataException("config.json 的 database 字段应为 JSON 对象。");
+
+        var dsn = db["dsn"]?.ToString();
+        if (!string.IsNullOrWhiteSpace(dsn) && Uri.TryCreate(dsn, UriKind.Absolute, out var uri))
+        {
+            host.Text = uri.Host;
+            port.Text = uri.Port.ToString();
+            var credentials = uri.UserInfo.Split(':', 2);
+            user.Text = Uri.UnescapeDataString(credentials[0]);
+            if (credentials.Length == 2) password.Text = Uri.UnescapeDataString(credentials[1]);
+            database.Text = Uri.UnescapeDataString(uri.AbsolutePath.TrimStart('/'));
+            var ssl = uri.Query.TrimStart('?').Split('&')
+                .FirstOrDefault(part => part.StartsWith("sslmode=", StringComparison.OrdinalIgnoreCase));
+            sslMode.Text = ssl is null ? "disable" : Uri.UnescapeDataString(ssl[8..]);
+        }
+        else
+        {
+            host.Text = db["host"]?.ToString() ?? host.Text;
+            port.Text = db["port"]?.ToString() ?? port.Text;
+            user.Text = db["user"]?.ToString() ?? user.Text;
+            password.Text = db["password"]?.ToString() ?? password.Text;
+            database.Text = db["dbname"]?.ToString() ?? database.Text;
+            sslMode.Text = db["sslmode"]?.ToString() ?? sslMode.Text;
         }
     }
 
@@ -316,30 +379,55 @@ internal sealed class DatabaseSetupForm : Form
             return;
         }
 
-        var configuration = new
-        {
-            database = new
-            {
-                host = hostname,
-                port = portNumber,
-                user = username,
-                password = password.Text,
-                dbname = dbName,
-                sslmode = sslMode.Text.Trim(),
-            },
-            skill_dir = "",
-        };
-
         try
         {
-            // Never overwrite an existing config, including on a second launch
-            // while the setup dialog is still open.
             var path = ConfigPath;
             Directory.CreateDirectory(Path.GetDirectoryName(Path.GetFullPath(path))!);
-            using (var output = new FileStream(path, FileMode.CreateNew, FileAccess.Write, FileShare.None))
-                JsonSerializer.Serialize(output, configuration, new JsonSerializerOptions { WriteIndented = true });
+            if (!editExisting || !File.Exists(path))
+            {
+                // First launch: do not overwrite a file created by another instance.
+                using var output = new FileStream(path, FileMode.CreateNew, FileAccess.Write, FileShare.None);
+                JsonSerializer.Serialize(output, new
+                {
+                    database = new {
+                        host = hostname, port = portNumber, user = username,
+                        password = password.Text, dbname = dbName, sslmode = sslMode.Text.Trim()
+                    },
+                    skill_dir = "",
+                }, new JsonSerializerOptions { WriteIndented = true });
+            }
+            else
+            {
+                // Preserve all other settings (skill_dir and future extensions).
+                // A previous database.dsn takes precedence over component fields;
+                // remove that key when the operator replaces the connection here.
+                var root = JsonNode.Parse(File.ReadAllText(path)) as JsonObject
+                    ?? throw new InvalidDataException("配置文件内容不是 JSON 对象。");
+                var dbNode = root["database"] as JsonObject
+                    ?? throw new InvalidDataException("配置文件的 database 字段不是 JSON 对象。");
+                dbNode.Remove("dsn");
+                dbNode["host"] = hostname;
+                dbNode["port"] = portNumber;
+                dbNode["user"] = username;
+                dbNode["password"] = password.Text;
+                dbNode["dbname"] = dbName;
+                dbNode["sslmode"] = sslMode.Text.Trim();
+                var tmp = path + ".new";
+                File.WriteAllText(tmp, root.ToJsonString(new JsonSerializerOptions { WriteIndented = true }) + "\n");
+                File.Move(tmp, path, overwrite: true);
+            }
             DialogResult = DialogResult.OK;
             Close();
+        }
+        catch (JsonException ex)
+        {
+            MessageBox.Show(this, "配置文件的 JSON 格式无效：" + ex.Message,
+                "数据库配置", MessageBoxButtons.OK, MessageBoxIcon.Error);
+        }
+        catch (InvalidDataException ex)
+        {
+            MessageBox.Show(this, ex.Message, "数据库配置",
+                MessageBoxButtons.OK, MessageBoxIcon.Error);
         }
         catch (IOException ex)
         {
