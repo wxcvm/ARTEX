@@ -33,7 +33,7 @@ internal sealed class DatabaseSetupForm : Form
     internal DatabaseSetupForm()
     {
         Text = "ARTEX · 首次数据库配置";
-        Icon = Icon.ExtractAssociatedIcon(Application.ExecutablePath) ?? SystemIcons.Application;
+        Icon = System.Drawing.Icon.ExtractAssociatedIcon(Application.ExecutablePath) ?? SystemIcons.Application;
         StartPosition = FormStartPosition.CenterParent;
         ClientSize = new Size(550, 385);
         MinimumSize = new Size(500, 380);
