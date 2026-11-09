@@ -1101,6 +1101,7 @@ export const api = {
 
   // ---- tools (built-in tool catalog) ----
   tools: () => get<{ tools: Tool[] }>("/tools").then((r) => arr(r.tools)),
+  externalTools: () => get<ExternalToolInventory>("/tools/packages"),
   saveTool: (key: string, patch: Pick<Tool, "description" | "schema" | "agents" | "enabled">) =>
     put<{ ok: boolean }>(`/tools/${key}`, patch),
   resetTool: (key: string) => post<{ ok: boolean }>(`/tools/${key}/reset`, {}),
