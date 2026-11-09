@@ -5,6 +5,7 @@ package main
 
 import (
 	"context"
+	"database/sql"
 	"flag"
 	"fmt"
 	"log"
@@ -18,6 +19,7 @@ import (
 
 	"github.com/Autumn-27/artex/agent"
 	"github.com/Autumn-27/artex/config"
+	"github.com/Autumn-27/artex/db"
 	"github.com/Autumn-27/artex/server"
 )
 
@@ -52,8 +54,19 @@ func run() int {
 		addr    = flag.String("addr", ":8787", "HTTP listen address")
 		dataDir = flag.String("data", filepath.Join(config.BaseDir(), "data"), "data directory for SQLite stores (default: data/ next to the executable)")
 		proxy   = flag.String("proxy", "127.0.0.1:8788", "traffic recording proxy address (empty to disable)")
+		checkDB = flag.Bool("check-db", false, "check PostgreSQL connectivity without starting the server or applying schema changes")
 	)
 	flag.Parse()
+	if *checkDB {
+		ctx, cancel := context.WithTimeout(context.Background(), 7*time.Second)
+		defer cancel()
+		if err := checkDatabaseConnection(ctx); err != nil {
+			fmt.Fprintf(os.Stderr, "PostgreSQL connection failed: %v\n", err)
+			return 1
+		}
+		fmt.Println("PostgreSQL connection OK")
+		return 0
+	}
 
 	// hand the build version to the server package so GET /api/health can report it
 	// to the frontend top bar.
@@ -134,4 +147,20 @@ func shutdownContext(signalCtx context.Context) (context.Context, context.Cancel
 		}
 	}()
 	return ctx, shutdown
+}
+
+	
+// checkDatabaseConnection only authenticates and pings. Unlike db.Open, it does
+// not create databases, apply migrations, or modify any existing records.
+func checkDatabaseConnection(ctx context.Context) error {
+	dsn, _, err := db.DSN()
+	if err != nil {
+		return err
+	}
+	conn, err := sql.Open("pgx", dsn)
+	if err != nil {
+		return err
+	}
+	defer conn.Close()
+	return conn.PingContext(ctx)
 }

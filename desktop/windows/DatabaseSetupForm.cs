@@ -1,3 +1,4 @@
+using System.Diagnostics;
 using System.Drawing;
 using System.Text.Json;
 using System.Windows.Forms;
@@ -120,8 +121,11 @@ internal sealed class DatabaseSetupForm : Form
         };
         var save = new Button { Text = "保存并连接", Width = 110, Height = 30 };
         save.Click += (_, _) => Save();
+        var test = new Button { Text = "测试数据库连接", Width = 124, Height = 30 };
+        test.Click += async (_, _) => await TestConnectionAsync(test);
         var cancel = new Button { Text = "稍后配置", Width = 100, Height = 30, DialogResult = DialogResult.Cancel };
         buttons.Controls.Add(save);
+        buttons.Controls.Add(test);
         buttons.Controls.Add(cancel);
         layout.Controls.Add(buttons, 0, 10);
         layout.SetColumnSpan(buttons, 2);
@@ -211,6 +215,84 @@ internal sealed class DatabaseSetupForm : Form
         finally
         {
             if (!IsDisposed) startLocal.Enabled = localServices.SelectedItem is not null;
+        }
+    }
+
+    private async Task TestConnectionAsync(Button button)
+    {
+        var hostname = host.Text.Trim();
+        var username = user.Text.Trim();
+        var dbName = database.Text.Trim();
+        if (hostname.Length == 0 || username.Length == 0 || dbName.Length == 0 ||
+            !int.TryParse(port.Text, out var portNumber) || portNumber is < 1 or > 65535)
+        {
+            MessageBox.Show(this, "请先填写服务器、用户名、数据库名和有效的端口。",
+                "连接测试", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+            return;
+        }
+        var executable = Path.Combine(AppContext.BaseDirectory, "artex.exe");
+        if (!File.Exists(executable))
+        {
+            MessageBox.Show(this, "找不到后端 artex.exe，请使用完整 Windows 桌面包。",
+                "连接测试", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            return;
+        }
+
+        // Send the credentials to the bundled Go PostgreSQL driver via a child
+        // process environment variable. Neither the command line nor a temp
+        // config file contains the password.
+        var hostForUri = hostname.Contains(':') && !hostname.StartsWith('[')
+            ? "[" + hostname + "]" : hostname;
+        var dsn = "postgres://" + Uri.EscapeDataString(username) + ":" +
+            Uri.EscapeDataString(password.Text) + "@" + hostForUri + ":" + portNumber +
+            "/" + Uri.EscapeDataString(dbName) + "?sslmode=" +
+            Uri.EscapeDataString(sslMode.Text.Trim() is "" ? "disable" : sslMode.Text.Trim());
+
+        button.Enabled = false;
+        discoveryStatus.Text = "正在使用 ARTEX 后端验证 PostgreSQL 账号与数据库…";
+        try
+        {
+            var start = new ProcessStartInfo(executable)
+            {
+                WorkingDirectory = AppContext.BaseDirectory,
+                UseShellExecute = false,
+                CreateNoWindow = true,
+                RedirectStandardError = true,
+                RedirectStandardOutput = true,
+            };
+            start.ArgumentList.Add("-check-db");
+            start.Environment["ARTEX_PG_DSN"] = dsn;
+            using var process = Process.Start(start) ??
+                throw new InvalidOperationException("无法启动连接检查程序。");
+            using var timeout = CancellationTokenSource.CreateLinkedTokenSource(discoveryLifetime.Token);
+            timeout.CancelAfter(TimeSpan.FromSeconds(12));
+            await process.WaitForExitAsync(timeout.Token);
+            var errorText = await process.StandardError.ReadToEndAsync(timeout.Token);
+            if (IsDisposed || discoveryLifetime.IsCancellationRequested) return;
+            if (process.ExitCode == 0)
+            {
+                discoveryStatus.Text = "PostgreSQL 连接验证成功。现在可以保存并连接。";
+                return;
+            }
+            if (password.Text.Length != 0)
+                errorText = errorText.Replace(password.Text, "***", StringComparison.Ordinal)
+                    .Replace(Uri.EscapeDataString(password.Text), "***", StringComparison.Ordinal);
+            discoveryStatus.Text = "PostgreSQL 连接失败，请检查配置。";
+            MessageBox.Show(this, errorText.Length > 600 ? errorText[..600] : errorText,
+                "数据库连接检查失败", MessageBoxButtons.OK, MessageBoxIcon.Warning);
+        }
+        catch (OperationCanceledException) when (discoveryLifetime.IsCancellationRequested) { }
+        catch (OperationCanceledException)
+        {
+            if (!IsDisposed) discoveryStatus.Text = "连接测试超时；检查数据库服务或网络连接。";
+        }
+        catch (Exception ex)
+        {
+            if (!IsDisposed) discoveryStatus.Text = "连接检查未完成：" + ex.Message;
+        }
+        finally
+        {
+            if (!IsDisposed) button.Enabled = true;
         }
     }
 
