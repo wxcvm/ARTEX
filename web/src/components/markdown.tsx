@@ -4,6 +4,8 @@ import * as React from "react";
 import ReactMarkdown, { type Components } from "react-markdown";
 import remarkGfm from "remark-gfm";
 
+import { guideSlug } from "@/lib/user-guide";
+
 // Tailwind-styled element overrides (no typography plugin in this project, so we
 // style each element). `node` is stripped — it's not a valid DOM attribute.
 const components: Components = {
@@ -50,6 +52,11 @@ const components: Components = {
 
 const guideComponents: Components = {
   ...components,
+  h3: ({ node, children, ...p }) => (
+    <h3 id={guideSlug(String(children))} className="scroll-mt-20 mt-2 text-sm font-semibold" {...p}>
+      {children}
+    </h3>
+  ),
   a: ({ node, href, ...p }) => (
     <a className="text-primary underline underline-offset-2"
       href={href} target={href?.startsWith("#") ? "_self" : "_blank"}

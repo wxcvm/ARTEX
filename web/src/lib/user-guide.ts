@@ -49,3 +49,28 @@ export function guideLinks(markdown: string): string {
     return start + base + target + (fragment ? "#" + fragment : "") + end;
   });
 }
+
+
+// The page-level help button links directly to the relevant section of the
+// existing manual. Keep these names identical to the guide's headings.
+const helpSections: readonly [prefix: string, heading: string][] = [
+  ["/function/tasks/detail", "6.3 任务详情页逐项看"],
+  ["/function/tasks", "6.1 创建任务"],
+  ["/system/llm", "5.1 创建模型 Profile"],
+  ["/system/skills", "9.2 Skills：创建、上传、编辑与调用统计"],
+  ["/system/mcp", "9.3 MCP：外部工具接入"],
+  ["/system/agents", "9.1 Agent"],
+  ["/system/tools", "9.4 其他系统入口"],
+  ["/system/settings", "9.4 其他系统入口"],
+  ["/system/logs", "12. 常见问题与检查清单"],
+  ["/function/traffic", "7.2 Traffic：流量记录"],
+  ["/function/assets", "7.1 Assets：资产图谱与范围"],
+  ["/function/findings", "7.3 Findings：漏洞记录与证据"],
+  ["/function/sync", "7.1 Assets：资产图谱与范围"],
+];
+
+export function guideHref(pathname: string): string {
+  const normalized = pathname.replace(/\/+$/, "");
+  const match = helpSections.find(([prefix]) => normalized === prefix || normalized.startsWith(prefix + "/"));
+  return match ? "/help/#" + guideSlug(match[1]) : "/help/";
+}

@@ -2,12 +2,15 @@
 
 import { type ReactNode, useEffect, useState } from "react";
 
+import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { CircleHelpIcon } from "lucide-react";
 
 import { Separator } from "@/components/ui/separator";
 import { SidebarTrigger } from "@/components/ui/sidebar";
 import { useCurrentUser } from "@/hooks/use-current-user";
 import { api } from "@/lib/api";
+import { guideHref } from "@/lib/user-guide";
 import { cn } from "@/lib/utils";
 
 import { AccountSwitcher } from "./sidebar/account-switcher";
@@ -64,6 +67,13 @@ export function MainContent({ children }: { children: ReactNode }) {
             <SearchDialog />
           </div>
           <div className="flex items-center gap-2">
+            {!pathname.startsWith("/help") && (
+              <Link href={guideHref(pathname)} aria-label="查看当前页面操作指南" title="查看当前页面操作指南"
+                className="inline-flex h-8 items-center gap-1 rounded-md px-2 text-sm text-muted-foreground hover:bg-accent hover:text-foreground">
+                <CircleHelpIcon className="size-4" />
+                <span className="hidden md:inline">操作指南</span>
+              </Link>
+            )}
             {version && (
               <span className="font-medium text-muted-foreground text-xs tabular-nums">Version · {version}</span>
             )}

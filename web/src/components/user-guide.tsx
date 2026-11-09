@@ -1,11 +1,20 @@
 "use client";
 
 import * as React from "react";
+import Link from "next/link";
 import { BookOpenIcon, SearchIcon, XIcon } from "lucide-react";
 
 import { Markdown } from "@/components/markdown";
 import { Input } from "@/components/ui/input";
-import { guideLinks, parseGuide } from "@/lib/user-guide";
+import { guideLinks, guideSlug, parseGuide } from "@/lib/user-guide";
+
+const quickStart = [
+  { title: "选择安装方式", heading: "1. 快速选择安装方式", page: "" },
+  { title: "连接 AI 模型", heading: "5.1 创建模型 Profile", page: "/system/llm" },
+  { title: "创建并运行任务", heading: "6.1 创建任务", page: "/function/tasks" },
+  { title: "查看任务结果", heading: "6.3 任务详情页逐项看", page: "/function/tasks" },
+  { title: "复核与导出发现", heading: "8.2 从 Findings 批量导出", page: "/function/findings" },
+];
 
 // The source text is embedded when Next.js statically builds /help. No API
 // request or second document copy is required at runtime.
@@ -55,6 +64,21 @@ export function UserGuide({ markdown }: { markdown: string }) {
           <div className="rounded-lg border bg-card p-4">
             <Markdown text={guideLinks(guide.introduction)} internalAnchors />
           </div>
+          <nav aria-label="首次使用的操作路线" className="rounded-lg border bg-card p-4">
+            <h2 className="mb-3 text-base font-semibold">第一次使用：按顺序完成</h2>
+            <ol className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
+              {quickStart.map((step, index) => (
+                <li key={step.title} className="flex items-start gap-3 rounded-md border p-3">
+                  <span className="flex size-7 shrink-0 items-center justify-center rounded-full bg-muted text-xs font-semibold">{index + 1}</span>
+                  <div className="flex min-w-0 flex-col gap-1">
+                    <span className="text-sm font-medium">{step.title}</span>
+                    <a className="text-xs text-primary hover:underline" href={"#" + guideSlug(step.heading)}>查看操作步骤</a>
+                    {step.page && <Link className="text-xs text-muted-foreground underline underline-offset-2" href={step.page}>打开功能页面</Link>}
+                  </div>
+                </li>
+              ))}
+            </ol>
+          </nav>
           <nav aria-label="指南章节目录" className="rounded-lg border bg-card p-4">
             <h2 className="mb-3 text-base font-semibold">章节导航</h2>
             <div className="grid gap-2 sm:grid-cols-2">
