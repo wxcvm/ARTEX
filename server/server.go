@@ -860,6 +860,7 @@ func (s *Server) Handler() http.Handler {
 	mux.HandleFunc("PUT /api/agents/{key}/visibility", s.pgSetAgentVisibility)
 	// built-in tool catalog (description/param defaults editable, bound per agent; key and handler live in code)
 	mux.HandleFunc("GET /api/tools", s.pgListTools)
+	mux.HandleFunc("GET /api/tools/packages", s.listExternalTools)
 	mux.HandleFunc("PUT /api/tools/{key}", s.pgUpdateTool)
 	mux.HandleFunc("POST /api/tools/custom", s.pgCreateCustomTool)
 	mux.HandleFunc("POST /api/tools/custom/test", s.pgTestCustomTool)
