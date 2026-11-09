@@ -34,7 +34,7 @@ services:
       - "8787:8787"
       - "127.0.0.1:8788:8788"
     volumes:
-      # Bind the data directory (jwt.key, SQLite, etc.) to data/ in the project root,
+      # Bind task data to data/ in the project root (the JWT key lives in keys/),
       # so it is easy to inspect/back up on the host and survives container rebuilds.
       - ./data:/app/data
       # Keep JWT signing key across container recreation; outside browsable data/.
