@@ -6,6 +6,7 @@ package llmrec
 import (
 	"context"
 	"encoding/json"
+	"errors"
 	"iter"
 	"log"
 	"strings"
@@ -148,74 +149,119 @@ func (r *Recorder) Stream(ctx context.Context, req llm.CompletionRequest) iter.S
 		ctx, capt = NewCapture(ctx)
 	}
 
+
 	return func(yield func(llm.StreamEvent, error) bool) {
 		var (
-			textBuf     strings.Builder
-			thinkingBuf strings.Builder
-			usage       llm.Usage
-			stopReason  string
-			streamErr   error
+			usage      llm.Usage
+			text       string
+			thinking   string
+			stopReason string
+			streamErr  error
 		)
-
-		finished := false
-		finish := func(err error) {
-			if finished {
-				return
+		// Exactly one ledger/trace entry for the logical request. Failed empty
+		// attempts still consume tokens, so their usage must be included.
+		defer func() {
+			if streamErr == nil && ctx.Err() != nil {
+				streamErr = ctx.Err()
 			}
-			finished = true
 			status := "ok"
-			if err != nil {
+			if streamErr != nil {
 				status = "error"
 			}
-			// Lightweight metering row — always written.
 			r.recordUsage(taskID, expID, worker, usage, int(time.Since(start).Milliseconds()), status)
-			// Heavy trace row — only when body recording is on.
 			if recordBodies {
-				r.record(req, session, taskID, worker, reqBody, capt, start, textBuf.String(), thinkingBuf.String(), usage, stopReason, err)
+				r.record(req, session, taskID, worker, reqBody, capt, start, text, thinking, usage, stopReason, streamErr)
 			}
-		}
-		defer func() { finish(ctx.Err()) }()
+		}()
 
-		for ev, err := range r.inner.Stream(ctx, req) {
-			if err != nil {
+		for attempt := 0; attempt <= emptyResponseRetries; attempt++ {
+			var (
+				attemptUsage llm.Usage
+				textBuf      strings.Builder
+				thinkingBuf  strings.Builder
+				pending      []llm.StreamEvent
+				seenContent  bool
+				stopped      bool
+			)
+			// Hold metadata until the first content event. An empty reply
+			// never reaches the caller, and hence cannot appear successful.
+			for ev, err := range r.inner.Stream(ctx, req) {
+				if err != nil {
+					streamErr = err
+					if !yield(ev, err) {
+						stopped = true
+					}
+					break
+				}
+				switch ev.Type {
+				case llm.SEMessageStart:
+					attemptUsage.Add(ev.Usage)
+				case llm.SEMessageDelta:
+					if ev.StopReason != "" {
+						stopReason = ev.StopReason
+					}
+					attemptUsage.Add(ev.Usage)
+				case llm.SETextDelta:
+					if recordBodies {
+						textBuf.WriteString(ev.Text)
+					}
+				case llm.SEThinkingDelta:
+					if recordBodies {
+						thinkingBuf.WriteString(ev.Text)
+					}
+				}
+				if !seenContent {
+					if !isResponseContent(ev) {
+						pending = append(pending, ev)
+						continue
+					}
+					seenContent = true
+					for _, event := range pending {
+						if !yield(event, nil) {
+							stopped = true
+							break
+						}
+					}
+					pending = nil
+				}
+				if stopped || !yield(ev, nil) {
+					stopped = true
+					break
+				}
+			}
+			usage.Add(attemptUsage)
+			text, thinking = textBuf.String(), thinkingBuf.String()
+
+			if stopped || streamErr != nil || seenContent {
+				return
+			}
+			if err := ctx.Err(); err != nil {
 				streamErr = err
-				finish(streamErr)
-				if !yield(ev, err) {
-					return
-				}
 				return
 			}
-			// Always track usage (cheap); accumulate text/thinking only for bodies.
-			// Anthropic (and the other providers) split token usage across events:
-			// message_start carries ONLY the input side (input + cache), message_delta
-			// ONLY the output. They must be FOLDED with Add — overwriting on delta
-			// would zero out the input already counted at start (mirrors the SDK's own
-			// llm.Accumulator; see norma/llm/accumulate.go).
-			switch ev.Type {
-			case llm.SETextDelta:
-				if recordBodies {
-					textBuf.WriteString(ev.Text)
-				}
-			case llm.SEThinkingDelta:
-				if recordBodies {
-					thinkingBuf.WriteString(ev.Text)
-				}
-			case llm.SEMessageStart:
-				usage.Add(ev.Usage)
-			case llm.SEMessageDelta:
-				if ev.StopReason != "" {
-					stopReason = ev.StopReason
-				}
-				usage.Add(ev.Usage)
-			}
-			if !yield(ev, err) {
+			if attempt == emptyResponseRetries {
+				streamErr = errEmptyResponse
+				yield(llm.StreamEvent{}, streamErr)
 				return
 			}
+			// A successful HTTP response with no text, thinking or tool call
+			// gets another attempt. Never retry an error or a partial response.
 		}
-
-		// Stream completed normally.
-		finish(streamErr)
 	}
+}
+
+const emptyResponseRetries = 2
+
+var errEmptyResponse = errors.New("LLM returned no text, thinking, or tool calls after 3 attempts")
+
+func isResponseContent(ev llm.StreamEvent) bool {
+	switch ev.Type {
+	case llm.SETextDelta, llm.SEThinkingDelta:
+		return ev.Text != ""
+	case llm.SEToolUseStart, llm.SEToolInputJSON:
+		return true
+	}
+	return false
 }
 
 // Complete implements the atomic completion path while preserving the same
@@ -241,7 +287,18 @@ func (r *Recorder) Complete(ctx context.Context, req llm.CompletionRequest) (llm
 		ctx, capt = NewCapture(ctx)
 	}
 
+
 	msg, stopReason, usage, err := r.inner.Complete(ctx, req)
+	for attempt := 0; attempt < emptyResponseRetries && err == nil && ctx.Err() == nil && emptyMessage(msg); attempt++ {
+		var nextUsage llm.Usage
+		msg, stopReason, nextUsage, err = r.inner.Complete(ctx, req)
+		usage.Add(nextUsage)
+	}
+	if err == nil && ctx.Err() != nil {
+		err = ctx.Err()
+	} else if err == nil && emptyMessage(msg) {
+		err = errEmptyResponse
+	}
 	status := "ok"
 	if err != nil {
 		status = "error"
@@ -251,6 +308,24 @@ func (r *Recorder) Complete(ctx context.Context, req llm.CompletionRequest) (llm
 		r.record(req, session, taskID, worker, reqBody, capt, start, msg.Text(), thinkingText(msg), usage, stopReason, err)
 	}
 	return msg, stopReason, usage, err
+}
+
+func emptyMessage(msg llm.Message) bool {
+	for _, block := range msg.Content {
+		switch block.Type {
+		case llm.BlockText:
+			if block.Text != "" {
+				return false
+			}
+		case llm.BlockThinking:
+			if block.Thinking != "" {
+				return false
+			}
+		case llm.BlockToolUse:
+			return false
+		}
+	}
+	return true
 }
 
 func thinkingText(msg llm.Message) string {
