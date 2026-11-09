@@ -596,7 +596,7 @@ export interface FindingDeepenResponse {
   queued: boolean;
 }
 
-// FindingStats is the whole-table findings aggregate (stat cards + vulnerability type dropdown), computed server-side, unaffected by pagination.
+// FindingStats counts filtered live findings independent of pagination; dropdown options stay global.
 export interface FindingStats {
   total: number;
   pending: number;

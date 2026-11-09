@@ -637,6 +637,33 @@ func (d *DB) FindingStats() (*FindingStats, error) {
 	return st, nil
 }
 
+// FilteredFindingStats counts exactly the live rows matched by the findings list.
+// Archive-only aggregates cannot be filtered by their original record content.
+// Keep the global class/task dropdown options returned by FindingStats.
+func (d *DB) FilteredFindingStats(filter FindingFilter) (*FindingStats, error) {
+	st, err := d.FindingStats()
+	if err != nil {
+		return nil, err
+	}
+	filter, err = d.applyAssetScope(filter)
+	if err != nil {
+		return nil, err
+	}
+	where, args := filter.where()
+	err = d.QueryRow(`SELECT COUNT(*),
+		COUNT(*) FILTER (WHERE f.status='pending'),
+		COUNT(*) FILTER (WHERE f.severity='critical'),
+		COUNT(*) FILTER (WHERE f.severity='high'),
+		COUNT(*) FILTER (WHERE f.severity='medium'),
+		COUNT(*) FILTER (WHERE f.severity='low')
+		FROM findings f LEFT JOIN tasks t ON t.id=f.task_id`+where, args...).Scan(
+		&st.Total, &st.Pending, &st.Critical, &st.High, &st.Medium, &st.Low)
+	if err != nil {
+		return nil, err
+	}
+	return st, nil
+}
+
 // GetFinding returns a single finding row (with task_description joined and the
 // full Markdown report), or nil when no row has that id. Unlike the list queries
 // it also selects `report` — that column is only needed on the detail page.
