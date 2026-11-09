@@ -80,6 +80,7 @@ jobs:
       - run: go build ./...
       - run: go test ./server -run 'TestTaskTransition|TestWebAPIEngineering|TestDownload' -count=20
       - run: go test ./server -run '^(TestExternalTool|TestJWTKey)' -count=1
+      - run: go test ./mcphttp -run '^TestStreamableClient(ProtocolVersions|VersionRejectionForms)$' -count=1
 
   web:
     runs-on: ubuntu-latest
