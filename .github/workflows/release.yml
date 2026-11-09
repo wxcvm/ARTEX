@@ -100,6 +100,13 @@ jobs:
         with:
           name: pkg-windows-desktop-amd64
           path: dist/ARTEX-Windows-Desktop-amd64.zip
+      - name: Build Windows desktop installer
+        shell: pwsh
+        run: ./desktop/windows/build-installer.ps1 -Version "${{ github.ref_name }}"
+      - uses: actions/upload-artifact@v4
+        with:
+          name: pkg-windows-setup-amd64
+          path: dist/ARTEX-Windows-Setup-amd64.exe
 
   # ④ Collect all zips → create the GitHub Release
   release:
@@ -113,11 +120,12 @@ jobs:
           path: dist
       - name: Generate checksums
         working-directory: dist
-        run: sha256sum *.zip > SHA256SUMS
+        run: sha256sum *.zip *.exe > SHA256SUMS
       - uses: softprops/action-gh-release@v2
         with:
           files: |
             dist/*.zip
+            dist/*.exe
             dist/SHA256SUMS
           generate_release_notes: false
           body: "See CHANGELOG.md for the list of changes in this release."
