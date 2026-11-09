@@ -617,3 +617,8 @@ docker compose logs --tail=100 postgres
 ### 漏洞详情 Markdown 导出
 
 漏洞详情页顶部提供「导出 Markdown」，可打包漏洞基本信息、摘要、PoC、详细报告、HTTP 流量证据预览、复测记录与溯源节点。若关联记录读取失败，会提示错误而不生成缺漏报告；二进制或截断正文会明确标注。
+
+
+### Next.js 构建标识可复现
+
+前端的 Next.js `BUILD_ID` 默认为固定 `artex`，可通过环境变量 `ARTEX_BUILD_ID` 指定（例如发布时设置为 Git commit SHA），使相同源码和相同构建标识的重复构建减少差异。此项只控制 Next.js 的构建标识，不保证所有 ZIP 或安装器字节完全一致，也不改变 Agent 的逻辑。
