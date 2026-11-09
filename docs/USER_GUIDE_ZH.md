@@ -251,6 +251,9 @@ docker compose logs -f artex
 
 `docker-compose.yml` 包含 `postgres` 与 `artex` 两个服务。默认映射 HTTP 8787，并将代理端口 8788 映射到宿主机回环地址；数据目录 `./data` 和 `./skills` 挂载到容器。数据库本体保存在 Docker 命名卷 `pgdata`。
 
+**Docker 重建后保留登录状态**：本 fork 的新后端使用 `ARTEX_JWT_KEY_DIR=/app/keys`，由 Compose 挂载仓库根目录的 `./keys`，单独持久化 JWT 签名密钥。`keys/` 不会被 Git 跟踪，也不进入 Docker 镜像构建上下文；备份时应保护该目录。Linux/macOS 可先执行 `mkdir -p keys`，Windows PowerShell 可执行 `New-Item -ItemType Directory -Force keys`。新后端会自动搬迁仍在挂载的 `data/jwt.key`，但**旧容器内部 `/app/jwt.key` 在容器重建后可能无法恢复**。如果已有旧容器，并希望保留现有登录令牌，应在删除或重新创建旧容器前将其密钥复制到宿主机的 `keys/jwt.key`（例如 `docker cp <旧容器名>:/app/jwt.key ./keys/jwt.key`）；只在原文件确实存在时操作，**不要生成不同的密钥覆盖它**。如果旧容器已经删除且密钥没有备份，只能重新登录。此行为仅适用于运行本 fork 新后端的 Docker 镜像；当前 Compose 的默认历史上游镜像不会因此自动更新到本 fork。
+
+
 **特别提醒：** 只设置 `ARTEX_IMAGE=wxcvm/ARTEX` 并不意味着镜像仓库一定存在，也不意味着镜像已经包含最新代码。只有确认自行构建或发布的镜像名称与标签后，才能把它们写入 `.env`。
 
 如将 AI 服务运行在宿主机，而 ARTEX 运行在 Docker 容器，容器内部的 `127.0.0.1` **不是宿主机**。请使用容器实际可访问的主机名/IP，并用模型连接测试验证。
