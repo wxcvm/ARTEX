@@ -96,3 +96,30 @@ jobs:
       - run: npm test
       - run: npx tsc --noEmit
       - run: npm run build:static
+      - uses: actions/upload-artifact@v4
+        with:
+          name: ci-web-dist
+          path: web/out
+
+  desktop:
+    needs: web
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-go@v5
+        with:
+          go-version-file: go.mod
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: "10.0.x"
+      - uses: actions/download-artifact@v4
+        with:
+          name: ci-web-dist
+          path: server/webui/dist
+      - name: Build portable Windows desktop bundle
+        shell: pwsh
+        run: ./desktop/windows/package.ps1 -SkipWebBuild -Version preview
+      - uses: actions/upload-artifact@v4
+        with:
+          name: artex-windows-desktop-preview
+          path: dist/ARTEX-Windows-Desktop-amd64.zip
