@@ -3,6 +3,7 @@ import {
   Ban,
   BellRing,
   Bot,
+  BookOpen,
   Brain,
   Bug,
   ClipboardList,
@@ -93,6 +94,7 @@ export const sidebarItems: NavGroup[] = [
       { id: "approvals", title: "Approval Records", url: "/system/intercept/approvals", icon: ClipboardList },
       { id: "logs", title: "Logs", url: "/system/logs", icon: ScrollText },
       { id: "settings", title: "System Settings", url: "/system/settings", icon: Settings2 },
+      { id: "help", title: "使用指南 / Help", url: "/help", icon: BookOpen },
     ],
   },
 ];
