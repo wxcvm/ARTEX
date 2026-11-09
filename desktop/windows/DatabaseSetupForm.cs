@@ -29,14 +29,30 @@ internal sealed class DatabaseSetupForm : Form
     private readonly TextBox password = new() { UseSystemPasswordChar = true, Width = 300 };
     private readonly TextBox database = new() { Text = "artex", Width = 300 };
     private readonly TextBox sslMode = new() { Text = "disable", Width = 300 };
+    private readonly Label discoveryStatus = new()
+    {
+        Text = "正在检查本机 PostgreSQL…",
+        AutoSize = false,
+        Dock = DockStyle.Fill,
+        ForeColor = SystemColors.GrayText,
+    };
+    private readonly ComboBox localServices = new()
+    {
+        DropDownStyle = ComboBoxStyle.DropDownList,
+        Width = 175,
+        Enabled = false,
+    };
+    private readonly Button detectLocal = new() { Text = "检测本机", Width = 94, Height = 30 };
+    private readonly Button startLocal = new() { Text = "启动所选服务", Width = 112, Height = 30, Enabled = false };
+    private readonly CancellationTokenSource discoveryLifetime = new();
 
     internal DatabaseSetupForm()
     {
         Text = "ARTEX · 首次数据库配置";
         Icon = System.Drawing.Icon.ExtractAssociatedIcon(Application.ExecutablePath) ?? SystemIcons.Application;
         StartPosition = FormStartPosition.CenterParent;
-        ClientSize = new Size(550, 385);
-        MinimumSize = new Size(500, 380);
+        ClientSize = new Size(610, 485);
+        MinimumSize = new Size(570, 445);
         FormBorderStyle = FormBorderStyle.FixedDialog;
         MaximizeBox = false;
         MinimizeBox = false;
@@ -45,7 +61,7 @@ internal sealed class DatabaseSetupForm : Form
         {
             Dock = DockStyle.Fill,
             ColumnCount = 2,
-            RowCount = 9,
+            RowCount = 11,
             Padding = new Padding(16),
             AutoSize = false,
         };
@@ -69,6 +85,22 @@ internal sealed class DatabaseSetupForm : Form
         AddField(layout, 5, "数据库名", database);
         AddField(layout, 6, "SSL 模式", sslMode);
 
+        var diagnostics = new FlowLayoutPanel
+        {
+            Dock = DockStyle.Fill,
+            FlowDirection = FlowDirection.LeftToRight,
+            WrapContents = false,
+        };
+        detectLocal.Click += async (_, _) => await DetectLocalAsync();
+        startLocal.Click += async (_, _) => await StartLocalAsync();
+        diagnostics.Controls.Add(detectLocal);
+        diagnostics.Controls.Add(localServices);
+        diagnostics.Controls.Add(startLocal);
+        layout.Controls.Add(diagnostics, 0, 7);
+        layout.SetColumnSpan(diagnostics, 2);
+        layout.Controls.Add(discoveryStatus, 0, 8);
+        layout.SetColumnSpan(discoveryStatus, 2);
+
         var configLabel = new Label
         {
             Text = "配置保存位置：" + ConfigPath,
@@ -77,7 +109,7 @@ internal sealed class DatabaseSetupForm : Form
             Dock = DockStyle.Fill,
             ForeColor = SystemColors.GrayText,
         };
-        layout.Controls.Add(configLabel, 0, 7);
+        layout.Controls.Add(configLabel, 0, 9);
         layout.SetColumnSpan(configLabel, 2);
 
         var buttons = new FlowLayoutPanel
@@ -91,12 +123,95 @@ internal sealed class DatabaseSetupForm : Form
         var cancel = new Button { Text = "稍后配置", Width = 100, Height = 30, DialogResult = DialogResult.Cancel };
         buttons.Controls.Add(save);
         buttons.Controls.Add(cancel);
-        layout.Controls.Add(buttons, 0, 8);
+        layout.Controls.Add(buttons, 0, 10);
         layout.SetColumnSpan(buttons, 2);
 
         AcceptButton = save;
         CancelButton = cancel;
         Controls.Add(layout);
+        Shown += async (_, _) => await DetectLocalAsync();
+        FormClosed += (_, _) =>
+        {
+            discoveryLifetime.Cancel();
+            discoveryLifetime.Dispose();
+        };
+    }
+
+    private async Task DetectLocalAsync()
+    {
+        if (discoveryLifetime.IsCancellationRequested) return;
+        detectLocal.Enabled = false;
+        startLocal.Enabled = false;
+        discoveryStatus.Text = "正在探测本机 PostgreSQL（5432 / 5433）…";
+        try
+        {
+            var found = await PostgresDiscovery.FindLocalPortAsync(discoveryLifetime.Token);
+            if (IsDisposed || discoveryLifetime.IsCancellationRequested) return;
+            localServices.Items.Clear();
+            foreach (var service in PostgresDiscovery.InstalledWindowsServices())
+                localServices.Items.Add(service);
+            localServices.Enabled = localServices.Items.Count != 0;
+            if (localServices.Enabled) localServices.SelectedIndex = 0;
+            startLocal.Enabled = localServices.Enabled;
+
+            if (found is int detectedPort)
+            {
+                if (host.Text.Trim() is "127.0.0.1" or "localhost" &&
+                    port.Text.Trim() is "5432" or "5433")
+                    port.Text = detectedPort.ToString();
+                discoveryStatus.Text = $"发现本机 PostgreSQL，端口 {detectedPort}。" +
+                    " 仅确认服务可连接，账号和密码仍需填写。";
+            }
+            else
+            {
+                discoveryStatus.Text = localServices.Items.Count > 0
+                    ? "已发现已安装的 PostgreSQL 服务，但常用端口尚未响应。可选择服务启动，或填写自定义端口。"
+                    : "未在 5432 / 5433 发现 PostgreSQL。可填写远程数据库，或先安装并启动本地服务。";
+            }
+        }
+        catch (OperationCanceledException) when (discoveryLifetime.IsCancellationRequested) { }
+        catch (Exception ex)
+        {
+            if (!IsDisposed)
+                discoveryStatus.Text = "检测未完成：" + ex.Message + "。仍可手动填写连接信息。";
+        }
+        finally
+        {
+            if (!IsDisposed) detectLocal.Enabled = true;
+        }
+    }
+
+    private async Task StartLocalAsync()
+    {
+        if (localServices.SelectedItem is not string service) return;
+        if (MessageBox.Show(this, $"是否启动本机已安装的 PostgreSQL 服务“{service}”？" +
+            "\\n不会创建或修改数据库和账户。",
+            "启动本机数据库服务", MessageBoxButtons.YesNo, MessageBoxIcon.Question) != DialogResult.Yes)
+            return;
+
+        startLocal.Enabled = false;
+        discoveryStatus.Text = $"正在请求启动 {service}…";
+        try
+        {
+            var started = await PostgresDiscovery.StartWindowsServiceAsync(service, discoveryLifetime.Token);
+            if (IsDisposed || discoveryLifetime.IsCancellationRequested) return;
+            if (!started)
+            {
+                discoveryStatus.Text = "服务启动命令未成功。可在 Windows 服务管理器中确认服务状态或管理员权限。";
+                return;
+            }
+            await Task.Delay(1000, discoveryLifetime.Token);
+            await DetectLocalAsync();
+        }
+        catch (OperationCanceledException) when (discoveryLifetime.IsCancellationRequested) { }
+        catch (Exception ex)
+        {
+            if (!IsDisposed) discoveryStatus.Text = "无法启动服务：" + ex.Message;
+        }
+        finally
+        {
+            if (!IsDisposed) startLocal.Enabled = localServices.SelectedItem is not null;
+        }
     }
 
     private static void AddField(TableLayoutPanel layout, int row, string name, TextBox field)
