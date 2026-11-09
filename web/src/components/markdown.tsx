@@ -48,10 +48,19 @@ const components: Components = {
   td: ({ node, ...p }) => <td className="border border-border px-2 py-1 align-top" {...p} />,
 };
 
-export function Markdown({ text }: { text: string }) {
+const guideComponents: Components = {
+  ...components,
+  a: ({ node, href, ...p }) => (
+    <a className="text-primary underline underline-offset-2"
+      href={href} target={href?.startsWith("#") ? "_self" : "_blank"}
+      rel={href?.startsWith("#") ? undefined : "noreferrer"} {...p} />
+  ),
+};
+
+export function Markdown({ text, internalAnchors = false }: { text: string; internalAnchors?: boolean }) {
   return (
     <div className="min-w-0 space-y-1.5 text-sm [&>*:first-child]:mt-0">
-      <ReactMarkdown remarkPlugins={[remarkGfm]} components={components}>
+      <ReactMarkdown remarkPlugins={[remarkGfm]} components={internalAnchors ? guideComponents : components}>
         {text}
       </ReactMarkdown>
     </div>
