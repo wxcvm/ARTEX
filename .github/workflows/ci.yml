@@ -123,3 +123,14 @@ jobs:
         with:
           name: artex-windows-desktop-preview
           path: dist/ARTEX-Windows-Desktop-amd64.zip
+      - name: Build Windows installer
+        shell: pwsh
+        run: |
+          ./desktop/windows/build-installer.ps1 -Version 0.0.0-preview
+      - name: Smoke test installer and upgrade
+        shell: pwsh
+        run: ./desktop/windows/test-installer.ps1
+      - uses: actions/upload-artifact@v4
+        with:
+          name: artex-windows-setup-preview
+          path: dist/ARTEX-Windows-Setup-amd64.exe
