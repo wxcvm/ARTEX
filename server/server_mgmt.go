@@ -1053,17 +1053,18 @@ func (s *Server) fsMissingSkills(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	limit, _ := strconv.Atoi(r.URL.Query().Get("limit"))
+	page, _ := strconv.Atoi(r.URL.Query().Get("page"))
 	installed, err := s.installedSkillNames()
 	if err != nil {
 		writeErr(w, 500, "skill library unavailable")
 		return
 	}
-	missing, err := pg.MissingSkillStats(limit, installed...)
+	missing, total, calls, err := pg.MissingSkillStatsPage(limit, page, installed...)
 	if err != nil {
 		writeErr(w, 500, err.Error())
 		return
 	}
-	writeJSON(w, 200, map[string]any{"missing": missing})
+	writeJSON(w, 200, map[string]any{"missing": missing, "total": total, "total_calls": calls})
 }
 
 // cleanStrs trims each string and drops empties.
