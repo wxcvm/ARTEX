@@ -562,30 +562,38 @@ export default function FindingsPage() {
     if (flatPage > lastPage) setFlatPage(lastPage);
   }, [flat.loaded, flat.total, flatPage, flatPageSize]);
 
-  // Whole-table aggregates (stat cards + vuln-class options) — independent of the
-  // current page, so they stay exact.
+  // Summary cards use the same current filters as the list. Ignore stale replies.
+  const statsQuery = React.useMemo(
+    () => ({ severity, status, vulnclass, task, query, assetScope: activeAssetScope ?? undefined }),
+    [severity, status, vulnclass, task, query, activeAssetScope],
+  );
+  const statsFingerprint = JSON.stringify(statsQuery);
+  const activeStatsFingerprint = React.useRef(statsFingerprint);
+  activeStatsFingerprint.current = statsFingerprint;
+  const statsRequest = React.useRef(0);
+  const refreshStats = React.useCallback(async () => {
+    if (activeStatsFingerprint.current !== statsFingerprint) return;
+    const request = ++statsRequest.current;
+    try {
+      const result = await api.findingStats(statsQuery);
+      if (request !== statsRequest.current || activeStatsFingerprint.current !== statsFingerprint) return;
+      setStats(result);
+      setStatsLoaded(true);
+    } catch {
+      // Keep the last successful snapshot on transient failures.
+    }
+  }, [statsQuery, statsFingerprint]);
+
   React.useEffect(() => {
-    let alive = true;
-    const load = () => {
-      api
-        .findingStats()
-        .then((s) => {
-          if (alive) {
-            setStats(s);
-            setStatsLoaded(true);
-          }
-        })
-        .catch(() => {
-          // Keep the previous aggregate snapshot until the next poll.
-        });
-    };
-    load();
-    const t = setInterval(load, 5000);
+    if (!preferencesHydrated) return;
+    void activeRetestFingerprint;
+    void refreshStats();
+    const timer = setInterval(() => void refreshStats(), 5000);
     return () => {
-      alive = false;
-      clearInterval(t);
+      statsRequest.current++;
+      clearInterval(timer);
     };
-  }, []);
+  }, [preferencesHydrated, refreshStats, activeRetestFingerprint]);
 
   React.useEffect(() => {
     if (!statsLoaded) return;
@@ -609,12 +617,7 @@ export default function FindingsPage() {
         await api.setFindingStatus(f.finding_id, next);
         toast.success(`Marked as "${statusMeta("finding", next).label}"`);
         // refresh stat cards (pending count) and drop the row if it no longer matches the status filter
-        api
-          .findingStats()
-          .then(setStats)
-          .catch(() => {
-            // The row update remains valid even if the aggregate refresh fails.
-          });
+        void refreshStats();
         if (status !== "all" && next !== status) {
           setFindings((cur) => cur.filter((x) => !isSameFinding(x, f)));
           setTotal((t) => Math.max(0, t - 1));
@@ -626,7 +629,7 @@ export default function FindingsPage() {
         toast.error(`Update failed: ${(e as Error).message}`);
       }
     },
-    [refreshAfterMutation, setFindings, status],
+    [refreshAfterMutation, refreshStats, setFindings, status],
   );
 
   // The inline expanded detailed-report cache is keyed by the globally stable row key. report is long-form
@@ -679,12 +682,7 @@ export default function FindingsPage() {
           ),
         );
         toast.success("Saved");
-        api
-          .findingStats()
-          .then(setStats)
-          .catch(() => {
-            // The edit remains valid even if the aggregate refresh fails.
-          });
+        void refreshStats();
         refreshAfterMutation(f);
       } catch (e) {
         toast.error(`Save failed: ${(e as Error).message}`);
@@ -692,7 +690,7 @@ export default function FindingsPage() {
         setSaving(false);
       }
     },
-    [edit, refreshAfterMutation, setFindings],
+    [edit, refreshAfterMutation, refreshStats, setFindings],
   );
 
   // deleteFinding deletes one vulnerability (with confirmation): on success it removes it from the list, collapses the row, and refreshes stats.
@@ -712,18 +710,13 @@ export default function FindingsPage() {
         const rowKey = findingRowKey(f);
         setExpanded((cur) => (cur === rowKey ? null : cur));
         toast.success("Vulnerability deleted");
-        api
-          .findingStats()
-          .then(setStats)
-          .catch(() => {
-            // The deletion remains valid even if the aggregate refresh fails.
-          });
+        void refreshStats();
         refreshAfterMutation(f, true);
       } catch (e) {
         toast.error(`Delete failed: ${(e as Error).message}`);
       }
     },
-    [refreshAfterMutation, setFindings],
+    [refreshAfterMutation, refreshStats, setFindings],
   );
 
   const openDeepen = React.useCallback((f: Finding) => {
