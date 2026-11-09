@@ -29,7 +29,7 @@ public sealed class MainForm : Form
     public MainForm()
     {
         Text = "ARTEX";
-        Icon = SystemIcons.Application;
+        Icon = System.Drawing.Icon.ExtractAssociatedIcon(Application.ExecutablePath) ?? SystemIcons.Application;
         MinimumSize = new Size(900, 620);
         Size = new Size(1360, 850);
         StartPosition = FormStartPosition.CenterScreen;
