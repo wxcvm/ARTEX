@@ -35,6 +35,7 @@ import {
   SheetTitle,
 } from "@/components/ui/sheet";
 import { api } from "@/lib/api";
+import { ExternalToolsPanel } from "@/components/external-tools-panel";
 import type { Agent, Tool } from "@/lib/types";
 
 // Traffic tools are host tools gated by the global traffic capture switch: bindable, but
@@ -365,6 +366,7 @@ function ToolGridCard({ tool, onClick }: { tool: Tool; onClick: () => void }) {
 
 export default function ToolsPage() {
   const [tools, setTools] = React.useState<Tool[]>([]);
+  const [activeTab, setActiveTab] = React.useState("system");
   const [agents, setAgents] = React.useState<Agent[]>([]);
   const [captureOn, setCaptureOn] = React.useState(false);
   const [selectedKey, setSelectedKey] = React.useState<string | null>(null);
@@ -416,10 +418,11 @@ export default function ToolsPage() {
         </div>
       </div>
 
-      <Tabs defaultValue="system">
+      <Tabs value={activeTab} onValueChange={setActiveTab}>
         <TabsList>
           <TabsTrigger value="system">System tools</TabsTrigger>
           <TabsTrigger value="custom">Custom tools</TabsTrigger>
+          <TabsTrigger value="external">External binaries</TabsTrigger>
         </TabsList>
 
         <TabsContent value="system">
@@ -446,6 +449,10 @@ export default function ToolsPage() {
               )}
             </CardContent>
           </Card>
+        </TabsContent>
+
+        <TabsContent value="external">
+          <ExternalToolsPanel onOpenCustom={() => setActiveTab("custom")} />
         </TabsContent>
 
         <TabsContent value="custom">
