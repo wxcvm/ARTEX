@@ -171,6 +171,21 @@ go build -tags embedui -o artex.exe ./cmd/artex
 ./desktop/windows/build-installer.ps1 -Version 0.0.0-preview
 ```
 
+### 2.8 Windows 外部工具检测（Tool Manager 第一阶段）
+
+在 ARTEX 中打开 **系统 → Tools → External binaries**，点击“重新检测”即可查看 nuclei、httpx、subfinder、katana、ffuf、naabu、dnsx 七种常用工具在**后端主机**上的状态、版本输出、发现路径及官方项目入口。界面会区分“版本检查通过”“已发现但版本检查失败”“未发现”。如果你通过手机浏览器连接 ARTEX，这里仍检测 Windows / Linux 后端，而不是手机内部的软件。
+
+检测目录按顺序为：
+
+1. 可选环境变量 `ARTEX_TOOL_DIRS` 指定的多个目录，Windows 使用分号分隔（例如 `D:\Tools\Recon;E:\Security\bin`）；
+2. `%LOCALAPPDATA%\ARTEX\tools`（Windows）；
+3. ARTEX 程序目录下的 `tools/` 或 `data/tools/`；
+4. 现有系统 `PATH`。
+
+支持直接放入 `tools\nuclei.exe`，也支持将多个版本分开放入 `tools\nuclei\v3.11.1\nuclei.exe` 等层级。设置新的环境变量后，重启 ARTEX 后端再刷新页面。程序只对找到的可执行文件运行清单中指定的版本参数（每项最多 3 秒），不会自动扫描资产、修改全局 PATH 或下载工具。
+
+**当前边界**：该页是本机可用性盘点，而非软件安装器；“版本检查通过”并不代表 SHA-256、签名或来源已经核验。安装包仍保持轻量，后续才会增加官方版本下载、可信校验与可选离线工具包。外部程序也不会因为被发现就自动成为 Agent 工具：需要使用时仍可在原有 Custom tools 中配置命令和 Agent 绑定。
+
 ## 3. Linux / macOS 安装
 
 ### 3.1 最省步骤：仓库安装脚本
