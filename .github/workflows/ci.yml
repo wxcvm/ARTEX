@@ -80,6 +80,68 @@ jobs:
       - run: go build ./...
       - run: go test ./server -run 'TestTaskTransition|TestWebAPIEngineering|TestDownload' -count=20
       - run: go test ./server -run '^(TestExternalTool|TestJWTKey)' -count=1
+      - run: go test ./mcphttp -run '^TestStreamableClient(ProtocolVersions|VersionRejectionForms)
+
+  web:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: web
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: npm
+          cache-dependency-path: web/package-lock.json
+      - run: npm ci
+      - run: npm test
+      - run: npx tsc --noEmit
+      - run: npm run build:static
+      - uses: actions/upload-artifact@v4
+        with:
+          name: ci-web-dist
+          path: web/out
+
+  desktop:
+    needs: web
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-go@v5
+        with:
+          go-version-file: go.mod
+      - uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: "10.0.x"
+      - uses: actions/download-artifact@v4
+        with:
+          name: ci-web-dist
+          path: server/webui/dist
+      - name: Build portable Windows desktop bundle
+        shell: pwsh
+        run: ./desktop/windows/package.ps1 -SkipWebBuild -Version preview
+      - name: Smoke test native desktop window and WebView2 navigation
+        shell: pwsh
+        timeout-minutes: 3
+        run: ./desktop/windows/test-desktop-smoke.ps1
+      - uses: actions/upload-artifact@v4
+        with:
+          name: artex-windows-desktop-preview
+          path: dist/ARTEX-Windows-Desktop-amd64.zip
+      - name: Build Windows installer
+        shell: pwsh
+        run: |
+          ./desktop/windows/build-installer.ps1 -Version 0.0.0-preview
+      - name: Smoke test installer and upgrade
+        shell: pwsh
+        timeout-minutes: 8
+        run: ./desktop/windows/test-installer.ps1
+      - uses: actions/upload-artifact@v4
+        with:
+          name: artex-windows-setup-preview
+          path: dist/ARTEX-Windows-Setup-amd64.exe
+ -count=1
 
   web:
     runs-on: ubuntu-latest
