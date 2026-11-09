@@ -863,6 +863,8 @@ func (s *Server) Handler() http.Handler {
 	mux.HandleFunc("GET /api/tools/packages", s.listExternalTools)
 	mux.HandleFunc("GET /api/tools/packages/{id}/release", s.externalToolLatestRelease)
 	mux.HandleFunc("POST /api/tools/packages/{id}/install", s.externalToolInstall)
+	mux.HandleFunc("POST /api/tools/packages/{id}/rollback", s.externalToolRollback)
+	mux.HandleFunc("DELETE /api/tools/packages/{id}/managed", s.externalToolUninstall)
 	mux.HandleFunc("PUT /api/tools/{key}", s.pgUpdateTool)
 	mux.HandleFunc("POST /api/tools/custom", s.pgCreateCustomTool)
 	mux.HandleFunc("POST /api/tools/custom/test", s.pgTestCustomTool)

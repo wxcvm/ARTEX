@@ -45,6 +45,7 @@ type externalToolStatus struct {
 	Detail  string `json:"detail,omitempty"`
 	ManagedVersion string `json:"managed_version,omitempty"`
 	ManagedPath string `json:"managed_path,omitempty"`
+	PreviousVersion string `json:"previous_version,omitempty"`
 }
 
 type externalToolRoot struct {
@@ -102,7 +103,14 @@ func externalToolExecutable(spec externalToolSpec, roots []externalToolRoot) (st
 		// Versioned Tool Manager layout: tools/<id>/<version>/<binary>.
 		versioned, _ := filepath.Glob(filepath.Join(root.dir, spec.ID, "*", binary))
 		sort.Sort(sort.Reverse(sort.StringSlice(versioned)))
-		candidates = append(candidates, versioned...)
+		for _, candidate := range versioned {
+			// Backups and interrupted swaps are not active executables.
+			folder := filepath.Base(filepath.Dir(candidate))
+			if strings.HasPrefix(folder, ".") || folder == "current" {
+				continue
+			}
+			candidates = append(candidates, candidate)
+		}
 		for _, candidate := range candidates {
 			fi, err := os.Stat(candidate)
 			if err == nil && fi.Mode().IsRegular() && (runtime.GOOS == "windows" || fi.Mode()&0111 != 0) {
@@ -125,9 +133,12 @@ func probeExternalTool(ctx context.Context, spec externalToolSpec, roots []exter
 	status := externalToolStatus{externalToolSpec: spec, Status: "missing"}
 	if local := os.Getenv("LOCALAPPDATA"); local != "" {
 		root := filepath.Join(local, "ARTEX", "tools")
-		if receipt := externalToolManagedReceipt(root, spec); receipt != nil {
+		if receipt, err := managedToolSlotReceipt(root, spec, "current"); err == nil && receipt != nil {
 			status.ManagedVersion = receipt.Version
 			status.ManagedPath = filepath.Join(root, spec.ID, "current", externalToolBinary(spec.Binary))
+		}
+		if receipt, err := managedToolSlotReceipt(root, spec, ".previous"); err == nil && receipt != nil {
+			status.PreviousVersion = receipt.Version
 		}
 	}
 	path, origin := externalToolExecutable(spec, roots)
