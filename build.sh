@@ -17,6 +17,7 @@
 #   ARTEX_UPX_ARGS="--best --lzma"    Arguments passed to UPX.
 #   ARTEX_SKIP_FRONTEND=1             Reuse server/webui/dist (for CI artifact builds).
 #   ARTEX_SKIP_NPM_CI=1               Skip npm ci while rebuilding the frontend.
+#   ARTEX_INCREMENTAL=1               Reuse unchanged frontend artifacts (local builds only).
 #   ARTEX_GOSUMDB=sum.golang.org      Go checksum database.
 set -euo pipefail
 
@@ -111,16 +112,45 @@ else
   ARTEX_TARGETS="${ARTEX_TARGETS:-${ARTEX_TARGET_OS}/${ARTEX_TARGET_ARCH}}"
 fi
 
+# Adapted from WSARTEX's incremental launcher: only the normal local build
+# may reuse an existing static export. Releases always rebuild their frontend.
+frontend_cache_fresh() {
+  stamp="server/webui/dist/index.html"
+  [ -s "$stamp" ] && [ -d "server/webui/dist/_next" ] || return 1
+  for path in web/src web/public web/package.json web/package-lock.json \
+    web/next.config.mjs web/postcss.config.mjs web/tsconfig.json \
+    web/tsconfig.scripts.json web/components.json web/biome.json \
+    web/.env web/.env.local web/.env.production; do
+    [ -e "$path" ] || continue
+    if [ -d "$path" ]; then
+      [ -z "$(find "$path" -type f -newer "$stamp" -print -quit)" ] || return 1
+    else
+      [ "$path" -nt "$stamp" ] && return 1
+    fi
+  done
+  return 0
+}
+
 if [ "${ARTEX_SKIP_FRONTEND:-0}" = "1" ]; then
   [ -d server/webui/dist ] || die "ARTEX_SKIP_FRONTEND=1 but server/webui/dist does not exist"
+elif [ "${ARTEX_INCREMENTAL:-0}" = "1" ] && [ "$ARTEX_RELEASE" != "1" ] && frontend_cache_fresh; then
+  info "Frontend unchanged; reusing server/webui/dist (ARTEX_INCREMENTAL=1)"
 else
   command -v npm >/dev/null 2>&1 || die "npm not detected (building the frontend static assets requires Node.js/npm)"
   command -v rsync >/dev/null 2>&1 || die "rsync not detected"
   info "Building frontend static assets"
   if [ "${ARTEX_SKIP_NPM_CI:-0}" != "1" ]; then
-    (cd web && npm ci)
+    if [ "${ARTEX_INCREMENTAL:-0}" = "1" ] && [ "$ARTEX_RELEASE" != "1" ] \
+      && [ -f web/node_modules/.package-lock.json ] \
+      && [ ! web/package-lock.json -nt web/node_modules/.package-lock.json ] \
+      && [ ! web/package.json -nt web/node_modules/.package-lock.json ]; then
+      info "Node dependencies unchanged; skipping npm ci"
+    else
+      (cd web && npm ci)
+    fi
   fi
   (cd web && npm run build:static)
+  [ -s web/out/index.html ] || die "frontend build did not produce web/out/index.html"
   info "Syncing frontend assets to server/webui/dist"
   mkdir -p server/webui/dist
   rsync -a --delete web/out/ server/webui/dist/

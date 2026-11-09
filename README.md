@@ -188,6 +188,8 @@ CGO_ENABLED=0 go build -tags embedui -o artex ./cmd/artex
 
 `build.sh` first builds and embeds the frontend, then strips debug info via the Go linker, and compresses the release files into zips. Release mode generates zips for Linux amd64/arm64, macOS amd64/arm64, and Windows amd64 by default:
 
+For repeated **local source builds**, use `ARTEX_INCREMENTAL=1 ./build.sh`. The builder reuses the embedded frontend when its source/config files have not changed, and skips `npm ci` if the installed dependencies are current. Backend compilation still runs. `./build.sh --release` retains the full frontend build even when incremental mode is set; omit `ARTEX_INCREMENTAL` to force a fresh local frontend build.
+
 ```bash
 ./build.sh --release
 # output: dist/artex-0.3.3-*.zip
