@@ -45,6 +45,7 @@ if ($LASTEXITCODE -ne 0) { throw "Windows desktop publish failed" }
 Copy-Item -Path (Join-Path $root "skills") -Destination (Join-Path $stage "skills") -Recurse -Force
 Copy-Item -Path (Join-Path $root "config.example.json") -Destination (Join-Path $stage "config.example.json")
 Copy-Item -Path (Join-Path $root "start.bat") -Destination (Join-Path $stage "start.bat")
+Copy-Item -Path (Join-Path $root "web/src/app/favicon.ico") -Destination (Join-Path $stage "ARTEX.ico")
 Copy-Item -Path (Join-Path $root "desktop/windows/README-Windows.txt") -Destination (Join-Path $stage "README-Windows.txt")
 New-Item -ItemType Directory -Path (Join-Path $stage "docs") -Force | Out-Null
 Copy-Item -Path (Join-Path $root "docs/USER_GUIDE_ZH.md") -Destination (Join-Path $stage "docs/USER_GUIDE_ZH.md")
