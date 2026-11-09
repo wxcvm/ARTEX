@@ -33,7 +33,7 @@ export async function collectFindingReport(source: FindingReportSource, id: stri
 const tick = String.fromCharCode(96);
 
 function inline(value: string): string {
-  return value.replace(/[\\_*{}[\]()#+.!|>~-]/g, "\\$&")
+  return value.replace(/[\\_*{}[\]()#+!|>~]/g, "\\$&")
     .split(tick).join("\\" + tick).replace(/\r?\n/g, " ");
 }
 
