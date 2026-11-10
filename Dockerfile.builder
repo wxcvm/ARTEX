@@ -14,7 +14,7 @@ COPY go.mod go.sum ./
 RUN go mod download
 COPY . .
 COPY --from=frontend /src/web/out /src/server/webui/dist
-RUN CGO_ENABLED=0 GOOS=linux go build -tags embedui -trimpath -o /out/artex ./cmd/artex
+RUN mkdir -p /out && CGO_ENABLED=0 GOOS=linux go build -tags embedui -trimpath -o /out/artex ./cmd/artex
 
 FROM scratch AS artifact
 COPY --from=backend /out/artex /artex
