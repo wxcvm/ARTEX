@@ -1141,6 +1141,21 @@ CREATE INDEX IF NOT EXISTS idx_findings_status ON findings(status, created_at DE
 -- The "by asset" view looks findings up via asset_ids @> '[<id>]'; without this GIN index that is a full table scan.
 CREATE INDEX IF NOT EXISTS idx_findings_asset_ids ON findings USING GIN(asset_ids jsonb_path_ops);
 
+-- Imported DSH human-review progress is independent of ARTEX finding disposition.
+-- A deleted finding removes its linked external feedback, without affecting other findings.
+CREATE TABLE IF NOT EXISTS finding_dsh_reviews (
+    finding_id BIGINT NOT NULL REFERENCES findings(id) ON DELETE CASCADE,
+    dsh_engagement TEXT NOT NULL,
+    source_task_id BIGINT,
+    inspected_evidence_version BIGINT,
+    review_status TEXT NOT NULL CHECK (review_status IN ('pending','in_progress','needs_evidence','reviewed')),
+    note TEXT NOT NULL DEFAULT '',
+    source_updated_at TEXT NOT NULL,
+    imported_at TIMESTAMPTZ NOT NULL DEFAULT now(),
+    PRIMARY KEY (finding_id, dsh_engagement)
+);
+CREATE INDEX IF NOT EXISTS idx_finding_dsh_reviews_recent ON finding_dsh_reviews(imported_at DESC);
+
 -- Manual retests are independent sessions; the verdict is stored separately from the original finding's disposition status.
 CREATE TABLE IF NOT EXISTS finding_retests (
     id BIGSERIAL PRIMARY KEY,
