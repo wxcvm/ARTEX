@@ -2,6 +2,8 @@ package server
 
 import (
 	"crypto/rand"
+	"crypto/subtle"
+	"encoding/hex"
 	"fmt"
 	"log"
 	"math/big"
@@ -45,6 +47,19 @@ func validatePassword(pw string) string {
 		return fmt.Sprintf("Password must not exceed %d bytes", maxPasswordBytes)
 	}
 	return ""
+}
+
+// newSetupToken creates a random, ephemeral first-time admin claim secret.
+func newSetupToken() (string, error) {
+	buf := make([]byte, 24)
+	if _, err := rand.Read(buf); err != nil {
+		return "", err
+	}
+	return hex.EncodeToString(buf), nil
+}
+
+func validSetupToken(provided, expected string) bool {
+	return expected != "" && subtle.ConstantTimeCompare([]byte(provided), []byte(expected)) == 1
 }
 
 // jwtLegacyBaseDir is the second legacy key location (the executable's directory,
@@ -241,9 +256,14 @@ func (s *Server) authInit(w http.ResponseWriter, r *http.Request) {
 	}
 	var req struct {
 		Password string `json:"password"`
+		SetupToken string `json:"setup_token"`
 	}
 	if err := decode(r, &req); err != nil || req.Password == "" {
 		writeErr(w, 400, "Password cannot be empty")
+		return
+	}
+	if !validSetupToken(req.SetupToken, s.setupToken) {
+		writeErr(w, 403, "Invalid setup token")
 		return
 	}
 	if msg := validatePassword(req.Password); msg != "" {
