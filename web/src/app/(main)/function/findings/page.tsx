@@ -18,6 +18,7 @@ import {
 import { toast } from "sonner";
 
 import { FindingRetestDialog } from "@/components/finding-retest-dialog";
+import { DSHReviewFeedbackPanel } from "@/components/dsh-review-feedback-panel";
 import { StatusBadge } from "@/components/status-badge";
 import { TablePagination } from "@/components/table-pagination";
 import { Button } from "@/components/ui/button";
@@ -822,6 +823,7 @@ export default function FindingsPage() {
           </TabsList>
         </Tabs>
       </div>
+      <DSHReviewFeedbackPanel />
       <div className="flex flex-1 flex-col gap-4 md:gap-6">
         <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-6">
           {statCards.map((stat) => {
