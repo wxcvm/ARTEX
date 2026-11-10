@@ -70,3 +70,19 @@ func TestMissingDatabase(t *testing.T) {
 		t.Fatalf("missing database: handle=%v, err=%v", k, err)
 	}
 }
+
+func TestRepositoryKnowledge(t *testing.T) {
+	k, err := Open(filepath.Join("..", "knowledge"))
+	if err != nil || k == nil {
+		t.Fatalf("open repository knowledge.db: handle=%v, err=%v", k, err)
+	}
+	defer k.Close()
+	hits, _, err := k.Search("1panel", 8)
+	if err != nil || len(hits) == 0 {
+		t.Fatalf("search repository knowledge.db: hits=%d, err=%v", len(hits), err)
+	}
+	entry, err := k.Get(hits[0].ID)
+	if err != nil || entry == nil || entry.Title == "" {
+		t.Fatalf("get repository knowledge entry: entry=%v, err=%v", entry, err)
+	}
+}
