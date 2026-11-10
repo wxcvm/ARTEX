@@ -1,6 +1,8 @@
 #!/usr/bin/env bash
 # ARTEX install script: 1) all-Docker  2) local build & run
 set -euo pipefail
+# Secrets created during installation must not be readable by other users.
+umask 077
 cd "$(cd "$(dirname "$0")" && pwd)"
 
 info(){ printf '\033[36m[*]\033[0m %s\n' "$*"; }
@@ -61,7 +63,7 @@ install_local(){
     2)
       ensure_docker
       local pw; pw="$(ask 'Postgres password (press Enter for random)' "$(rand)")"
-      docker run -d --name artex-pg -p 5432:5432 \
+      docker run -d --name artex-pg -p 127.0.0.1:5432:5432 \
         -e POSTGRES_USER=artex -e POSTGRES_PASSWORD="$pw" -e POSTGRES_DB=artex \
         -v artex-pg:/var/lib/postgresql/data postgres:16-alpine
       DB_HOST=127.0.0.1 DB_PORT=5432 DB_USER=artex DB_PASS="$pw" DB_NAME=artex DB_SSL=disable ;;
@@ -87,6 +89,7 @@ install_local(){
   }
 }
 JSON
+  chmod 600 config.json
   ok "config.json generated"
 
   # go environment check
