@@ -43,8 +43,9 @@ type Server struct {
 	engine *Engine
 	ctx    context.Context
 
-	skillDir string // root directory for skill subdirectories
-	jwtKey   []byte // HS256 signing key loaded from / generated into dataDir/jwt.key
+	skillDir   string // root directory for skill subdirectories
+	jwtKey     []byte // HS256 signing key loaded from / generated into dataDir/jwt.key
+	setupToken string // ephemeral first-time admin setup secret; never returned via HTTP
 
 	// concMu serializes concurrency-cap decisions (admission + reconcile) so a
 	// scheduler tick and an HTTP settings change / task creation can't both count
@@ -145,7 +146,21 @@ func New(ctx context.Context, m *Manager, skillDir string, dataDir string, keyDi
 	if err != nil {
 		log.Fatalf("[auth] JWT key: %v", err)
 	}
-	s := &Server{m: m, engine: NewEngine(m), ctx: ctx, skillDir: skillDir, jwtKey: key, chatBusy: map[string]bool{},
+	setupToken := strings.TrimSpace(os.Getenv("ARTEX_SETUP_TOKEN"))
+	if setupToken == "" {
+		setupToken, err = newSetupToken()
+		if err != nil {
+			log.Fatalf("[auth] generate first-time setup token: %v", err)
+		}
+	}
+	// Require possession of a local startup secret before anyone can claim an
+	// uninitialized instance. Never return this token from any HTTP endpoint.
+	if m.pg != nil {
+		if existing, _, readErr := m.pg.GetSetting(authPassKey); readErr != nil || existing == "" {
+			fmt.Fprintf(os.Stderr, "[auth] first-time setup token (enter on /setup): %s\n", setupToken)
+		}
+	}
+	s := &Server{m: m, engine: NewEngine(m), ctx: ctx, skillDir: skillDir, jwtKey: key, setupToken: setupToken, chatBusy: map[string]bool{},
 		chatCancel: map[string]context.CancelCauseFunc{}, triggerQ: map[string][]triggeredRun{},
 		triggerActive: map[string]int{}, triggerCfg: map[string]triggerBehavior{},
 		profChatAgents: map[int64]*agent.ChatAgent{},

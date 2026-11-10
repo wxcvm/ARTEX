@@ -13,6 +13,7 @@ import { auth } from "@/lib/auth";
 export default function SetupPage() {
   const router = useRouter();
   const [password, setPassword] = useState("");
+  const [setupToken, setSetupToken] = useState("");
   const [confirm, setConfirm] = useState("");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
@@ -47,7 +48,7 @@ export default function SetupPage() {
     setLoading(true);
     setError("");
     try {
-      const { token } = await api.initPassword(password);
+      const { token } = await api.initPassword(password, setupToken.trim());
       auth.setToken(token);
       router.replace("/function/tasks");
     } catch (err) {
@@ -93,6 +94,19 @@ export default function SetupPage() {
           ) : (
             <form onSubmit={handleSubmit} className="flex flex-col gap-4">
               <div className="space-y-1.5">
+                <Label htmlFor="setup-token">Setup token</Label>
+                <Input
+                  id="setup-token"
+                  type="password"
+                  value={setupToken}
+                  onChange={(e) => setSetupToken(e.target.value)}
+                  placeholder="From the ARTEX backend startup log"
+                  autoComplete="off"
+                  required
+                />
+                <p className="text-xs text-muted-foreground">Find the one-time token in the backend startup log. Docker: docker compose logs artex. Windows Desktop: %LOCALAPPDATA%\\ARTEX\\desktop-backend.log.</p>
+              </div>
+              <div className="space-y-1.5">
                 <Label htmlFor="password">New password</Label>
                 <Input
                   id="password"
@@ -116,7 +130,7 @@ export default function SetupPage() {
                 />
               </div>
               {error && <p className="text-sm text-destructive">{error}</p>}
-              <Button type="submit" className="w-full" disabled={loading || !password || !confirm}>
+              <Button type="submit" className="w-full" disabled={loading || !password || !confirm || !setupToken.trim()}>
                 {loading ? "Saving..." : "Set password and sign in"}
               </Button>
             </form>
