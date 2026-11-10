@@ -304,6 +304,17 @@ Optional: `ARTEX_LLM_PROVIDER` (anthropic | openai | openai-responses | ollama) 
 
 **Common flags**: `./start.sh -addr :8787 -proxy :8788` (`-addr` frontend+API, `-proxy` traffic recording proxy). The startup script passes arguments through to `artex` verbatim.
 
+### Build a Docker image from this fork's source
+
+The default Compose image `autumn27/artex:latest` is a **historical upstream image**, not a build of this fork. Even when that image is available, it does not include security fixes committed only to `wxcvm/ARTEX`. To build the current checkout without needing Node or Go on the host, use Docker Buildx:
+
+```bash
+bash scripts/docker-build-fork.sh
+ARTEX_IMAGE=artex ARTEX_TAG=local docker compose up -d
+```
+
+The optional script builds the Next.js frontend and Go binary in Docker, then uses the existing runtime `Dockerfile` to create `artex:local`. Re-run after changing source. On Windows, run the Bash script in WSL; for the second command in PowerShell, set `$env:ARTEX_IMAGE='artex'; $env:ARTEX_TAG='local'` before `docker compose up -d`. The default Compose workflow is not otherwise changed. Be aware that runtime Dockerfile dependencies still come from external package sources; source-build provenance does not audit those dependencies.
+
 ### Privacy defaults and first-time setup
 
 - Bare-metal ARTEX now listens on `127.0.0.1:8787` unless you explicitly pass `-addr`. Docker Compose publishes port 8787 to host loopback by default; set `ARTEX_BIND` in `.env` only if you intentionally want to make the console reachable from another network. The traffic-recording proxy remains local.
