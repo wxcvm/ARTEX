@@ -34,8 +34,12 @@ type sarifResultProperties struct {
 	FindingID  int64   `json:"findingId"`
 	TaskID     *int64  `json:"taskId,omitempty"`
 	AssetIDs   []int64 `json:"assetIds,omitempty"`
-	Severity   string  `json:"severity"`
-	Status     string  `json:"status"`
+	Severity              string `json:"severity"`
+	Status                string `json:"status"`
+	TrafficCount          int    `json:"trafficCount"`
+	EvidenceVersion       int64  `json:"evidenceVersion"`
+	ReportEvidenceVersion int64  `json:"reportEvidenceVersion"`
+	ReportStale           bool   `json:"reportStale"`
 }
 
 type sarifResult struct {
@@ -132,8 +136,12 @@ func FindingsSARIF(findings []*db.DBFinding) ([]byte, error) {
 				FindingID: f.ID,
 				TaskID: f.TaskID,
 				AssetIDs: assets,
-				Severity: f.Severity,
-				Status: f.Status,
+				Severity:              f.Severity,
+				Status:                f.Status,
+				TrafficCount:          f.TrafficCount,
+				EvidenceVersion:       f.EvidenceVersion,
+				ReportEvidenceVersion: f.ReportEvidenceVersion,
+				ReportStale:           f.Report != "" && f.EvidenceVersion != f.ReportEvidenceVersion,
 			},
 		})
 	}
