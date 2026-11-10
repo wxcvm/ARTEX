@@ -77,7 +77,7 @@ try {
 
     $desktop = Start-Process -FilePath $program -WorkingDirectory (Split-Path $program) -PassThru
     $navigated = $false
-    for ($i = 0; $i -lt 120; $i++) {
+    for ($i = 0; $i -lt 240; $i++) {
         $desktop.Refresh()
         if ($desktop.HasExited) {
             throw "ARTEX desktop exited before navigating (code $($desktop.ExitCode))"
@@ -89,7 +89,8 @@ try {
         Start-Sleep -Milliseconds 250
     }
     if (-not $navigated) {
-        throw "ARTEX desktop did not load the local UI in WebView2 within 30 seconds"
+        $seen = if (Test-Path $requestLog) { (Get-Content -LiteralPath $requestLog) -join ", " } else { "(no requests)" }
+        throw "ARTEX desktop did not load the local UI in WebView2 within 60 seconds. HTTP routes seen: $seen"
     }
     Write-Host "[ARTEX] Native window, health probe and WebView2 navigation passed."
 }

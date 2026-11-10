@@ -46,7 +46,10 @@ ARTEX Windows 桌面客户端（便携版）
   可手动初始化普通 artex 专用账户及其新数据库，或选择只创建缺失的目标数据库。
   专用账户不具有 SUPERUSER、CREATEDB、CREATEROLE 权限。
   管理服务可能需要 Windows 管理员权限；原有数据库和账户不会被重置。
-- 不要只复制 ARTEX.Desktop.exe，桌面包中的 artex.exe、skills 及配置
+- 可选知识库随包附带 knowledge\knowledge.db。要让 Agent 使用只读检索工具，
+  在 config.json 设置 "knowledge_dir": "D:/Apps/ARTEX/knowledge"（按实际安装路径修改），
+  或将环境变量 ARTEX_KB_DIR 设置为该目录的绝对路径。
+- 不要只复制 ARTEX.Desktop.exe，桌面包中的 artex.exe、skills、knowledge 及配置
   模板应一并保留。
 
 完整中文操作指南：docs\USER_GUIDE_ZH.md

@@ -28,6 +28,9 @@ type Database struct {
 type Config struct {
 	Database Database `json:"database"`
 	SkillDir string   `json:"skill_dir"`
+	// KnowledgeDir points at a directory holding knowledge.db (the deployment
+	// knowledge base). Empty = the kb_search / kb_get tools are not registered.
+	KnowledgeDir string `json:"knowledge_dir"`
 }
 
 // BaseDir is the directory that anchors all runtime artifacts (config.json and
@@ -113,6 +116,20 @@ func Load() Config {
 //	env ARTEX_SKILL_DIR  >  config file (skill_dir)  >  BaseDir()/skills
 //
 // The directory is created if it does not exist.
+// KnowledgeDir returns the optional knowledge base directory with the same
+// precedence as SkillDir:
+//
+//	env ARTEX_KB_DIR  >  config file (knowledge_dir)  >  "" (feature off)
+//
+// Unlike SkillDir it never creates the directory: an absent knowledge base must
+// leave no empty state behind, and the tools simply stay unregistered.
+func KnowledgeDir() string {
+	if v := strings.TrimSpace(os.Getenv("ARTEX_KB_DIR")); v != "" {
+		return v
+	}
+	return strings.TrimSpace(Load().KnowledgeDir)
+}
+
 func SkillDir() string {
 	var d string
 	if v := strings.TrimSpace(os.Getenv("ARTEX_SKILL_DIR")); v != "" {

@@ -81,6 +81,9 @@ if ($LASTEXITCODE -ne 0) { throw "Go backend build failed" }
 if ($LASTEXITCODE -ne 0) { throw "Windows desktop publish failed" }
 
 Copy-Item -Path (Join-Path $root "skills") -Destination (Join-Path $stage "skills") -Recurse -Force
+# Only the read-only SQLite ledger is needed at runtime; keep source notes out of the ZIP.
+New-Item -ItemType Directory -Path (Join-Path $stage "knowledge") -Force | Out-Null
+Copy-Item -Path (Join-Path $root "knowledge/knowledge.db") -Destination (Join-Path $stage "knowledge/knowledge.db")
 Copy-Item -Path (Join-Path $root "config.example.json") -Destination (Join-Path $stage "config.example.json")
 Copy-Item -Path (Join-Path $root "start.bat") -Destination (Join-Path $stage "start.bat")
 Copy-Item -Path (Join-Path $root "web/src/app/favicon.ico") -Destination (Join-Path $stage "ARTEX.ico")

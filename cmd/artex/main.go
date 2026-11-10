@@ -20,6 +20,7 @@ import (
 	"github.com/Autumn-27/artex/agent"
 	"github.com/Autumn-27/artex/config"
 	"github.com/Autumn-27/artex/db"
+	"github.com/Autumn-27/artex/kb"
 	"github.com/Autumn-27/artex/server"
 )
 
@@ -142,6 +143,16 @@ func run() int {
 		skillDir = abs
 	}
 	log.Printf("[config] skill directory: %s", skillDir)
+	// Optional knowledge base: <knowledge_dir>/knowledge.db. A missing file only
+	// means kb_search / kb_get stay unregistered.
+	if k, err := kb.Open(config.KnowledgeDir()); err != nil {
+		log.Printf("[kb] knowledge base disabled: %v", err)
+	} else if k != nil {
+		agent.SetKnowledge(k)
+		log.Printf("[kb] knowledge base: %s (fts=%v)", k.Path(), k.HasFTS())
+	} else {
+		log.Printf("[kb] no knowledge.db under %q; kb_* tools disabled", config.KnowledgeDir())
+	}
 	jwtKeyDir := config.BaseDir()
 	if override := os.Getenv("ARTEX_JWT_KEY_DIR"); override != "" {
 		jwtKeyDir = override
