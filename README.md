@@ -315,6 +315,12 @@ ARTEX_IMAGE=artex ARTEX_TAG=local docker compose up -d
 
 The optional script builds the Next.js frontend and Go binary in Docker, then uses the existing runtime `Dockerfile` to create `artex:local`. Re-run after changing source. On Windows, run the Bash script in WSL; for the second command in PowerShell, set `$env:ARTEX_IMAGE='artex'; $env:ARTEX_TAG='local'` before `docker compose up -d`. The default Compose workflow is not otherwise changed. Be aware that runtime Dockerfile dependencies still come from external package sources; source-build provenance does not audit those dependencies.
 
+### Privacy and exposure dashboard
+
+After login, open **System → 隐私与暴露面** (`/system/privacy`) to inspect this ARTEX process's configured HTTP listener. The read-only endpoint `GET /api/privacy/exposure` requires a valid JWT. It reports loopback, wildcard/all-interface, specific-interface or unknown binding and explicitly marks public reachability **not tested**.
+
+This local diagnosis does **not** inspect Docker host publication, NAT, reverse proxies, firewall rules or your VPS security group. A loopback-bound ARTEX may still be reachable via forwarding; do not interpret the display as proof that no internet access is possible. The page does not send queries to third-party scanning services. Purge/DSH remains an independently configured service and is not automatically inspected by ARTEX.
+
 ### Privacy defaults and first-time setup
 
 - Bare-metal ARTEX now listens on `127.0.0.1:8787` unless you explicitly pass `-addr`. Docker Compose publishes port 8787 to host loopback by default; set `ARTEX_BIND` in `.env` only if you intentionally want to make the console reachable from another network. The traffic-recording proxy remains local.
