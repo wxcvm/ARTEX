@@ -5,6 +5,8 @@ import (
 	"encoding/hex"
 	"encoding/json"
 	"fmt"
+	"net"
+	"net/url"
 	"sort"
 	"strconv"
 	"strings"
@@ -34,12 +36,45 @@ type sarifResultProperties struct {
 	FindingID  int64   `json:"findingId"`
 	TaskID     *int64  `json:"taskId,omitempty"`
 	AssetIDs   []int64 `json:"assetIds,omitempty"`
+	AssetRefs  []sarifAssetRef `json:"assetRefs,omitempty"`
 	Severity              string `json:"severity"`
 	Status                string `json:"status"`
 	TrafficCount          int    `json:"trafficCount"`
 	EvidenceVersion       int64  `json:"evidenceVersion"`
 	ReportEvidenceVersion int64  `json:"reportEvidenceVersion"`
 	ReportStale           bool   `json:"reportStale"`
+}
+
+// Stable source identity for cross-tool reconciliation. Never exports auth,
+// raw URL query strings, traffic contents, or private credential fields.
+type sarifAssetRef struct {
+	ID int64 `json:"id"`
+	Type string `json:"type,omitempty"`
+	IP string `json:"ip,omitempty"`
+	Domain string `json:"domain,omitempty"`
+	Port *int `json:"port,omitempty"`
+}
+
+func assetSARIFRef(a *db.Asset) sarifAssetRef {
+	ref := sarifAssetRef{ID: a.ID, Type: a.Type, IP: strings.TrimSpace(a.IP),
+		Domain: strings.ToLower(strings.TrimSuffix(strings.TrimSpace(a.Domain), ".")), Port: a.Port}
+	if a.URL != "" {
+		if u, err := url.Parse(a.URL); err == nil && u.Hostname() != "" {
+			if ref.IP == "" && ref.Domain == "" {
+				host := strings.ToLower(u.Hostname())
+				if net.ParseIP(host) != nil { ref.IP = host } else { ref.Domain = host }
+			}
+			if ref.Port == nil {
+				p, err := strconv.Atoi(u.Port())
+				if err == nil && p > 0 && p <= 65535 { ref.Port = &p }
+				if u.Port() == "" {
+					if u.Scheme == "https" { p = 443; ref.Port = &p }
+					if u.Scheme == "http" { p = 80; ref.Port = &p }
+				}
+			}
+		}
+	}
+	return ref
 }
 
 type sarifResult struct {
@@ -104,6 +139,12 @@ func sarifKind(status string) string {
 // It contains no physical locations because findings do not have verified
 // source path/line data; downstream code-scanning alert support may vary.
 func FindingsSARIF(findings []*db.DBFinding) ([]byte, error) {
+	return FindingsSARIFWithAssets(findings, nil)
+}
+
+// FindingsSARIFWithAssets adds source asset identities to the normal export.
+// It reads only the explicitly linked asset rows and does not alter findings.
+func FindingsSARIFWithAssets(findings []*db.DBFinding, identity map[int64]*db.Asset) ([]byte, error) {
 	items := append([]*db.DBFinding(nil), findings...)
 	sortFindingsForExport(items)
 
@@ -120,6 +161,10 @@ func FindingsSARIF(findings []*db.DBFinding) ([]byte, error) {
 		}
 		assets := append([]int64(nil), f.AssetIDs...)
 		sort.Slice(assets, func(i, j int) bool { return assets[i] < assets[j] })
+		refs := make([]sarifAssetRef, 0, len(assets))
+		for _, assetID := range assets {
+			if asset := identity[assetID]; asset != nil { refs = append(refs, assetSARIFRef(asset)) }
+		}
 		message := findingTitle(f)
 		if summary := strings.TrimSpace(f.Summary); summary != "" {
 			message = fmt.Sprintf("%s: %s", message, summary)
@@ -136,6 +181,7 @@ func FindingsSARIF(findings []*db.DBFinding) ([]byte, error) {
 				FindingID: f.ID,
 				TaskID: f.TaskID,
 				AssetIDs: assets,
+				AssetRefs: refs,
 				Severity:              f.Severity,
 				Status:                f.Status,
 				TrafficCount:          f.TrafficCount,
