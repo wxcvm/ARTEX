@@ -13,9 +13,8 @@
 }
 ```
 
-启动后日志出现「知识库已加载: N 条」即生效；agent 开局会自动检索它（按 弹药 / 打法 / 负面情报 三档返回）。
-当前 fork 需要先应用 `patches/0002-knowledge-runtime.patch`（`kb_search` / `kb_get` 运行时）；
-不应用时本目录只是人读的文档库。
+在此集成分支构建的后端中，启动日志出现 `[kb] knowledge base: ... (fts=true)` 即表示已经打开知识库；Agent 可按需调用只读的 `kb_search` / `kb_get` 查找记录。未设置目录或文件不存在时，这两个工具不会注册。
+主分支旧版尚未合入运行时，仍需先应用 `patches/0002-knowledge-runtime.patch` 或合并本集成 PR；仅复制 `knowledge/` 目录不会自动接通 Agent。
 
 ## 目录
 
