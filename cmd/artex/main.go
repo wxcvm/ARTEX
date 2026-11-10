@@ -147,6 +147,7 @@ func run() int {
 		jwtKeyDir = override
 	}
 	srv := server.New(ctx, mgr, skillDir, *dataDir, jwtKeyDir)
+	srv.SetListenAddress(*addr)
 	httpSrv := &http.Server{
 		Addr:              *addr,
 		Handler:           srv.Handler(),
