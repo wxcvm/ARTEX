@@ -6,6 +6,8 @@ import (
     "errors"
     "fmt"
     "strings"
+    "time"
+    "unicode/utf8"
 )
 
 const DSHReviewFeedbackSchema = "artex.dsh.review-feedback.v1"
@@ -71,8 +73,11 @@ func ParseDSHReviewFeedback(data []byte) (DSHReviewFeedback, error) {
         case "pending", "in_progress", "needs_evidence", "reviewed":
         default: return input, errors.New("invalid human review status")
         }
-        if len(item.Note) > 1000 || len(item.UpdatedAt) > 80 {
+        if utf8.RuneCountInString(item.Note) > 1000 || len(item.UpdatedAt) > 80 {
             return input, errors.New("review note or timestamp too long")
+        }
+        if _, err := time.Parse(time.RFC3339Nano, item.UpdatedAt); err != nil {
+            return input, errors.New("invalid source review update timestamp")
         }
     }
     return input, nil
