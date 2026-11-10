@@ -2294,7 +2294,7 @@ func (s *Server) findingsExport(w http.ResponseWriter, r *http.Request) {
 		setDownload("text/csv; charset=utf-8", "findings-"+stamp+".csv")
 		_, _ = w.Write(report.FindingsCSV(fs))
 	case "sarif":
-		payload, err := report.FindingsSARIF(fs)
+		payload, err := report.FindingsSARIFWithAssets(fs, s.resolveFindingAssets(fs))
 		if err != nil {
 			writeErr(w, 500, "SARIF export failed")
 			return
