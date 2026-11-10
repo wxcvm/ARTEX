@@ -62,6 +62,24 @@ func TestAuthInitFailsClosedWhenDataSourceUnavailable(t *testing.T) {
 	}
 }
 
+func TestSetupTokenValidation(t *testing.T) {
+	token, err := newSetupToken()
+	if err != nil {
+		t.Fatal(err)
+	}
+	if len(token) != 48 || !validSetupToken(token, token) {
+		t.Fatal("new setup token is invalid")
+	}
+	for _, wrong := range []string{"", "wrong", token + "x"} {
+		if validSetupToken(wrong, token) {
+			t.Fatal("accepted invalid setup token")
+		}
+	}
+	if validSetupToken("", "") {
+		t.Fatal("empty setup token accepted")
+	}
+}
+
 func TestValidatePassword(t *testing.T) {
 	for _, tc := range []struct {
 		name, pw string
