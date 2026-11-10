@@ -103,7 +103,8 @@ func (d *DB) ImportDSHReviewFeedback(input DSHReviewFeedback) (DSHReviewImportRe
                 source_task_id=excluded.source_task_id,
                 inspected_evidence_version=excluded.inspected_evidence_version,
                 review_status=excluded.review_status, note=excluded.note,
-                source_updated_at=excluded.source_updated_at, imported_at=now()`,
+                source_updated_at=excluded.source_updated_at, imported_at=now()
+            WHERE finding_dsh_reviews.source_updated_at <= excluded.source_updated_at`,
             item.FindingID, input.Engagement, item.TaskID, item.EvidenceVersion,
             item.Status, item.Note, item.UpdatedAt)
         if err != nil { return result, err }
