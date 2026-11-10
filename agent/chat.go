@@ -160,6 +160,7 @@ func (c *ChatAgent) Chat(ctx context.Context, agentKey, sessionID, message strin
 		Settlement:   wrapupSettlement(agentKey, nil),
 		NonStreaming: c.nonStreaming(), // when this profile selects non-streaming, use Provider.Complete
 		MaxTokens:    c.maxTokens(),    // 0 = send no cap, the server's default decides
+		UntrustedOutputBoundary: untrustedBoundaryEnabled(), // optional, off by default
 	}
 	if c.guard != nil {
 		opts.Hooks = c.guard.Hooks()
