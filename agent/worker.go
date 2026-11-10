@@ -526,6 +526,7 @@ func (w *Worker) execute(ctx context.Context, name string, taskID int64, as *db.
 		Todos:         actool.NewTodoStore(),                  // session-level scratch todos (TodoWrite), pure planning, discarded on exit
 		NonStreaming:  w.nonStreaming(),                       // when this profile selects non-streaming, use Provider.Complete
 		MaxTokens:     w.maxTokens(),                          // 0 = send no cap; the server default decides
+		UntrustedOutputBoundary: untrustedBoundaryEnabled(), // optional, off by default
 	}
 	if hooks != nil { // typed-nil guard: only set when concrete (avoids harness panic)
 		opts.Hooks = hooks
