@@ -304,6 +304,13 @@ Optional: `ARTEX_LLM_PROVIDER` (anthropic | openai | openai-responses | ollama) 
 
 **Common flags**: `./start.sh -addr :8787 -proxy :8788` (`-addr` frontend+API, `-proxy` traffic recording proxy). The startup script passes arguments through to `artex` verbatim.
 
+### Privacy defaults and first-time setup
+
+- Bare-metal ARTEX now listens on `127.0.0.1:8787` unless you explicitly pass `-addr`. Docker Compose publishes port 8787 to host loopback by default; set `ARTEX_BIND` in `.env` only if you intentionally want to make the console reachable from another network. The traffic-recording proxy remains local.
+- **Admin bootstrap (this fork's binaries only):** On a new instance, open `/setup` and paste the one-time setup token from ARTEX's startup logs before setting the administrator password. On Windows Desktop, check `%LOCALAPPDATA%\\ARTEX\\desktop-backend.log`; for a local terminal check its output; for the fork's Docker image use `docker compose logs artex`. Restarting an uninitialized backend generates a new token. You can explicitly set `ARTEX_SETUP_TOKEN` for unattended installations. Never publish this token or log file.
+- The historical `autumn27/artex:latest` image selected by the included Compose file **does not automatically contain fixes from wxcvm/ARTEX**. To use the new bootstrap protection, deploy a binary/image built from this fork and set `ARTEX_IMAGE`/`ARTEX_TAG` accordingly. The repository Dockerfile expects a prebuilt `dist/<arch>/artex` binary; a plain `docker compose build` without that artifact is not sufficient.
+- For remote management, prefer an authenticated VPN or SSH tunnel to localhost rather than publishing the administration API directly. Local bind alone does not prove a host is unreachable if a reverse proxy forwards to it.
+
 ### Reverse proxy deployment (HTTPS / only exposing 443)
 
 The frontend and API/SSE are served by the same backend port (default `:8787`), and the realtime activity stream uses the **same-origin** address by default, so **there is no need to configure `NEXT_PUBLIC_SSE_BASE`**: just expose 443 publicly and keep 8787 on the internal network.
