@@ -255,7 +255,7 @@ func (s *Server) authInit(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	var req struct {
-		Password string `json:"password"`
+		Password   string `json:"password"`
 		SetupToken string `json:"setup_token"`
 	}
 	if err := decode(r, &req); err != nil || req.Password == "" {
