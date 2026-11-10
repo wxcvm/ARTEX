@@ -42,8 +42,8 @@ func TestFindingsSARIFStableTriageAndSafeEvidence(t *testing.T) {
 	now := time.Date(2026, 11, 8, 0, 0, 0, 0, time.UTC)
 	findings := []*db.DBFinding{
 		{ID: 11, TaskID: &task, Name: "Fixed", VulnClass: "Access Control", Severity: "low", Status: db.FindingFixed, CreatedAt: now.Add(time.Hour), AssetIDs: []int64{4, 1}},
-		{ID: 12, Name: "Pending", VulnClass: "Access Control", Severity: "medium", Status: db.FindingPending, CreatedAt: now, Evidence: "PRIVATE-EVIDENCE-DO-NOT-EXPORT"},
-		{ID: 13, Name: "Confirmed", VulnClass: "Configuration", Severity: "critical", Status: db.FindingConfirmed, Summary: "Observed problem", CreatedAt: now},
+		{ID: 12, Name: "Pending", VulnClass: "Access Control", Severity: "medium", Status: db.FindingPending, CreatedAt: now, Evidence: "PRIVATE-EVIDENCE-DO-NOT-EXPORT", Report: "PRIVATE-REPORT-DO-NOT-EXPORT", TrafficCount: 2, EvidenceVersion: 5, ReportEvidenceVersion: 4},
+		{ID: 13, Name: "Confirmed", VulnClass: "Configuration", Severity: "critical", Status: db.FindingConfirmed, Summary: "Observed problem", CreatedAt: now, TrafficCount: 1, EvidenceVersion: 8, ReportEvidenceVersion: 7},
 	}
 	before := append([]*db.DBFinding(nil), findings...)
 	out, err := FindingsSARIF(findings)
@@ -60,6 +60,7 @@ func TestFindingsSARIFStableTriageAndSafeEvidence(t *testing.T) {
 		}
 	}
 	if strings.Contains(string(out), "PRIVATE-EVIDENCE-DO-NOT-EXPORT") ||
+		strings.Contains(string(out), "PRIVATE-REPORT-DO-NOT-EXPORT") ||
 		strings.Contains(string(out), "physicalLocation") {
 		t.Fatalf("export leaked raw evidence or invented source location: %s", out)
 	}
@@ -79,6 +80,10 @@ func TestFindingsSARIFStableTriageAndSafeEvidence(t *testing.T) {
 					FindingID int64 `json:"findingId"`
 					TaskID *int64 `json:"taskId"`
 					AssetIDs []int64 `json:"assetIds"`
+					TrafficCount int `json:"trafficCount"`
+					EvidenceVersion int64 `json:"evidenceVersion"`
+					ReportEvidenceVersion int64 `json:"reportEvidenceVersion"`
+					ReportStale bool `json:"reportStale"`
 				} `json:"properties"`
 			} `json:"results"`
 		} `json:"runs"`
@@ -95,6 +100,13 @@ func TestFindingsSARIFStableTriageAndSafeEvidence(t *testing.T) {
 	}
 	if r.Results[1].Properties.FindingID != 12 || r.Results[1].Kind != "review" || r.Results[1].Level != "warning" {
 		t.Fatalf("unreviewed finding misclassified: %+v", r.Results[1])
+	}
+	if r.Results[1].Properties.TrafficCount != 2 || r.Results[1].Properties.EvidenceVersion != 5 ||
+		r.Results[1].Properties.ReportEvidenceVersion != 4 || !r.Results[1].Properties.ReportStale {
+		t.Fatalf("stale report linkage missing: %+v", r.Results[1].Properties)
+	}
+	if r.Results[0].Properties.ReportStale || r.Results[0].Properties.TrafficCount != 1 {
+		t.Fatalf("finding without detailed report must not be flagged stale: %+v", r.Results[0].Properties)
 	}
 	last := r.Results[2]
 	if last.Kind != "pass" || last.PartialFingerprints["artexFindingId"] != "11" || last.Properties.TaskID == nil ||
