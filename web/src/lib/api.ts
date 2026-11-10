@@ -242,6 +242,7 @@ function interceptPageQuery(page: number, size: number, filter: InterceptApprova
 export const api = {
   // Backend application version (injected via ldflags at release, default "dev").
   health: () => get<{ ok: boolean; service: string; version: string }>("/health"),
+  privacyExposure: () => get<{ listen_address: string; scope: "loopback" | "all_interfaces" | "specific_interface" | "unknown"; public_reachability: "not_tested"; detail: string }>("/privacy/exposure"),
 
   // ---- auth ----
   authStatus: () => get<{ initialized: boolean }>("/auth/status"),
