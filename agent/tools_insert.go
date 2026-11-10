@@ -654,7 +654,7 @@ func splitLines(s string) []string {
 
 // WorkerTools returns the tool set for a work agent.
 func (t *ToolSet) WorkerTools() []actool.CoreTool {
-	return []actool.CoreTool{
+	return withKB([]actool.CoreTool{
 		// list_findings stays: check the task's confirmed findings before reporting, to
 		// avoid reporting the same finding twice.
 		t.listFindings(),
@@ -680,7 +680,7 @@ func (t *ToolSet) WorkerTools() []actool.CoreTool {
 		// planner/main (reading context, cross-work retrospection are planning duties; a
 		// worker only executes and writes back its single intent):
 		// list_facts / list_companies / list_worker_traces.
-	}
+	})
 }
 
 // MainAgentTools returns the human-interface tool set.
