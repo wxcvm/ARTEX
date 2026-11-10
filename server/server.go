@@ -766,6 +766,8 @@ func (s *Server) Handler() http.Handler {
 	mux.HandleFunc("GET /api/exploration/findings/asset-tree", s.findingAssetTree)
 	mux.HandleFunc("GET /api/exploration/findings/stats", s.findingStats)
 	mux.HandleFunc("GET /api/exploration/findings/export", s.findingsExport)
+	mux.HandleFunc("POST /api/exploration/findings/dsh-reviews/import", s.importDSHReviewFeedback)
+	mux.HandleFunc("GET /api/exploration/findings/dsh-reviews", s.listDSHReviewFeedback)
 	s.registerFindingTraffic(mux)
 	mux.HandleFunc("GET /api/exploration/findings/{id}", s.getFinding)
 	mux.HandleFunc("GET /api/exploration/findings/{id}/lineage", s.findingLineage)
