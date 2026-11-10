@@ -43,8 +43,8 @@ type Server struct {
 	engine *Engine
 	ctx    context.Context
 
-	skillDir string // root directory for skill subdirectories
-	jwtKey   []byte // HS256 signing key loaded from / generated into dataDir/jwt.key
+	skillDir   string // root directory for skill subdirectories
+	jwtKey     []byte // HS256 signing key loaded from / generated into dataDir/jwt.key
 	setupToken string // ephemeral first-time admin setup secret; never returned via HTTP
 
 	// concMu serializes concurrency-cap decisions (admission + reconcile) so a
@@ -157,7 +157,7 @@ func New(ctx context.Context, m *Manager, skillDir string, dataDir string, keyDi
 	// uninitialized instance. Never return this token from any HTTP endpoint.
 	if m.pg != nil {
 		if existing, _, readErr := m.pg.GetSetting(authPassKey); readErr != nil || existing == "" {
-			log.Printf("[auth] first-time setup token (enter on /setup): %s", setupToken)
+			fmt.Fprintf(os.Stderr, "[auth] first-time setup token (enter on /setup): %s\n", setupToken)
 		}
 	}
 	s := &Server{m: m, engine: NewEngine(m), ctx: ctx, skillDir: skillDir, jwtKey: key, setupToken: setupToken, chatBusy: map[string]bool{},
