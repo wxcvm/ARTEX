@@ -1,0 +1,103 @@
+diff --git a/agent/mainagent.go b/agent/mainagent.go
+index 7ce4ace..72fe43c 100644
+--- a/agent/mainagent.go
++++ b/agent/mainagent.go
+@@ -5,6 +5,7 @@ import (
+ 	"fmt"
+ 
+ 	"github.com/Autumn-27/artex/db"
++	"github.com/Autumn-27/artex/guard"
+ 	"github.com/Autumn-27/artex/intercept"
+ 	"github.com/Autumn-27/norma/agentcore"
+ 	"github.com/Autumn-27/norma/llm"
+@@ -29,6 +30,7 @@ type MainAgent struct {
+ 	proxyCACert     string                                 // recording proxy's CA cert path (HTTPS verify)
+ 	webSearch       WebSearchOpts                          // web_search tool backend selection (off by default)
+ 	workDir         string                                 // shared work dir (surfaced in prompt as artifact-output target)
++	guard           *guard.Guard                           // optional; nil disables intercept hooks
+ 	steerWork       func(intentID int64, msg string) error // engine callback: steer a running work (nil = off)
+ 	nonStreamingFn  func() bool                            // resolver: use non-streaming (Complete) path? (nil = streaming)
+ 	noaEnabledFn    func() bool                            // resolver: use experimental noa compaction? (nil = off)
+@@ -61,6 +63,10 @@ func NewMainAgent(prov llm.Provider, model, workDir string, tx *transcript.Store
+ 	return &MainAgent{prov: prov, model: model, workDir: workDir, tx: tx, window: window, maxTurns: maxTurns}
+ }
+ 
++// SetGuard attaches a guard so the main agent's tool calls (it holds
++// actool.DefaultTools, which includes Bash) are gated by the intercept rules too.
++func (m *MainAgent) SetGuard(g *guard.Guard) { m.guard = g }
++
+ func (m *MainAgent) SetCompactionWindowResolver(fn func() int) { m.windowFn = fn }
+ 
+ func (m *MainAgent) compactionWindow() int {
+@@ -180,6 +186,9 @@ func (m *MainAgent) Chat(ctx context.Context, taskID int64, mainSeg int, as *db.
+ 			opts.SessionID = fmt.Sprintf("exp%d-main-s%d", ts.ID(), mainSeg)
+ 		}
+ 	}
++	if m.guard != nil {
++		opts.Hooks = m.guard.Hooks()
++	}
+ 	// experimental feature: when enabled, noa takes over context compression (archive centralized under <workDir>/noa/<SessionID>, persistent).
+ 	// the session id follows the same rule as the transcript (segment-aware), keeping archive and resume aligned.
+ 	noaSession := fmt.Sprintf("exp%d-main", ts.ID())
+diff --git a/agent/planner.go b/agent/planner.go
+index abbc6ca..3f69475 100644
+--- a/agent/planner.go
++++ b/agent/planner.go
+@@ -8,6 +8,7 @@ import (
+ 	"sync"
+ 
+ 	"github.com/Autumn-27/artex/db"
++	"github.com/Autumn-27/artex/guard"
+ 	"github.com/Autumn-27/artex/intercept"
+ 	"github.com/Autumn-27/norma/agentcore"
+ 	"github.com/Autumn-27/norma/llm"
+@@ -28,6 +29,7 @@ type Planner struct {
+ 	window            int                                    // context window in tokens (for compaction)
+ 	windowFn          func() int                             // optional dynamic task-chain minimum
+ 	maxTurns          int                                    // max agent turns per run (0 = unlimited)
++	guard             *guard.Guard                           // optional; nil disables intercept hooks (same hole as ChatAgent)
+ 	killWork          func(intentID int64) error             // engine callback to terminate a running work (nil = off)
+ 	steerWork         func(intentID int64, msg string) error // engine callback to steer a running work mid-run (nil = off)
+ 	proxyAddr         string                                 // recording proxy for WebFetch (empty = direct)
+@@ -55,6 +57,11 @@ func NewPlanner(prov llm.Provider, model, workDir string, tx *transcript.Store,
+ 	return &Planner{prov: prov, model: model, workDir: workDir, tx: tx, window: window, maxTurns: maxTurns, todos: map[int64]*actool.TodoStore{}}
+ }
+ 
++// SetGuard attaches a guard (with the user-configured intercept rules) so the planner's
++// own tool calls (it holds actool.DefaultTools, which includes Bash) go through the
++// same PreToolUse gate as the worker. nil keeps the historical behaviour.
++func (p *Planner) SetGuard(g *guard.Guard) { p.guard = g }
++
+ func (p *Planner) SetCompactionWindowResolver(fn func() int) { p.windowFn = fn }
+ 
+ // SetCompactor wires the cold-node compactor (cold-digest §7). Called each
+@@ -467,6 +474,9 @@ func (p *Planner) Plan(ctx context.Context, taskID int64, as *db.AssetStore, ts
+ 		opts.Transcript = p.tx
+ 		opts.SessionID = fmt.Sprintf("exp%d-planner", ts.ID())
+ 	}
++	if p.guard != nil {
++		opts.Hooks = p.guard.Hooks()
++	}
+ 	// Experimental: when on, noa takes over context compression (archives persist under <workDir>/noa/<SessionID>).
+ 	noaSession := fmt.Sprintf("exp%d-planner", ts.ID())
+ 	enableNoa(&opts, p.noaEnabledFn, p.workDir, noaSession, noaWarn(noaSession))
+diff --git a/server/task_llm.go b/server/task_llm.go
+index a04a592..4152923 100644
+--- a/server/task_llm.go
++++ b/server/task_llm.go
+@@ -707,6 +707,7 @@ func (s *Server) agentsForTask(t *Task) *taskAgentBundle {
+ 	pl.SetProxy(s.m.ProxyAddr(), s.m.ProxyCACert())
+ 	pl.SetWebSearch(s.webSearchFor("planner"))
+ 	pl.SetConstraintInject(s.constraintInjectPlanner) // operation-constraint injection into the planner (configurable, on by default)
++	pl.SetGuard(t.Guard)                             // planner holds Bash: without this the intercept rules never see its calls
+ 	// cold-digest §7: background compaction of cold nodes. This per-task planner set
+ 	// (agentsForTask) is exactly what the engine actually drives through the authoritative
+ 	// resolver, so the Compactor must hook in here. The planner provider goes through task routing (§4: same model as the agent, resolved with the task's LLM chain); compaction uses Complete to generate the body in one shot.
+@@ -723,6 +724,7 @@ func (s *Server) agentsForTask(t *Task) *taskAgentBundle {
+ 	main.SetProxy(s.m.ProxyAddr(), s.m.ProxyCACert())
+ 	main.SetWebSearch(s.webSearchFor("mainagent"))
+ 	main.SetSteerWork(s.engine.SteerWork) // steer_work: real-time course correction on running work by a human
++	main.SetGuard(t.Guard)                // mainagent holds Bash: same gate as worker/chat
+ 	bundle := &taskAgentBundle{
+ 		runtime: goalRuntime, plannerRuntime: plannerRuntime, workerRuntime: workerRuntime,
+ 		mainRuntime: mainRuntime, pl: pl, wk: wk, main: main,

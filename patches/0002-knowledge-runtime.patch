@@ -1,0 +1,436 @@
+diff --git a/agent/knowledge.go b/agent/knowledge.go
+new file mode 100644
+index 0000000..cfea50c
+--- /dev/null
++++ b/agent/knowledge.go
+@@ -0,0 +1,84 @@
++package agent
++
++import (
++	"context"
++	"encoding/json"
++
++	"github.com/Autumn-27/artex/kb"
++	actool "github.com/Autumn-27/norma/tool"
++)
++
++// knowledgeBase is the process-wide read-only knowledge base. It is optional:
++// when nil the kb_* tools are not registered at all, so a deployment without a
++// knowledge/ directory behaves exactly as before.
++var knowledgeBase *kb.KB
++
++// SetKnowledge installs the knowledge base behind kb_search / kb_get. Call it
++// once at startup, before any task is created.
++func SetKnowledge(k *kb.KB) { knowledgeBase = k }
++
++// Knowledge returns the installed handle (nil when the feature is off).
++func Knowledge() *kb.KB { return knowledgeBase }
++
++// kbTools returns the two knowledge tools, or nil when no base is installed.
++func kbTools() []actool.CoreTool {
++	if knowledgeBase == nil {
++		return nil
++	}
++	return []actool.CoreTool{kbSearchTool(), kbGetTool()}
++}
++
++// withKB appends the knowledge tools to a role's base list. A composite literal
++// cannot spread a slice, so roles that want them go through this wrapper.
++func withKB(tools []actool.CoreTool) []actool.CoreTool {
++	return append(tools, kbTools()...)
++}
++
++func kbSearchTool() actool.CoreTool {
++	return readTool("kb_search",
++		"Search the deployment knowledge base before hand-crafting a payload: past engagements with POCs, playbooks and negative results. q takes a product name / component / CVE / technique keyword (Chinese or English). Returns compact hits (id, title, tier, snippet). tier=ammo is verified and directly reusable; tier=negative means that direction was already proven dead, so do not retry it. Read the full entry with kb_get(id). Read-only, no side effects.",
++		obj(map[string]any{
++			"q":     str("keywords: product / component / CVE / technique, e.g. '1panel 验证码绕过' or 'phpwind 写文件'"),
++			"limit": intp("max hits to return, default 8, max 30"),
++		}, "q"),
++		func(_ context.Context, in json.RawMessage) (actool.Result, error) {
++			var a struct {
++				Q     string `json:"q"`
++				Limit int    `json:"limit"`
++			}
++			_ = json.Unmarshal(in, &a)
++			hits, degraded, err := knowledgeBase.Search(a.Q, a.Limit)
++			if err != nil {
++				return actool.Errorf("kb_search: " + err.Error()), nil
++			}
++			if len(hits) == 0 {
++				return actool.Text("no matching knowledge entries"), nil
++			}
++			return jsonResult(map[string]any{"hits": hits, "count": len(hits), "degraded": degraded})
++		})
++}
++
++func kbGetTool() actool.CoreTool {
++	return readTool("kb_get",
++		"Read one knowledge entry in full by the id returned from kb_search. The body is the recorded PoC / playbook (targets are placeholders such as <target>). Read-only.",
++		obj(map[string]any{
++			"id": idp("entry id taken from kb_search"),
++		}, "id"),
++		func(_ context.Context, in json.RawMessage) (actool.Result, error) {
++			var a struct {
++				ID int64 `json:"id"`
++			}
++			_ = json.Unmarshal(in, &a)
++			if a.ID <= 0 {
++				return actool.Errorf("id is required (take it from kb_search)"), nil
++			}
++			e, err := knowledgeBase.Get(a.ID)
++			if err != nil {
++				return actool.Errorf("kb_get: " + err.Error()), nil
++			}
++			if e == nil {
++				return actool.Errorf("no knowledge entry with that id"), nil
++			}
++			return jsonResult(e)
++		})
++}
+diff --git a/agent/tools.go b/agent/tools.go
+index 0fc92f9..57a1a47 100644
+--- a/agent/tools.go
++++ b/agent/tools.go
+@@ -2189,7 +2189,7 @@ func (t *ToolSet) listWorkerTraces() actool.CoreTool {
+ 
+ // PlannerTools is the read + intent-generation + goal-judgement tool set.
+ func (t *ToolSet) PlannerTools() []actool.CoreTool {
+-	return []actool.CoreTool{
++	return withKB([]actool.CoreTool{
+ 		t.graphOverview(), t.listFindings(), t.listFacts(), t.nodeDetail(),
+ 		// cold-digest §6.1: restore folded cold nodes (digest body → members → detail).
+ 		t.expandDigest(),
+@@ -2215,5 +2215,5 @@ func (t *ToolSet) PlannerTools() []actool.CoreTool {
+ 		// list_untested_assets: query untested assets in this task's scope on demand
+ 		// (by type + paginated), and decide on supplementary testing yourself.
+ 		t.listUntestedAssets(),
+-	}
++	})
+ }
+diff --git a/agent/tools_insert.go b/agent/tools_insert.go
+index 99b61a1..78ee0ae 100644
+--- a/agent/tools_insert.go
++++ b/agent/tools_insert.go
+@@ -654,7 +654,7 @@ func splitLines(s string) []string {
+ 
+ // WorkerTools returns the tool set for a work agent.
+ func (t *ToolSet) WorkerTools() []actool.CoreTool {
+-	return []actool.CoreTool{
++	return withKB([]actool.CoreTool{
+ 		// list_findings stays: check the task's confirmed findings before reporting, to
+ 		// avoid reporting the same finding twice.
+ 		t.listFindings(),
+@@ -680,7 +680,7 @@ func (t *ToolSet) WorkerTools() []actool.CoreTool {
+ 		// planner/main (reading context, cross-work retrospection are planning duties; a
+ 		// worker only executes and writes back its single intent):
+ 		// list_facts / list_companies / list_worker_traces.
+-	}
++	})
+ }
+ 
+ // MainAgentTools returns the human-interface tool set.
+diff --git a/cmd/artex/main.go b/cmd/artex/main.go
+index 856025b..56c8147 100644
+--- a/cmd/artex/main.go
++++ b/cmd/artex/main.go
+@@ -20,6 +20,7 @@ import (
+ 	"github.com/Autumn-27/artex/agent"
+ 	"github.com/Autumn-27/artex/config"
+ 	"github.com/Autumn-27/artex/db"
++	"github.com/Autumn-27/artex/kb"
+ 	"github.com/Autumn-27/artex/server"
+ )
+ 
+@@ -142,6 +143,16 @@ func run() int {
+ 		skillDir = abs
+ 	}
+ 	log.Printf("[config] skill directory: %s", skillDir)
++	// Optional knowledge base: <knowledge_dir>/knowledge.db. A missing file only
++	// means kb_search / kb_get stay unregistered.
++	if k, err := kb.Open(config.KnowledgeDir()); err != nil {
++		log.Printf("[kb] knowledge base disabled: %v", err)
++	} else if k != nil {
++		agent.SetKnowledge(k)
++		log.Printf("[kb] knowledge base: %s (fts=%v)", k.Path(), k.HasFTS())
++	} else {
++		log.Printf("[kb] no knowledge.db under %q; kb_* tools disabled", config.KnowledgeDir())
++	}
+ 	jwtKeyDir := config.BaseDir()
+ 	if override := os.Getenv("ARTEX_JWT_KEY_DIR"); override != "" {
+ 		jwtKeyDir = override
+diff --git a/config/config.go b/config/config.go
+index 1734e82..ae9dbae 100644
+--- a/config/config.go
++++ b/config/config.go
+@@ -28,6 +28,9 @@ type Database struct {
+ type Config struct {
+ 	Database Database `json:"database"`
+ 	SkillDir string   `json:"skill_dir"`
++	// KnowledgeDir points at a directory holding knowledge.db (the deployment
++	// knowledge base). Empty = the kb_search / kb_get tools are not registered.
++	KnowledgeDir string `json:"knowledge_dir"`
+ }
+ 
+ // BaseDir is the directory that anchors all runtime artifacts (config.json and
+@@ -113,6 +116,20 @@ func Load() Config {
+ //	env ARTEX_SKILL_DIR  >  config file (skill_dir)  >  BaseDir()/skills
+ //
+ // The directory is created if it does not exist.
++// KnowledgeDir returns the optional knowledge base directory with the same
++// precedence as SkillDir:
++//
++//	env ARTEX_KB_DIR  >  config file (knowledge_dir)  >  "" (feature off)
++//
++// Unlike SkillDir it never creates the directory: an absent knowledge base must
++// leave no empty state behind, and the tools simply stay unregistered.
++func KnowledgeDir() string {
++	if v := strings.TrimSpace(os.Getenv("ARTEX_KB_DIR")); v != "" {
++		return v
++	}
++	return strings.TrimSpace(Load().KnowledgeDir)
++}
++
+ func SkillDir() string {
+ 	var d string
+ 	if v := strings.TrimSpace(os.Getenv("ARTEX_SKILL_DIR")); v != "" {
+diff --git a/kb/kb.go b/kb/kb.go
+new file mode 100644
+index 0000000..fd12dae
+--- /dev/null
++++ b/kb/kb.go
+@@ -0,0 +1,234 @@
++// Package kb exposes the deployment knowledge base (knowledge/knowledge.db) to
++// the agents as two read-only tools.
++//
++// The file is a SQLite database produced by the deployment package: table `poc`
++// plus an FTS5 index `poc_fts`. Nothing here writes: the handle is opened
++// read-only and every failure is returned to the caller instead of being
++// swallowed, so a broken knowledge base shows up in the logs at startup.
++package kb
++
++import (
++	"database/sql"
++	"errors"
++	"fmt"
++	"os"
++	"path/filepath"
++	"strings"
++
++	_ "modernc.org/sqlite"
++)
++
++// KB is a read-only handle on knowledge.db.
++type KB struct {
++	db   *sql.DB
++	path string
++	fts  bool // poc_fts exists -> MATCH search is available
++}
++
++// Hit is one search result (no body: call Get for the full text).
++type Hit struct {
++	ID       int64  `json:"id"`
++	Title    string `json:"title"`
++	Category string `json:"category,omitempty"`
++	Kind     string `json:"kind,omitempty"`
++	Tags     string `json:"tags,omitempty"`
++	Tier     string `json:"tier"` // ammo | playbook | negative | reference
++	Verified bool   `json:"verified"`
++	Snippet  string `json:"snippet,omitempty"`
++}
++
++// Entry is one full record.
++type Entry struct {
++	ID       int64  `json:"id"`
++	Title    string `json:"title"`
++	Category string `json:"category,omitempty"`
++	Kind     string `json:"kind,omitempty"`
++	Tags     string `json:"tags,omitempty"`
++	Verified bool   `json:"verified"`
++	Usage    string `json:"usage,omitempty"`
++	Content  string `json:"content"`
++}
++
++// Open loads <dir>/knowledge.db. A missing file returns (nil, nil): the feature
++// is optional, so callers only check for a non-nil handle.
++func Open(dir string) (*KB, error) {
++	dir = strings.TrimSpace(dir)
++	if dir == "" {
++		return nil, nil
++	}
++	path := filepath.Join(dir, "knowledge.db")
++	if _, err := os.Stat(path); err != nil {
++		if errors.Is(err, os.ErrNotExist) {
++			return nil, nil
++		}
++		return nil, err
++	}
++	dsn := fmt.Sprintf("file:%s?mode=ro&_pragma=busy_timeout(2000)", filepath.ToSlash(path))
++	db, err := sql.Open("sqlite", dsn)
++	if err != nil {
++		return nil, err
++	}
++	if err := db.Ping(); err != nil {
++		db.Close()
++		return nil, err
++	}
++	k := &KB{db: db, path: path}
++	k.fts = k.hasFTS()
++	return k, nil
++}
++
++// Path is the file backing this handle.
++func (k *KB) Path() string { return k.path }
++
++// HasFTS reports whether the full-text index is present.
++func (k *KB) HasFTS() bool { return k.fts }
++
++// Close releases the handle. Safe on a nil receiver.
++func (k *KB) Close() error {
++	if k == nil || k.db == nil {
++		return nil
++	}
++	return k.db.Close()
++}
++
++func (k *KB) hasFTS() bool {
++	var n int
++	if err := k.db.QueryRow(`SELECT count(*) FROM sqlite_master WHERE name = 'poc_fts'`).Scan(&n); err != nil {
++		return false
++	}
++	return n > 0
++}
++
++// ftsQuery turns free text into an FTS5 AND query: every whitespace-separated
++// term becomes its own phrase, so '1panel 验证码' means both must appear. Quotes
++// are stripped so a model-supplied string cannot inject operators (NEAR, *, -)
++// that would error out or scan the whole index.
++func ftsQuery(q string) string { return joinTerms(q, " AND ") }
++
++// orQuery is the looser form, used only when the AND query finds nothing.
++func orQuery(q string) string { return joinTerms(q, " OR ") }
++
++func joinTerms(q, op string) string {
++	fields := strings.Fields(strings.ReplaceAll(q, `"`, " "))
++	if len(fields) == 0 {
++		return `""`
++	}
++	for i, f := range fields {
++		fields[i] = `"` + f + `"`
++	}
++	return strings.Join(fields, op)
++}
++
++// tierOf maps a row onto the three tiers the prompts refer to: ammo (verified,
++// directly reusable), playbook (methodology), negative (already proven dead) and
++// reference (everything else).
++func tierOf(verified bool, category, kind, title string) string {
++	low := strings.ToLower(title + " " + category + " " + kind)
++	for _, neg := range []string{"判死", "负面", "证否", "全否", "不成立", "negative"} {
++		if strings.Contains(low, neg) {
++			return "negative"
++		}
++	}
++	if verified {
++		return "ammo"
++	}
++	if category == "methodology" || kind == "markdown" {
++		return "playbook"
++	}
++	return "reference"
++}
++
++// Search runs a full-text query: AND first, then the looser OR form, and only
++// then a LIKE scan. degraded=true means FTS was unavailable or matched nothing,
++// so the LIKE scan answered (slower, still correct).
++func (k *KB) Search(q string, limit int) (hits []Hit, degraded bool, err error) {
++	q = strings.TrimSpace(q)
++	if q == "" {
++		return nil, false, errors.New("q is required")
++	}
++	if limit <= 0 {
++		limit = 8
++	}
++	if limit > 30 {
++		limit = 30
++	}
++	if k.fts {
++		for _, match := range []string{ftsQuery(q), orQuery(q)} {
++			got, qerr := k.searchFTS(match, limit)
++			if qerr != nil {
++				continue // syntax/index problem -> try the next form, then LIKE
++			}
++			if len(got) > 0 {
++				return got, false, nil
++			}
++		}
++	}
++	got, lerr := k.searchLike(q, limit)
++	return got, true, lerr
++}
++
++func (k *KB) searchFTS(match string, limit int) ([]Hit, error) {
++	rows, err := k.db.Query(
++		`SELECT p.id, p.title, IFNULL(p.category,''), IFNULL(p.kind,''), IFNULL(p.tags,''),
++		        IFNULL(p.verified,0), substr(IFNULL(p.content,''),1,240)
++		   FROM poc_fts f JOIN poc p ON p.id = f.poc_id
++		  WHERE poc_fts MATCH ? ORDER BY rank LIMIT ?`, match, limit)
++	if err != nil {
++		return nil, err
++	}
++	defer rows.Close()
++	return scanHits(rows)
++}
++
++func (k *KB) searchLike(q string, limit int) ([]Hit, error) {
++	like := "%" + q + "%"
++	rows, err := k.db.Query(
++		`SELECT id, title, IFNULL(category,''), IFNULL(kind,''), IFNULL(tags,''),
++		        IFNULL(verified,0), substr(IFNULL(content,''),1,240)
++		   FROM poc
++		  WHERE title LIKE ? OR IFNULL(description,'') LIKE ? OR IFNULL(content,'') LIKE ?
++		  LIMIT ?`, like, like, like, limit)
++	if err != nil {
++		return nil, err
++	}
++	defer rows.Close()
++	return scanHits(rows)
++}
++
++func scanHits(rows *sql.Rows) ([]Hit, error) {
++	var hits []Hit
++	for rows.Next() {
++		var (
++			h        Hit
++			verified int
++		)
++		if err := rows.Scan(&h.ID, &h.Title, &h.Category, &h.Kind, &h.Tags, &verified, &h.Snippet); err != nil {
++			return nil, err
++		}
++		h.Verified = verified == 1
++		h.Tier = tierOf(h.Verified, h.Category, h.Kind, h.Title)
++		hits = append(hits, h)
++	}
++	return hits, rows.Err()
++}
++
++// Get returns one full record, or (nil, nil) when the id does not exist.
++func (k *KB) Get(id int64) (*Entry, error) {
++	var (
++		e        Entry
++		verified int
++	)
++	err := k.db.QueryRow(
++		`SELECT id, title, IFNULL(category,''), IFNULL(kind,''), IFNULL(tags,''),
++		        IFNULL(verified,0), IFNULL(usage,''), IFNULL(content,'')
++		   FROM poc WHERE id = ?`, id).
++		Scan(&e.ID, &e.Title, &e.Category, &e.Kind, &e.Tags, &verified, &e.Usage, &e.Content)
++	if errors.Is(err, sql.ErrNoRows) {
++		return nil, nil
++	}
++	if err != nil {
++		return nil, err
++	}
++	e.Verified = verified == 1
++	return &e, nil
++}

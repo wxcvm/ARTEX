@@ -1,0 +1,14 @@
+工作脚本见 D:/ARTEX/data/tasks/574/i2783/（probe_jndi.py / probe_native.py / probe_jackson.py / parsemode.py / ecb_exploit.py / final_native.py）。
+
+否定面清单（全部 0 回连/无效应）：
+- Fastjson autoType：24 个 JSON 端点 × {java.lang.AutoCloseable, <target>.Inet4Address/URL, com.sun.rowset.JdbcRowSetImpl(dataSourceName=ldap://)}。
+- Log4j2：8 头 × 9 接口 + body 字段，含 ${lower:}/${::-}/${env:} 混淆。
+- 原生 Java 序列化/Hessian/Burlap：application/x-java-serialized-object、x-java-object、octet-stream、x-hessian/burlap 送 aced0005。
+- JNDI 直填 url/jdbcUrl/dataSource/jndiName；XML body XStream/XXE。
+- Shiro rememberMe：无 deleteMe（未装 Shiro）。
+- Jackson 多态 @class/@type（含 default-typing）。
+
+正向发现：
+- 未授权 GET /api/version → version:5.3.0-RELEASE / builder / profile:prod / license:375（RuoYi 风格）。
+- /ecb/<hex> 加密网关实测 200 且可解密回包（dial_code 列表、user/info）。
+- 全局鉴权过滤器：未映射/未授权 /api/* → 86B code:401；actuator 带 token → Spring 404（不存在）。

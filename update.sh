@@ -15,6 +15,12 @@ ask(){  local p="$1" d="${2:-}" a; read -rp "$p${d:+ [$d]}: " a; echo "${a:-$d}"
 # ── Optional: sync the repo to the latest code (compose/scripts/local build sources all update through it) ───────
 sync_repo(){
   [ -d .git ] && command -v git >/dev/null 2>&1 || { warn "not a git working copy, skipping git pull"; return; }
+  # 只从自己的仓库拉：origin 若指向别人的 fork，git pull 等于把对方的提交直接放进部署。
+  origin_url="$(git remote get-url origin 2>/dev/null || true)"
+  case "$origin_url" in
+    *wxcvm/ARTEX*) ;;
+    *) warn "origin 不是本仓库（$origin_url），已跳过 git pull；要更新请先 git remote set-url origin <你的仓库>"; return ;;
+  esac
   [ "$(ask 'Pull the latest code (git pull --ff-only)? (y/n)' y)" = y ] || return
   if ! git pull --ff-only; then
     warn "git pull could not fast-forward (local changes or diverged branches) — resolve manually and retry; continuing with the current code"

@@ -6,6 +6,23 @@ All notable changes to this project are documented in this file. The format is b
 
 ### Added
 
+- **Knowledge layer shipped in-repo** (`knowledge/`): a 448-entry SQLite ledger (`knowledge.db`, FTS5) plus 429 per-entry POC/playbook directories, the 14 agent role prompts and the 4 armor presets, six operator runbooks (`knowledge/ops/`), deployment defaults (`knowledge/prompts/config/`) and a weapon manifest that indexes 197 tools without committing any binaries. Desensitised on import: public IPv4 → `203.0.113.x`, non-allowlisted hosts → `<target>`, local user paths → `<HOME>`.
+- **43 additional skills** (`skills/`), including the `chains-*` decision-chain sets (`chains-web/ad/priv/recon/app/meta/pivot/rev/pwn`, 52 reference documents).
+- **`patches/0002-knowledge-runtime.patch`**: optional runtime that makes `knowledge/` consumable by the engine — `knowledge_dir` / `ARTEX_KB_DIR` config, a read-only `kb` package over `knowledge.db` with FTS5 `AND` → `OR` → `LIKE` degradation, and the `kb_search` / `kb_get` tools bound to planner and worker. Not applied: needs `go build` validation.
+- **`patches/0001-guard-hooks.patch`**: wires `Guard` hooks into `Planner` and `MainAgent`. Both hold `actool.DefaultTools()` (which includes Bash) but were never gated, so the intercept rules, human approval and the LLM reviewer never saw their shell calls. Not applied: needs `go build` validation.
+- **`knowledge/tools/kb_check.py`** + `tools/scan_sensitive.py`: corpus health (ledger/FTS consistency is the only blocking check) and an import-time guard against leaking public IPs, local user paths or customer data files.
+
+### Changed
+
+- `docker-compose.yml` defaults to `artex:local` instead of the upstream author's prebuilt `autumn27/artex` image; the old default silently ran someone else's binary with `./data` and `./keys` mounted.
+- `update.sh` only pulls when `origin` actually points at this fork.
+- `install.sh`: repaired a bad merge that left an unterminated `if` condition and made the whole script fail to parse.
+- `README.md`: documents `knowledge/`, `knowledge/MAP.md`, `knowledge/ops/INDEX.md` and the two runtime patches.
+
+### Removed
+
+- `.github/workflows/bot.yml` + `.github/scripts/bot.sh`: the workflow checked out pull-request code and injected `DEEPSEEK_API_KEY` into it (indirect pipeline poisoning).
+
 - **Ollama support**: an `ollama` LLM profile format for a local or LAN Ollama server. Keyless by design: no API key is needed, `OPENAI_API_KEY` is never inherited, the base URL defaults to `http://127.0.0.1:11434/v1` and is normalized to the `/v1` root, and the profile works in the failover pool, task LLM chains, model listing and connection tests. Contributed by @glauberportella (#128).
 
 ## [0.4.0] - 2026-10-23

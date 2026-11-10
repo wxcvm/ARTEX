@@ -65,3 +65,6 @@ posture-runs/
 
 # benchmark runner output (one dir per run)
 benchmark-results/
+# knowledge base is versioned on purpose (see knowledge/absorb/INDEX.md)
+!/knowledge/knowledge.db
+

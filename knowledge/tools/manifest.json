@@ -1,0 +1,1858 @@
+{
+ "count_tools": 197,
+ "count_bundles": 8,
+ "sources": [
+  "ARTEX-老魏二改带知识库-linux-amd64.tar.gz",
+  "ARTEX-0.4.2-Windows64位.zip",
+  "ARTEX-Friend-win.zip"
+ ],
+ "tools": [
+  {
+   "name": "nuclei.exe",
+   "path": "nuclei.exe",
+   "size": 179050496,
+   "package": "0.4.2-win",
+   "category": "scanner",
+   "needs": "none",
+   "av_flagged": false
+  },
+  {
+   "name": "AntSword",
+   "path": "AntSword/AntSword-Loader-v4.0.3-linux-x64/AntSword",
+   "size": 114900904,
+   "package": "lw-linux-amd64+friend-win",
+   "category": "exploit",
+   "needs": "none",
+   "av_flagged": false
+  },
+  {
+   "name": "katana",
+   "path": "katana/katana",
+   "size": 67002530,
+   "package": "lw-linux-amd64",
+   "category": "scanner",
+   "needs": "none",
+   "av_flagged": false
+  },
+  {
+   "name": "httpx",
+   "path": "httpx/httpx",
+   "size": 54444194,
+   "package": "lw-linux-amd64",
+   "category": "scanner",
+   "needs": "none",
+   "av_flagged": false
+  },
+  {
+   "name": "httpx",
+   "path": "httpx",
+   "size": 54327808,
+   "package": "0.4.2-win",
+   "category": "scanner",
+   "needs": "none",
+   "av_flagged": false
+  },
+  {
+   "name": "katana",
+   "path": "katana",
+   "size": 50167296,
+   "package": "0.4.2-win",
+   "category": "scanner",
+   "needs": "none",
+   "av_flagged": false
+  },
+  {
+   "name": "subfinder.exe",
+   "path": "subfinder.exe",
+   "size": 40541184,
+   "package": "0.4.2-win",
+   "category": "scanner",
+   "needs": "none",
+   "av_flagged": false
+  },
+  {
+   "name": "naabu.exe",
+   "path": "naabu.exe",
+   "size": 34713600,
+   "package": "0.4.2-win",
+   "category": "scanner",
+   "needs": "none",
+   "av_flagged": false
+  },
+  {
+   "name": "naabu",
+   "path": "naabu/naabu",
+   "size": 34087204,
+   "package": "lw-linux-amd64",
+   "category": "scanner",
+   "needs": "none",
+   "av_flagged": false
+  },
+  {
+   "name": "mihomo-windows-amd64.exe",
+   "path": "mihomo/mihomo-windows-amd64.exe",
+   "size": 32796160,
+   "package": "0.4.2-win",
+   "category": "tunnel",
+   "needs": "none",
+   "av_flagged": false
+  },
+  {
+   "name": "godzilla.jar",
+   "path": "Godzilla/godzilla.jar",
+   "size": 31861675,
+   "package": "lw-linux-amd64",
+   "category": "exploit",
+   "needs": "java",
+   "av_flagged": true
+  },
+  {
+   "name": "dnsx.exe",
+   "path": "dnsx.exe",
+   "size": 29313024,
+   "package": "0.4.2-win",
+   "category": "scanner",
+   "needs": "none",
+   "av_flagged": false
+  },
+  {
+   "name": "subfinder",
+   "path": "subfinder/subfinder",
+   "size": 29270200,
+   "package": "lw-linux-amd64",
+   "category": "scanner",
+   "needs": "none",
+   "av_flagged": false
+  },
+  {
+   "name": "dnsx",
+   "path": "dnsx/dnsx",
+   "size": 28569784,
+   "package": "lw-linux-amd64+friend-win",
+   "category": "scanner",
+   "needs": "none",
+   "av_flagged": false
+  },
+  {
+   "name": "ligolo-proxy",
+   "path": "ligolo-proxy",
+   "size": 21371392,
+   "package": "0.4.2-win",
+   "category": "tunnel",
+   "needs": "none",
+   "av_flagged": true
+  },
+  {
+   "name": "frps",
+   "path": "frp/frps",
+   "size": 20332728,
+   "package": "lw-linux-amd64+friend-win",
+   "category": "tunnel",
+   "needs": "none",
+   "av_flagged": false
+  },
+  {
+   "name": "ksubdomain",
+   "path": "ksubdomain/ksubdomain",
+   "size": 20011976,
+   "package": "lw-linux-amd64",
+   "category": "scanner",
+   "needs": "none",
+   "av_flagged": false
+  },
+  {
+   "name": "frps.exe",
+   "path": "frps.exe",
+   "size": 19691008,
+   "package": "0.4.2-win",
+   "category": "tunnel",
+   "needs": "none",
+   "av_flagged": false
+  },
+  {
+   "name": "frpc",
+   "path": "frp/frpc",
+   "size": 16593080,
+   "package": "lw-linux-amd64+friend-win",
+   "category": "tunnel",
+   "needs": "none",
+   "av_flagged": false
+  },
+  {
+   "name": "ffuf.exe",
+   "path": "ffuf.exe",
+   "size": 15797248,
+   "package": "0.4.2-win",
+   "category": "scanner",
+   "needs": "none",
+   "av_flagged": false
+  },
+  {
+   "name": "frpc.exe",
+   "path": "frpc.exe",
+   "size": 15523328,
+   "package": "0.4.2-win",
+   "category": "tunnel",
+   "needs": "none",
+   "av_flagged": false
+  },
+  {
+   "name": "gospider.exe",
+   "path": "gospider.exe",
+   "size": 15060480,
+   "package": "0.4.2-win",
+   "category": "scanner",
+   "needs": "none",
+   "av_flagged": false
+  },
+  {
+   "name": "chisel.exe",
+   "path": "chisel.exe",
+   "size": 11954176,
+   "package": "0.4.2-win",
+   "category": "tunnel",
+   "needs": "none",
+   "av_flagged": true
+  },
+  {
+   "name": "suo5",
+   "path": "suo5",
+   "size": 11940352,
+   "package": "0.4.2-win",
+   "category": "tunnel",
+   "needs": "none",
+   "av_flagged": true
+  },
+  {
+   "name": "suo5-windows-amd64.exe",
+   "path": "suo5-windows-amd64.exe",
+   "size": 11940352,
+   "package": "lw-linux-amd64",
+   "category": "tunnel",
+   "needs": "none",
+   "av_flagged": true
+  },
+  {
+   "name": "winPEASany.exe",
+   "path": "peass/winPEASany.exe",
+   "size": 11716608,
+   "package": "0.4.2-win",
+   "category": "other",
+   "needs": "none",
+   "av_flagged": true
+  },
+  {
+   "name": "winPEASx64.exe",
+   "path": "peass/winPEASx64.exe",
+   "size": 11716096,
+   "package": "0.4.2-win",
+   "category": "other",
+   "needs": "none",
+   "av_flagged": true
+  },
+  {
+   "name": "chisel",
+   "path": "chisel/chisel",
+   "size": 11587744,
+   "package": "lw-linux-amd64+friend-win",
+   "category": "tunnel",
+   "needs": "none",
+   "av_flagged": true
+  },
+  {
+   "name": "suo5-linux-amd64",
+   "path": "suo5/suo5-linux-amd64",
+   "size": 11456674,
+   "package": "lw-linux-amd64",
+   "category": "tunnel",
+   "needs": "none",
+   "av_flagged": true
+  },
+  {
+   "name": "gogo_linux_arm64",
+   "path": "gogo/gogo_linux_arm64",
+   "size": 10223616,
+   "package": "lw-linux-amd64",
+   "category": "scanner",
+   "needs": "none",
+   "av_flagged": true
+  },
+  {
+   "name": "icudtl.dat",
+   "path": "AntSword/AntSword-Loader-v4.0.3-linux-x64/icudtl.dat",
+   "size": 10218000,
+   "package": "lw-linux-amd64+friend-win",
+   "category": "exploit",
+   "needs": "none",
+   "av_flagged": false
+  },
+  {
+   "name": "laZagne.exe",
+   "path": "laZagne.exe",
+   "size": 10136093,
+   "package": "0.4.2-win",
+   "category": "credential",
+   "needs": "none",
+   "av_flagged": true
+  },
+  {
+   "name": "fscan.exe",
+   "path": "fscan.exe",
+   "size": 8785920,
+   "package": "0.4.2-win",
+   "category": "scanner",
+   "needs": "none",
+   "av_flagged": true
+  },
+  {
+   "name": "fscan_windows_x64.exe",
+   "path": "fscan/fscan_windows_x64.exe",
+   "size": 8774144,
+   "package": "lw-linux-amd64+friend-win",
+   "category": "scanner",
+   "needs": "none",
+   "av_flagged": true
+  },
+  {
+   "name": "resources.pak",
+   "path": "AntSword/AntSword-Loader-v4.0.3-linux-x64/resources.pak",
+   "size": 8691078,
+   "package": "lw-linux-amd64+friend-win",
+   "category": "exploit",
+   "needs": "none",
+   "av_flagged": false
+  },
+  {
+   "name": "fscan",
+   "path": "fscan/fscan",
+   "size": 8480860,
+   "package": "lw-linux-amd64+friend-win",
+   "category": "scanner",
+   "needs": "none",
+   "av_flagged": true
+  },
+  {
+   "name": "fscan_linux_arm64",
+   "path": "fscan/fscan_linux_arm64",
+   "size": 7509720,
+   "package": "lw-linux-amd64+friend-win",
+   "category": "scanner",
+   "needs": "none",
+   "av_flagged": true
+  },
+  {
+   "name": "ligolo-agent.exe",
+   "path": "ligolo-agent.exe",
+   "size": 7374848,
+   "package": "0.4.2-win",
+   "category": "tunnel",
+   "needs": "none",
+   "av_flagged": true
+  },
+  {
+   "name": "libVkICD_mock_icd.so",
+   "path": "AntSword/AntSword-Loader-v4.0.3-linux-x64/libVkICD_mock_icd.so",
+   "size": 7199112,
+   "package": "lw-linux-amd64+friend-win",
+   "category": "exploit",
+   "needs": "none",
+   "av_flagged": false
+  },
+  {
+   "name": "libGLESv2.so",
+   "path": "AntSword/AntSword-Loader-v4.0.3-linux-x64/libGLESv2.so",
+   "size": 6058008,
+   "package": "lw-linux-amd64+friend-win",
+   "category": "exploit",
+   "needs": "none",
+   "av_flagged": false
+  },
+  {
+   "name": "nmap-os-db",
+   "path": "nmap/nmap-os-db",
+   "size": 5002931,
+   "package": "friend-win",
+   "category": "scanner",
+   "needs": "none",
+   "av_flagged": false
+  },
+  {
+   "name": "libgtk-win32-2.0-0.dll",
+   "path": "nmap/py2exe/libgtk-win32-2.0-0.dll",
+   "size": 4939820,
+   "package": "friend-win",
+   "category": "scanner",
+   "needs": "none",
+   "av_flagged": false
+  },
+  {
+   "name": "gogo",
+   "path": "gogo/gogo",
+   "size": 4340260,
+   "package": "lw-linux-amd64",
+   "category": "scanner",
+   "needs": "none",
+   "av_flagged": true
+  },
+  {
+   "name": "gogo",
+   "path": "gogo",
+   "size": 4307456,
+   "package": "0.4.2-win",
+   "category": "scanner",
+   "needs": "none",
+   "av_flagged": true
+  },
+  {
+   "name": "gogo.exe",
+   "path": "gogo.exe",
+   "size": 4307456,
+   "package": "lw-linux-amd64+0.4.2-win",
+   "category": "scanner",
+   "needs": "none",
+   "av_flagged": true
+  },
+  {
+   "name": "gogo_windows_amd64.exe",
+   "path": "gogo/gogo_windows_amd64.exe",
+   "size": 4307456,
+   "package": "lw-linux-amd64",
+   "category": "scanner",
+   "needs": "none",
+   "av_flagged": true
+  },
+  {
+   "name": "libffmpeg.so",
+   "path": "AntSword/AntSword-Loader-v4.0.3-linux-x64/libffmpeg.so",
+   "size": 3152384,
+   "package": "lw-linux-amd64+friend-win",
+   "category": "exploit",
+   "needs": "none",
+   "av_flagged": false
+  },
+  {
+   "name": "nmap.exe",
+   "path": "nmap/nmap.exe",
+   "size": 2686536,
+   "package": "friend-win",
+   "category": "scanner",
+   "needs": "none",
+   "av_flagged": false
+  },
+  {
+   "name": "python27.dll",
+   "path": "nmap/python27.dll",
+   "size": 2639872,
+   "package": "friend-win",
+   "category": "scanner",
+   "needs": "python",
+   "av_flagged": false
+  },
+  {
+   "name": "nmap-service-probes",
+   "path": "nmap/nmap-service-probes",
+   "size": 2461461,
+   "package": "friend-win",
+   "category": "scanner",
+   "needs": "none",
+   "av_flagged": false
+  },
+  {
+   "name": "gtk._gtk.pyd",
+   "path": "nmap/py2exe/gtk._gtk.pyd",
+   "size": 1882624,
+   "package": "friend-win",
+   "category": "scanner",
+   "needs": "none",
+   "av_flagged": false
+  },
+  {
+   "name": "linpeas.sh",
+   "path": "peass/linpeas.sh",
+   "size": 1806456,
+   "package": "0.4.2-win",
+   "category": "other",
+   "needs": "none",
+   "av_flagged": false
+  },
+  {
+   "name": "CRYPT32.dll",
+   "path": "nmap/py2exe/CRYPT32.dll",
+   "size": 1612504,
+   "package": "friend-win",
+   "category": "scanner",
+   "needs": "none",
+   "av_flagged": false
+  },
+  {
+   "name": "_ssl.pyd",
+   "path": "nmap/py2exe/_ssl.pyd",
+   "size": 1410048,
+   "package": "friend-win",
+   "category": "scanner",
+   "needs": "none",
+   "av_flagged": false
+  },
+  {
+   "name": "mimikatz.exe",
+   "path": "mimikatz.exe",
+   "size": 1355264,
+   "package": "0.4.2-win",
+   "category": "credential",
+   "needs": "none",
+   "av_flagged": true
+  },
+  {
+   "name": "libcairo-2.dll",
+   "path": "nmap/py2exe/libcairo-2.dll",
+   "size": 1294335,
+   "package": "friend-win",
+   "category": "scanner",
+   "needs": "none",
+   "av_flagged": false
+  },
+  {
+   "name": "libeay32.dll",
+   "path": "nmap/libeay32.dll",
+   "size": 1281608,
+   "package": "friend-win",
+   "category": "scanner",
+   "needs": "none",
+   "av_flagged": false
+  },
+  {
+   "name": "libglib-2.0-0.dll",
+   "path": "nmap/py2exe/libglib-2.0-0.dll",
+   "size": 1242929,
+   "package": "friend-win",
+   "category": "scanner",
+   "needs": "none",
+   "av_flagged": false
+  },
+  {
+   "name": "libxml2-2.dll",
+   "path": "nmap/py2exe/libxml2-2.dll",
+   "size": 1225225,
+   "package": "friend-win",
+   "category": "scanner",
+   "needs": "none",
+   "av_flagged": false
+  },
+  {
+   "name": "libgio-2.0-0.dll",
+   "path": "nmap/py2exe/libgio-2.0-0.dll",
+   "size": 1222182,
+   "package": "friend-win",
+   "category": "scanner",
+   "needs": "none",
+   "av_flagged": false
+  },
+  {
+   "name": "library.zip",
+   "path": "nmap/py2exe/library.zip",
+   "size": 1134173,
+   "package": "friend-win",
+   "category": "scanner",
+   "needs": "none",
+   "av_flagged": false
+  },
+  {
+   "name": "logo.png",
+   "path": "AntSword/AntSword-Loader-v4.0.3-linux-x64/logo.png",
+   "size": 1069474,
+   "package": "lw-linux-amd64+friend-win",
+   "category": "exploit",
+   "needs": "none",
+   "av_flagged": false
+  },
+  {
+   "name": "v8_context_snapshot.bin",
+   "path": "AntSword/AntSword-Loader-v4.0.3-linux-x64/v8_context_snapshot.bin",
+   "size": 1040312,
+   "package": "lw-linux-amd64+friend-win",
+   "category": "exploit",
+   "needs": "none",
+   "av_flagged": false
+  },
+  {
+   "name": "_hashlib.pyd",
+   "path": "nmap/py2exe/_hashlib.pyd",
+   "size": 1016832,
+   "package": "friend-win",
+   "category": "scanner",
+   "needs": "none",
+   "av_flagged": false
+  },
+  {
+   "name": "nmap-services",
+   "path": "nmap/nmap-services",
+   "size": 1000134,
+   "package": "friend-win",
+   "category": "scanner",
+   "needs": "none",
+   "av_flagged": false
+  },
+  {
+   "name": "libgdk-win32-2.0-0.dll",
+   "path": "nmap/py2exe/libgdk-win32-2.0-0.dll",
+   "size": 932373,
+   "package": "friend-win",
+   "category": "scanner",
+   "needs": "none",
+   "av_flagged": false
+  },
+  {
+   "name": "libpangoft2-1.0-0.dll",
+   "path": "nmap/py2exe/libpangoft2-1.0-0.dll",
+   "size": 815421,
+   "package": "friend-win",
+   "category": "scanner",
+   "needs": "none",
+   "av_flagged": false
+  },
+  {
+   "name": "CHANGELOG",
+   "path": "nmap/CHANGELOG",
+   "size": 740693,
+   "package": "friend-win",
+   "category": "scanner",
+   "needs": "none",
+   "av_flagged": false
+  },
+  {
+   "name": "unicodedata.pyd",
+   "path": "nmap/py2exe/unicodedata.pyd",
+   "size": 687104,
+   "package": "friend-win",
+   "category": "scanner",
+   "needs": "none",
+   "av_flagged": false
+  },
+  {
+   "name": "nmap-mac-prefixes",
+   "path": "nmap/nmap-mac-prefixes",
+   "size": 659575,
+   "package": "friend-win",
+   "category": "scanner",
+   "needs": "none",
+   "av_flagged": false
+  },
+  {
+   "name": "snapshot_blob.bin",
+   "path": "AntSword/AntSword-Loader-v4.0.3-linux-x64/snapshot_blob.bin",
+   "size": 641676,
+   "package": "lw-linux-amd64+friend-win",
+   "category": "exploit",
+   "needs": "none",
+   "av_flagged": false
+  },
+  {
+   "name": "sqlite3.dll",
+   "path": "nmap/py2exe/sqlite3.dll",
+   "size": 551424,
+   "package": "friend-win",
+   "category": "scanner",
+   "needs": "none",
+   "av_flagged": false
+  },
+  {
+   "name": "freetype6.dll",
+   "path": "nmap/py2exe/freetype6.dll",
+   "size": 538324,
+   "package": "friend-win",
+   "category": "scanner",
+   "needs": "none",
+   "av_flagged": false
+  },
+  {
+   "name": "zenmap.exe",
+   "path": "nmap/zenmap.exe",
+   "size": 449608,
+   "package": "friend-win",
+   "category": "scanner",
+   "needs": "none",
+   "av_flagged": false
+  },
+  {
+   "name": "ncat.exe",
+   "path": "vps/ncat.exe",
+   "size": 435784,
+   "package": "lw-linux-amd64",
+   "category": "other",
+   "needs": "none",
+   "av_flagged": false
+  },
+  {
+   "name": "libgobject-2.0-0.dll",
+   "path": "nmap/py2exe/libgobject-2.0-0.dll",
+   "size": 341594,
+   "package": "friend-win",
+   "category": "scanner",
+   "needs": "none",
+   "av_flagged": false
+  },
+  {
+   "name": "nping.exe",
+   "path": "nmap/nping.exe",
+   "size": 341576,
+   "package": "friend-win",
+   "category": "scanner",
+   "needs": "none",
+   "av_flagged": false
+  },
+  {
+   "name": "libpango-1.0-0.dll",
+   "path": "nmap/py2exe/libpango-1.0-0.dll",
+   "size": 333729,
+   "package": "friend-win",
+   "category": "scanner",
+   "needs": "none",
+   "av_flagged": false
+  },
+  {
+   "name": "libgsf-1-114.dll",
+   "path": "nmap/py2exe/libgsf-1-114.dll",
+   "size": 333440,
+   "package": "friend-win",
+   "category": "scanner",
+   "needs": "none",
+   "av_flagged": false
+  },
+  {
+   "name": "ssleay32.dll",
+   "path": "nmap/ssleay32.dll",
+   "size": 308808,
+   "package": "friend-win",
+   "category": "scanner",
+   "needs": "none",
+   "av_flagged": false
+  },
+  {
+   "name": "libgdk_pixbuf-2.0-0.dll",
+   "path": "nmap/py2exe/libgdk_pixbuf-2.0-0.dll",
+   "size": 285194,
+   "package": "friend-win",
+   "category": "scanner",
+   "needs": "none",
+   "av_flagged": false
+  },
+  {
+   "name": "libfontconfig-1.dll",
+   "path": "nmap/py2exe/libfontconfig-1.dll",
+   "size": 279059,
+   "package": "friend-win",
+   "category": "scanner",
+   "needs": "none",
+   "av_flagged": false
+  },
+  {
+   "name": "librsvg-2-2.dll",
+   "path": "nmap/py2exe/librsvg-2-2.dll",
+   "size": 273302,
+   "package": "friend-win",
+   "category": "scanner",
+   "needs": "none",
+   "av_flagged": false
+  },
+  {
+   "name": "gio._gio.pyd",
+   "path": "nmap/py2exe/gio._gio.pyd",
+   "size": 263168,
+   "package": "friend-win",
+   "category": "scanner",
+   "needs": "none",
+   "av_flagged": false
+  },
+  {
+   "name": "libcroco-0.6-3.dll",
+   "path": "nmap/py2exe/libcroco-0.6-3.dll",
+   "size": 257706,
+   "package": "friend-win",
+   "category": "scanner",
+   "needs": "none",
+   "av_flagged": false
+  },
+  {
+   "name": "libEGL.so",
+   "path": "AntSword/AntSword-Loader-v4.0.3-linux-x64/libEGL.so",
+   "size": 255912,
+   "package": "lw-linux-amd64+friend-win",
+   "category": "exploit",
+   "needs": "none",
+   "av_flagged": false
+  },
+  {
+   "name": "chrome_200_percent.pak",
+   "path": "AntSword/AntSword-Loader-v4.0.3-linux-x64/chrome_200_percent.pak",
+   "size": 250097,
+   "package": "lw-linux-amd64+friend-win",
+   "category": "exploit",
+   "needs": "none",
+   "av_flagged": false
+  },
+  {
+   "name": "libpng14-14.dll",
+   "path": "nmap/py2exe/libpng14-14.dll",
+   "size": 230529,
+   "package": "friend-win",
+   "category": "scanner",
+   "needs": "none",
+   "av_flagged": false
+  },
+  {
+   "name": "ca-bundle.crt",
+   "path": "nmap/ca-bundle.crt",
+   "size": 209282,
+   "package": "friend-win",
+   "category": "scanner",
+   "needs": "none",
+   "av_flagged": false
+  },
+  {
+   "name": "atk.pyd",
+   "path": "nmap/py2exe/atk.pyd",
+   "size": 208384,
+   "package": "friend-win",
+   "category": "scanner",
+   "needs": "none",
+   "av_flagged": false
+  },
+  {
+   "name": "penelope.py",
+   "path": "penelope.py",
+   "size": 190016,
+   "package": "0.4.2-win",
+   "category": "tunnel",
+   "needs": "python",
+   "av_flagged": true
+  },
+  {
+   "name": "libcairo-script-interpreter-2.dll",
+   "path": "nmap/py2exe/libcairo-script-interpreter-2.dll",
+   "size": 182789,
+   "package": "friend-win",
+   "category": "scanner",
+   "needs": "none",
+   "av_flagged": false
+  },
+  {
+   "name": "zlibwapi.dll",
+   "path": "nmap/zlibwapi.dll",
+   "size": 180296,
+   "package": "friend-win",
+   "category": "scanner",
+   "needs": "none",
+   "av_flagged": false
+  },
+  {
+   "name": "libglade-2.0-0.dll",
+   "path": "nmap/py2exe/libglade-2.0-0.dll",
+   "size": 168833,
+   "package": "friend-win",
+   "category": "scanner",
+   "needs": "none",
+   "av_flagged": false
+  },
+  {
+   "name": "chrome_100_percent.pak",
+   "path": "AntSword/AntSword-Loader-v4.0.3-linux-x64/chrome_100_percent.pak",
+   "size": 167930,
+   "package": "lw-linux-amd64+friend-win",
+   "category": "exploit",
+   "needs": "none",
+   "av_flagged": false
+  },
+  {
+   "name": "libatk-1.0-0.dll",
+   "path": "nmap/py2exe/libatk-1.0-0.dll",
+   "size": 163476,
+   "package": "friend-win",
+   "category": "scanner",
+   "needs": "none",
+   "av_flagged": false
+  },
+  {
+   "name": "libssh2.dll",
+   "path": "nmap/libssh2.dll",
+   "size": 161352,
+   "package": "friend-win",
+   "category": "scanner",
+   "needs": "none",
+   "av_flagged": false
+  },
+  {
+   "name": "intl.dll",
+   "path": "nmap/py2exe/intl.dll",
+   "size": 152489,
+   "package": "friend-win",
+   "category": "scanner",
+   "needs": "none",
+   "av_flagged": false
+  },
+  {
+   "name": "libexpat-1.dll",
+   "path": "nmap/py2exe/libexpat-1.dll",
+   "size": 143096,
+   "package": "friend-win",
+   "category": "scanner",
+   "needs": "none",
+   "av_flagged": false
+  },
+  {
+   "name": "pyexpat.pyd",
+   "path": "nmap/py2exe/pyexpat.pyd",
+   "size": 136704,
+   "package": "friend-win",
+   "category": "scanner",
+   "needs": "none",
+   "av_flagged": false
+  },
+  {
+   "name": "natives_blob.bin",
+   "path": "AntSword/AntSword-Loader-v4.0.3-linux-x64/natives_blob.bin",
+   "size": 125011,
+   "package": "lw-linux-amd64+friend-win",
+   "category": "exploit",
+   "needs": "none",
+   "av_flagged": false
+  },
+  {
+   "name": "gobject._gobject.pyd",
+   "path": "nmap/py2exe/gobject._gobject.pyd",
+   "size": 113152,
+   "package": "friend-win",
+   "category": "scanner",
+   "needs": "none",
+   "av_flagged": false
+  },
+  {
+   "name": "pango.pyd",
+   "path": "nmap/py2exe/pango.pyd",
+   "size": 111616,
+   "package": "friend-win",
+   "category": "scanner",
+   "needs": "none",
+   "av_flagged": false
+  },
+  {
+   "name": "libpangowin32-1.0-0.dll",
+   "path": "nmap/py2exe/libpangowin32-1.0-0.dll",
+   "size": 108945,
+   "package": "friend-win",
+   "category": "scanner",
+   "needs": "none",
+   "av_flagged": false
+  },
+  {
+   "name": "pypykatz",
+   "path": "pypykatz",
+   "size": 108349,
+   "package": "0.4.2-win",
+   "category": "credential",
+   "needs": "none",
+   "av_flagged": true
+  },
+  {
+   "name": "nxc",
+   "path": "nxc",
+   "size": 108343,
+   "package": "0.4.2-win",
+   "category": "credential",
+   "needs": "none",
+   "av_flagged": true
+  },
+  {
+   "name": "libgcc_s_dw2-1.dll",
+   "path": "nmap/py2exe/libgcc_s_dw2-1.dll",
+   "size": 108032,
+   "package": "friend-win",
+   "category": "scanner",
+   "needs": "none",
+   "av_flagged": false
+  },
+  {
+   "name": "libpangocairo-1.0-0.dll",
+   "path": "nmap/py2exe/libpangocairo-1.0-0.dll",
+   "size": 104729,
+   "package": "friend-win",
+   "category": "scanner",
+   "needs": "none",
+   "av_flagged": false
+  },
+  {
+   "name": "zlib1.dll",
+   "path": "nmap/py2exe/zlib1.dll",
+   "size": 100352,
+   "package": "friend-win",
+   "category": "scanner",
+   "needs": "none",
+   "av_flagged": false
+  },
+  {
+   "name": "_ctypes.pyd",
+   "path": "nmap/py2exe/_ctypes.pyd",
+   "size": 91648,
+   "package": "friend-win",
+   "category": "scanner",
+   "needs": "none",
+   "av_flagged": false
+  },
+  {
+   "name": "libasprintf-0.dll",
+   "path": "nmap/py2exe/libasprintf-0.dll",
+   "size": 90120,
+   "package": "friend-win",
+   "category": "scanner",
+   "needs": "none",
+   "av_flagged": false
+  },
+  {
+   "name": "Uninstall.exe",
+   "path": "nmap/Uninstall.exe",
+   "size": 79136,
+   "package": "friend-win",
+   "category": "scanner",
+   "needs": "none",
+   "av_flagged": false
+  },
+  {
+   "name": "3rd-party-licenses.txt",
+   "path": "nmap/3rd-party-licenses.txt",
+   "size": 71217,
+   "package": "friend-win",
+   "category": "scanner",
+   "needs": "none",
+   "av_flagged": false
+  },
+  {
+   "name": "bz2.pyd",
+   "path": "nmap/py2exe/bz2.pyd",
+   "size": 71168,
+   "package": "friend-win",
+   "category": "scanner",
+   "needs": "none",
+   "av_flagged": false
+  },
+  {
+   "name": "cairo._cairo.pyd",
+   "path": "nmap/py2exe/cairo._cairo.pyd",
+   "size": 69632,
+   "package": "friend-win",
+   "category": "scanner",
+   "needs": "none",
+   "av_flagged": false
+  },
+  {
+   "name": "libgailutil-18.dll",
+   "path": "nmap/py2exe/libgailutil-18.dll",
+   "size": 60599,
+   "package": "friend-win",
+   "category": "scanner",
+   "needs": "none",
+   "av_flagged": false
+  },
+  {
+   "name": "glib._glib.pyd",
+   "path": "nmap/py2exe/glib._glib.pyd",
+   "size": 58368,
+   "package": "friend-win",
+   "category": "scanner",
+   "needs": "none",
+   "av_flagged": false
+  },
+  {
+   "name": "_sqlite3.pyd",
+   "path": "nmap/py2exe/_sqlite3.pyd",
+   "size": 50688,
+   "package": "friend-win",
+   "category": "scanner",
+   "needs": "none",
+   "av_flagged": false
+  },
+  {
+   "name": "nmap-rpc",
+   "path": "nmap/nmap-rpc",
+   "size": 49647,
+   "package": "friend-win",
+   "category": "scanner",
+   "needs": "none",
+   "av_flagged": false
+  },
+  {
+   "name": "nse_main.lua",
+   "path": "nmap/nse_main.lua",
+   "size": 48404,
+   "package": "friend-win",
+   "category": "scanner",
+   "needs": "none",
+   "av_flagged": false
+  },
+  {
+   "name": "suo5.jsp",
+   "path": "suo5-payloads/suo5.jsp",
+   "size": 46753,
+   "package": "lw-linux-amd64+0.4.2-win",
+   "category": "tunnel",
+   "needs": "none",
+   "av_flagged": true
+  },
+  {
+   "name": "_socket.pyd",
+   "path": "nmap/py2exe/_socket.pyd",
+   "size": 46592,
+   "package": "friend-win",
+   "category": "scanner",
+   "needs": "none",
+   "av_flagged": false
+  },
+  {
+   "name": "libgthread-2.0-0.dll",
+   "path": "nmap/py2exe/libgthread-2.0-0.dll",
+   "size": 44287,
+   "package": "friend-win",
+   "category": "scanner",
+   "needs": "none",
+   "av_flagged": false
+  },
+  {
+   "name": "libcairo-gobject-2.dll",
+   "path": "nmap/py2exe/libcairo-gobject-2.dll",
+   "size": 44049,
+   "package": "friend-win",
+   "category": "scanner",
+   "needs": "none",
+   "av_flagged": false
+  },
+  {
+   "name": "suo5.aspx",
+   "path": "suo5-payloads/suo5.aspx",
+   "size": 43633,
+   "package": "lw-linux-amd64+0.4.2-win",
+   "category": "tunnel",
+   "needs": "none",
+   "av_flagged": true
+  },
+  {
+   "name": "libgmodule-2.0-0.dll",
+   "path": "nmap/py2exe/libgmodule-2.0-0.dll",
+   "size": 36986,
+   "package": "friend-win",
+   "category": "scanner",
+   "needs": "none",
+   "av_flagged": false
+  },
+  {
+   "name": "wxgroup.png",
+   "path": "Godzilla/wxgroup.png",
+   "size": 36760,
+   "package": "lw-linux-amd64",
+   "category": "exploit",
+   "needs": "none",
+   "av_flagged": true
+  },
+  {
+   "name": "suo5.php",
+   "path": "suo5-payloads/suo5.php",
+   "size": 34669,
+   "package": "lw-linux-amd64+0.4.2-win",
+   "category": "tunnel",
+   "needs": "none",
+   "av_flagged": true
+  },
+  {
+   "name": "nmap.xsl",
+   "path": "nmap/nmap.xsl",
+   "size": 31936,
+   "package": "friend-win",
+   "category": "scanner",
+   "needs": "none",
+   "av_flagged": false
+  },
+  {
+   "name": "ndiff.exe",
+   "path": "nmap/ndiff.exe",
+   "size": 29256,
+   "package": "friend-win",
+   "category": "scanner",
+   "needs": "none",
+   "av_flagged": false
+  },
+  {
+   "name": "COPYING",
+   "path": "nmap/COPYING",
+   "size": 27921,
+   "package": "friend-win",
+   "category": "scanner",
+   "needs": "none",
+   "av_flagged": false
+  },
+  {
+   "name": "base64.png",
+   "path": "Godzilla/base64.png",
+   "size": 26790,
+   "package": "lw-linux-amd64",
+   "category": "exploit",
+   "needs": "none",
+   "av_flagged": true
+  },
+  {
+   "name": "COPYING_HIGWIDGETS",
+   "path": "nmap/COPYING_HIGWIDGETS",
+   "size": 26562,
+   "package": "friend-win",
+   "category": "scanner",
+   "needs": "none",
+   "av_flagged": false
+  },
+  {
+   "name": "LGPL-2.1",
+   "path": "nmap/licenses/LGPL-2.1",
+   "size": 26440,
+   "package": "friend-win",
+   "category": "scanner",
+   "needs": "none",
+   "av_flagged": false
+  },
+  {
+   "name": "MPL-1.1",
+   "path": "nmap/licenses/MPL-1.1",
+   "size": 25755,
+   "package": "friend-win",
+   "category": "scanner",
+   "needs": "none",
+   "av_flagged": false
+  },
+  {
+   "name": "LGPL-2",
+   "path": "nmap/licenses/LGPL-2",
+   "size": 25292,
+   "package": "friend-win",
+   "category": "scanner",
+   "needs": "none",
+   "av_flagged": false
+  },
+  {
+   "name": "libgsf-win32-1-114.dll",
+   "path": "nmap/py2exe/libgsf-win32-1-114.dll",
+   "size": 24488,
+   "package": "friend-win",
+   "category": "scanner",
+   "needs": "none",
+   "av_flagged": false
+  },
+  {
+   "name": "raw.png",
+   "path": "Godzilla/raw.png",
+   "size": 22521,
+   "package": "lw-linux-amd64",
+   "category": "exploit",
+   "needs": "none",
+   "av_flagged": true
+  },
+  {
+   "name": "pangocairo.pyd",
+   "path": "nmap/py2exe/pangocairo.pyd",
+   "size": 17920,
+   "package": "friend-win",
+   "category": "scanner",
+   "needs": "none",
+   "av_flagged": false
+  },
+  {
+   "name": "icon1.ico",
+   "path": "nmap/icon1.ico",
+   "size": 15086,
+   "package": "friend-win",
+   "category": "scanner",
+   "needs": "none",
+   "av_flagged": false
+  },
+  {
+   "name": "nmap-payloads",
+   "path": "nmap/nmap-payloads",
+   "size": 14579,
+   "package": "friend-win",
+   "category": "scanner",
+   "needs": "none",
+   "av_flagged": false
+  },
+  {
+   "name": "WinPcap-license.txt",
+   "path": "nmap/licenses/WinPcap-license.txt",
+   "size": 13143,
+   "package": "friend-win",
+   "category": "scanner",
+   "needs": "none",
+   "av_flagged": false
+  },
+  {
+   "name": "vps.sh",
+   "path": "vps/vps.sh",
+   "size": 11078,
+   "package": "lw-linux-amd64",
+   "category": "other",
+   "needs": "none",
+   "av_flagged": false
+  },
+  {
+   "name": "dga_jumper.py",
+   "path": "dga_jumper.py",
+   "size": 10272,
+   "package": "lw-linux-amd64+friend-win",
+   "category": "other",
+   "needs": "python",
+   "av_flagged": false
+  },
+  {
+   "name": "select.pyd",
+   "path": "nmap/py2exe/select.pyd",
+   "size": 10240,
+   "package": "friend-win",
+   "category": "scanner",
+   "needs": "none",
+   "av_flagged": false
+  },
+  {
+   "name": "fofa_mcp.py",
+   "path": "mcp/fofa_mcp.py",
+   "size": 9716,
+   "package": "0.4.2-win",
+   "category": "other",
+   "needs": "python",
+   "av_flagged": false
+  },
+  {
+   "name": "nmap-protocols",
+   "path": "nmap/nmap-protocols",
+   "size": 6703,
+   "package": "friend-win",
+   "category": "scanner",
+   "needs": "none",
+   "av_flagged": false
+  },
+  {
+   "name": "OpenSSL-license.txt",
+   "path": "nmap/licenses/OpenSSL-license.txt",
+   "size": 6126,
+   "package": "friend-win",
+   "category": "scanner",
+   "needs": "none",
+   "av_flagged": false
+  },
+  {
+   "name": "jumper.js",
+   "path": "jumper.js",
+   "size": 5750,
+   "package": "lw-linux-amd64+friend-win",
+   "category": "other",
+   "needs": "none",
+   "av_flagged": false
+  },
+  {
+   "name": "p79.py",
+   "path": "p79.py",
+   "size": 4802,
+   "package": "lw-linux-amd64+friend-win",
+   "category": "other",
+   "needs": "python",
+   "av_flagged": false
+  },
+  {
+   "name": "vps_proxy.py",
+   "path": "vps/vps_proxy.py",
+   "size": 4470,
+   "package": "lw-linux-amd64",
+   "category": "other",
+   "needs": "python",
+   "av_flagged": false
+  },
+  {
+   "name": "p78_client.py",
+   "path": "p78_client.py",
+   "size": 3860,
+   "package": "lw-linux-amd64+friend-win",
+   "category": "other",
+   "needs": "python",
+   "av_flagged": false
+  },
+  {
+   "name": "VPS-│÷┐┌╦╡├≈.md",
+   "path": "vps/VPS-│÷┐┌╦╡├≈.md",
+   "size": 3758,
+   "package": "lw-linux-amd64",
+   "category": "other",
+   "needs": "none",
+   "av_flagged": false
+  },
+  {
+   "name": "VPS-出口说明.md",
+   "path": "vps/VPS-出口说明.md",
+   "size": 3758,
+   "package": "lw-linux-amd64",
+   "category": "other",
+   "needs": "none",
+   "av_flagged": false
+  },
+  {
+   "name": "VPS-│÷┐┌╦╡├≈.md.bak-fofa-20261010115636",
+   "path": "vps/VPS-│÷┐┌╦╡├≈.md.bak-fofa-20261010115636",
+   "size": 3755,
+   "package": "lw-linux-amd64",
+   "category": "other",
+   "needs": "none",
+   "av_flagged": false
+  },
+  {
+   "name": "README.md",
+   "path": "Godzilla/README.md",
+   "size": 2942,
+   "package": "lw-linux-amd64",
+   "category": "exploit",
+   "needs": "none",
+   "av_flagged": true
+  },
+  {
+   "name": "PCRE-license.txt",
+   "path": "nmap/licenses/PCRE-license.txt",
+   "size": 2496,
+   "package": "friend-win",
+   "category": "scanner",
+   "needs": "none",
+   "av_flagged": false
+  },
+  {
+   "name": "ZENMAP_README",
+   "path": "nmap/ZENMAP_README",
+   "size": 2261,
+   "package": "friend-win",
+   "category": "scanner",
+   "needs": "none",
+   "av_flagged": false
+  },
+  {
+   "name": "dga_jumper.xml",
+   "path": "dga_jumper.xml",
+   "size": 2023,
+   "package": "lw-linux-amd64+friend-win",
+   "category": "other",
+   "needs": "none",
+   "av_flagged": false
+  },
+  {
+   "name": "dga_jumper_nocmd.xml",
+   "path": "dga_jumper_nocmd.xml",
+   "size": 1975,
+   "package": "lw-linux-amd64+friend-win",
+   "category": "other",
+   "needs": "none",
+   "av_flagged": false
+  },
+  {
+   "name": "NDIFF_README",
+   "path": "nmap/NDIFF_README",
+   "size": 1957,
+   "package": "friend-win",
+   "category": "scanner",
+   "needs": "none",
+   "av_flagged": false
+  },
+  {
+   "name": "id_rsa",
+   "path": "vps/id_rsa",
+   "size": 1674,
+   "package": "lw-linux-amd64",
+   "category": "other",
+   "needs": "none",
+   "av_flagged": false
+  },
+  {
+   "name": "╟σ╡Ñ.md",
+   "path": "╟σ╡Ñ.md",
+   "size": 1647,
+   "package": "lw-linux-amd64",
+   "category": "other",
+   "needs": "none",
+   "av_flagged": false
+  },
+  {
+   "name": "清单.md",
+   "path": "清单.md",
+   "size": 1647,
+   "package": "lw-linux-amd64+friend-win+friend-win",
+   "category": "other",
+   "needs": "none",
+   "av_flagged": false
+  },
+  {
+   "name": "hashsumJar",
+   "path": "Godzilla/hashsumJar",
+   "size": 1640,
+   "package": "lw-linux-amd64",
+   "category": "exploit",
+   "needs": "none",
+   "av_flagged": true
+  },
+  {
+   "name": "LIBLINEAR-license.txt",
+   "path": "nmap/licenses/LIBLINEAR-license.txt",
+   "size": 1486,
+   "package": "friend-win",
+   "category": "scanner",
+   "needs": "none",
+   "av_flagged": false
+  },
+  {
+   "name": "BSD-simplified",
+   "path": "nmap/licenses/BSD-simplified",
+   "size": 1465,
+   "package": "friend-win",
+   "category": "scanner",
+   "needs": "none",
+   "av_flagged": false
+  },
+  {
+   "name": "Libdnet-license.txt",
+   "path": "nmap/licenses/Libdnet-license.txt",
+   "size": 1460,
+   "package": "friend-win",
+   "category": "scanner",
+   "needs": "none",
+   "av_flagged": false
+  },
+  {
+   "name": "rt-proxy-on.cmd",
+   "path": "vps/rt-proxy-on.cmd",
+   "size": 1246,
+   "package": "lw-linux-amd64",
+   "category": "other",
+   "needs": "none",
+   "av_flagged": false
+  },
+  {
+   "name": "rt-proxy-on.cmd.bak-fofa-20261010115636",
+   "path": "vps/rt-proxy-on.cmd.bak-fofa-20261010115636",
+   "size": 1240,
+   "package": "lw-linux-amd64",
+   "category": "other",
+   "needs": "none",
+   "av_flagged": false
+  },
+  {
+   "name": "LICENSE",
+   "path": "AntSword/AntSword-Loader-v4.0.3-linux-x64/LICENSE",
+   "size": 1081,
+   "package": "lw-linux-amd64+friend-win",
+   "category": "exploit",
+   "needs": "none",
+   "av_flagged": false
+  },
+  {
+   "name": "Lua-license.txt",
+   "path": "nmap/licenses/Lua-license.txt",
+   "size": 1066,
+   "package": "friend-win",
+   "category": "scanner",
+   "needs": "none",
+   "av_flagged": false
+  },
+  {
+   "name": "MIT",
+   "path": "nmap/licenses/MIT",
+   "size": 1065,
+   "package": "friend-win",
+   "category": "scanner",
+   "needs": "none",
+   "av_flagged": false
+  },
+  {
+   "name": "zlib-license.txt",
+   "path": "nmap/licenses/zlib-license.txt",
+   "size": 996,
+   "package": "friend-win",
+   "category": "scanner",
+   "needs": "none",
+   "av_flagged": false
+  },
+  {
+   "name": "rt-proxy-off.cmd",
+   "path": "vps/rt-proxy-off.cmd",
+   "size": 962,
+   "package": "lw-linux-amd64",
+   "category": "other",
+   "needs": "none",
+   "av_flagged": false
+  },
+  {
+   "name": "ssh-proxy.cmd",
+   "path": "vps/ssh-proxy.cmd",
+   "size": 891,
+   "package": "lw-linux-amd64",
+   "category": "other",
+   "needs": "none",
+   "av_flagged": false
+  },
+  {
+   "name": "BSD-modified.txt",
+   "path": "nmap/licenses/BSD-modified.txt",
+   "size": 868,
+   "package": "friend-win",
+   "category": "scanner",
+   "needs": "none",
+   "av_flagged": false
+  },
+  {
+   "name": "suo5_keepalive.cmd",
+   "path": "suo5_keepalive.cmd",
+   "size": 612,
+   "package": "lw-linux-amd64+friend-win",
+   "category": "tunnel",
+   "needs": "none",
+   "av_flagged": true
+  },
+  {
+   "name": "s5loop.cmd",
+   "path": "s5loop.cmd",
+   "size": 542,
+   "package": "lw-linux-amd64+friend-win",
+   "category": "other",
+   "needs": "none",
+   "av_flagged": false
+  },
+  {
+   "name": "p78.out",
+   "path": "p78.out",
+   "size": 497,
+   "package": "lw-linux-amd64+friend-win",
+   "category": "other",
+   "needs": "none",
+   "av_flagged": false
+  },
+  {
+   "name": "rt-tunnel-key",
+   "path": "vps/rt-tunnel-key",
+   "size": 464,
+   "package": "lw-linux-amd64",
+   "category": "other",
+   "needs": "none",
+   "av_flagged": false
+  },
+  {
+   "name": "id_rsa.153-newserver",
+   "path": "vps/id_rsa.153-newserver",
+   "size": 411,
+   "package": "lw-linux-amd64",
+   "category": "other",
+   "needs": "none",
+   "av_flagged": false
+  },
+  {
+   "name": "suo5_run_176.bat",
+   "path": "suo5_run_176.bat",
+   "size": 342,
+   "package": "lw-linux-amd64+friend-win",
+   "category": "tunnel",
+   "needs": "none",
+   "av_flagged": true
+  },
+  {
+   "name": ".gitignore",
+   "path": "Godzilla/.gitignore",
+   "size": 301,
+   "package": "lw-linux-amd64",
+   "category": "exploit",
+   "needs": "none",
+   "av_flagged": true
+  },
+  {
+   "name": "hidjumper.vbs",
+   "path": "hidjumper.vbs",
+   "size": 274,
+   "package": "lw-linux-amd64+friend-win",
+   "category": "other",
+   "needs": "none",
+   "av_flagged": false
+  },
+  {
+   "name": "application.config",
+   "path": "Godzilla/application.config",
+   "size": 258,
+   "package": "lw-linux-amd64",
+   "category": "exploit",
+   "needs": "none",
+   "av_flagged": true
+  },
+  {
+   "name": "hid.vbs",
+   "path": "hid.vbs",
+   "size": 226,
+   "package": "lw-linux-amd64+friend-win",
+   "category": "other",
+   "needs": "none",
+   "av_flagged": false
+  },
+  {
+   "name": "nmap_performance.reg",
+   "path": "nmap/nmap_performance.reg",
+   "size": 192,
+   "package": "friend-win",
+   "category": "scanner",
+   "needs": "none",
+   "av_flagged": false
+  },
+  {
+   "name": "README-WIN32",
+   "path": "nmap/README-WIN32",
+   "size": 186,
+   "package": "friend-win",
+   "category": "scanner",
+   "needs": "none",
+   "av_flagged": false
+  },
+  {
+   "name": "rt-tunnel-key.pub",
+   "path": "vps/rt-tunnel-key.pub",
+   "size": 100,
+   "package": "lw-linux-amd64",
+   "category": "other",
+   "needs": "none",
+   "av_flagged": false
+  },
+  {
+   "name": "pypykatz.cmd",
+   "path": "pypykatz.cmd",
+   "size": 95,
+   "package": "0.4.2-win",
+   "category": "credential",
+   "needs": "none",
+   "av_flagged": true
+  },
+  {
+   "name": "sqlmap.cmd",
+   "path": "sqlmap.cmd",
+   "size": 93,
+   "package": "0.4.2-win",
+   "category": "exploit",
+   "needs": "none",
+   "av_flagged": false
+  },
+  {
+   "name": "nxc.cmd",
+   "path": "nxc.cmd",
+   "size": 90,
+   "package": "0.4.2-win",
+   "category": "credential",
+   "needs": "none",
+   "av_flagged": true
+  },
+  {
+   "name": "run_jumper.cmd",
+   "path": "run_jumper.cmd",
+   "size": 82,
+   "package": "lw-linux-amd64+friend-win",
+   "category": "other",
+   "needs": "none",
+   "av_flagged": false
+  },
+  {
+   "name": "impacket",
+   "path": "impacket",
+   "size": 38,
+   "package": "0.4.2-win",
+   "category": "credential",
+   "needs": "none",
+   "av_flagged": true
+  },
+  {
+   "name": "version",
+   "path": "AntSword/AntSword-Loader-v4.0.3-linux-x64/version",
+   "size": 6,
+   "package": "lw-linux-amd64+friend-win",
+   "category": "exploit",
+   "needs": "none",
+   "av_flagged": false
+  },
+  {
+   "name": ".82.40.45.98_top2_web_db_mail_ftp_ssh_default_jl.dat",
+   "path": "gogo/.82.40.45.98_top2_web_db_mail_ftp_ssh_default_jl.dat",
+   "size": 0,
+   "package": "lw-linux-amd64",
+   "category": "scanner",
+   "needs": "none",
+   "av_flagged": true
+  }
+ ],
+ "bundles": [
+  {
+   "name": "Behinder",
+   "files": 84,
+   "size": 283979026,
+   "package": "friend-win+lw-linux-amd64",
+   "category": "exploit",
+   "needs": "none",
+   "av_flagged": false
+  },
+  {
+   "name": "dirsearch",
+   "files": 459,
+   "size": 2372091,
+   "package": "0.4.2-win+friend-win+lw-linux-amd64",
+   "category": "scanner",
+   "needs": "none",
+   "av_flagged": false
+  },
+  {
+   "name": "jdk11",
+   "files": 201,
+   "size": 80118176,
+   "package": "friend-win+lw-linux-amd64",
+   "category": "runtime",
+   "needs": "none",
+   "av_flagged": false
+  },
+  {
+   "name": "nmap/ncat",
+   "files": 1,
+   "size": 435784,
+   "package": "friend-win",
+   "category": "scanner",
+   "needs": "none",
+   "av_flagged": false
+  },
+  {
+   "name": "oneforall",
+   "files": 284,
+   "size": 112440710,
+   "package": "0.4.2-win+lw-linux-amd64",
+   "category": "scanner",
+   "needs": "none",
+   "av_flagged": false
+  },
+  {
+   "name": "pgsql",
+   "files": 156,
+   "size": 154002234,
+   "package": "0.4.2-win+friend-win",
+   "category": "runtime",
+   "needs": "none",
+   "av_flagged": false
+  },
+  {
+   "name": "python313",
+   "files": 33,
+   "size": 21260662,
+   "package": "0.4.2-win",
+   "category": "runtime",
+   "needs": "python",
+   "av_flagged": false
+  },
+  {
+   "name": "wordlists",
+   "files": 6,
+   "size": 589624,
+   "package": "0.4.2-win+lw-linux-amd64",
+   "category": "wordlist",
+   "needs": "none",
+   "av_flagged": false
+  }
+ ]
+}

@@ -15,9 +15,10 @@ services:
     restart: unless-stopped
 
   artex:
-    # Override ARTEX_IMAGE with an image built from this fork; the legacy
-    # upstream image does not contain locally committed ARTEX changes.
-    image: ${ARTEX_IMAGE:-autumn27/artex}:${ARTEX_TAG:-latest}
+    # 默认跑本仓库源码构建出来的镜像（scripts/docker-build-fork.sh）。
+    # 上游历史上游镜像 autumn27/artex 不含本 fork 的改动，且会挂载 ./data 与 ./keys
+    # （JWT 私钥），所以默认值不再指向它 —— 要复现历史行为请显式设 ARTEX_IMAGE。
+    image: ${ARTEX_IMAGE:-artex}:${ARTEX_TAG:-local}
     depends_on:
       postgres:
         condition: service_healthy

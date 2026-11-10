@@ -126,9 +126,37 @@ Sync asset data directly from [ScopeSentry](https://github.com/Autumn-27/ScopeSe
 
 ---
 
+## Knowledge base, skills and prompts (`knowledge/`, `skills/`)
+
+This fork carries the practical knowledge layer alongside the code:
+
+- `knowledge/knowledge.db` — 448-entry SQLite ledger (`poc` table + FTS5 index): verified flag, category, component, kind, tags, full text. Point `knowledge_dir` in `config.json` at `knowledge/` and the agents start searching it ("弹药 / 打法 / 负面情报" three tiers).
+- `knowledge/pocs/` — 429 per-entry directories (`poc.sh` / `poc.py` / `*.md` / `*.http`). The title of each entry *is* the conclusion, including the negative ones (`…-判死-…`): a dead end recorded once is not explored again.
+- `knowledge/INDEX.md` — flat table of all 448 entries.
+- `knowledge/prompts/` — the 14 agent role prompts (planner / worker / verifier / retester / exploit / pentest / cloud / avevasion / payout_analyst / kb_curator / goals / mainagent / auto / worker.intranet) plus the 4 armor presets under `prompts/armor/`.
+- `skills/` — 54 skills; `chains-*/refs/*.md` are 52 decision-chain documents (30–80 KB each) covering web / AD / priv-esc / recon / app / meta / pivot / reverse.
+
+Provenance and the desensitisation rules applied before these assets entered the repo are recorded in [`knowledge/absorb/ABSORB-2026-11-10.md`](knowledge/absorb/ABSORB-2026-11-10.md) and [`knowledge/absorb/INDEX.md`](knowledge/absorb/INDEX.md). Binaries, toolkit archives, engagement snapshots and nuclei template copies are deliberately **not** committed.
+
+Two more indexes:
+
+- [`knowledge/MAP.md`](knowledge/MAP.md) — one-to-one mapping between the 448 ledger rows and the 429 POC directories, with the unmatched rows on both sides listed.
+- [`knowledge/ops/INDEX.md`](knowledge/ops/INDEX.md) — operator runbooks: hardening, deployment, troubleshooting, upgrade, Linux variant, package changelog.
+
+Two runtime patches are delivered as files, not applied — each needs a local `go build` first:
+
+- [`patches/0001-guard-hooks.patch`](patches/0001-guard-hooks.patch) — wire `Guard` hooks into planner / mainagent (they hold Bash but were never gated).
+- [`patches/0002-knowledge-runtime.patch`](patches/0002-knowledge-runtime.patch) — `knowledge_dir` + `kb_search` / `kb_get` read-only tools over `knowledge/knowledge.db` (see the README next to it).
+
+Corpus health: `python knowledge/tools/kb_check.py` (P1 = ledger/FTS mismatch only).
+
+Before committing anything under `knowledge/` or `docs/`, run `python tools/scan_sensitive.py` — it exits non-zero when a public IP, a local user path or an `assets.db` slips in.
+
+---
+
 ## Installation
 
-> **Fork note:** This repository is `wxcvm/ARTEX`. The default Docker Compose image is still the historical `autumn27/artex` image, **not** a build of this fork. To run your changes, compile this source locally or set `ARTEX_IMAGE` and `ARTEX_TAG` in `.env` to an image that you built/published from this source. No fork-specific Docker image is bundled with this repository.
+> **Fork note:** This repository is `wxcvm/ARTEX`. `docker-compose.yml` now defaults to `artex:local` — build it from this checkout with `bash scripts/docker-build-fork.sh` before `docker compose up -d`. Set `ARTEX_IMAGE` / `ARTEX_TAG` in `.env` only if you want to run a published image instead.
 
 > Requires a **PostgreSQL** database; exploration requires an **LLM** (`ANTHROPIC_API_KEY` or `OPENAI_API_KEY`, which can also be configured in the UI).
 
@@ -594,3 +622,4 @@ Users must comply with all laws and regulations of their country/region regardin
 ### Disclaimer
 
 This project is provided "as is", without any express or implied warranty. The authors and contributors are not liable for any direct or indirect loss, data loss, system damage, or legal disputes caused by the use of this tool (whether used properly or not). **Downloading, installing, or using this project means you have read, understood, and agreed to all of the above terms.**
+

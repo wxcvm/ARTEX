@@ -1,0 +1,86 @@
+# 博彩 PHPWind 站群「打不动」实战结论集（203.0.113.87/24，2026-10-15）
+
+## 目标画像
+- 域名：example.com / target420.example.com / target421.example.com / example.com / target422.example.com 等 20+ 个同族域名
+- 母舰：CNAME 全部收敛到 `ns207.example.com`（同族每台机器一个 nsXXX.example.com）
+- C 段：203.0.113.87/24，**118 台资产**，统一指纹 `21 Pure-FTPd + 22 OpenSSH + 80/443 nginx + 1031 nginx`
+- 命名规律：`dh-1.<客户域名>`，一个 IP 挂一户客户站（博彩站群 CDN 母舰集群）
+- CMS：**PHPWind 7.3.2 GBK**，表前缀 `604b2_`（从 cookie 前缀 `604b2_AdminUser` 泄露）
+
+## 分段防护画像（关键：不是"一套部署"，是"持续维护的集群"）
+| 子群 | 代表 IP | SSH banner | 特征 |
+| --- | --- | --- | --- |
+| SafeLine WAF 全路径 403 | 43 台（.109 .131 .144 .159 .164） | — | 连 `/bbs/` 都 403，**无面** |
+| 纯 7.4 老镜像 | .131~.178 那 19 台全绿 | `SSH-2.0-OpenSSH_7.4` | 同一次部署，banner 字符串完全一致 |
+| 新 Ubuntu 子群 | .25 / .40 / .94 / .50 | 8.9p1 / 9.6p1 Ubuntu-3ubuntu0.17/0.18/13.20 | **后期重装**，口令非默认 |
+| 另一批 | .170 / .173 | Debian 9.2p1 | 不同批 |
+| 主动防护 | .158 / .160 | 空 banner（连接后不发 banner 就断） | 跳过 |
+
+**推论修正**：Ubuntu 版本号在变（0.17→0.18→13.20）说明**有机器被后期重装过** → 口令大概率同步改过。
+**"同镜像同口令"只在老 7.4 子群成立**，新镜像机不成立。**两个子群要分开对待。**
+
+## 已穷尽并判死的路线（按投入产出排序）
+
+### 1. 口令类（累计 8700+ 组，零命中）
+- 主站后台 `POST /bbs/example.com`（字段 `admin_name`/`admin_pwd`/`Login_f`，form action 带 `&verify=<hash>`，**无验证码**）
+  - **失败态基线 = 3980 字节**（表单重绘）；注意同一批里响应大小会漂移到 14540（密码错+跳首页）
+  - **★ 警告**：知识库另一条记的「195 字节 = 登录成功」**在本类部署上不成立**，别照用
+  - 真实管理员用户名 = **「管理员」（GBK 中文，不是 admin）**，从 `sitemap.php` 帖子作者字段挖出
+  - 38 组（9 组 admin/* + 29 组「管理员」× 多样）全灭
+- **XML-RPC `system.multicall`**（`.64` example.com）：7 用户名 × 1235 组 = **8645 组全灭**，通道无封禁
+- SSH：root × 32+ 组全灭；**防护阈值为「同 IP 连续 12-13 次认证」**（.25 实测），但每台阈值不一（.191 打 8 组仍全通）
+- FTP：30 组 × 11 台全 530（干净拒绝，无防护干扰）
+
+### 2. 端口与入口类
+- **1031 端口**：实测是**明文 HTTP 强制 301 跳 HTTPS**（`.159`/`.191` 均如此），跳转目标就是 443 → **撞 WAF，不是绕过入口**
+  - （早期在特定 Host 组合下观察到 444，但换 14 Host × 6 路径全试无绕过空间）
+- `example.com`（PHPWind 插件入口）→ **403「网站防火墙」**（被 SafeLine 点名拦，非 404）
+- `admin/example.com` / `require/common.php` → **9 字节 Forbidden**（PHPWind 的 `readover` 守卫，非 nginx deny）
+  - 判据：同目录请求不存在的文件应回 404/146B；若回 9 字节则是 PHP 真实执行 + 函数守卫
+
+### 3. 未授权与信息泄露（能读到东西，但通不到权限）
+- **`sitemap.php` 零鉴权** → 135916 字节 / 361 条帖子元数据 + `<version>PHPWind 7.3.2 Certificate</version>` + 真实管理员名
+- **`wc/v3` 管理级路由表未授权**（`.64`）→ 251028 字节完整路由 + 参数定义（数据端点仍 401）
+- `wp-json/wp/v2/users` → 泄露管理员 slug=admin
+- **`wc/store/v1/cart` 未授权全链**（`.64`）→ `add-item` 201 写入 / `checkout` 回 **400 payment_method_disabled 而非须登录** = **鉴权完全绕过**
+
+### 4. 写点类（`.64` 三方向全部穷尽）
+- WP 原生写点全 401（media/posts/pages/settings/plugins）
+- **CF7 表单 11 无 file 字段** → 7 字段名 × 5 文件名变体（.php/.php.jpg/.pHp/.php%00.jpg/.phtml）全返回 200 mail_sent，但 **29 个落盘路径全 404**（文件被忽略）
+- Slider Revolution REST 端点真实存在但 **403 rest_cookie_invalid_nonce**，根因：**前置缓存层剥掉 Set-Cookie**（响应头 `x-xpanel-origin-cache: HIT`）→ 任何非官方会话的 nonce 都过不了
+- **`target419.example.com` 被自定义 WAF 无条件拦：POST → 400 + 1 字节**
+- cn2 网关 `.3/.4/.5`：路径穿越 400、SSRF 无回连、actuator 等全回 529 模板页
+
+## ★ 关键判据（可复用）
+
+1. **uploads 目录 PHP 可执行判据（三方对照）**：
+   - 不存在的 `.php` → 404 / **548B / text/html**（nginx 静态层）
+   - 日期目录下 `example.com` → 404 / **5B / charset=UTF-8**（★ **PHP-FPM 响应**）
+   - 目录本身 → 403 / 548B
+   → **"5 字节 + UTF-8" = PHP 处理过的响应**，与 nginx 静态 404 可区分
+
+2. **PHPWind 5 字节响应真身**：`example.com?action=<任意>` 返回的 5 字节是 **`0\r\n\r\n`**（HTTP chunked 终止块 = 空 body），**不是权限拒绝**。带不带 cookie 一样。
+
+3. **出口被封 vs curl 故障判据**：
+   - 本机 curl 走 Windows schannel → `CRYPT_E_REVOCATION_OFFLINE (0x80092013)` → TLS 握手直接挂，**看起来像"目标不可达"**
+   - 判据：换 Python `urllib`/`requests` + `ssl` 关 verify 复测。能通就是 curl 的锅
+   - **出口可用性两级验活**：① `curl -x $P http://myip.ipip.net/` 过第一关；② 打目标的已知页面看**状态码 + 字节数**是否与基线一致（如主站 `/bbs/` 应 200/42799）
+
+4. **稳定出口姿势（代理下）**：`CONNECT 用 IP` + `TLS SNI 用域名` + `Connection: close`
+   - 用域名发 CONNECT 会挂；用 IP 发 CONNECT 再在隧道上 SNI 指定域名才稳（实测 4/4）
+
+5. **环境坏代理陷阱**：本机 `HTTP_PROXY/HTTPS_PROXY/ALL_PROXY=127.0.0.1:17992` 是**坏代理**（打 baidu 通、打目标 504）→ **所有工具必须显式覆盖掉它**（curl `--noproxy '*'` 或显式 `-x`）
+
+6. **PHPWind PostCheck 同源铁律**：所有 POST 回「非法操作,请返回」时，**第一件事检查 Referer 与 Host 是否同源**（要求 Referer 的 host 严格等于 HTTP_HOST，用 IP 做 Referer 必被拒）
+
+7. **PHPWind 登录 `lgt` 参数**：`/bbs/login.php` 的登录类型参数
+   - `lgt=0` → **成功**（实测拿到 `604b2_winduser` cookie）
+   - `lgt=1/3/4/5/空/username/uid/email` → 「您的登录类型有误!」
+   - `lgt=2` → 「信箱没有填写或不符合检查标准」
+   → **打 PHPWind 前台登录卡在"拿不到 winduser"时，先试 `lgt=0`**
+
+8. **GBK 站点表单必须走 latin-1 字节级往返**：`urlencode(encoding='latin-1').encode('latin-1')` 后以 bytes 传入，并手设 Content-Type。用 dict 传 data 会默认 UTF-8 编码 → 中文用户名（如「管理员」）会错
+
+## 结论
+这套目标（SafeLine WAF + 自定义 WAF 钉死 admin-ajax + 缓存层剥 Cookie + 活跃运维 + 非默认口令 + SSH/FTP 防爆破）**属于防护水平明显高于常规演练靶标的类型**。
+**打这类站群的正解不是硬啃口令或 Nday，而是找它自己暴露的"未加固子群"**（如同一 C 段里混布的独立业务站、新装机、无 WAF 的机器）。
