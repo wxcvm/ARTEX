@@ -322,9 +322,11 @@ public sealed class MainForm : Form
 
     private void ShowDesktop()
     {
+        var wasMinimized = WindowState == FormWindowState.Minimized;
+        var lastState = restoreWindowState;
         Show();
-        if (WindowState == FormWindowState.Minimized)
-            WindowState = fullScreen ? FormWindowState.Normal : restoreWindowState;
+        if (wasMinimized)
+            WindowState = fullScreen ? FormWindowState.Normal : lastState;
         if (fullScreen)
             Bounds = Screen.FromControl(this).Bounds;
         Activate();
@@ -336,7 +338,7 @@ public sealed class MainForm : Form
         {
             var screen = Screen.FromControl(this);
             beforeFullScreenState = WindowState;
-            beforeFullScreenBounds = Bounds;
+            beforeFullScreenBounds = WindowState == FormWindowState.Maximized ? RestoreBounds : Bounds;
             fullScreen = true;
             WindowState = FormWindowState.Normal;
             FormBorderStyle = FormBorderStyle.None;
