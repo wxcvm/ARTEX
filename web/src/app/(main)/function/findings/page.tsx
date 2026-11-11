@@ -746,12 +746,12 @@ export default function FindingsPage() {
   }
 
   const statCards = [
-    { label: "Total findings", value: stats.total, icon: BugIcon },
-    { label: "Pending", value: stats.pending, tone: "text-amber-500", icon: ClockIcon },
-    { label: "Critical", value: stats.critical, tone: "text-rose-600", icon: ShieldAlertIcon },
-    { label: "High", value: stats.high, tone: "text-red-500", icon: TriangleAlertIcon },
-    { label: "Medium", value: stats.medium, tone: "text-amber-500", icon: TriangleAlertIcon },
-    { label: "Low", value: stats.low, tone: "text-slate-500", icon: InfoIcon },
+    { label: "全部发现", value: stats.total, icon: BugIcon },
+    { label: "待处理", value: stats.pending, tone: "text-amber-500", icon: ClockIcon },
+    { label: "严重", value: stats.critical, tone: "text-rose-600", icon: ShieldAlertIcon },
+    { label: "高危", value: stats.high, tone: "text-red-500", icon: TriangleAlertIcon },
+    { label: "中危", value: stats.medium, tone: "text-amber-500", icon: TriangleAlertIcon },
+    { label: "低危", value: stats.low, tone: "text-slate-500", icon: InfoIcon },
   ];
 
   // The "current filter" count in the export dialog: both views share the same filters, only the counting source differs.
@@ -782,7 +782,7 @@ export default function FindingsPage() {
 
   // The flat view and the asset view's right side are the same table + pagination, differing only in filter conditions.
   const flatListCard = (
-    <Card className="gap-0 py-0">
+    <Card className="min-w-0 gap-0 overflow-hidden rounded-xl border-border/70 bg-card/90 py-0 shadow-sm">
       <CardContent className="px-0">
         {flat.loading && !flat.loaded ? (
           <div className="flex min-h-36 items-center justify-center">
@@ -809,30 +809,33 @@ export default function FindingsPage() {
   );
 
   return (
-    <div className="flex flex-1 flex-col gap-4 md:gap-6">
-      <div className="flex flex-wrap items-center justify-between gap-3">
-        <div>
-          <h1 className="text-xl font-semibold tracking-tight">Findings</h1>
-          <p className="text-muted-foreground text-sm">Cross-task vulnerability overview</p>
+    <div className="flex min-w-0 flex-1 flex-col gap-5 pb-6">
+      <header className="flex flex-wrap items-center justify-between gap-4 rounded-2xl border border-border/70 bg-gradient-to-br from-card to-primary/5 px-5 py-5 shadow-sm sm:px-7">
+        <div className="min-w-0">
+          <p className="mb-1 text-[11px] font-semibold tracking-[0.16em] text-primary">ARTEX / FINDINGS</p>
+          <h1 className="text-2xl font-semibold tracking-tight">发现结果</h1>
+          <p className="mt-1 text-sm leading-relaxed text-muted-foreground">汇总不同任务的发现结果，按严重程度、任务或资产查看。</p>
         </div>
-        <Tabs value={view} onValueChange={(v) => setView(v as FindingView)}>
-          <TabsList>
-            <TabsTrigger value="flat">All findings</TabsTrigger>
-            <TabsTrigger value="grouped">By task</TabsTrigger>
-            <TabsTrigger value="asset">By asset</TabsTrigger>
-          </TabsList>
-        </Tabs>
-      </div>
+        <div className="min-w-0 overflow-x-auto">
+          <Tabs value={view} onValueChange={(v) => setView(v as FindingView)}>
+            <TabsList className="min-w-max rounded-lg bg-muted/60 p-1">
+              <TabsTrigger value="flat">全部发现</TabsTrigger>
+              <TabsTrigger value="grouped">按任务</TabsTrigger>
+              <TabsTrigger value="asset">按资产</TabsTrigger>
+            </TabsList>
+          </Tabs>
+        </div>
+      </header>
       <DSHReviewFeedbackPanel />
       <div className="flex flex-1 flex-col gap-4 md:gap-6">
-        <div className="grid grid-cols-2 gap-4 sm:grid-cols-3 lg:grid-cols-6">
+        <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 xl:grid-cols-6">
           {statCards.map((stat) => {
             const StatIcon = stat.icon;
             return (
-              <Card key={stat.label} className="gap-1 py-4">
+              <Card key={stat.label} className="gap-2 rounded-xl border-border/70 bg-card/90 py-4 shadow-sm">
                 <CardHeader className="px-4">
                   <CardDescription>{stat.label}</CardDescription>
-                  <CardTitle className={cn("flex items-center gap-2 text-2xl tabular-nums", stat.tone)}>
+                  <CardTitle className={cn("flex items-center gap-2 text-3xl font-semibold tabular-nums", stat.tone)}>
                     <StatIcon className="size-5" aria-hidden="true" />
                     {stat.value}
                   </CardTitle>
@@ -842,14 +845,14 @@ export default function FindingsPage() {
           })}
         </div>
 
-        <div className="flex flex-wrap items-center gap-2">
+        <div className="flex flex-wrap items-center gap-2 rounded-xl border border-border/70 bg-card/80 p-3 sm:p-4">
           <InputGroup className="w-full sm:w-72">
             <InputGroupInput
               type="search"
               value={search}
               onChange={(event) => setSearch(event.target.value)}
-              placeholder="Search findings"
-              aria-label="Search findings"
+              placeholder="搜索发现结果"
+              aria-label="搜索发现结果"
             />
             <InputGroupAddon>
               <SearchIcon aria-hidden="true" />
@@ -866,11 +869,11 @@ export default function FindingsPage() {
           >
             {(
               [
-                ["all", "All"],
-                ["critical", "Critical"],
-                ["high", "High"],
-                ["medium", "Medium"],
-                ["low", "Low"],
+                ["all", "全部"],
+                ["critical", "严重"],
+                ["high", "高危"],
+                ["medium", "中危"],
+                ["low", "低危"],
               ] as const
             ).map(([val, label]) => (
               <ToggleGroupItem key={val} value={val} aria-label={`Filter by ${label} severity`}>
@@ -881,10 +884,10 @@ export default function FindingsPage() {
 
           <Select value={status} onValueChange={(v) => setStatus(v as "all" | FindingStatus)}>
             <SelectTrigger size="sm" className="w-32">
-              <SelectValue placeholder="Status" />
+              <SelectValue placeholder="状态" />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="all">All statuses</SelectItem>
+              <SelectItem value="all">全部状态</SelectItem>
               {FINDING_STATUSES.map((st) => (
                 <SelectItem key={st} value={st}>
                   {statusMeta("finding", st).label}
@@ -895,10 +898,10 @@ export default function FindingsPage() {
 
           <Select value={vulnclass} onValueChange={setVulnclass}>
             <SelectTrigger size="sm" className="w-40">
-              <SelectValue placeholder="Vulnerability type" />
+              <SelectValue placeholder="漏洞类型" />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="all">All types</SelectItem>
+              <SelectItem value="all">全部类型</SelectItem>
               {stats.vulnclasses.map((vc) => (
                 <SelectItem key={vc} value={vc}>
                   {vc}
@@ -909,11 +912,11 @@ export default function FindingsPage() {
 
           <Select value={task} onValueChange={setTask}>
             <SelectTrigger size="sm" className="w-48">
-              <SelectValue placeholder="Task" />
+              <SelectValue placeholder="任务" />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="all">All tasks</SelectItem>
-              <SelectItem value={UNASSIGNED_TASK}>Unlinked / task deleted</SelectItem>
+              <SelectItem value="all">全部任务</SelectItem>
+              <SelectItem value={UNASSIGNED_TASK}>未关联 / 任务已删除</SelectItem>
               {(stats.tasks ?? []).map((t) => {
                 const id = String(t.id);
                 const label = t.name || t.description || `Task #${id} (deleted)`;
@@ -939,8 +942,8 @@ export default function FindingsPage() {
               <SelectValue />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="severity">By severity</SelectItem>
-              <SelectItem value="time">By time</SelectItem>
+              <SelectItem value="severity">按严重程度</SelectItem>
+              <SelectItem value="time">按时间</SelectItem>
             </SelectContent>
           </Select>
 
@@ -1105,7 +1108,7 @@ export default function FindingsPage() {
             })}
             {groups.length === 0 && (
               <Card>
-                <CardContent className="py-12 text-center text-sm text-muted-foreground">No matching findings.</CardContent>
+                <CardContent className="py-12 text-center text-sm text-muted-foreground">没有匹配的发现结果，请调整筛选条件。</CardContent>
               </Card>
             )}
             <TablePagination
