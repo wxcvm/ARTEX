@@ -58,22 +58,42 @@ internal sealed class DatabaseSetupForm : Form
         Text = editExisting ? "ARTEX · 修改数据库配置" : "ARTEX · 首次数据库配置";
         Icon = System.Drawing.Icon.ExtractAssociatedIcon(Application.ExecutablePath) ?? SystemIcons.Application;
         StartPosition = FormStartPosition.CenterParent;
-        ClientSize = new Size(760, 485);
-        MinimumSize = new Size(730, 455);
-        FormBorderStyle = FormBorderStyle.FixedDialog;
-        MaximizeBox = false;
+        AutoScaleMode = AutoScaleMode.Dpi;
+        ClientSize = new Size(860, 610);
+        MinimumSize = new Size(620, 440);
+        FormBorderStyle = FormBorderStyle.Sizable;
+        MaximizeBox = true;
         MinimizeBox = false;
 
-        var layout = new TableLayoutPanel
+        // Keep the primary actions visible when Windows text size/DPI grows.
+        // All editable settings and secondary actions live in an independently
+        // scrollable section instead of forcing eleven rows into a fixed height.
+        var root = new TableLayoutPanel
         {
             Dock = DockStyle.Fill,
+            ColumnCount = 1,
+            RowCount = 2,
+            Margin = Padding.Empty,
+            Padding = Padding.Empty,
+        };
+        root.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 100));
+        root.RowStyles.Add(new RowStyle(SizeType.Percent, 100));
+        root.RowStyles.Add(new RowStyle(SizeType.AutoSize));
+        var scroll = new Panel { Dock = DockStyle.Fill, AutoScroll = true };
+        var layout = new TableLayoutPanel
+        {
+            Dock = DockStyle.Top,
             ColumnCount = 2,
             RowCount = 11,
-            Padding = new Padding(16),
-            AutoSize = false,
+            Padding = new Padding(18, 16, 18, 12),
+            Margin = Padding.Empty,
+            AutoSize = true,
+            AutoSizeMode = AutoSizeMode.GrowAndShrink,
         };
         layout.ColumnStyles.Add(new ColumnStyle(SizeType.Absolute, 145));
         layout.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 100));
+        for (var row = 0; row < layout.RowCount; row++)
+            layout.RowStyles.Add(new RowStyle(SizeType.AutoSize));
 
         var intro = new Label
         {
@@ -81,7 +101,8 @@ internal sealed class DatabaseSetupForm : Form
                 "首次运行需要连接 PostgreSQL。请填写连接信息。") +
                 "\nDocker 手册示例端口是 5433；ARTEX_PG_DSN 环境变量优先于此配置。",
             AutoSize = true,
-            Dock = DockStyle.Fill,
+            Dock = DockStyle.Top,
+            Margin = new Padding(3, 0, 3, 12),
         };
         layout.Controls.Add(intro, 0, 0);
         layout.SetColumnSpan(intro, 2);
@@ -95,9 +116,12 @@ internal sealed class DatabaseSetupForm : Form
 
         var diagnostics = new FlowLayoutPanel
         {
-            Dock = DockStyle.Fill,
+            Dock = DockStyle.Top,
+            AutoSize = true,
+            AutoSizeMode = AutoSizeMode.GrowAndShrink,
             FlowDirection = FlowDirection.LeftToRight,
-            WrapContents = false,
+            WrapContents = true,
+            Margin = new Padding(3, 12, 3, 8),
         };
         detectLocal.Click += async (_, _) => await DetectLocalAsync();
         startLocal.Click += async (_, _) => await StartLocalAsync();
@@ -110,13 +134,18 @@ internal sealed class DatabaseSetupForm : Form
         layout.SetColumnSpan(diagnostics, 2);
         layout.Controls.Add(discoveryStatus, 0, 8);
         layout.SetColumnSpan(discoveryStatus, 2);
+        discoveryStatus.AutoSize = true;
+        discoveryStatus.Dock = DockStyle.Top;
+        discoveryStatus.MinimumSize = new Size(0, 26);
+        discoveryStatus.Margin = new Padding(3, 3, 3, 10);
 
         var configLabel = new Label
         {
             Text = "配置保存位置：" + ConfigPath,
             AutoSize = false,
             AutoEllipsis = true,
-            Dock = DockStyle.Fill,
+            Dock = DockStyle.Top,
+            MinimumSize = new Size(0, 26),
             ForeColor = SystemColors.GrayText,
         };
         layout.Controls.Add(configLabel, 0, 9);
