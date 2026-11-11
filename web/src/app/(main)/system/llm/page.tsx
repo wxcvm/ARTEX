@@ -485,7 +485,7 @@ function ProfileSheet({
     <Sheet open={open} onOpenChange={onOpenChange}>
       <SheetContent
         side="right"
-        className="flex w-full min-w-0 flex-col gap-0 overflow-hidden p-0 data-[side=right]:sm:max-w-xl"
+        className="flex min-w-0 flex-col gap-0 overflow-hidden p-0 data-[side=right]:w-full data-[side=right]:max-w-full data-[side=right]:sm:max-w-xl"
       >
         <SheetHeader className="px-4">
           <SheetTitle className="flex items-center gap-2">
