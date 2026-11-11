@@ -253,23 +253,26 @@ export default function SystemSettingsPage() {
   const braveNeedsKey = webSearch && backend === "brave-free" && !braveKeySet;
 
   return (
-    <div className="flex flex-1 flex-col gap-4 md:gap-6">
-      <div>
-        <h1 className="text-xl font-semibold tracking-tight">System settings</h1>
-        <p className="text-muted-foreground text-sm">Global runtime switches</p>
-      </div>
+    <div className="flex min-w-0 flex-1 flex-col gap-5 pb-6">
+      <header className="rounded-2xl border border-border/70 bg-gradient-to-br from-card to-primary/5 px-5 py-5 shadow-sm sm:px-7">
+        <p className="mb-1 text-[11px] font-semibold tracking-[0.16em] text-primary">ARTEX / SETTINGS</p>
+        <h1 className="text-2xl font-semibold tracking-tight">系统设置</h1>
+        <p className="mt-1 max-w-3xl text-sm leading-relaxed text-muted-foreground">
+          集中管理网络、模型工具与工作台行为。每项设置的生效范围在对应卡片中说明。
+        </p>
+      </header>
 
       {/* Multi-column instead of grid: the web search card is several times taller than the others and
           its height varies with the selected backend (brave/tavily key inputs are conditional). A grid
           would stretch the row to the tallest card and leave blank space beside the others, while columns
           balance-fill by content height. Card spacing uses mb rather than gap — in a multi-column layout
           column-gap only covers the gaps between columns; row spacing must come from the children. */}
-      <div className="columns-1 gap-4 md:gap-6 lg:columns-2">
-        <Card className="mb-4 break-inside-avoid md:mb-6">
+      <div className="columns-1 gap-4 xl:columns-2 xl:gap-5">
+        <Card className="mb-4 min-w-0 break-inside-avoid rounded-xl border-border/70 bg-card/90 shadow-sm xl:mb-5">
           <CardHeader>
             <CardTitle className="flex items-center gap-2 text-base">
               <RadioTowerIcon className="size-4" />
-              Traffic capture
+              流量采集
             </CardTitle>
             <CardDescription>
               When enabled, every agent's HTTP traffic is stored in full through the recording proxy, and agents are injected with the traffic_search / traffic_get
@@ -292,11 +295,11 @@ export default function SystemSettingsPage() {
           </CardContent>
         </Card>
 
-        <Card className="mb-4 break-inside-avoid md:mb-6">
+        <Card className="mb-4 min-w-0 break-inside-avoid rounded-xl border-border/70 bg-card/90 shadow-sm xl:mb-5">
           <CardHeader>
             <CardTitle className="flex items-center gap-2 text-base">
               <RadioTowerIcon className="size-4" />
-              Automatic agent traffic binding
+              自动关联智能体流量
             </CardTitle>
             <CardDescription id="agent-traffic-binding-description">
               Off by default. When enabled, the report agent triggered on vulnerability creation reviews existing HTTP requests/responses and links the matching traffic before writing the report.
@@ -320,11 +323,11 @@ export default function SystemSettingsPage() {
           </CardContent>
         </Card>
 
-        <Card className="mb-4 break-inside-avoid md:mb-6">
+        <Card className="mb-4 min-w-0 break-inside-avoid rounded-xl border-border/70 bg-card/90 shadow-sm xl:mb-5">
           <CardHeader>
             <CardTitle className="flex items-center gap-2 text-base">
               <RadioTowerIcon className="size-4" />
-              Global proxy
+              全局代理
             </CardTitle>
             <CardDescription>
               All agents' <b>target traffic</b> egresses through this proxy (hide the source IP / use a jump host). Supports <b>http / https / socks5</b>, optionally with{" "}
@@ -342,8 +345,9 @@ export default function SystemSettingsPage() {
             <Label htmlFor="global-proxy" className="text-sm font-normal text-muted-foreground">
               Proxy address
             </Label>
-            <div className="flex items-center gap-2">
+            <div className="flex min-w-0 flex-wrap items-center gap-2">
               <Input
+                className="min-w-56 flex-1"
                 id="global-proxy"
                 autoComplete="off"
                 placeholder="socks5://user:pass@host:1080 or http://host:port (empty = direct)"
@@ -361,11 +365,11 @@ export default function SystemSettingsPage() {
           </CardContent>
         </Card>
 
-        <Card className="mb-4 break-inside-avoid md:mb-6">
+        <Card className="mb-4 min-w-0 break-inside-avoid rounded-xl border-border/70 bg-card/90 shadow-sm xl:mb-5">
           <CardHeader>
             <CardTitle className="flex items-center gap-2 text-base">
               <ShieldAlertIcon className="size-4" />
-              Operation constraint injection
+              任务操作约束
             </CardTitle>
             <CardDescription>
               When enabled, each task's <b>operation constraints</b> (the allow/deny entries maintained under "Operation constraints" in the task overview) are spliced into the corresponding agent's
@@ -401,11 +405,11 @@ export default function SystemSettingsPage() {
           </CardContent>
         </Card>
 
-        <Card className="mb-4 break-inside-avoid md:mb-6">
+        <Card className="mb-4 min-w-0 break-inside-avoid rounded-xl border-border/70 bg-card/90 shadow-sm xl:mb-5">
           <CardHeader>
             <CardTitle className="flex items-center gap-2 text-base">
               <FlaskConicalIcon className="size-4" />
-              Experimental features
+              实验功能
             </CardTitle>
             <CardDescription>
               Mechanisms still being validated, off by default. They may change agent behavior or affect stability; enable only after understanding the impact.
@@ -429,11 +433,11 @@ export default function SystemSettingsPage() {
           </CardContent>
         </Card>
 
-        <Card className="mb-4 break-inside-avoid md:mb-6">
+        <Card className="mb-4 min-w-0 break-inside-avoid rounded-xl border-border/70 bg-card/90 shadow-sm xl:mb-5">
           <CardHeader>
             <CardTitle className="flex items-center gap-2 text-base">
               <SearchIcon className="size-4" />
-              Web search
+              网页搜索
             </CardTitle>
             <CardDescription>
               This is the web search <b>master switch + source config</b>. Only when it is enabled can <b>each agent's config</b> separately choose whether to enable
@@ -577,8 +581,9 @@ export default function SystemSettingsPage() {
                 <Label htmlFor="ws-proxy" className="text-sm font-normal text-muted-foreground">
                   Egress proxy (optional)
                 </Label>
-                <div className="flex items-center gap-2">
+                <div className="flex min-w-0 flex-wrap items-center gap-2">
                   <Input
+                    className="min-w-56 flex-1"
                     id="ws-proxy"
                     autoComplete="off"
                     placeholder="http://host:port or socks5://host:port (empty = direct)"
@@ -615,11 +620,11 @@ export default function SystemSettingsPage() {
           </CardContent>
         </Card>
 
-        <Card className="mb-4 break-inside-avoid md:mb-6">
+        <Card className="mb-4 min-w-0 break-inside-avoid rounded-xl border-border/70 bg-card/90 shadow-sm xl:mb-5">
           <CardHeader>
             <CardTitle className="flex items-center gap-2 text-base">
               <RadioTowerIcon className="size-4" />
-              Custom scripts · Python interpreter
+              自定义脚本 · Python 环境
             </CardTitle>
             <CardDescription>
               Custom <b>script</b> tools run Python with it. Auto-detected at startup (python3 first); you can enter an absolute path to a venv /
@@ -645,11 +650,11 @@ export default function SystemSettingsPage() {
           </CardContent>
         </Card>
 
-        <Card className="mb-4 break-inside-avoid md:mb-6">
+        <Card className="mb-4 min-w-0 break-inside-avoid rounded-xl border-border/70 bg-card/90 shadow-sm xl:mb-5">
           <CardHeader>
             <CardTitle className="flex items-center gap-2 text-base">
               <CpuIcon className="size-4" />
-              Work concurrency · worker agent count
+              任务并发与工作智能体
             </CardTitle>
             <CardDescription>
               The number of worker agents running concurrently per task (default 3). Higher values mean more parallel probing and higher consumption. Changes
@@ -674,11 +679,11 @@ export default function SystemSettingsPage() {
           </CardContent>
         </Card>
 
-        <Card className="mb-4 break-inside-avoid md:mb-6">
+        <Card className="mb-4 min-w-0 break-inside-avoid rounded-xl border-border/70 bg-card/90 shadow-sm xl:mb-5">
           <CardHeader>
             <CardTitle className="flex items-center gap-2 text-base">
               <KeyboardIcon className="size-4" />
-              Chat input send key binding
+              聊天发送快捷键
             </CardTitle>
             <CardDescription>
               Shared by the main-agent chat inputs on the chat page and task details; takes effect immediately on selection, no saving needed.

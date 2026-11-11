@@ -43,6 +43,8 @@ export default function LogsPage() {
   const [paused, setPaused] = React.useState(false);
   const [loadingHistory, setLoadingHistory] = React.useState(false);
   const [hasMore, setHasMore] = React.useState(false);
+  const [connection, setConnection] = React.useState<"connecting" | "connected" | "disconnected">("connecting");
+  const pendingWhilePaused = React.useRef<LogLine[]>([]);
   const bottom = React.useRef<HTMLDivElement>(null);
   const stick = React.useRef(true);
   const pausedRef = React.useRef(false);
@@ -65,10 +67,19 @@ export default function LogsPage() {
       return;
     }
     const es = new EventSource(sseUrl("/api/logs/stream?since=0"));
+    es.onopen = () => setConnection("connected");
+    es.onerror = () => setConnection("disconnected");
     es.onmessage = (e) => {
-      if (pausedRef.current) return;
       try {
         const l = JSON.parse(e.data) as LogLine;
+        if (pausedRef.current) {
+          // Pause the display, not the incoming stream; restore missed lines on resume.
+          const buffer = pendingWhilePaused.current;
+          buffer.push(l);
+          // Trim in batches to avoid copying a 3000-line buffer on every event.
+          if (buffer.length > 3000) buffer.splice(0, 300);
+          return;
+        }
         setLines((prev) => (prev.some((x) => x.seq === l.seq) ? prev : [...prev, l].slice(-3000)));
       } catch {
         /* ignore malformed frame */
@@ -76,6 +87,21 @@ export default function LogsPage() {
     };
     return () => es.close();
   }, []);
+
+  React.useEffect(() => {
+    if (paused || pendingWhilePaused.current.length === 0) return;
+    const pending = pendingWhilePaused.current;
+    pendingWhilePaused.current = [];
+    setLines((prev) => {
+      const seen = new Set(prev.map((line) => line.seq));
+      const unseen = pending.filter((line) => {
+        if (seen.has(line.seq)) return false;
+        seen.add(line.seq);
+        return true;
+      });
+      return [...prev, ...unseen].slice(-3000);
+    });
+  }, [paused]);
 
   // Mark "has more" once we have any db_id in view.
   React.useEffect(() => {
@@ -140,20 +166,27 @@ export default function LogsPage() {
   }, [lines]);
 
   return (
-    <div className="flex flex-1 flex-col gap-3">
-      <div>
-        <h1 className="text-xl font-semibold tracking-tight">System logs</h1>
-        <p className="text-muted-foreground text-sm">Live backend log stream (planner / worker / database / traffic …)</p>
-      </div>
-      <div className="flex flex-1 flex-col gap-3">
-        <div className="flex flex-wrap items-center gap-2">
+    <div className="flex min-w-0 flex-1 flex-col gap-4 pb-5">
+      <header className="flex flex-wrap items-center justify-between gap-4 rounded-2xl border border-border/70 bg-gradient-to-br from-card to-primary/5 px-5 py-5 shadow-sm sm:px-7">
+        <div>
+          <p className="mb-1 text-[11px] font-semibold tracking-[0.16em] text-primary">ARTEX / LOGS</p>
+          <h1 className="text-2xl font-semibold tracking-tight">系统日志</h1>
+          <p className="mt-1 text-sm leading-relaxed text-muted-foreground">实时查看后端、任务规划与工作进程的运行记录。</p>
+        </div>
+        <span role="status" className="inline-flex items-center gap-2 rounded-lg border border-border/70 bg-background/60 px-3 py-2 text-xs text-muted-foreground">
+          <span className={cn("size-2 rounded-full", MOCK ? "bg-sky-400" : connection === "connected" ? "bg-emerald-400" : connection === "connecting" ? "bg-amber-400" : "bg-rose-400")} />
+          {MOCK ? "演示数据" : connection === "connected" ? "实时连接" : connection === "connecting" ? "正在连接" : "连接中断 · 自动重试"}
+        </span>
+      </header>
+      <div className="flex min-w-0 flex-1 flex-col overflow-hidden rounded-xl border border-border/70 bg-card/90 shadow-sm">
+        <div className="flex flex-wrap items-center gap-2 border-b border-border/60 px-4 py-4 sm:px-5">
           <Input
-            placeholder="Filter (text / tag)…"
+            placeholder="筛选日志内容或标签…"
             value={q}
             onChange={(e) => setQ(e.target.value)}
-            className="h-8 max-w-xs"
+            className="h-9 min-w-[180px] flex-1 sm:max-w-sm"
           />
-          <div className="flex gap-1">
+          <div className="flex flex-wrap gap-1">
             {(["all", "info", "warn", "error"] as const).map((lv) => (
               <Button
                 key={lv}
@@ -162,7 +195,7 @@ export default function LogsPage() {
                 className="h-8"
                 onClick={() => setLevel(lv)}
               >
-                {lv === "all" ? "All" : lv}
+                {lv === "all" ? "全部" : lv === "info" ? "信息" : lv === "warn" ? "警告" : "错误"}
               </Button>
             ))}
           </div>
@@ -172,15 +205,15 @@ export default function LogsPage() {
             className="h-8"
             onClick={() => setPaused((p) => !p)}
           >
-            {paused ? "Paused" : "Pause"}
+            {paused ? "继续显示" : "暂停显示"}
           </Button>
-          <Button size="sm" variant="outline" className="h-8" onClick={() => setLines([])}>
-            Clear
+          <Button size="sm" variant="outline" className="h-9" onClick={() => { pendingWhilePaused.current = []; setLines([]); }}>
+            清空显示
           </Button>
           <span className="ml-auto text-xs text-muted-foreground">
-            {counts.total} lines ·{" "}
-            <span className="text-amber-600 dark:text-amber-400">{counts.warn} warnings</span> ·{" "}
-            <span className="text-red-600 dark:text-red-400">{counts.error} errors</span>
+            共 {counts.total} 条 ·{" "}
+            <span className="text-amber-600 dark:text-amber-400">{counts.warn} 警告</span> ·{" "}
+            <span className="text-red-600 dark:text-red-400">{counts.error} 错误</span>
           </span>
         </div>
 
@@ -189,7 +222,7 @@ export default function LogsPage() {
             const el = e.currentTarget;
             stick.current = el.scrollHeight - el.scrollTop - el.clientHeight < 40;
           }}
-          className="h-[calc(100vh-14rem)] overflow-auto rounded-lg border bg-card p-2 font-mono text-xs leading-relaxed"
+          className="h-[calc(100dvh-19rem)] min-h-[22rem] min-w-0 overflow-auto bg-card/50 p-3 font-mono text-[13px] leading-6 sm:p-4"
         >
           {hasMore && (
             <div className="flex justify-center py-2">
@@ -200,12 +233,14 @@ export default function LogsPage() {
                 disabled={loadingHistory}
                 onClick={loadOlderHistory}
               >
-                {loadingHistory ? "Loading…" : "Load older logs"}
+                {loadingHistory ? "加载中…" : "加载更早的日志"}
               </Button>
             </div>
           )}
           {filtered.length === 0 ? (
-            <p className="py-10 text-center text-muted-foreground">No logs yet.</p>
+            <p className="px-4 py-16 text-center text-sm text-muted-foreground">
+              {q || level !== "all" ? "没有符合筛选条件的日志。" : "暂无日志记录，连接后会自动显示新内容。"}
+            </p>
           ) : (
             filtered.map((l) => {
               const body =
@@ -213,13 +248,13 @@ export default function LogsPage() {
                   ? l.text.slice(l.tag.length + 2).trimStart()
                   : l.text;
               return (
-                <div key={l.seq} className="flex items-start gap-2 px-1 py-0.5 hover:bg-muted/40">
+                <div key={l.seq} className="flex flex-wrap items-start gap-x-3 gap-y-1 rounded-md border-b border-border/35 px-2 py-2 last:border-b-0 hover:bg-muted/35">
                   <span className={cn("mt-1.5 size-1.5 shrink-0 rounded-full", levelDot[l.level])} />
                   <span className="shrink-0 tabular-nums text-muted-foreground">{fmtTime(l.ts)}</span>
                   {l.tag && (
-                    <span className="shrink-0 rounded bg-muted px-1 text-[10px] text-foreground/70">{l.tag}</span>
+                    <span className="shrink-0 rounded-md bg-muted px-2 py-0.5 text-[11px] text-foreground/80">{l.tag}</span>
                   )}
-                  <span className={cn("min-w-0 whitespace-pre-wrap break-words", levelTone[l.level])}>{body}</span>
+                  <span className={cn("min-w-[min(100%,20rem)] flex-1 whitespace-pre-wrap break-words", levelTone[l.level])}>{body}</span>
                 </div>
               );
             })

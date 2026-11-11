@@ -98,13 +98,13 @@ function statusTone(code: number) {
 const PAGE_SIZES = [25, 50, 100, 200];
 
 const TABS: { key: string; label: string; icon: LucideIcon }[] = [
-  { key: "company", label: "Companies", icon: BuildingIcon },
-  { key: "root_domain", label: "Root domains", icon: GlobeIcon },
+  { key: "company", label: "企业", icon: BuildingIcon },
+  { key: "root_domain", label: "根域名", icon: GlobeIcon },
   { key: "ip", label: "IP", icon: NetworkIcon },
-  { key: "subdomain", label: "Subdomains", icon: GlobeIcon },
-  { key: "app", label: "Apps", icon: SmartphoneIcon },
-  { key: "service", label: "Services", icon: LayoutTemplateIcon },
-  { key: "endpoint", label: "Endpoints", icon: LinkIcon },
+  { key: "subdomain", label: "子域名", icon: GlobeIcon },
+  { key: "app", label: "应用", icon: SmartphoneIcon },
+  { key: "service", label: "服务", icon: LayoutTemplateIcon },
+  { key: "endpoint", label: "接口", icon: LinkIcon },
 ];
 
 export default function AssetsPage() {
@@ -313,32 +313,34 @@ export default function AssetsPage() {
   );
 
   return (
-    <div className="flex h-[calc(100vh-6rem)] min-h-0 flex-col gap-4">
-      <div className="flex items-center justify-between gap-4">
-        <div>
-          <h1 className="text-xl font-semibold tracking-tight">Assets</h1>
+    <div className="flex h-[calc(100dvh-10rem)] min-h-[26rem] min-w-0 flex-col gap-4">
+      <div className="flex flex-wrap items-center justify-between gap-4 rounded-2xl border border-border/70 bg-gradient-to-br from-card to-primary/5 px-5 py-5 shadow-sm sm:px-7">
+        <div className="min-w-0">
+          <p className="mb-1 text-[11px] font-semibold tracking-[0.16em] text-primary">ARTEX / ASSETS</p>
+          <h1 className="text-2xl font-semibold tracking-tight">资产管理</h1>
+          <p className="mt-1 text-sm leading-relaxed text-muted-foreground">按类型查看、搜索与整理发现的资产。</p>
         </div>
-        <div className="flex items-center gap-3">
-          <span className="text-sm text-muted-foreground">
-            <span className="tabular-nums">{totalAssets}</span> assets in total
+        <div className="flex min-w-0 flex-wrap items-center gap-2">
+          <span className="rounded-lg border border-border/70 bg-background/60 px-3 py-2 text-sm text-muted-foreground">
+            资产总数 <strong className="ml-1 tabular-nums text-foreground">{totalAssets}</strong>
           </span>
           {selected.size > 0 && (
             <Button variant="destructive" size="sm" onClick={() => openDelete(Array.from(selected) as number[])}>
-              <Trash2Icon className="size-3.5" /> Delete selected ({selected.size})
+              <Trash2Icon className="size-3.5" /> 删除所选（{selected.size}）
             </Button>
           )}
           <Button variant="outline" size="sm" onClick={refresh} disabled={loading}>
-            <RefreshCwIcon className={cn("size-4", loading && "animate-spin")} /> Refresh
+            <RefreshCwIcon className={cn("size-4", loading && "animate-spin")} /> 刷新
           </Button>
           <CompanyDialog onSaved={refresh} />
         </div>
       </div>
 
       <Tabs value={tab} onValueChange={setTab} className="flex min-h-0 flex-1 flex-col gap-4">
-        <div className="overflow-x-auto overflow-y-hidden">
-          <TabsList variant="default">
+        <div className="min-w-0 overflow-x-auto overflow-y-hidden pb-1">
+          <TabsList variant="default" className="h-auto min-w-max gap-1 rounded-lg bg-muted/50 p-1">
             {TABS.map((t) => (
-              <TabsTrigger key={t.key} value={t.key}>
+              <TabsTrigger key={t.key} value={t.key} className="gap-1.5 rounded-md px-3 py-2 text-sm">
                 <t.icon className="size-3.5" />
                 {t.label}
                 <span className="ml-1 tabular-nums text-muted-foreground">{tabCounts[t.key]}</span>
@@ -349,10 +351,10 @@ export default function AssetsPage() {
 
         {/* Companies */}
         <TabsContent value="company" className="mt-0 flex min-h-0 flex-1 flex-col">
-          <Card className="flex min-h-0 flex-1 flex-col overflow-hidden py-0">
+          <Card className="flex min-h-0 min-w-0 flex-1 flex-col overflow-hidden rounded-xl border-border/70 bg-card/90 py-0 shadow-sm">
             <div className="min-h-0 flex-1 overflow-auto">
               <Table>
-                <TableHeader className="sticky top-0 z-10 bg-card">
+                <TableHeader className="sticky top-0 z-10 bg-card/95">
                   <TableRow>
                     <TableHead>Company</TableHead>
                     <TableHead className="w-24 text-right">Assets</TableHead>
@@ -845,10 +847,10 @@ function AssetCard({
   const someSelected = selected != null && pageIds.some((id) => selected.has(id));
 
   return (
-    <Card className="flex min-h-0 flex-1 flex-col overflow-hidden py-0">
+    <Card className="flex min-h-0 min-w-0 flex-1 flex-col overflow-hidden rounded-xl border-border/70 bg-card/90 py-0 shadow-sm">
       <div className="min-h-0 flex-1 overflow-auto scrollbar-thin scrollbar-track-transparent">
         <Table>
-          <TableHeader className="sticky top-0 z-10 bg-card">
+          <TableHeader className="sticky top-0 z-10 bg-card/95">
             <TableRow>
               {cols.map((c, i) =>
                 c === "" && i === 0 && onToggleAll ? (
