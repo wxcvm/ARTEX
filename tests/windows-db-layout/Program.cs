@@ -50,7 +50,7 @@ internal static class Program
         {
             "检测本机", "启动所选服务", "安装 PostgreSQL",
             "创建目标数据库", "初始化专用账户",
-            "稍后配置", "测试数据库连接", "保存并连接",
+            "稍后配置", "测试数据库连接", "初始化并连接",
         }.Select(GetButton).ToArray();
 
         foreach (var button in buttons)
@@ -74,9 +74,25 @@ internal static class Program
         var root = dialog.Controls.OfType<TableLayoutPanel>().Single();
         var scroll = root.Controls.OfType<Panel>().Single(panel => panel.AutoScroll);
         var footer = root.Controls.OfType<FlowLayoutPanel>().Single();
-        foreach (var name in new[] { "保存并连接", "测试数据库连接", "稍后配置" })
+        foreach (var name in new[] { "初始化并连接", "测试数据库连接", "稍后配置" })
             if (!footer.Controls.Contains(GetButton(name)))
                 throw new Exception("Primary action escaped pinned footer: " + name);
+
+        // Recommended setup must be simple by default, with advanced fields
+        // and the original save/test operations available on demand.
+        var radioButtons = children.OfType<RadioButton>().ToArray();
+        var recommended = radioButtons.Single(r => r.Text == "本机安装 · 推荐");
+        var custom = radioButtons.Single(r => r.Text == "已有账户 / 远程连接");
+        if (!recommended.Checked || GetButton("初始化并连接").Visible == false)
+            throw new Exception("Recommended setup is not the default");
+        custom.Checked = true;
+        Application.DoEvents();
+        if (!GetButton("保存并连接").Visible || !GetButton("测试数据库连接").Visible)
+            throw new Exception("Custom database options were not restored");
+        recommended.Checked = true;
+        Application.DoEvents();
+        if (!GetButton("初始化并连接").Visible)
+            throw new Exception("Recommended setup was not restored");
 
         var frame = dialog.RectangleToScreen(dialog.ClientRectangle);
         var bottom = footer.RectangleToScreen(footer.ClientRectangle);
