@@ -363,6 +363,7 @@ function ProfileSheet({
   } | null>(null);
   const [saving, setSaving] = React.useState(false);
   const [models, setModels] = React.useState<string[]>([]);
+  const modelListVersion = React.useRef(0);
   const [modelListFeedback, setModelListFeedback] = React.useState<{ ok: boolean; message: string } | null>(null);
   const [loadingModels, setLoadingModels] = React.useState(false);
   const [modelsOpen, setModelsOpen] = React.useState(false);
@@ -412,14 +413,26 @@ function ProfileSheet({
 
   const profileId = profile ? Number(profile.id) : undefined;
 
+  // Results from a previous endpoint or saved profile must never be offered
+  // as selectable models for a newly edited connection.
+  React.useEffect(() => {
+    modelListVersion.current += 1;
+    setModels([]);
+    setModelsOpen(false);
+    setModelListFeedback(null);
+    setLoadingModels(false);
+  }, [open, profile?.id, format, baseUrl, apiKey, proxy]);
+
   async function loadModels() {
     if (loadingModels) return;
     setLoadingModels(true);
     setModelsOpen(false);
     setModels([]);
     setModelListFeedback(null);
+    const version = modelListVersion.current;
     try {
       const r = await api.fetchLLMModels(format, baseUrl, apiKey, proxy, profileId);
+      if (version !== modelListVersion.current) return;
       if (r.ok && r.models && r.models.length > 0) {
         setModels(r.models);
         setModelsOpen(true);
@@ -429,10 +442,11 @@ function ProfileSheet({
         setModelListFeedback({ ok: false, message: `无法获取模型列表：${reason}。你仍可手动填写模型名称。` });
       }
     } catch (e) {
+      if (version !== modelListVersion.current) return;
       const reason = e instanceof Error ? e.message : "请求失败";
       setModelListFeedback({ ok: false, message: `无法获取模型列表：${reason}。请检查接口地址、网络或密钥，也可以手动输入。` });
     } finally {
-      setLoadingModels(false);
+      if (version === modelListVersion.current) setLoadingModels(false);
     }
   }
 
