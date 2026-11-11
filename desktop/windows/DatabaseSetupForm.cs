@@ -365,7 +365,7 @@ internal sealed class DatabaseSetupForm : Form
         {
             // WinForms scrolls to the first focused input on opening. Restore
             // the first explanatory row after focus and initial layout settle.
-            ActiveControl = host;
+            ActiveControl = quickMode.Checked ? password : host;
             scroll.AutoScrollPosition = Point.Empty;
             BeginInvoke((Action)(() =>
             {
