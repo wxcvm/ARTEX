@@ -1,6 +1,9 @@
 ARTEX Windows 桌面客户端（便携版）
 ================================
 
+程序图标：ARTEX 使用银色鹰首盾牌标识，网页、Windows 桌面窗口、任务栏、快捷方式和安装器使用同一品牌图案。
+Windows 多尺寸 .ico 由 desktop/windows/generate-icon.ps1 根据 web/public/logo.jpg 自动生成。
+
 运行方法（无需手工编写 config.json）：
 1. 将完整安装包解压至可写目录（例如 D:\Apps\ARTEX），运行 ARTEX.Desktop.exe。
 2. 第一次打开时自动检查本机 PostgreSQL：

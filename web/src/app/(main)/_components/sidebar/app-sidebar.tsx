@@ -44,7 +44,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
             <SidebarMenuButton asChild className="h-11 rounded-lg px-2 hover:bg-sidebar-accent/65">
               <Link prefetch={false} href="/dashboard">
                 {/* eslint-disable-next-line @next/next/no-img-element */}
-                <img src="/logo.png" alt="ARTEX" width={34} height={34} className="shrink-0 rounded-md" />
+                <img src="/logo.jpg" alt="ARTEX" width={34} height={34} className="size-[34px] shrink-0 rounded-lg object-cover shadow-sm" />
                 <span className="flex min-w-0 flex-col leading-tight">
                   <strong className="text-sm font-semibold tracking-wide">{APP_CONFIG.name}</strong>
                   <span className="text-[10px] font-normal text-sidebar-foreground/60">智能工作台</span>

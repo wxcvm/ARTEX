@@ -43,6 +43,8 @@ Thumbs.db
 /artex.failed
 /artex.upgrade.json
 /server/webui/dist/
+# Generated Windows application icon (source: web/public/logo.jpg)
+/desktop/windows/generated/
 /dist/
 
 # JWT signing key (standalone installs: project root; Docker: keys/ volume)

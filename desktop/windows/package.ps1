@@ -86,7 +86,7 @@ New-Item -ItemType Directory -Path (Join-Path $stage "knowledge") -Force | Out-N
 Copy-Item -Path (Join-Path $root "knowledge/knowledge.db") -Destination (Join-Path $stage "knowledge/knowledge.db")
 Copy-Item -Path (Join-Path $root "config.example.json") -Destination (Join-Path $stage "config.example.json")
 Copy-Item -Path (Join-Path $root "start.bat") -Destination (Join-Path $stage "start.bat")
-Copy-Item -Path (Join-Path $root "web/src/app/favicon.ico") -Destination (Join-Path $stage "ARTEX.ico")
+Copy-Item -Path (Join-Path $root "desktop/windows/generated/ARTEX.ico") -Destination (Join-Path $stage "ARTEX.ico")
 Copy-Item -Path (Join-Path $root "desktop/windows/README-Windows.txt") -Destination (Join-Path $stage "README-Windows.txt")
 New-Item -ItemType Directory -Path (Join-Path $stage "docs") -Force | Out-Null
 Copy-Item -Path (Join-Path $root "docs/USER_GUIDE_ZH.md") -Destination (Join-Path $stage "docs/USER_GUIDE_ZH.md")
