@@ -25,5 +25,20 @@ Require '!passwordKeysHeld.Add(e.KeyCode)' 'Repeated held password keystrokes mu
 Require 'password.KeyUp +=' 'Held key must be released'
 Require 'password.Leave +=' 'Held key state must clear on focus loss'
 Require 'e.KeyCode == Keys.V' 'Repeated Ctrl+V must be covered'
+# A 100%-DPI build can pass even when fixed-size Chinese labels are cut off at
+# large system text scales. Assert every action group uses measured button sizes.
+Require 'private static void ConfigureActionButton(Button button, int minimumWidth)' 'Shared autosize helper must exist'
+Require 'button.AutoSize = true;' 'Action width must be measured from button text'
+Require 'button.Padding = new Padding(10, 3, 10, 3);' 'Text needs space around the rendered label'
+foreach ($button in @('detectLocal','startLocal','installLocal','create','provisionApp','save','test','cancel')) {
+    Require "ConfigureActionButton($button," "Missing DPI-aware sizing for $button"
+}
+foreach ($fixed in @('Width = 94, Height = 30', 'Width = 112, Height = 30', 'Width = 140, Height = 30', 'Width = 135, Height = 30')) {
+    if ($source.Contains($fixed)) { throw "Database setup regression: fixed-size action label still exists ($fixed)" }
+}
+Require 'ActiveControl = host;' 'Wizard must focus the first form field'
+Require 'scroll.AutoScrollPosition = Point.Empty;' 'Wizard must begin with the introduction visible'
+Require 'BeginInvoke((Action)(() =>' 'Restore top scroll after the initial focus/layout pass'
+
 
 Write-Host "[ARTEX] Database setup DPI layout and password key-repeat regressions checked."
