@@ -219,7 +219,7 @@ public sealed class MainForm : Form
                         status.Text = "界面加载失败 · 可重新连接";
                         var details = "WebView2 导航失败：" + args.WebErrorStatus;
                         LogDesktopFailure(details);
-                        ShowPageMessage("界面加载失败", details + "\\n请确认本机服务可访问，再点击“重新连接”。", true);
+                        ShowPageMessage("界面加载失败", details + "\n请确认本机服务可访问，再点击“重新连接”。", true);
                         return;
                     }
                     if (staticAssetFailed) return;
@@ -241,7 +241,7 @@ public sealed class MainForm : Form
                     var details = "页面资源加载失败：HTTP " + args.Response.StatusCode + " " + uri.AbsolutePath;
                     LogDesktopFailure(details);
                     status.Text = "网页脚本或样式加载失败 · 可重新连接";
-                    ShowPageMessage("界面资源加载失败", details + "\\n请点击“重新连接”重新加载。", true);
+                    ShowPageMessage("界面资源加载失败", details + "\n请点击“重新连接”重新加载。", true);
                 };
                 core.ProcessFailed += (_, args) =>
                 {
@@ -280,7 +280,7 @@ public sealed class MainForm : Form
             status.Text = "连接失败 · 可点击“数据库配置”修正连接或“重新连接”重试";
             LogDesktopFailure("连接失败：" + ex);
             ShowPageMessage("ARTEX 无法启动",
-                ex.Message + "\\n请确认 PostgreSQL、WebView2 Runtime 和本机 8787 服务。\\n后端日志：" + LogPath,
+                ex.Message + "\n请确认 PostgreSQL、WebView2 Runtime 和本机 8787 服务。\n后端日志：" + LogPath,
                 true);
         }
         finally
@@ -325,7 +325,7 @@ public sealed class MainForm : Form
         {
             browserRecreationNeeded = true;
             status.Text = "WebView2 异常 · 请重新连接";
-            ShowPageMessage("网页进程已停止", "WebView2：" + kind + "\\n点击“重新连接”重建网页视图。", true);
+            ShowPageMessage("网页进程已停止", "WebView2：" + kind + "\n点击“重新连接”重建网页视图。", true);
             return;
         }
         // A renderer crash can be recovered by reloading; try once per user retry.
