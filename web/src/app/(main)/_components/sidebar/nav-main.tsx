@@ -114,9 +114,9 @@ export function NavMain({ items }: NavMainProps) {
   return (
     <>
       {items.map((group) => (
-        <SidebarGroup key={group.id}>
+        <SidebarGroup key={group.id} className="px-2 py-2">
           {group.label && (
-            <SidebarGroupLabel className="group-data-[collapsible=icon]:pointer-events-none">
+            <SidebarGroupLabel className="mb-1 px-3 text-[11px] font-semibold tracking-wide text-sidebar-foreground/50 group-data-[collapsible=icon]:pointer-events-none">
               {group.label}
             </SidebarGroupLabel>
           )}
@@ -188,7 +188,13 @@ function InterceptPendingBadge() {
 function NavLinkItem({ item, isActive, showIconFallback }: NavLinkItemProps) {
   return (
     <SidebarMenuItem>
-      <SidebarMenuButton asChild aria-disabled={item.disabled} tooltip={item.title} isActive={isActive}>
+      <SidebarMenuButton
+        asChild
+        aria-disabled={item.disabled}
+        tooltip={item.title}
+        isActive={isActive}
+        className="h-9 rounded-lg px-3 text-[13px] transition-colors data-[active=true]:bg-sidebar-accent data-[active=true]:font-semibold data-[active=true]:text-sidebar-accent-foreground"
+      >
         <Link
           prefetch={false}
           href={item.url}
