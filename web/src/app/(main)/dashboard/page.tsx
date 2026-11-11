@@ -278,7 +278,7 @@ export default function DashboardPage() {
     [tasks],
   );
 
-  const recent发现结果 = React.useMemo(
+  const recentFindings = React.useMemo(
     () => [...findings].sort((a, b) => Date.parse(b.ts) - Date.parse(a.ts)).slice(0, 8),
     [findings],
   );
@@ -941,10 +941,10 @@ export default function DashboardPage() {
           </div>
 
           <div className="divide-y">
-            {recent发现结果.length === 0 ? (
+            {recentFindings.length === 0 ? (
               <div className="py-4 text-center text-xs text-muted-foreground">暂无发现结果</div>
             ) : (
-              recent发现结果.map((f) => (
+              recentFindings.map((f) => (
                 <div key={f.id} className="flex items-start gap-2 py-2">
                   <StatusBadge
                     domain="severity"
