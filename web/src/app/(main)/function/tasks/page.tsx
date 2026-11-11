@@ -780,19 +780,29 @@ export default function TasksPage() {
   );
 
   return (
-    <Tabs value={activeTab} onValueChange={setActiveTab} className="gap-4">
-      <TabsList className="mx-4 lg:mx-6">
-        <TabsTrigger value="current">Current tasks</TabsTrigger>
-        <TabsTrigger value="archived">Archived</TabsTrigger>
+    <Tabs value={activeTab} onValueChange={setActiveTab} className="min-w-0 gap-4">
+      <div className="flex flex-wrap items-center justify-between gap-4 rounded-2xl border border-border/70 bg-gradient-to-br from-card to-primary/5 px-5 py-5 shadow-sm sm:px-7">
+        <div className="min-w-0">
+          <p className="mb-1 text-[11px] font-semibold tracking-[0.16em] text-primary">ARTEX / TASKS</p>
+          <h1 className="text-2xl font-semibold tracking-tight">任务管理</h1>
+          <p className="mt-1 text-sm leading-relaxed text-muted-foreground">创建、筛选与管理任务，在此查看执行状态和进展。</p>
+        </div>
+        <span className="rounded-lg border border-border/70 bg-background/60 px-3 py-2 text-sm text-muted-foreground">
+          当前任务 <strong className="ml-1 tabular-nums text-foreground">{tasks.length}</strong>
+        </span>
+      </div>
+      <TabsList className="mx-0 w-fit max-w-full rounded-lg bg-muted/60 p-1">
+        <TabsTrigger value="current">当前任务</TabsTrigger>
+        <TabsTrigger value="archived">已归档</TabsTrigger>
       </TabsList>
-      <TabsContent value="current">
-        <Card>
-          <CardContent className="flex flex-col gap-4 px-0 pt-6">
-            <div className="flex flex-wrap items-center gap-2 px-4 lg:px-6">
+      <TabsContent value="current" className="mt-0 min-w-0">
+        <Card className="min-w-0 overflow-hidden rounded-xl border-border/70 bg-card/90 shadow-sm">
+          <CardContent className="flex min-w-0 flex-col gap-4 px-0 pt-5">
+            <div className="flex flex-wrap items-center gap-2.5 border-b border-border/60 px-4 pb-4 sm:px-5 lg:px-6">
               <div className="relative w-full sm:max-w-xs">
                 <SearchIcon className="text-muted-foreground pointer-events-none absolute top-1/2 left-2.5 size-4 -translate-y-1/2" />
                 <Input
-                  placeholder="Search description / goal / ID"
+                  placeholder="搜索任务描述、目标或 ID"
                   value={query}
                   onChange={(e) => setQuery(e.target.value)}
                   className="pl-8"
@@ -801,7 +811,7 @@ export default function TasksPage() {
                   <button
                     type="button"
                     onClick={() => setQuery("")}
-                    aria-label="Clear search"
+                    aria-label="清除搜索"
                     className="text-muted-foreground hover:text-foreground absolute top-1/2 right-2 -translate-y-1/2"
                   >
                     <XIcon className="size-4" />
@@ -810,11 +820,11 @@ export default function TasksPage() {
               </div>
               <Select value={statusFilter} onValueChange={(v) => setStatusFilter(v as TaskStatus | "all")}>
                 <SelectTrigger className="w-36">
-                  <SelectValue placeholder="Status" />
+                  <SelectValue placeholder="状态" />
                 </SelectTrigger>
                 <SelectContent>
                   <SelectGroup>
-                    <SelectItem value="all">All statuses</SelectItem>
+                    <SelectItem value="all">全部状态</SelectItem>
                     {STATUS_OPTIONS.map((s) => (
                       <SelectItem key={s.value} value={s.value}>
                         {s.label}
@@ -825,12 +835,12 @@ export default function TasksPage() {
               </Select>
               <Select value={categoryFilter} onValueChange={setCategoryFilter}>
                 <SelectTrigger className="w-40">
-                  <SelectValue placeholder="Task category" />
+                  <SelectValue placeholder="任务分类" />
                 </SelectTrigger>
                 <SelectContent>
                   <SelectGroup>
-                    <SelectItem value="all">All categories</SelectItem>
-                    <SelectItem value={UNCATEGORIZED_VALUE}>Uncategorized</SelectItem>
+                    <SelectItem value="all">全部分类</SelectItem>
+                    <SelectItem value={UNCATEGORIZED_VALUE}>未分类</SelectItem>
                     {categories.map((category) => (
                       <SelectItem key={category.id} value={String(category.id)}>
                         {category.name}
@@ -840,7 +850,7 @@ export default function TasksPage() {
                 </SelectContent>
               </Select>
               <span className="text-muted-foreground text-xs tabular-nums">
-                {filtered.length}/{tasks.length} tasks
+                显示 {filtered.length} / {tasks.length} 项任务
               </span>
               {selectedIds.size > 0 && (
                 <>
@@ -915,15 +925,15 @@ export default function TasksPage() {
             </div>
 
             {tasks.length === 0 ? (
-              <div className="text-muted-foreground mx-4 flex items-center justify-center rounded-lg border border-dashed py-20 text-sm lg:mx-6">
-                No tasks yet. Click "New task" at the top right to start.
+              <div className="text-muted-foreground mx-4 flex min-h-52 items-center justify-center rounded-xl border border-dashed border-border/70 bg-muted/10 px-5 py-12 text-center text-sm sm:mx-5 lg:mx-6">
+                暂无任务。可以使用上方的“新建任务”入口开始。
               </div>
             ) : filtered.length === 0 ? (
-              <div className="text-muted-foreground mx-4 flex items-center justify-center rounded-lg border border-dashed py-20 text-sm lg:mx-6">
-                No matching tasks.
+              <div className="text-muted-foreground mx-4 flex min-h-52 items-center justify-center rounded-xl border border-dashed border-border/70 bg-muted/10 px-5 py-12 text-center text-sm sm:mx-5 lg:mx-6">
+                没有匹配的任务。可以调整搜索或筛选条件。
               </div>
             ) : (
-              <Table className="**:data-[slot='table-cell']:px-4 **:data-[slot='table-head']:px-4">
+              <Table className="min-w-[1050px] text-sm **:data-[slot='table-cell']:px-4 **:data-[slot='table-head']:px-4">
                 <TableHeader className="[&_tr]:border-t">
                   <TableRow>
                     <TableHead className="w-10">
