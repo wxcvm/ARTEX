@@ -344,13 +344,14 @@ export default function TrafficPage() {
   const rangeEnd = page * size + exchanges.length;
 
   return (
-    <div className="flex min-h-0 flex-1 flex-col gap-4">
-      <div className="flex items-center justify-between gap-4">
-        <div>
-          <h1 className="text-xl font-semibold tracking-tight">Traffic</h1>
-          <p className="text-muted-foreground text-sm">Global recording proxy · all HTTP traffic</p>
+    <div className="flex min-h-0 min-w-0 flex-1 flex-col gap-4 pb-5">
+      <header className="flex flex-wrap items-center justify-between gap-4 rounded-2xl border border-border/70 bg-gradient-to-br from-card to-primary/5 px-5 py-5 shadow-sm sm:px-7">
+        <div className="min-w-0">
+          <p className="mb-1 text-[11px] font-semibold tracking-[0.16em] text-primary">ARTEX / TRAFFIC</p>
+          <h1 className="text-2xl font-semibold tracking-tight">流量记录</h1>
+          <p className="mt-1 text-sm leading-relaxed text-muted-foreground">查询录制的 HTTP 请求与响应，按目标、状态和内容筛选。</p>
         </div>
-        <div className="flex items-center gap-4 text-sm">
+        <div className="flex min-w-0 flex-wrap items-center gap-2 text-sm">
           <span
             className={cn(
               "inline-flex items-center gap-1.5 rounded-md border px-2 py-0.5 text-xs font-medium",
@@ -360,22 +361,22 @@ export default function TrafficPage() {
             )}
           >
             <RadioTowerIcon className="size-3.5" />
-            {traffic?.enabled ? "Recording" : "Disabled"}
+            {traffic?.enabled ? "正在采集" : "未开启采集"}
           </span>
-          {traffic?.proxy && <span className="font-mono text-xs text-muted-foreground">{traffic.proxy}</span>}
+          {traffic?.proxy && <span className="max-w-[14rem] truncate font-mono text-xs text-muted-foreground" title={traffic.proxy}>{traffic.proxy}</span>}
           <span className="text-xs text-muted-foreground">
-            <span className="tabular-nums">{traffic?.count ?? 0}</span> records
+            共 <span className="tabular-nums">{traffic?.count ?? 0}</span> 条
           </span>
         </div>
-      </div>
+      </header>
 
       {/* Toolbar */}
-      <div className="flex flex-wrap items-center gap-2">
+      <div className="flex min-w-0 flex-wrap items-center gap-2 rounded-xl border border-border/70 bg-card/90 p-3 shadow-sm sm:p-4">
         <Popover open={pickerOpen} onOpenChange={setPickerOpen}>
           <PopoverTrigger asChild>
             <Button variant="outline" size="sm" className="h-8">
               <ListChecksIcon className="size-3.5" />
-              {selectedHosts.length > 0 ? `Select targets (${selectedHosts.length})` : "Select targets…"}
+              {selectedHosts.length > 0 ? `已选目标（${selectedHosts.length}）` : "选择目标…"}
             </Button>
           </PopoverTrigger>
           <PopoverContent
@@ -485,10 +486,10 @@ export default function TrafficPage() {
           <EraserIcon className="size-3.5" />
           Purge all
         </Button>
-        <div className="relative max-w-sm flex-1">
+        <div className="relative min-w-[180px] flex-1 sm:max-w-sm">
           <SearchIcon className="absolute top-1/2 left-2.5 size-4 -translate-y-1/2 text-muted-foreground" />
           <Input
-            placeholder="Search everything (ID / URL / method / type / status…)"
+            placeholder="搜索 ID、URL、方法、状态等…"
             value={query}
             onChange={(e) => setQuery(e.target.value)}
             className="h-8 pl-8"
@@ -496,10 +497,10 @@ export default function TrafficPage() {
         </div>
         <Select value={method} onValueChange={setMethod}>
           <SelectTrigger size="sm" className="w-32">
-            <SelectValue placeholder="Method" />
+            <SelectValue placeholder="请求方法" />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="all">All methods</SelectItem>
+            <SelectItem value="all">全部方法</SelectItem>
             {METHODS.map((m) => (
               <SelectItem key={m} value={m}>
                 {m}
@@ -514,7 +515,7 @@ export default function TrafficPage() {
           <SelectContent>
             {PAGE_SIZES.map((n) => (
               <SelectItem key={n} value={String(n)}>
-                {n} / page
+                每页 {n} 条
               </SelectItem>
             ))}
           </SelectContent>
@@ -549,11 +550,11 @@ export default function TrafficPage() {
       </div>
 
       {/* Advanced filters (issue #177): narrow 660k+ exchanges down to the one packet. */}
-      <div className="flex flex-wrap items-center gap-2 rounded-md border bg-muted/30 px-2 py-1.5">
-        <span className="pl-1 text-xs font-medium text-muted-foreground">Advanced filters</span>
+      <div className="flex min-w-0 flex-wrap items-center gap-2 rounded-xl border border-border/70 bg-muted/20 px-3 py-3">
+        <span className="pl-1 text-xs font-medium text-muted-foreground">高级筛选</span>
         <div className="relative w-56">
           <Input
-            placeholder="Response content (body keyword, ≥3 chars)"
+            placeholder="响应内容（至少 3 个字符）"
             value={body}
             onChange={(e) => setBody(e.target.value)}
             className="h-8"
@@ -561,7 +562,7 @@ export default function TrafficPage() {
         </div>
         <div className="relative w-52">
           <Input
-            placeholder="Path (e.g. /api/user/…)"
+            placeholder="请求路径（例如 /api/user/）"
             value={path}
             onChange={(e) => setPath(e.target.value)}
             className="h-8"
@@ -569,10 +570,10 @@ export default function TrafficPage() {
         </div>
         <Select value={statusFilter} onValueChange={setStatusFilter}>
           <SelectTrigger size="sm" className="w-28">
-            <SelectValue placeholder="Status" />
+            <SelectValue placeholder="状态" />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="all">All statuses</SelectItem>
+            <SelectItem value="all">全部状态</SelectItem>
             {STATUS_BUCKETS.map((s) => (
               <SelectItem key={s} value={s}>
                 {s}
@@ -581,11 +582,11 @@ export default function TrafficPage() {
           </SelectContent>
         </Select>
         <div className="flex items-center gap-1 text-xs text-muted-foreground">
-          <span>Response size</span>
+          <span>响应大小</span>
           <Input
             type="number"
             min={0}
-            placeholder="Min (B)"
+            placeholder="最小 B"
             value={respMin}
             onChange={(e) => setRespMin(e.target.value)}
             className="h-8 w-24"
@@ -594,7 +595,7 @@ export default function TrafficPage() {
           <Input
             type="number"
             min={0}
-            placeholder="Max (B)"
+            placeholder="最大 B"
             value={respMax}
             onChange={(e) => setRespMax(e.target.value)}
             className="h-8 w-24"
@@ -603,28 +604,28 @@ export default function TrafficPage() {
         {hasAdvancedFilter ? (
           <Button variant="ghost" size="sm" className="h-8" onClick={resetAdvancedFilters}>
             <FilterXIcon className="size-3.5" />
-            Clear filters
+            清除筛选
           </Button>
         ) : null}
       </div>
 
       <div className="flex flex-wrap items-center gap-2">
-        <span className="text-sm text-muted-foreground">{selectedFlows.size} flows selected</span>
+        <span className="text-sm text-muted-foreground">已选 {selectedFlows.size} 条</span>
         <Button variant="outline" size="sm" disabled={selectedFlows.size === 0} onClick={() => setLinking(true)}>
-          Link to finding
+          关联发现结果
         </Button>
         {selectedFlows.size > 0 ? (
           <Button variant="ghost" size="sm" onClick={() => setSelectedFlows(new Set())}>
-            Clear selection
+            清除选择
           </Button>
         ) : null}
       </div>
       {/* History table */}
-      <div className="flex h-[calc(100vh-15rem)] min-h-0 flex-col">
-        <Card className="flex min-h-0 flex-1 flex-col overflow-hidden py-0">
+      <div className="flex h-[calc(100dvh-23rem)] min-h-[22rem] min-w-0 flex-col">
+        <Card className="flex min-h-0 min-w-0 flex-1 flex-col overflow-hidden rounded-xl border-border/70 bg-card/90 py-0 shadow-sm">
           <div className="min-h-0 flex-1 overflow-auto">
             <Table>
-              <TableHeader className="sticky top-0 z-10 bg-card">
+              <TableHeader className="sticky top-0 z-10 bg-card/95">
                 <TableRow>
                   <TableHead className="w-10">
                     <Checkbox
@@ -732,7 +733,7 @@ export default function TrafficPage() {
                 {exchanges.length === 0 && (
                   <TableRow>
                     <TableCell colSpan={9} className="py-12 text-center text-sm text-muted-foreground">
-                      {traffic === null ? "Loading…" : "No matching traffic."}
+                      {traffic === null ? "正在加载流量记录…" : "没有匹配的流量记录，请调整筛选条件。"}
                     </TableCell>
                   </TableRow>
                 )}
