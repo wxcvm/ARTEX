@@ -152,13 +152,15 @@ public sealed class MainForm : Form
                 cancel.ThrowIfCancellationRequested();
                 await browser.EnsureCoreWebView2Async(environment);
 
-                browser.CoreWebView2.AcceleratorKeyPressed += (_, args) =>
+                browser.AcceleratorKeyPressed += (_, args) =>
                 {
                     if (args.KeyEventKind is not (CoreWebView2KeyEventKind.KeyDown or
                         CoreWebView2KeyEventKind.SystemKeyDown)) return;
                     if (args.VirtualKey != 0x7A && (!fullScreen || args.VirtualKey != 0x1B)) return;
                     args.Handled = true;
-                    if (!IsDisposed && !Disposing) BeginInvoke((Action)ToggleFullScreen);
+                    // Bit 30 marks a repeated keydown; do not toggle twice on a long press.
+                    if ((args.KeyEventLParam & (1 << 30)) == 0 && !IsDisposed && !Disposing)
+                        BeginInvoke((Action)ToggleFullScreen);
                 };
 
                 browser.CoreWebView2.NewWindowRequested += (_, args) =>
