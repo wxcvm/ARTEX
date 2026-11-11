@@ -19,6 +19,8 @@ export function ReportTab({ taskId }: { taskId: string }) {
   const [loading, setLoading] = React.useState(true);
   const [copied, setCopied] = React.useState(false);
   const [error, setError] = React.useState("");
+  const [errorTaskId, setErrorTaskId] = React.useState(taskId);
+  const currentError = errorTaskId === taskId ? error : "";
   const [refresh, setRefresh] = React.useState(0);
 
   React.useEffect(() => {
@@ -30,11 +32,15 @@ export function ReportTab({ taskId }: { taskId: string }) {
         if (active) {
           setReport(text);
           setReportTaskId(taskId);
+          setErrorTaskId(taskId);
           setError("");
         }
       })
       .catch((cause) => {
-        if (active) setError(cause instanceof Error ? cause.message : "Report request failed.");
+        if (active) {
+          setErrorTaskId(taskId);
+          setError(cause instanceof Error ? cause.message : "报告请求失败");
+        }
       })
       .finally(() => {
         if (active) setLoading(false);
@@ -43,6 +49,10 @@ export function ReportTab({ taskId }: { taskId: string }) {
       active = false;
     };
   }, [taskId, refresh]);
+
+  React.useEffect(() => {
+    setCopied(false);
+  }, [taskId]);
 
   async function copy() {
     if (!currentReport) return;
@@ -57,7 +67,7 @@ export function ReportTab({ taskId }: { taskId: string }) {
   }
 
   let content: React.ReactNode;
-  if (loading && !currentReport && !error) {
+  if (loading && !currentReport && !currentError) {
     content = (
       <div className="flex min-h-64 flex-col items-center justify-center gap-3 rounded-lg border border-dashed border-border/70 bg-muted/10 px-4 py-14 text-center text-sm text-muted-foreground">
         <FileTextIcon className="size-8 opacity-50" />
@@ -70,7 +80,7 @@ export function ReportTab({ taskId }: { taskId: string }) {
         <Markdown text={currentReport} />
       </article>
     );
-  } else if (error) {
+  } else if (currentError) {
     content = null;
   } else {
     content = (
@@ -93,7 +103,7 @@ export function ReportTab({ taskId }: { taskId: string }) {
         </div>
         <div className="flex flex-wrap items-center gap-2">
           <Button size="sm" variant="outline" disabled={loading} onClick={() => setRefresh((n) => n + 1)}>
-            <RefreshCwIcon className={loading ? "animate-spin" : ""} /> {error ? "重试加载" : "刷新报告"}
+            <RefreshCwIcon className={loading ? "animate-spin" : ""} /> {currentError ? "重试加载" : "刷新报告"}
           </Button>
           {currentReport && (
             <Button size="sm" variant="outline" onClick={copy}>
@@ -103,10 +113,10 @@ export function ReportTab({ taskId }: { taskId: string }) {
         </div>
       </CardHeader>
       <CardContent className="min-w-0 space-y-3 px-4 py-4 sm:px-6">
-        {error && (
+        {currentError && (
           <div role="alert" className="rounded-md border border-destructive/30 p-3 text-sm" data-testid="report-request-error">
             <p className="font-medium text-destructive">无法加载任务报告</p>
-            <p className="break-words">{error}</p>
+            <p className="break-words">{currentError}</p>
             <p className="text-muted-foreground">这只是报告请求失败，不代表任务失败或没有发现结果。</p>
             {currentReport && <p className="text-muted-foreground">下方保留上次成功加载的报告，内容可能不是最新版本。</p>}
           </div>
