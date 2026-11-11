@@ -368,9 +368,19 @@ internal sealed class DatabaseSetupForm : Form
         // clipping it to an old fixed pixel width.
         button.AutoSize = true;
         button.AutoSizeMode = AutoSizeMode.GrowAndShrink;
-        button.MinimumSize = new Size(minimumWidth, 36);
         button.Padding = new Padding(10, 3, 10, 3);
         button.Margin = new Padding(3, 3, 9, 8);
+        void MeasureButton()
+        {
+            var size = TextRenderer.MeasureText(button.Text, button.Font);
+            button.MinimumSize = new Size(
+                Math.Max(minimumWidth, size.Width + button.Padding.Horizontal + 8),
+                Math.Max(36, size.Height + button.Padding.Vertical + 8));
+        }
+        // Hidden advanced-mode buttons still need correct dimensions at high DPI.
+        button.FontChanged += (_, _) => MeasureButton();
+        button.TextChanged += (_, _) => MeasureButton();
+        MeasureButton();
     }
 
     private void InstallPostgreSQL()
