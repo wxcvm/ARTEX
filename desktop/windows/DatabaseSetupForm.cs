@@ -328,6 +328,7 @@ internal sealed class DatabaseSetupForm : Form
         // monitor. Keep the whole dialog inside the active display's work area.
         Load += (_, _) =>
         {
+            DesktopChrome.UseDarkTitleBar(this);
             var work = Screen.FromControl(this).WorkingArea;
             var maxWidth = Math.Max(1, work.Width - 24);
             var maxHeight = Math.Max(1, work.Height - 24);
