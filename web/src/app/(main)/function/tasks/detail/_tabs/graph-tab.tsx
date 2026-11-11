@@ -60,7 +60,13 @@ export function GraphTab({ taskId }: { taskId: string }) {
     };
     load(true);
     const timer = setInterval(() => load(false), 20000);
-    return (
+    return () => {
+      cancelled = true;
+      clearInterval(timer);
+    };
+  }, [taskId, refresh]);
+
+  return (
     <Card className="min-w-0 gap-0 overflow-hidden rounded-xl border-border/70 bg-card/90 py-0 shadow-sm">
       <CardHeader className="flex flex-wrap items-center justify-between gap-3 border-b border-border/70 px-4 py-4 sm:px-5">
         <div className="min-w-0">
