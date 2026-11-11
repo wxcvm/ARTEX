@@ -74,7 +74,10 @@ export default function LogsPage() {
         const l = JSON.parse(e.data) as LogLine;
         if (pausedRef.current) {
           // Pause the display, not the incoming stream; restore missed lines on resume.
-          pendingWhilePaused.current = [...pendingWhilePaused.current, l].slice(-3000);
+          const buffer = pendingWhilePaused.current;
+          buffer.push(l);
+          // Trim in batches to avoid copying a 3000-line buffer on every event.
+          if (buffer.length > 3000) buffer.splice(0, 300);
           return;
         }
         setLines((prev) => (prev.some((x) => x.seq === l.seq) ? prev : [...prev, l].slice(-3000)));
@@ -91,7 +94,11 @@ export default function LogsPage() {
     pendingWhilePaused.current = [];
     setLines((prev) => {
       const seen = new Set(prev.map((line) => line.seq));
-      const unseen = pending.filter((line) => !seen.has(line.seq));
+      const unseen = pending.filter((line) => {
+        if (seen.has(line.seq)) return false;
+        seen.add(line.seq);
+        return true;
+      });
       return [...prev, ...unseen].slice(-3000);
     });
   }, [paused]);
