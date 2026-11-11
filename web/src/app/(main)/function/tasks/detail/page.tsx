@@ -54,17 +54,17 @@ import { RetestsTab } from "./_tabs/retests-tab";
 import { SessionsTab } from "./_tabs/sessions-tab";
 
 const TABS = [
-  { value: "sessions", label: "Sessions" },
-  { value: "overview", label: "Overview" },
-  { value: "graph", label: "Exploration graph" },
-  { value: "broadcast", label: "Broadcast" },
-  { value: "findings", label: "Findings" },
-  { value: "retests", label: "Retests" },
-  { value: "assets", label: "Test assets" },
-  { value: "credentials", label: "Credentials" },
-  { value: "coverage", label: "Asset coverage" },
-  { value: "intercept", label: "Interception approval" },
-  { value: "report", label: "Report" },
+  { value: "sessions", label: "会话" },
+  { value: "overview", label: "概览" },
+  { value: "graph", label: "探索图谱" },
+  { value: "broadcast", label: "任务广播" },
+  { value: "findings", label: "发现结果" },
+  { value: "retests", label: "复测" },
+  { value: "assets", label: "测试资产" },
+  { value: "credentials", label: "测试凭据" },
+  { value: "coverage", label: "资产覆盖" },
+  { value: "intercept", label: "操作审批" },
+  { value: "report", label: "报告" },
 ];
 
 function taskProfileIDs(task: Task): string[] {
@@ -352,17 +352,17 @@ function TaskDetailInner() {
   );
 
   return (
-    <Tabs value={tab} onValueChange={setTab} className="flex flex-1 flex-col gap-0">
+    <Tabs value={tab} onValueChange={setTab} className="flex min-w-0 flex-1 flex-col gap-0">
       {/* Top fixed area */}
-      <header className="sticky top-0 z-10 flex flex-col gap-2 border-b bg-background/95 px-4 py-2.5 backdrop-blur lg:px-6">
-        <div className="flex items-center gap-2">
+      <header className="sticky top-0 z-10 flex min-w-0 flex-col gap-3 border-b border-border/70 bg-background px-4 py-4 shadow-sm lg:px-7">
+        <div className="flex min-w-0 flex-wrap items-center gap-2">
           <SidebarTrigger className="-ml-1" />
           <Button asChild variant="ghost" size="icon" className="size-7">
             <Link href="/function/tasks">
               <ArrowLeftIcon />
             </Link>
           </Button>
-          <h1 className="min-w-0 flex-1 truncate text-sm font-semibold" title={task.name || task.description}>
+          <h1 className="min-w-[10rem] flex-1 truncate text-base font-semibold tracking-tight sm:text-lg" title={task.name || task.description}>
             {task.name || task.description}
           </h1>
           <code className="hidden rounded bg-muted px-1.5 py-0.5 font-mono text-xs text-muted-foreground sm:inline">
@@ -407,12 +407,12 @@ function TaskDetailInner() {
             {controlLabel}
           </Button>
         </div>
-        <p className="truncate text-xs text-muted-foreground">{task.goal}</p>
+        <p className="line-clamp-2 max-w-4xl text-xs leading-relaxed text-muted-foreground">{task.goal}</p>
         {/* Tabs */}
-        <div className="no-scrollbar min-w-0 overflow-x-auto">
-          <TabsList variant="default" className="min-w-max">
+        <div className="no-scrollbar min-w-0 overflow-x-auto pb-1">
+          <TabsList variant="default" className="h-auto min-w-max gap-1 rounded-lg bg-muted/55 p-1">
             {TABS.map((t) => (
-              <TabsTrigger key={t.value} value={t.value}>
+              <TabsTrigger key={t.value} value={t.value} className="rounded-md px-3 py-2 text-sm">
                 {t.label}
                 {t.value === "intercept" && interceptPendingCount > 0 && (
                   <span className="ml-1.5 inline-flex h-4 min-w-[16px] items-center justify-center rounded-full bg-amber-500 px-1 text-[10px] font-semibold leading-none text-white">
@@ -426,7 +426,7 @@ function TaskDetailInner() {
       </header>
 
       {/* Tab content */}
-      <div className="flex-1 p-4 lg:p-6">
+      <div className="min-w-0 flex-1 bg-background p-4 sm:p-5 lg:p-7">
         {task.id === id && <TaskOutcomeCard key={id} task={task} />}
         <TabsContent value="sessions" className="mt-0">
           <SessionsTab taskId={id} taskPaused={task?.status === "paused"} />

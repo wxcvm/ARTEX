@@ -893,37 +893,38 @@ export default function LLMPage() {
   const poolOn = pool?.enabled ?? false;
 
   return (
-    <div className="flex flex-1 flex-col gap-4 md:gap-6">
-      <div className="flex flex-wrap items-start justify-between gap-3">
-        <div>
-          <h1 className="font-semibold text-xl tracking-tight">LLM</h1>
-          <p className="text-muted-foreground text-sm">
-            Format / model / rate-limit settings shared by all agents. Click a card to edit it; the starred card is the active profile.
+    <div className="flex min-w-0 flex-1 flex-col gap-5 pb-6">
+      <header className="flex flex-wrap items-center justify-between gap-4 rounded-2xl border border-border/70 bg-gradient-to-br from-card to-primary/5 px-5 py-5 shadow-sm sm:px-7">
+        <div className="min-w-0">
+          <p className="mb-1 text-[11px] font-semibold tracking-[0.16em] text-primary">ARTEX / MODELS</p>
+          <h1 className="text-2xl font-semibold tracking-tight">模型配置</h1>
+          <p className="mt-1 max-w-2xl text-sm leading-relaxed text-muted-foreground">
+            管理智能体使用的模型连接、默认配置与故障切换。点击配置卡片可编辑，星标表示当前默认配置。
           </p>
         </div>
-        <div className="flex items-center gap-2">
+        <div className="flex flex-wrap items-center gap-2">
           <Button size="sm" variant="outline" onClick={() => setPoolOpen(true)}>
-            <ZapIcon /> Pool settings
+            <ZapIcon /> 模型池设置
             {poolOn && (
               <Badge variant="outline" className="ml-1 border-emerald-500/50 text-emerald-600 dark:text-emerald-400">
-                On
+                已开启
               </Badge>
             )}
           </Button>
           <Button size="sm" variant="outline" onClick={() => openEditor(null)}>
-            <PlusIcon /> Create
+            <PlusIcon /> 新建模型配置
           </Button>
         </div>
-      </div>
+      </header>
 
-      <Tabs defaultValue="profiles" className="flex-1">
-        <TabsList>
-          <TabsTrigger value="profiles">Model profiles</TabsTrigger>
-          <TabsTrigger value="retry">Retry & backoff</TabsTrigger>
+      <Tabs defaultValue="profiles" className="min-w-0 flex-1">
+        <TabsList className="h-auto max-w-full rounded-lg bg-muted/60 p-1">
+          <TabsTrigger value="profiles">模型连接</TabsTrigger>
+          <TabsTrigger value="retry">重试与退避</TabsTrigger>
         </TabsList>
 
         <TabsContent value="profiles" className="mt-4">
-          <div className="grid grid-cols-1 gap-4 md:grid-cols-2 xl:grid-cols-3">
+          <div className="grid min-w-0 grid-cols-1 gap-4 lg:grid-cols-2 2xl:grid-cols-3">
             {profiles.map((p) => {
               const h = healthOf(p, health.get(p.id));
               return (
@@ -940,11 +941,11 @@ export default function LLMPage() {
                     }
                   }}
                   className={cn(
-                    "cursor-pointer gap-0 py-4 outline-none transition-colors hover:border-foreground/30",
+                    "min-w-0 cursor-pointer gap-2 rounded-xl border-border/70 bg-card/90 py-4 shadow-sm outline-none transition-colors hover:border-primary/40 focus-visible:ring-2 focus-visible:ring-primary/60",
                     p.is_default && "border-amber-400/50 bg-amber-400/5",
                   )}
                 >
-                  <CardContent className="grid gap-2 px-4">
+                  <CardContent className="grid min-w-0 gap-3 px-5">
                     <div className="flex items-start gap-2">
                       <StarIcon
                         className={cn(
@@ -954,7 +955,7 @@ export default function LLMPage() {
                       />
                       <div className="min-w-0 flex-1">
                         <div className="flex flex-wrap items-center gap-2">
-                          <span className="truncate font-medium text-sm">{p.name}</span>
+                          <span className="truncate text-base font-semibold">{p.name}</span>
                           <Badge variant="outline" className="uppercase">
                             {p.format}
                           </Badge>
@@ -992,12 +993,12 @@ export default function LLMPage() {
                           void activate(p.id, p.name);
                         }}
                       >
-                        {p.is_default ? "Active" : "Set as active"}
+                        {p.is_default ? "当前默认" : "设为默认"}
                       </Button>
                       <Button
                         size="icon"
                         variant="outline"
-                        aria-label="Delete profile"
+                        aria-label="删除模型配置"
                         onClick={(e) => {
                           e.stopPropagation();
                           void remove(p);
@@ -1011,8 +1012,17 @@ export default function LLMPage() {
               );
             })}
             {profiles.length === 0 && (
-              <div className="col-span-full rounded-lg border border-dashed p-10 text-center text-muted-foreground text-sm">
-                No model profiles yet — click "Create" in the top right to add the first one.
+              <div className="col-span-full flex min-h-64 flex-col items-center justify-center gap-4 rounded-2xl border border-dashed border-border/70 bg-card/70 px-6 py-12 text-center">
+                <PlugZapIcon className="size-9 text-primary" aria-hidden="true" />
+                <div>
+                  <h2 className="text-lg font-semibold">还没有模型配置</h2>
+                  <p className="mt-1 max-w-md text-sm leading-relaxed text-muted-foreground">
+                    添加已有模型服务的地址、模型名称和凭据，再选择默认配置，即可供智能体使用。
+                  </p>
+                </div>
+                <Button onClick={() => openEditor(null)}>
+                  <PlusIcon /> 添加第一个模型
+                </Button>
               </div>
             )}
           </div>
