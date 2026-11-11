@@ -1,4 +1,5 @@
 using System.Drawing;
+using System.Runtime.InteropServices;
 using System.Windows.Forms;
 
 namespace Artex.Desktop;
@@ -175,5 +176,18 @@ internal sealed class StartupView : UserControl
             card.Top = Math.Max(22, (ClientSize.Height - card.Height) / 2);
         }
         finally { arranging = false; }
+    }
+}
+
+internal static class DesktopChrome
+{
+    [DllImport("dwmapi.dll", ExactSpelling = true)]
+    private static extern int DwmSetWindowAttribute(nint handle, int attribute, ref int value, int size);
+
+    internal static void UseDarkTitleBar(Form window)
+    {
+        if (!OperatingSystem.IsWindowsVersionAtLeast(10, 0, 22000)) return;
+        var enabled = 1;
+        _ = DwmSetWindowAttribute(window.Handle, 20, ref enabled, sizeof(int));
     }
 }
