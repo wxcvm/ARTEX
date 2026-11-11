@@ -70,6 +70,22 @@ const EFFORT_LEVELS: { value: string; label: string }[] = [
   { value: "max", label: "max" },
 ];
 
+function modelTestAdvice(message: string): string {
+  if (/401|403|unauthorized|authentication|invalid.*(?:key|token)/i.test(message))
+    return "认证未通过：请检查 API 密钥、账户权限和接口地址。";
+  if (/404|model.*not found|unknown model|not found.*model/i.test(message))
+    return "接口没有找到指定模型：检查模型名称，或使用旁边的按钮获取可用模型列表。";
+  if (/429|quota|rate.limit|insufficient.balance/i.test(message))
+    return "可能触发了速率限制或额度不足：检查服务端配额后重新测试。";
+  if (/timeout|deadline exceeded|timed out|超时/i.test(message))
+    return "连接超时：请检查网络、代理设置和模型服务是否正在响应。";
+  if (/connection refused|ECONNREFUSED|connectex|fetch failed|dial tcp/i.test(message))
+    return "无法连接到服务：请检查服务是否启动、接口地址及端口是否正确。";
+  if (/certificate|\bTLS\b|\bSSL\b/i.test(message))
+    return "TLS 连接失败：请检查接口 HTTPS 地址及服务端证书配置。";
+  return "请检查接口类型、模型名称、地址和密钥；展开技术详情可查看服务端返回的原因。";
+}
+
 function cooldownText(secs: number) {
   if (secs <= 0) return "";
   if (secs < 60) return `${secs}s`;
@@ -338,6 +354,12 @@ function ProfileSheet({
   const [userAgent, setUserAgent] = React.useState(""); // custom User-Agent; empty = keep the default UA
   const [retry, setRetry] = React.useState<LLMRetryOverride>(ZERO_OVERRIDE); // retry override for this profile; all 0 = follow the global
   const [testing, setTesting] = React.useState(false);
+  const [testFeedback, setTestFeedback] = React.useState<{
+    ok: boolean;
+    headline: string;
+    hint: string;
+    detail?: string;
+  } | null>(null);
   const [saving, setSaving] = React.useState(false);
   const [models, setModels] = React.useState<string[]>([]);
   const [loadingModels, setLoadingModels] = React.useState(false);
@@ -374,8 +396,14 @@ function ProfileSheet({
     setKeyHint(profile?.api_key_hint ?? "");
     setModels([]);
     setModelsOpen(false);
+    setTestFeedback(null);
     setAdvancedOpen(Boolean(profile));
   }, [open, profile]);
+
+  // A connection test only applies to the exact endpoint settings tested.
+  React.useEffect(() => {
+    setTestFeedback(null);
+  }, [format, model, baseUrl, apiKey, proxy, thinkingType, effort, streaming, sessionHeaderKey, userAgent]);
 
   const profileId = profile ? Number(profile.id) : undefined;
 
@@ -402,9 +430,10 @@ function ProfileSheet({
   async function testConnection() {
     if (testing) return;
     setTesting(true);
+    setTestFeedback(null);
     try {
-      // Test with the thinking parameters the profile would actually run, so a model that does not support the field fails here,
-      // not when a task is already running. Pass the profile id: with the Key input left empty, the stored Key is used.
+      // Use the same options as a normal LLM request; an empty key when editing
+      // refers to the existing stored key, rather than accidentally testing blank credentials.
       const r = await api.testLLM(
         format,
         model,
@@ -418,14 +447,24 @@ function ProfileSheet({
         sessionHeaderKey.trim(),
         userAgent.trim(),
       );
-      // Show the reply too: only when the model demonstrably spoke is this the same as working inside a session.
-      if (r.ok)
-        toast.success(`Connected · ${r.latency_ms ?? "?"}ms · ${r.model ?? model}`, {
-          description: r.reply ? `Reply: ${r.reply}` : undefined,
+      if (r.ok) {
+        const latency = typeof r.latency_ms === "number" ? ` · ${r.latency_ms} ms` : "";
+        setTestFeedback({
+          ok: true,
+          headline: `模型连接成功${latency}`,
+          hint: `已收到来自 ${r.model || model || "模型服务"} 的有效测试响应。`,
+          detail: r.reply ? `模型回复：${r.reply}` : undefined,
         });
-      else toast.error(`Connection failed: ${r.error ?? "unknown"}`);
-    } catch (e) {
-      toast.error(`Test error: ${(e as Error).message}`);
+        toast.success("模型连接测试通过");
+      } else {
+        const detail = r.error ?? "服务端没有返回详细错误";
+        setTestFeedback({ ok: false, headline: "模型连接测试失败", hint: modelTestAdvice(detail), detail });
+        toast.error("模型连接测试失败");
+      }
+    } catch (error) {
+      const detail = error instanceof Error ? error.message : String(error);
+      setTestFeedback({ ok: false, headline: "无法完成连接测试", hint: modelTestAdvice(detail), detail });
+      toast.error("模型连接测试失败");
     } finally {
       setTesting(false);
     }
@@ -828,7 +867,34 @@ function ProfileSheet({
           </section>
         </div>
 
-        <div className="flex flex-wrap gap-2 border-t bg-background px-4 py-3 sm:px-5">
+        <div className="border-t border-border/70 bg-background">
+          {testing && (
+            <div role="status" aria-live="polite" className="flex items-center gap-2 px-4 pt-3 text-sm text-muted-foreground sm:px-5">
+              <Loader2Icon className="size-4 animate-spin" />
+              正在向模型发送测试请求并检查响应…
+            </div>
+          )}
+          {!testing && testFeedback && (
+            <div
+              role={testFeedback.ok ? "status" : "alert"}
+              className={cn(
+                "mx-4 mt-3 max-h-44 overflow-y-auto rounded-lg border px-3 py-2 text-sm sm:mx-5",
+                testFeedback.ok
+                  ? "border-emerald-500/30 bg-emerald-500/10"
+                  : "border-amber-500/30 bg-amber-500/10",
+              )}
+            >
+              <p className="font-semibold">{testFeedback.headline}</p>
+              <p className="mt-1 leading-relaxed text-muted-foreground">{testFeedback.hint}</p>
+              {testFeedback.detail && (
+                <details className="mt-2">
+                  <summary className="cursor-pointer text-xs font-medium">查看{testFeedback.ok ? "模型回复" : "原始错误"}</summary>
+                  <pre className="mt-1 whitespace-pre-wrap break-all font-mono text-xs text-muted-foreground">{testFeedback.detail}</pre>
+                </details>
+              )}
+            </div>
+          )}
+          <div className="flex flex-wrap gap-2 px-4 py-3 sm:px-5">
           <Button variant="outline" className="min-w-0 flex-1 sm:flex-none" onClick={testConnection} disabled={testing}>
             {testing ? <Loader2Icon className="animate-spin" /> : <PlugZapIcon />}
             {testing ? "正在测试…" : "测试连接"}
@@ -838,6 +904,7 @@ function ProfileSheet({
             {!saving && (isNew ? <PlusIcon /> : <SaveIcon />)}
             {isNew ? "保存模型配置" : "保存更改"}
           </Button>
+          </div>
         </div>
       </SheetContent>
     </Sheet>
