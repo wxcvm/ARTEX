@@ -342,6 +342,7 @@ function ProfileSheet({
   const [models, setModels] = React.useState<string[]>([]);
   const [loadingModels, setLoadingModels] = React.useState(false);
   const [modelsOpen, setModelsOpen] = React.useState(false);
+  const [advancedOpen, setAdvancedOpen] = React.useState(false);
 
   // Every time it opens, the form is re-filled from the passed-in profile (reset to defaults when creating). Closing and reopening
   // the drawer is a clean start, leaving no leftovers from the previous profile.
@@ -373,6 +374,7 @@ function ProfileSheet({
     setKeyHint(profile?.api_key_hint ?? "");
     setModels([]);
     setModelsOpen(false);
+    setAdvancedOpen(Boolean(profile));
   }, [open, profile]);
 
   const profileId = profile ? Number(profile.id) : undefined;
@@ -483,11 +485,11 @@ function ProfileSheet({
     <Sheet open={open} onOpenChange={onOpenChange}>
       <SheetContent
         side="right"
-        className="flex flex-col gap-0 p-0 data-[side=right]:min-w-[420px] data-[side=right]:sm:max-w-xl"
+        className="flex min-w-0 flex-col gap-0 overflow-hidden p-0 data-[side=right]:w-full data-[side=right]:max-w-full data-[side=right]:sm:max-w-xl"
       >
         <SheetHeader className="px-4">
           <SheetTitle className="flex items-center gap-2">
-            {isNew ? "New model profile" : `Edit: ${profile?.name}`}
+            {isNew ? "添加模型连接" : `编辑模型：${profile?.name}`}
             {profile?.is_default && (
               <Badge variant="outline" className="border-amber-400/50 text-amber-500">
                 Active
@@ -496,44 +498,44 @@ function ProfileSheet({
           </SheetTitle>
           <SheetDescription>
             {isNew
-              ? "New profiles are not activated automatically; use 'Set as active' on its card to enable it."
-              : "Click save after editing; saving the active profile takes effect immediately for all agents."}
+              ? "填写模型名称、接口类型与访问凭据；保存后可在卡片上设为默认模型。"
+              : "修改后保存即可生效；当前默认模型的修改无需重启服务。"}
           </SheetDescription>
         </SheetHeader>
 
-        <div className="flex min-h-0 flex-1 flex-col gap-4 overflow-y-auto px-4 pb-4">
+        <div className="flex min-h-0 min-w-0 flex-1 flex-col gap-4 overflow-y-auto px-4 pb-5 sm:px-5">
           <div className="grid gap-4 sm:grid-cols-2">
             <div className="grid gap-2">
-              <Label htmlFor="p-name">Name</Label>
+              <Label htmlFor="p-name">配置名称</Label>
               <Input
                 id="p-name"
-                placeholder="e.g. OpenAI production"
+                placeholder="例如：我的日常模型"
                 value={name}
                 onChange={(e) => setName(e.target.value)}
               />
             </div>
             <div className="grid gap-2">
-              <Label>Format</Label>
+              <Label>接口类型</Label>
               <Select value={format} onValueChange={(v) => setFormat(v as ProfileFormat)}>
                 <SelectTrigger>
-                  <SelectValue placeholder="Select a format" />
+                  <SelectValue placeholder="选择接口类型" />
                 </SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="anthropic">Anthropic</SelectItem>
-                  <SelectItem value="openai">OpenAI (Chat Completions)</SelectItem>
-                  <SelectItem value="openai-responses">OpenAI (Responses API)</SelectItem>
-                  <SelectItem value="ollama">Ollama (local, no key needed)</SelectItem>
+                  <SelectItem value="anthropic">Anthropic API</SelectItem>
+                  <SelectItem value="openai">OpenAI 兼容（Chat Completions）</SelectItem>
+                  <SelectItem value="openai-responses">OpenAI Responses API</SelectItem>
+                  <SelectItem value="ollama">本机 Ollama（无需密钥）</SelectItem>
                 </SelectContent>
               </Select>
             </div>
           </div>
 
           <div className="grid gap-2">
-            <Label htmlFor="p-model">Model</Label>
+            <Label htmlFor="p-model">模型名称</Label>
             <div className="flex gap-2">
               <Input
                 id="p-model"
-                className="font-mono"
+                className="min-w-0 flex-1 font-mono"
                 placeholder={format === "ollama" ? "llama3.2" : "claude-opus-4-8"}
                 value={model}
                 onChange={(e) => setModel(e.target.value)}
@@ -576,7 +578,7 @@ function ProfileSheet({
           </div>
 
           <div className="grid gap-2">
-            <Label htmlFor="p-base-url">Base URL (optional)</Label>
+            <Label htmlFor="p-base-url">接口地址（可选）</Label>
             <Input
               id="p-base-url"
               className="font-mono"
@@ -584,8 +586,38 @@ function ProfileSheet({
               value={baseUrl}
               onChange={(e) => setBaseUrl(e.target.value)}
             />
+            <p className="text-xs leading-relaxed text-muted-foreground">
+              {format === "ollama"
+                ? "本机 Ollama 默认使用 127.0.0.1:11434，可留空。"
+                : "官方接口可留空；使用 LM Studio 或其他兼容网关时填写对应 API 地址。"}
+            </p>
           </div>
 
+          <div className="grid gap-2">
+            <Label htmlFor="p-api-key">
+              {format === "ollama" ? "API 密钥（Ollama 可留空）" : "API 密钥"}
+            </Label>
+            <Input
+              id="p-api-key"
+              type="password"
+              placeholder={keyPlaceholder}
+              value={apiKey}
+              onChange={(e) => setApiKey(e.target.value)}
+            />
+          </div>
+
+          <section className="min-w-0 rounded-xl border border-border/70 bg-muted/20">
+            <button
+              type="button"
+              className="flex w-full items-center justify-between gap-3 px-4 py-3 text-left text-sm font-semibold hover:bg-muted/30"
+              aria-expanded={advancedOpen}
+              aria-controls="model-advanced-settings"
+              onClick={() => setAdvancedOpen((value) => !value)}
+            >
+              <span>高级设置 <span className="font-normal text-muted-foreground">· 代理、速率、推理、重试</span></span>
+              <span className="shrink-0 text-xs font-normal text-muted-foreground">{advancedOpen ? "收起" : "展开"}</span>
+            </button>
+            <div id="model-advanced-settings" className={advancedOpen ? "grid min-w-0 gap-4 border-t border-border/70 px-4 py-4" : "hidden"}>
           <div className="grid gap-2">
             <Label htmlFor="p-proxy">Proxy (optional)</Label>
             <Input
@@ -632,19 +664,6 @@ function ProfileSheet({
             </p>
           </div>
 
-          <div className="grid gap-2">
-            <Label htmlFor="p-api-key">
-              {format === "ollama" ? "API Key (optional for Ollama)" : "API Key"}
-            </Label>
-            <Input
-              id="p-api-key"
-              type="password"
-              placeholder={keyPlaceholder}
-              value={apiKey}
-              onChange={(e) => setApiKey(e.target.value)}
-            />
-          </div>
-
           <div className="grid gap-4 sm:grid-cols-3">
             <div className="grid gap-2">
               <Label htmlFor="p-rps">Rate limit per second</Label>
@@ -673,7 +692,7 @@ function ProfileSheet({
           </p>
 
           <div className="grid gap-3 rounded-lg border p-3">
-            <div className="flex items-center justify-between gap-4">
+            <div className="flex flex-col items-start gap-3 sm:flex-row sm:items-center sm:justify-between">
               <div className="grid gap-0.5">
                 <Label htmlFor="p-priority" className="text-sm">
                   Pool priority
@@ -690,7 +709,7 @@ function ProfileSheet({
                 onChange={(e) => setPriority(e.target.value)}
               />
             </div>
-            <div className="flex items-center justify-between gap-4 border-t pt-3">
+            <div className="flex flex-col items-start gap-3 border-t pt-3 sm:flex-row sm:items-center sm:justify-between">
               <div className="grid gap-0.5">
                 <Label className="text-sm">Excluded from pool</Label>
                 <p className="text-muted-foreground text-xs">
@@ -700,7 +719,7 @@ function ProfileSheet({
               </div>
               <Switch checked={poolExclude} onCheckedChange={setPoolExclude} aria-label="Excluded from pool" />
             </div>
-            <div className="flex items-center justify-between gap-4 border-t pt-3">
+            <div className="flex flex-col items-start gap-3 border-t pt-3 sm:flex-row sm:items-center sm:justify-between">
               <div className="grid gap-0.5">
                 <Label className="text-sm">Streaming output</Label>
                 <p className="text-muted-foreground text-xs">
@@ -714,7 +733,7 @@ function ProfileSheet({
           </div>
 
           <div className="grid gap-3 rounded-lg border p-3">
-            <div className="flex items-center justify-between gap-4">
+            <div className="flex flex-col items-start gap-3 sm:flex-row sm:items-center sm:justify-between">
               <div className="grid gap-0.5">
                 <Label htmlFor="p-max-tokens" className="text-sm">
                   Output cap · max tokens
@@ -735,7 +754,7 @@ function ProfileSheet({
                 placeholder="0"
               />
             </div>
-            <div className="flex items-center justify-between gap-4 border-t pt-3">
+            <div className="flex flex-col items-start gap-3 border-t pt-3 sm:flex-row sm:items-center sm:justify-between">
               <div className="grid gap-0.5">
                 <Label className="text-sm">Cap field name</Label>
                 <p className="text-muted-foreground text-xs">{MAX_TOKENS_FIELD_HINTS[format]}</p>
@@ -760,7 +779,7 @@ function ProfileSheet({
           </div>
 
           <div className="grid gap-3 rounded-lg border p-3">
-            <div className="flex items-center justify-between gap-4">
+            <div className="flex flex-col items-start gap-3 sm:flex-row sm:items-center sm:justify-between">
               <div className="grid gap-0.5">
                 <Label className="text-sm">Thinking switch · thinking.type</Label>
                 <p className="text-muted-foreground text-xs">
@@ -781,7 +800,7 @@ function ProfileSheet({
                 </SelectContent>
               </Select>
             </div>
-            <div className="flex items-center justify-between gap-4 border-t pt-3">
+            <div className="flex flex-col items-start gap-3 border-t pt-3 sm:flex-row sm:items-center sm:justify-between">
               <div className="grid gap-0.5">
                 <Label className="text-sm">Thinking effort · reasoning_effort</Label>
                 <p className="text-muted-foreground text-xs">
@@ -805,17 +824,19 @@ function ProfileSheet({
           </div>
 
           <ProfileRetryFields value={retry} onChange={setRetry} />
+            </div>
+          </section>
         </div>
 
-        <div className="flex gap-2 border-t px-4 py-3">
-          <Button variant="outline" onClick={testConnection} disabled={testing}>
+        <div className="flex flex-wrap gap-2 border-t bg-background px-4 py-3 sm:px-5">
+          <Button variant="outline" className="min-w-0 flex-1 sm:flex-none" onClick={testConnection} disabled={testing}>
             {testing ? <Loader2Icon className="animate-spin" /> : <PlugZapIcon />}
-            {testing ? "Testing…" : "Test connection"}
+            {testing ? "正在测试…" : "测试连接"}
           </Button>
-          <Button onClick={save} disabled={saving} className="flex-1">
+          <Button onClick={save} disabled={saving} className="min-w-0 flex-1">
             {saving && <Loader2Icon className="animate-spin" />}
             {!saving && (isNew ? <PlusIcon /> : <SaveIcon />)}
-            {isNew ? "Create" : "Save"}
+            {isNew ? "保存模型配置" : "保存更改"}
           </Button>
         </div>
       </SheetContent>
