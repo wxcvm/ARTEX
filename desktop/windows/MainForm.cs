@@ -11,7 +11,31 @@ namespace Artex.Desktop;
 public sealed class MainForm : Form
 {
     private static readonly Uri Service = new("http://127.0.0.1:8787/");
-    private readonly WebView2 browser = new() { Dock = DockStyle.Fill };
+    private WebView2 browser = new() { Dock = DockStyle.Fill };
+    private readonly Panel viewHost = new() { Dock = DockStyle.Fill };
+    private readonly TableLayoutPanel pageState = new()
+    {
+        Dock = DockStyle.Fill,
+        ColumnCount = 1,
+        RowCount = 5,
+        BackColor = Color.FromArgb(23, 28, 38),
+        Padding = new Padding(24),
+    };
+    private readonly Label pageTitle = new()
+    {
+        Dock = DockStyle.Fill,
+        TextAlign = ContentAlignment.MiddleCenter,
+        ForeColor = Color.White,
+        Text = "正在启动 ARTEX…",
+    };
+    private readonly Label pageDetails = new()
+    {
+        Dock = DockStyle.Fill,
+        TextAlign = ContentAlignment.MiddleCenter,
+        ForeColor = Color.FromArgb(190, 201, 218),
+        Text = "正在连接本机服务并加载界面",
+    };
+    private readonly Button pageRetry = new() { Text = "重新连接", Width = 140, Height = 36, Anchor = AnchorStyles.None, Visible = false };
     private readonly ToolStrip toolbar = new() { Dock = DockStyle.Top, GripStyle = ToolStripGripStyle.Hidden };
     private readonly StatusStrip statusBar = new() { Dock = DockStyle.Bottom };
     private readonly ToolStripButton fullScreenButton = new("全屏 (F11)");
@@ -24,6 +48,9 @@ public sealed class MainForm : Form
     private StreamWriter? backendLog;
     private bool exiting;
     private bool ready;
+    private bool staticAssetFailed;
+    private bool browserRecreationNeeded;
+    private bool rendererRecoveryAttempted;
     private bool fullScreen;
     private FormWindowState restoreWindowState = FormWindowState.Maximized;
     private FormWindowState beforeFullScreenState;
@@ -43,6 +70,20 @@ public sealed class MainForm : Form
         Size = new Size(1360, 850);
         StartPosition = FormStartPosition.CenterScreen;
         WindowState = FormWindowState.Maximized;
+        pageTitle.Font = new Font(Font.FontFamily, 17f, FontStyle.Bold);
+        pageDetails.Font = new Font(Font.FontFamily, 10f);
+        pageState.RowStyles.Add(new RowStyle(SizeType.Percent, 42));
+        pageState.RowStyles.Add(new RowStyle(SizeType.Absolute, 50));
+        pageState.RowStyles.Add(new RowStyle(SizeType.Absolute, 90));
+        pageState.RowStyles.Add(new RowStyle(SizeType.Absolute, 48));
+        pageState.RowStyles.Add(new RowStyle(SizeType.Percent, 58));
+        pageState.Controls.Add(pageTitle, 0, 1);
+        pageState.Controls.Add(pageDetails, 0, 2);
+        pageState.Controls.Add(pageRetry, 0, 3);
+        pageRetry.Click += (_, _) => RetryConnection();
+        viewHost.Controls.Add(browser);
+        viewHost.Controls.Add(pageState);
+
         toolbar.Items.Add(Button("后退", () =>
         {
             if (browser.CoreWebView2?.CanGoBack == true) browser.CoreWebView2.GoBack();
@@ -51,7 +92,7 @@ public sealed class MainForm : Form
         {
             if (browser.CoreWebView2?.CanGoForward == true) browser.CoreWebView2.GoForward();
         }));
-        toolbar.Items.Add(Button("刷新", () => browser.CoreWebView2?.Reload()));
+        toolbar.Items.Add(Button("刷新", RetryConnection));
         fullScreenButton.Click += (_, _) => ToggleFullScreen();
         toolbar.Items.Add(fullScreenButton);
         toolbar.Items.Add(new ToolStripSeparator());
@@ -61,12 +102,12 @@ public sealed class MainForm : Form
             Process.Start(new ProcessStartInfo("explorer.exe", "\"" + AppContext.BaseDirectory.TrimEnd('\\') + "\"")
             { UseShellExecute = true })));
         toolbar.Items.Add(new ToolStripSeparator());
-        toolbar.Items.Add(Button("重新连接", () => _ = ConnectAsync(lifetime.Token)));
+        toolbar.Items.Add(Button("重新连接", RetryConnection));
         toolbar.Items.Add(Button("退出", ExitDesktop));
 
         statusBar.Items.Add(status);
 
-        Controls.Add(browser);
+        Controls.Add(viewHost);
         Controls.Add(toolbar);
         Controls.Add(statusBar);
 
@@ -103,6 +144,7 @@ public sealed class MainForm : Form
 
         try
         {
+            ShowPageMessage("正在连接 ARTEX…", "正在检查本机服务", false);
             status.Text = "正在连接本机 ARTEX 服务…";
             if (!await IsHealthyAsync(cancel))
             {
@@ -124,6 +166,7 @@ public sealed class MainForm : Form
                         if (setup.ShowDialog(this) != DialogResult.OK)
                         {
                             status.Text = "未配置数据库 · 点击“重新连接”继续设置";
+                            ShowPageMessage("需要配置数据库", "点击“重新连接”继续数据库设置", true);
                             return;
                         }
                     }
@@ -161,7 +204,55 @@ public sealed class MainForm : Form
                     if (!IsDisposed && !Disposing) BeginInvoke((Action)ToggleFullScreen);
                 };
 
-                browser.CoreWebView2.NewWindowRequested += (_, args) =>
+                var core = browser.CoreWebView2;
+                core.NavigationStarting += (_, args) =>
+                {
+                    if (!args.Uri.StartsWith(Service.AbsoluteUri, StringComparison.OrdinalIgnoreCase)) return;
+                    staticAssetFailed = false;
+                    ShowPageMessage("正在加载 ARTEX 界面…", "正在等待网页完成加载", false);
+                };
+                core.NavigationCompleted += (_, args) =>
+                {
+                    if (!args.IsSuccess)
+                    {
+                        ready = false;
+                        status.Text = "界面加载失败 · 可重新连接";
+                        var details = "WebView2 导航失败：" + args.WebErrorStatus;
+                        LogDesktopFailure(details);
+                        ShowPageMessage("界面加载失败", details + "\\n请确认本机服务可访问，再点击“重新连接”。", true);
+                        return;
+                    }
+                    if (staticAssetFailed) return;
+                    ready = true;
+                    pageState.Hide();
+                    status.Text = ownedBackend is { HasExited: false }
+                        ? "已连接 · 本机 ARTEX 后端由桌面客户端管理 · 127.0.0.1:8787"
+                        : "已连接 · 正在使用已运行的 ARTEX 后端 · 127.0.0.1:8787";
+                };
+                core.WebResourceResponseReceived += (_, args) =>
+                {
+                    if (!Uri.TryCreate(args.Request.Uri, UriKind.Absolute, out var uri) ||
+                        !uri.AbsolutePath.StartsWith("/_next/", StringComparison.OrdinalIgnoreCase) ||
+                        !(uri.AbsolutePath.EndsWith(".js", StringComparison.OrdinalIgnoreCase) ||
+                          uri.AbsolutePath.EndsWith(".css", StringComparison.OrdinalIgnoreCase)) ||
+                        args.Response.StatusCode < 400) return;
+                    staticAssetFailed = true;
+                    ready = false;
+                    var details = "页面资源加载失败：HTTP " + args.Response.StatusCode + " " + uri.AbsolutePath;
+                    LogDesktopFailure(details);
+                    status.Text = "网页脚本或样式加载失败 · 可重新连接";
+                    ShowPageMessage("界面资源加载失败", details + "\\n请点击“重新连接”重新加载。", true);
+                };
+                core.ProcessFailed += (_, args) =>
+                {
+                    var kind = args.ProcessFailedKind;
+                    if (kind is not (CoreWebView2ProcessFailedKind.BrowserProcessExited or
+                        CoreWebView2ProcessFailedKind.RenderProcessExited or
+                        CoreWebView2ProcessFailedKind.RenderProcessUnresponsive)) return;
+                    if (!IsHandleCreated || IsDisposed || Disposing) return;
+                    BeginInvoke((Action)(() => HandleBrowserFailure(kind)));
+                };
+                core.NewWindowRequested += (_, args) =>
                 {
                     if (Uri.TryCreate(args.Uri, UriKind.Absolute, out var uri) &&
                         (uri.Scheme == Uri.UriSchemeHttps || uri.Scheme == Uri.UriSchemeHttp))
@@ -172,11 +263,11 @@ public sealed class MainForm : Form
                 };
             }
 
-            browser.Source = Service;
-            ready = true;
-            status.Text = ownedBackend is { HasExited: false }
-                ? "已连接 · 本机 ARTEX 后端由桌面客户端管理 · 127.0.0.1:8787"
-                : "已连接 · 正在使用已运行的 ARTEX 后端 · 127.0.0.1:8787";
+            // Backend health alone is not proof that the UI has rendered.
+            // NavigationCompleted is responsible for marking the page ready.
+            ready = false;
+            status.Text = "正在加载 ARTEX 页面…";
+            browser.CoreWebView2.Navigate(Service.AbsoluteUri);
         }
         catch (OperationCanceledException) when (cancel.IsCancellationRequested)
         {
@@ -187,16 +278,81 @@ public sealed class MainForm : Form
             if (cancel.IsCancellationRequested) return;
             ready = false;
             status.Text = "连接失败 · 可点击“数据库配置”修正连接或“重新连接”重试";
-            var message = ex.Message + "\n\n" +
-                "可以点击工具栏“数据库配置”修改连接。请确认 PostgreSQL（config.json 或 ARTEX_PG_DSN），" +
-                "并已安装 Microsoft Edge WebView2 Runtime。\n" +
-                "如需排查，打开配置目录或查看：" + LogPath;
-            MessageBox.Show(this, message, "ARTEX 启动失败", MessageBoxButtons.OK, MessageBoxIcon.Error);
+            LogDesktopFailure("连接失败：" + ex);
+            ShowPageMessage("ARTEX 无法启动",
+                ex.Message + "\\n请确认 PostgreSQL、WebView2 Runtime 和本机 8787 服务。\\n后端日志：" + LogPath,
+                true);
         }
         finally
         {
             Interlocked.Exchange(ref connecting, 0);
         }
+    }
+
+    private void ShowPageMessage(string title, string details, bool canRetry)
+    {
+        pageTitle.Text = title;
+        pageDetails.Text = details;
+        pageRetry.Visible = canRetry;
+        pageState.Show();
+        pageState.BringToFront();
+    }
+
+    private void RetryConnection()
+    {
+        if (lifetime.IsCancellationRequested || Volatile.Read(ref connecting) != 0) return;
+        if (browserRecreationNeeded)
+        {
+            var previous = browser;
+            browser = new WebView2 { Dock = DockStyle.Fill };
+            viewHost.Controls.Add(browser);
+            browser.SendToBack();
+            pageState.BringToFront();
+            previous.Dispose();
+            browserRecreationNeeded = false;
+        }
+        rendererRecoveryAttempted = false;
+        _ = ConnectAsync(lifetime.Token);
+    }
+
+    private void HandleBrowserFailure(CoreWebView2ProcessFailedKind kind)
+    {
+        if (lifetime.IsCancellationRequested || IsDisposed) return;
+        ready = false;
+        LogDesktopFailure("WebView2 进程异常：" + kind);
+        if (kind is CoreWebView2ProcessFailedKind.BrowserProcessExited or
+            CoreWebView2ProcessFailedKind.RenderProcessUnresponsive)
+        {
+            browserRecreationNeeded = true;
+            status.Text = "WebView2 异常 · 请重新连接";
+            ShowPageMessage("网页进程已停止", "WebView2：" + kind + "\\n点击“重新连接”重建网页视图。", true);
+            return;
+        }
+        // A renderer crash can be recovered by reloading; try once per user retry.
+        if (!rendererRecoveryAttempted)
+        {
+            rendererRecoveryAttempted = true;
+            status.Text = "网页渲染进程退出 · 正在恢复…";
+            ShowPageMessage("正在恢复界面…", "网页渲染进程意外退出，正在重新载入。", false);
+            browser.CoreWebView2?.Reload();
+        }
+        else
+        {
+            status.Text = "网页渲染进程再次退出 · 请重新连接";
+            ShowPageMessage("网页渲染进程异常", "自动恢复未成功，请点击“重新连接”。", true);
+        }
+    }
+
+    private static void LogDesktopFailure(string message)
+    {
+        try
+        {
+            Directory.CreateDirectory(LocalData);
+            File.AppendAllText(Path.Combine(LocalData, "desktop-ui.log"),
+                "[" + DateTimeOffset.Now.ToString("O") + "] " + message + Environment.NewLine);
+        }
+        catch (IOException) { }
+        catch (UnauthorizedAccessException) { }
     }
 
     private void EditDatabaseConfiguration()
