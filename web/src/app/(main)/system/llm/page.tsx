@@ -535,7 +535,7 @@ function ProfileSheet({
             <div className="flex gap-2">
               <Input
                 id="p-model"
-                className="font-mono"
+                className="min-w-0 flex-1 font-mono"
                 placeholder={format === "ollama" ? "llama3.2" : "claude-opus-4-8"}
                 value={model}
                 onChange={(e) => setModel(e.target.value)}
@@ -692,7 +692,7 @@ function ProfileSheet({
           </p>
 
           <div className="grid gap-3 rounded-lg border p-3">
-            <div className="flex items-center justify-between gap-4">
+            <div className="flex flex-col items-start gap-3 sm:flex-row sm:items-center sm:justify-between">
               <div className="grid gap-0.5">
                 <Label htmlFor="p-priority" className="text-sm">
                   Pool priority
@@ -709,7 +709,7 @@ function ProfileSheet({
                 onChange={(e) => setPriority(e.target.value)}
               />
             </div>
-            <div className="flex items-center justify-between gap-4 border-t pt-3">
+            <div className="flex flex-col items-start gap-3 border-t pt-3 sm:flex-row sm:items-center sm:justify-between">
               <div className="grid gap-0.5">
                 <Label className="text-sm">Excluded from pool</Label>
                 <p className="text-muted-foreground text-xs">
@@ -719,7 +719,7 @@ function ProfileSheet({
               </div>
               <Switch checked={poolExclude} onCheckedChange={setPoolExclude} aria-label="Excluded from pool" />
             </div>
-            <div className="flex items-center justify-between gap-4 border-t pt-3">
+            <div className="flex flex-col items-start gap-3 border-t pt-3 sm:flex-row sm:items-center sm:justify-between">
               <div className="grid gap-0.5">
                 <Label className="text-sm">Streaming output</Label>
                 <p className="text-muted-foreground text-xs">
@@ -733,7 +733,7 @@ function ProfileSheet({
           </div>
 
           <div className="grid gap-3 rounded-lg border p-3">
-            <div className="flex items-center justify-between gap-4">
+            <div className="flex flex-col items-start gap-3 sm:flex-row sm:items-center sm:justify-between">
               <div className="grid gap-0.5">
                 <Label htmlFor="p-max-tokens" className="text-sm">
                   Output cap · max tokens
@@ -754,7 +754,7 @@ function ProfileSheet({
                 placeholder="0"
               />
             </div>
-            <div className="flex items-center justify-between gap-4 border-t pt-3">
+            <div className="flex flex-col items-start gap-3 border-t pt-3 sm:flex-row sm:items-center sm:justify-between">
               <div className="grid gap-0.5">
                 <Label className="text-sm">Cap field name</Label>
                 <p className="text-muted-foreground text-xs">{MAX_TOKENS_FIELD_HINTS[format]}</p>
@@ -779,7 +779,7 @@ function ProfileSheet({
           </div>
 
           <div className="grid gap-3 rounded-lg border p-3">
-            <div className="flex items-center justify-between gap-4">
+            <div className="flex flex-col items-start gap-3 sm:flex-row sm:items-center sm:justify-between">
               <div className="grid gap-0.5">
                 <Label className="text-sm">Thinking switch · thinking.type</Label>
                 <p className="text-muted-foreground text-xs">
@@ -800,7 +800,7 @@ function ProfileSheet({
                 </SelectContent>
               </Select>
             </div>
-            <div className="flex items-center justify-between gap-4 border-t pt-3">
+            <div className="flex flex-col items-start gap-3 border-t pt-3 sm:flex-row sm:items-center sm:justify-between">
               <div className="grid gap-0.5">
                 <Label className="text-sm">Thinking effort · reasoning_effort</Label>
                 <p className="text-muted-foreground text-xs">
