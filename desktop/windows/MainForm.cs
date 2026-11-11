@@ -36,6 +36,7 @@ public sealed class MainForm : Form
         Text = "正在连接本机服务并加载界面",
     };
     private readonly Button pageRetry = new() { Text = "重新连接", Width = 140, Height = 36, Anchor = AnchorStyles.None, Visible = false };
+    private readonly System.Windows.Forms.Timer pageLoadWatchdog = new() { Interval = 25000 };
     private readonly ToolStrip toolbar = new() { Dock = DockStyle.Top, GripStyle = ToolStripGripStyle.Hidden };
     private readonly StatusStrip statusBar = new() { Dock = DockStyle.Bottom };
     private readonly ToolStripButton fullScreenButton = new("全屏 (F11)");
@@ -81,6 +82,14 @@ public sealed class MainForm : Form
         pageState.Controls.Add(pageDetails, 0, 2);
         pageState.Controls.Add(pageRetry, 0, 3);
         pageRetry.Click += (_, _) => RetryConnection();
+        pageLoadWatchdog.Tick += (_, _) =>
+        {
+            pageLoadWatchdog.Stop();
+            if (ready || lifetime.IsCancellationRequested) return;
+            status.Text = "页面加载超时 · 可重新连接";
+            LogDesktopFailure("WebView2 页面加载超过 25 秒");
+            ShowPageMessage("界面加载超时", "网页未能按时加载，请点击“重新连接”重试。", true);
+        };
         viewHost.Controls.Add(browser);
         viewHost.Controls.Add(pageState);
 
@@ -209,10 +218,13 @@ public sealed class MainForm : Form
                 {
                     if (!args.Uri.StartsWith(Service.AbsoluteUri, StringComparison.OrdinalIgnoreCase)) return;
                     pageResourceFailed = false;
+                    pageLoadWatchdog.Stop();
+                    pageLoadWatchdog.Start();
                     ShowPageMessage("正在加载 ARTEX 界面…", "正在等待网页完成加载", false);
                 };
                 core.NavigationCompleted += (_, args) =>
                 {
+                    pageLoadWatchdog.Stop();
                     if (!args.IsSuccess)
                     {
                         ready = false;
@@ -243,6 +255,7 @@ public sealed class MainForm : Form
                     if (!staticAsset && !document) return;
                     pageResourceFailed = true;
                     ready = false;
+                    pageLoadWatchdog.Stop();
                     var details = "网页请求失败：HTTP " + args.Response.StatusCode + " " + uri.AbsolutePath;
                     LogDesktopFailure(details);
                     status.Text = "ARTEX 网页资源请求失败 · 可重新连接";
@@ -327,6 +340,7 @@ public sealed class MainForm : Form
     {
         if (lifetime.IsCancellationRequested || IsDisposed) return;
         ready = false;
+        pageLoadWatchdog.Stop();
         LogDesktopFailure("WebView2 进程异常：" + kind);
         if (kind is CoreWebView2ProcessFailedKind.BrowserProcessExited or
             CoreWebView2ProcessFailedKind.RenderProcessUnresponsive)
@@ -565,6 +579,8 @@ public sealed class MainForm : Form
     protected override void OnFormClosed(FormClosedEventArgs e)
     {
         lifetime.Cancel();
+        pageLoadWatchdog.Stop();
+        pageLoadWatchdog.Dispose();
         tray.Visible = false;
         tray.Dispose();
 
