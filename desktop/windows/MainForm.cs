@@ -152,15 +152,13 @@ public sealed class MainForm : Form
                 cancel.ThrowIfCancellationRequested();
                 await browser.EnsureCoreWebView2Async(environment);
 
-                browser.AcceleratorKeyPressed += (_, args) =>
+                // WebView2 forwards accelerator keys through the WinForms KeyDown event.
+                browser.KeyDown += (_, args) =>
                 {
-                    if (args.KeyEventKind is not (CoreWebView2KeyEventKind.KeyDown or
-                        CoreWebView2KeyEventKind.SystemKeyDown)) return;
-                    if (args.VirtualKey != 0x7A && (!fullScreen || args.VirtualKey != 0x1B)) return;
+                    if (args.KeyCode != Keys.F11 && (!fullScreen || args.KeyCode != Keys.Escape)) return;
                     args.Handled = true;
-                    // Bit 30 marks a repeated keydown; do not toggle twice on a long press.
-                    if ((args.KeyEventLParam & (1 << 30)) == 0 && !IsDisposed && !Disposing)
-                        BeginInvoke((Action)ToggleFullScreen);
+                    args.SuppressKeyPress = true;
+                    if (!IsDisposed && !Disposing) BeginInvoke((Action)ToggleFullScreen);
                 };
 
                 browser.CoreWebView2.NewWindowRequested += (_, args) =>
