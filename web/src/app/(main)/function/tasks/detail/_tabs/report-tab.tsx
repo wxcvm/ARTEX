@@ -13,9 +13,14 @@ import { copyText } from "@/lib/utils";
 
 export function ReportTab({ taskId }: { taskId: string }) {
   const [report, setReport] = React.useState<string>("");
+  const [reportTaskId, setReportTaskId] = React.useState(taskId);
+  // When the task changes, never display the previous task's report.
+  const currentReport = reportTaskId === taskId ? report : "";
   const [loading, setLoading] = React.useState(true);
   const [copied, setCopied] = React.useState(false);
   const [error, setError] = React.useState("");
+  const [errorTaskId, setErrorTaskId] = React.useState(taskId);
+  const currentError = errorTaskId === taskId ? error : "";
   const [refresh, setRefresh] = React.useState(0);
 
   React.useEffect(() => {
@@ -26,11 +31,16 @@ export function ReportTab({ taskId }: { taskId: string }) {
       .then((text) => {
         if (active) {
           setReport(text);
+          setReportTaskId(taskId);
+          setErrorTaskId(taskId);
           setError("");
         }
       })
       .catch((cause) => {
-        if (active) setError(cause instanceof Error ? cause.message : "Report request failed.");
+        if (active) {
+          setErrorTaskId(taskId);
+          setError(cause instanceof Error ? cause.message : "报告请求失败");
+        }
       })
       .finally(() => {
         if (active) setLoading(false);
@@ -40,68 +50,75 @@ export function ReportTab({ taskId }: { taskId: string }) {
     };
   }, [taskId, refresh]);
 
+  React.useEffect(() => {
+    setCopied(false);
+  }, [taskId]);
+
   async function copy() {
-    if (!report) return;
-    const ok = await copyText(report);
+    if (!currentReport) return;
+    const ok = await copyText(currentReport);
     if (ok) {
       setCopied(true);
-      toast.success("Markdown copied");
+      toast.success("报告 Markdown 已复制");
       setTimeout(() => setCopied(false), 1500);
     } else {
-      toast.error("Copy failed; please select the text and copy it manually");
+      toast.error("复制失败，请选中报告内容手动复制");
     }
   }
 
   let content: React.ReactNode;
-  if (loading && !report && !error) {
+  if (loading && !currentReport && !currentError) {
     content = (
-      <div className="flex flex-col items-center justify-center gap-2 rounded-md border border-dashed py-16 text-muted-foreground text-sm">
-        <FileTextIcon className="size-8 opacity-40" />
-        Loading…
+      <div className="flex min-h-64 flex-col items-center justify-center gap-3 rounded-lg border border-dashed border-border/70 bg-muted/10 px-4 py-14 text-center text-sm text-muted-foreground">
+        <FileTextIcon className="size-8 opacity-50" />
+        正在加载任务报告…
       </div>
     );
-  } else if (report) {
+  } else if (currentReport) {
     content = (
-      <div className="max-h-[60vh] overflow-auto rounded-md border bg-muted/20 p-4">
-        <Markdown text={report} />
-      </div>
+      <article className="max-h-[65dvh] min-w-0 overflow-auto rounded-xl border border-border/70 bg-background/60 p-4 text-sm leading-7 sm:p-6">
+        <Markdown text={currentReport} />
+      </article>
     );
-  } else if (error) {
+  } else if (currentError) {
     content = null;
   } else {
     content = (
-      <div className="flex flex-col items-center justify-center gap-2 rounded-md border border-dashed py-16 text-muted-foreground text-sm">
-        <FileTextIcon className="size-8 opacity-40" />
-        <span>No report artifact available</span>
-        <span className="px-4 text-center text-xs">An absent report does not mean the assessment completed without findings.</span>
+      <div className="flex min-h-64 flex-col items-center justify-center gap-3 rounded-lg border border-dashed border-border/70 bg-muted/10 px-4 py-14 text-center text-sm text-muted-foreground">
+        <FileTextIcon className="size-8 opacity-50" />
+        <strong className="text-foreground">当前没有可用的任务报告</strong>
+        <span className="max-w-lg leading-relaxed">没有生成报告不等于任务没有发现结果。可以稍后刷新，或到“发现结果”标签查看已有数据。</span>
       </div>
     );
   }
 
   return (
-    <Card>
-      <CardHeader className="flex-row items-center justify-between">
-        <CardTitle className="flex items-center gap-2 text-sm">
-          <FileTextIcon className="size-4" /> Penetration test report (Markdown)
-        </CardTitle>
-        <div className="flex gap-2">
+    <Card className="min-w-0 gap-0 overflow-hidden rounded-xl border-border/70 bg-card/90 py-0 shadow-sm">
+      <CardHeader className="flex flex-wrap items-center justify-between gap-3 border-b border-border/70 px-4 py-4 sm:px-6">
+        <div className="min-w-0">
+          <CardTitle className="flex items-center gap-2 text-base font-semibold">
+            <FileTextIcon className="size-4" /> 任务报告
+          </CardTitle>
+          <p className="mt-1 text-xs text-muted-foreground">Markdown 报告 · 可滚动阅读、复制原文</p>
+        </div>
+        <div className="flex flex-wrap items-center gap-2">
           <Button size="sm" variant="outline" disabled={loading} onClick={() => setRefresh((n) => n + 1)}>
-            <RefreshCwIcon className={loading ? "animate-spin" : ""} /> {error ? "Retry report" : "Refresh report"}
+            <RefreshCwIcon className={loading ? "animate-spin" : ""} /> {currentError ? "重试加载" : "刷新报告"}
           </Button>
-          {report && (
+          {currentReport && (
             <Button size="sm" variant="outline" onClick={copy}>
-              {copied ? <CheckIcon /> : <CopyIcon />} Copy
+              {copied ? <CheckIcon /> : <CopyIcon />} {copied ? "已复制" : "复制 Markdown"}
             </Button>
           )}
         </div>
       </CardHeader>
-      <CardContent className="space-y-3">
-        {error && (
+      <CardContent className="min-w-0 space-y-3 px-4 py-4 sm:px-6">
+        {currentError && (
           <div role="alert" className="rounded-md border border-destructive/30 p-3 text-sm" data-testid="report-request-error">
-            <p className="font-medium text-destructive">Report unavailable — request failed</p>
-            <p className="break-words">{error}</p>
-            <p className="text-muted-foreground">This is a report-loading error, not evidence of zero findings or a task failure.</p>
-            {report && <p className="text-muted-foreground">The last successfully loaded report is shown below and may be stale.</p>}
+            <p className="font-medium text-destructive">无法加载任务报告</p>
+            <p className="break-words">{currentError}</p>
+            <p className="text-muted-foreground">这只是报告请求失败，不代表任务失败或没有发现结果。</p>
+            {currentReport && <p className="text-muted-foreground">下方保留上次成功加载的报告，内容可能不是最新版本。</p>}
           </div>
         )}
         {content}
