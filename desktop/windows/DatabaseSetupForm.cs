@@ -473,10 +473,24 @@ internal sealed class DatabaseSetupForm : Form
         }
     }
 
-    private async Task ProvisionDedicatedAccountAsync()
+    private async Task SetupAndSaveAsync()
+    {
+        if (!quickMode.Checked) { Save(); return; }
+        saveButton.Enabled = false;
+        try
+        {
+            if (await ProvisionDedicatedAccountAsync()) Save();
+        }
+        finally
+        {
+            if (!IsDisposed) saveButton.Enabled = true;
+        }
+    }
+
+    private async Task<bool> ProvisionDedicatedAccountAsync()
     {
         var adminDsn = CurrentDsn();
-        if (adminDsn is null) return;
+        if (adminDsn is null) return false;
         var dbName = database.Text.Trim();
         if (MessageBox.Show(this,
             $"将使用当前填写的管理员账号“{user.Text.Trim()}”在 PostgreSQL 上创建专用账户 artex，" +
@@ -485,14 +499,14 @@ internal sealed class DatabaseSetupForm : Form
             "\\n完成后会将向导账号切换为 artex。确认继续？",
             "初始化 ARTEX 专用账户",
             MessageBoxButtons.YesNo, MessageBoxIcon.Question) != DialogResult.Yes)
-            return;
+            return false;
 
         var executable = Path.Combine(AppContext.BaseDirectory, "artex.exe");
         if (!File.Exists(executable))
         {
             MessageBox.Show(this, "找不到 artex.exe，请使用完整 Windows 桌面包。",
                 "初始化专用账户", MessageBoxButtons.OK, MessageBoxIcon.Error);
-            return;
+            return false;
         }
         var newPassword = Convert.ToHexString(RandomNumberGenerator.GetBytes(24));
         provisionApp.Enabled = false;
@@ -526,18 +540,17 @@ internal sealed class DatabaseSetupForm : Form
                 if (!process.HasExited) process.Kill(entireProcessTree: true);
                 throw;
             }
-            if (IsDisposed || discoveryLifetime.IsCancellationRequested) return;
+            if (IsDisposed || discoveryLifetime.IsCancellationRequested) return false;
             if (process.ExitCode == 0)
             {
                 user.Text = "artex";
                 password.Text = newPassword;
                 discoveryStatus.Text = "ARTEX 专用账户与数据库已就绪，已切换到专用账户。请点击“保存并连接”。";
-                MessageBox.Show(this,
-                    "已创建专用账户 artex，数据库归它所有。\\n" +
-                    "向导已填入随机生成的专用密码，请点击“保存并连接”以保存配置。\\n" +
-                    "PostgreSQL 管理员密码不会保存到 ARTEX 配置中。",
-                    "专用账户已就绪", MessageBoxButtons.OK, MessageBoxIcon.Information);
-                return;
+                if (!quickMode.Checked)
+                    MessageBox.Show(this,
+                        "已创建专用账户 artex，数据库归它所有。请点击“保存并连接”继续。",
+                        "专用账户已就绪", MessageBoxButtons.OK, MessageBoxIcon.Information);
+                return true;
             }
             var details = await process.StandardError.ReadToEndAsync(timeout.Token);
             if (password.Text.Length > 0)
@@ -561,6 +574,7 @@ internal sealed class DatabaseSetupForm : Form
         {
             if (!IsDisposed) provisionApp.Enabled = true;
         }
+        return false;
     }
 
     private string? CurrentDsn()
