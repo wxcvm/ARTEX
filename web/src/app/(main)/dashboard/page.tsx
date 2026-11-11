@@ -117,12 +117,12 @@ function SectionTitle({
   sub?: React.ReactNode;
 }) {
   return (
-    <div className="mb-3 flex items-center justify-between">
-      <div className="flex items-center gap-1.5 text-xs font-semibold">
+    <div className="mb-4 flex items-center justify-between gap-3">
+      <div className="flex items-center gap-2 text-sm font-semibold">
         <Icon className="size-3.5 text-muted-foreground" />
         {children}
       </div>
-      {sub && <span className="text-[10px] text-muted-foreground">{sub}</span>}
+      {sub && <span className="text-xs text-muted-foreground">{sub}</span>}
     </div>
   );
 }
@@ -132,7 +132,7 @@ function SectionTitle({
 export default function DashboardPage() {
   // data state
   const [tasks, setTasks] = React.useState<Task[]>([]);
-  const [findings, setFindings] = React.useState<Finding[]>([]);
+  const [findings, set发现结果] = React.useState<Finding[]>([]);
   const [stats, setStats] = React.useState<Stats | null>(null);
   const [settings, setSettings] = React.useState<Settings | null>(null);
   const [pending, setPending] = React.useState<InterceptPending[]>([]);
@@ -197,7 +197,7 @@ export default function DashboardPage() {
           api.conversationTokens(),
         ]);
         if (!alive) return;
-        setFindings(findings);
+        set发现结果(findings);
         setStats(stats);
         setSettings(settings);
         setPending(pending);
@@ -492,107 +492,144 @@ export default function DashboardPage() {
   // ── render ────────────────────────────────────────────────────────────────
 
   return (
-    <div className="flex flex-1 flex-col gap-4 pb-6">
-      {/* ── Header ── */}
-      <div>
-        <div>
-          <h1 className="text-lg font-semibold tracking-tight">Overview</h1>
-          <p className="text-xs text-muted-foreground">System-wide status · live refresh</p>
+    <div className="artex-dashboard flex min-w-0 flex-1 flex-col gap-5 pb-7">
+      {/* ── Dashboard introduction ── */}
+      <section className="relative overflow-hidden rounded-2xl border border-border/70 bg-gradient-to-br from-card via-card to-primary/10 px-5 py-5 shadow-sm sm:px-7 sm:py-6">
+        <div className="relative flex flex-wrap items-center justify-between gap-5">
+          <div className="min-w-0">
+            <div className="mb-2 text-xs font-semibold tracking-[0.18em] text-primary">ARTEX / WORKSPACE</div>
+            <h1 className="text-2xl font-semibold tracking-tight sm:text-3xl">工作台总览</h1>
+            <p className="mt-2 max-w-2xl text-sm leading-relaxed text-muted-foreground">
+              一站查看任务进展、发现结果、资产与系统健康状态。
+            </p>
+            <div className="mt-3 flex items-center gap-2 text-xs text-muted-foreground">
+              <LiveDot className="bg-primary" />
+              <span>页面数据自动刷新</span>
+            </div>
+          </div>
+          <div className="flex flex-wrap gap-2">
+            <Link href="/function/tasks" className="inline-flex h-10 items-center gap-2 rounded-lg bg-primary px-4 text-sm font-semibold text-primary-foreground transition-colors hover:bg-primary/90">
+              查看任务 <ArrowUpRightIcon className="size-4" />
+            </Link>
+            <Link href="/system/settings" className="inline-flex h-10 items-center rounded-lg border border-border bg-background/70 px-4 text-sm font-medium text-foreground transition-colors hover:bg-accent">
+              系统设置
+            </Link>
+          </div>
         </div>
-      </div>
+      </section>
+
+      {stats && !stats.llm_configured && (
+        <section
+          role="status"
+          className="flex flex-wrap items-center justify-between gap-4 rounded-xl border border-amber-500/25 bg-amber-500/8 px-5 py-4"
+        >
+          <div className="flex min-w-0 items-start gap-3">
+            <ShieldCheckIcon className="mt-0.5 size-5 shrink-0 text-amber-400" />
+            <div>
+              <p className="text-sm font-semibold">还没有配置默认模型</p>
+              <p className="mt-1 text-xs leading-relaxed text-muted-foreground">
+                完成模型连接后，才可以正常使用需要大模型的任务能力。
+              </p>
+            </div>
+          </div>
+          <Link href="/system/llm" className="inline-flex h-9 items-center gap-1.5 rounded-lg border border-amber-500/30 px-3 text-xs font-semibold text-foreground transition-colors hover:bg-amber-500/10">
+            配置模型 <ArrowUpRightIcon className="size-3.5" />
+          </Link>
+        </section>
+      )}
 
       {/* ── Row 1: 5 stat cards ── */}
-      <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 lg:grid-cols-5">
-        {/* Active tasks */}
-        <Card className="gap-1">
+      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-5">
+        {/* 进行中任务 */}
+        <Card className="gap-2 rounded-xl border-border/70 bg-card/90 shadow-sm transition-colors hover:border-primary/30">
           <CardHeader className="pb-0">
-            <div className="flex items-center gap-1.5 text-[10px] text-muted-foreground">
-              <TargetIcon className="size-3" /> Active tasks
+            <div className="flex items-center gap-2 text-xs font-medium text-muted-foreground">
+              <TargetIcon className="size-4" /> 进行中任务
             </div>
             <div className="flex items-baseline gap-1.5">
-              <span className="text-2xl font-semibold tabular-nums">{tasksByStatus.running ?? 0}</span>
+              <span className="text-3xl font-semibold tracking-tight tabular-nums">{tasksByStatus.running ?? 0}</span>
               <span className="text-xs text-muted-foreground">/ {tasks.length}</span>
             </div>
           </CardHeader>
-          <CardContent className="flex flex-wrap gap-x-2.5 gap-y-0.5 text-[10px]">
-            {(tasksByStatus.running ?? 0) > 0 && <span className="text-blue-400">Exploring {tasksByStatus.running}</span>}
-            {(tasksByStatus.paused ?? 0) > 0 && <span className="text-amber-400">Paused {tasksByStatus.paused}</span>}
-            {(tasksByStatus.done ?? 0) > 0 && <span className="text-emerald-400">Completed {tasksByStatus.done}</span>}
-            {tasks.length === 0 && <span className="text-muted-foreground">No tasks</span>}
+          <CardContent className="flex flex-wrap gap-x-2.5 gap-y-0.5 text-xs">
+            {(tasksByStatus.running ?? 0) > 0 && <span className="text-blue-400">运行中 {tasksByStatus.running}</span>}
+            {(tasksByStatus.paused ?? 0) > 0 && <span className="text-amber-400">已暂停 {tasksByStatus.paused}</span>}
+            {(tasksByStatus.done ?? 0) > 0 && <span className="text-emerald-400">已完成 {tasksByStatus.done}</span>}
+            {tasks.length === 0 && <span className="text-muted-foreground">暂无任务</span>}
           </CardContent>
         </Card>
 
-        {/* Confirmed findings */}
-        <Card className="gap-1">
+        {/* 发现结果 */}
+        <Card className="gap-2 rounded-xl border-border/70 bg-card/90 shadow-sm transition-colors hover:border-primary/30">
           <CardHeader className="pb-0">
-            <div className="flex items-center gap-1.5 text-[10px] text-muted-foreground">
-              <BugIcon className="size-3" /> Confirmed findings
+            <div className="flex items-center gap-2 text-xs font-medium text-muted-foreground">
+              <BugIcon className="size-4" /> 发现结果
             </div>
-            <div className="text-2xl font-semibold tabular-nums">{findings.length}</div>
+            <div className="text-3xl font-semibold tracking-tight tabular-nums">{findings.length}</div>
           </CardHeader>
-          <CardContent className="flex flex-wrap gap-2.5 text-[10px]">
-            <span className="text-rose-500">Critical {findingsBySev.critical}</span>
-            <span className="text-red-400">High {findingsBySev.high}</span>
-            <span className="text-amber-400">Medium {findingsBySev.medium}</span>
-            <span className="text-slate-400">Low {findingsBySev.low}</span>
+          <CardContent className="flex flex-wrap gap-2.5 text-xs">
+            <span className="text-rose-500">严重 {findingsBySev.critical}</span>
+            <span className="text-red-400">高危 {findingsBySev.high}</span>
+            <span className="text-amber-400">中危 {findingsBySev.medium}</span>
+            <span className="text-slate-400">低危 {findingsBySev.low}</span>
           </CardContent>
         </Card>
 
-        {/* Asset nodes */}
-        <Card className="gap-1">
+        {/* 资产节点 */}
+        <Card className="gap-2 rounded-xl border-border/70 bg-card/90 shadow-sm transition-colors hover:border-primary/30">
           <CardHeader className="pb-0">
-            <div className="flex items-center gap-1.5 text-[10px] text-muted-foreground">
-              <NetworkIcon className="size-3" /> Asset nodes
+            <div className="flex items-center gap-2 text-xs font-medium text-muted-foreground">
+              <NetworkIcon className="size-4" /> 资产节点
             </div>
-            <div className="text-2xl font-semibold tabular-nums">{totalAssets}</div>
+            <div className="text-3xl font-semibold tracking-tight tabular-nums">{totalAssets}</div>
           </CardHeader>
-          <CardContent className="text-[10px] text-muted-foreground">Shared across tasks</CardContent>
+          <CardContent className="text-xs text-muted-foreground">跨任务共享</CardContent>
         </Card>
 
-        {/* Traffic exchanges */}
-        <Card className="gap-1">
+        {/* 近期流量 */}
+        <Card className="gap-2 rounded-xl border-border/70 bg-card/90 shadow-sm transition-colors hover:border-primary/30">
           <CardHeader className="pb-0">
-            <div className="flex items-center gap-1.5 text-[10px] text-muted-foreground">
-              <ActivityIcon className="size-3" /> Traffic exchanges
+            <div className="flex items-center gap-2 text-xs font-medium text-muted-foreground">
+              <ActivityIcon className="size-4" /> 近期流量
             </div>
-            <div className="text-2xl font-semibold tabular-nums">{traffic.length}</div>
+            <div className="text-3xl font-semibold tracking-tight tabular-nums">{traffic.length}</div>
           </CardHeader>
-          <CardContent className="flex items-center gap-1.5 text-[10px] text-muted-foreground">
+          <CardContent className="flex items-center gap-2 text-xs font-medium text-muted-foreground">
             {settings?.traffic_capture ? (
               <>
                 <LiveDot />
-                <span>Recording</span>
+                <span>记录中</span>
               </>
             ) : (
-              <span>Capture is off</span>
+              <span>未开启采集</span>
             )}
           </CardContent>
         </Card>
 
         {/* LLM usage */}
-        <Card className="gap-1">
+        <Card className="gap-2 rounded-xl border-border/70 bg-card/90 shadow-sm transition-colors hover:border-primary/30">
           <CardHeader className="pb-0">
-            <div className="flex items-center gap-1.5 text-[10px] text-muted-foreground">
-              <ZapIcon className="size-3" /> Token usage
+            <div className="flex items-center gap-2 text-xs font-medium text-muted-foreground">
+              <ZapIcon className="size-4" /> Token 使用量
             </div>
-            <div className="text-2xl font-semibold tabular-nums">
+            <div className="text-3xl font-semibold tracking-tight tabular-nums">
               {fmtTokens(displayedTokens.input + displayedTokens.output) || "—"}
             </div>
           </CardHeader>
-          <CardContent className="text-[10px] text-muted-foreground">
-            In {fmtTokens(displayedTokens.input)} (incl. cache {fmtTokens(displayedTokens.cacheRead)}) · Out{" "}
+          <CardContent className="text-xs text-muted-foreground">
+            输入 {fmtTokens(displayedTokens.input)} （含缓存 {fmtTokens(displayedTokens.cacheRead)}) · 输出{" "}
             {fmtTokens(displayedTokens.output)}
           </CardContent>
         </Card>
       </div>
 
-      {/* ── Row 2: LLM token usage ── */}
-      <Card className="p-4">
+      {/* ── Row 2: 模型 Token 使用分析 ── */}
+      <Card className="rounded-xl border-border/70 bg-card/90 p-5 shadow-sm">
         {/* Header */}
         <div className="mb-4 flex flex-wrap items-center justify-between gap-2">
           <div className="flex items-center gap-1.5 text-xs font-semibold">
             <ZapIcon className="size-3.5 text-muted-foreground" />
-            LLM token usage
+            模型 Token 使用分析
             {/* Data source toggle: old = activity stats (includes historical tasks), new = the llm_usage metering ledger (more accurate, only covers data since it was enabled) */}
             <div className="ml-1 flex gap-0.5 rounded-md border bg-muted/30 p-0.5">
               {(
@@ -611,7 +648,7 @@ export default function DashboardPage() {
                       : "Old: from activity stats (includes historical tasks); aborted runs are not counted and it cannot break down by model"
                   }
                   className={cn(
-                    "rounded px-2 py-0.5 text-[9px] font-medium transition-colors",
+                    "rounded px-2 py-0.5 text-[11px] font-medium transition-colors",
                     tokenVersion === v
                       ? "bg-background text-foreground shadow-sm"
                       : "text-muted-foreground hover:text-foreground",
@@ -621,7 +658,7 @@ export default function DashboardPage() {
                 </button>
               ))}
             </div>
-            <span className="text-[10px] font-normal text-muted-foreground">
+            <span className="text-xs font-normal text-muted-foreground">
               {tokenVersion === "new" ? "llm_usage" : "activity"}
             </span>
           </div>
@@ -631,7 +668,7 @@ export default function DashboardPage() {
               type="button"
               onClick={() => setTokenTab("all")}
               className={cn(
-                "rounded-md px-2.5 py-1 text-[10px] font-medium transition-colors",
+                "rounded-md px-2.5 py-1 text-xs font-medium transition-colors",
                 tokenTab === "all"
                   ? "bg-foreground text-background"
                   : "bg-muted/30 text-muted-foreground hover:text-foreground",
@@ -649,7 +686,7 @@ export default function DashboardPage() {
                   key={p.id}
                   onClick={() => setTokenTab(resolvedKey)}
                   className={cn(
-                    "flex items-center gap-1 rounded-md px-2.5 py-1 text-[10px] font-medium transition-colors",
+                    "flex items-center gap-1 rounded-md px-2.5 py-1 text-xs font-medium transition-colors",
                     tokenTab === resolvedKey
                       ? "bg-foreground text-background"
                       : "bg-muted/30 text-muted-foreground hover:text-foreground",
@@ -660,7 +697,7 @@ export default function DashboardPage() {
                   {p.is_default && (
                     <span
                       className={cn(
-                        "rounded px-1 py-0 text-[8px]",
+                        "rounded px-1 py-0 text-[10px]",
                         tokenTab === resolvedKey
                           ? "bg-background/20 text-background"
                           : "bg-emerald-500/20 text-emerald-400",
@@ -681,11 +718,11 @@ export default function DashboardPage() {
           <div className="flex flex-col gap-4">
             {/* Total */}
             <div>
-              <div className="text-[10px] text-muted-foreground">Total (input+output)</div>
+              <div className="text-xs text-muted-foreground">Total (input+output)</div>
               <div className="mt-0.5 text-3xl font-bold tabular-nums tracking-tight">
                 {fmtTokens(displayedTokens.input + displayedTokens.output) || "—"}
               </div>
-              <div className="mt-0.5 text-[10px] text-muted-foreground">{displayedTokens.taskCount} tasks</div>
+              <div className="mt-0.5 text-xs text-muted-foreground">{displayedTokens.taskCount} tasks</div>
             </div>
 
             {/* Per-type bars */}
@@ -716,7 +753,7 @@ export default function DashboardPage() {
                   const pct = total > 0 ? (value / total) * 100 : 0;
                   return (
                     <div key={label}>
-                      <div className="mb-1 flex items-center justify-between text-[10px]">
+                      <div className="mb-1 flex items-center justify-between text-xs">
                         <span className="text-muted-foreground">{label}</span>
                         <span className={cn("font-mono font-semibold tabular-nums", text)}>{fmtTokens(value)}</span>
                       </div>
@@ -738,7 +775,7 @@ export default function DashboardPage() {
               const denominator = displayedTokens.input;
               const hitPct = denominator > 0 ? Math.round((displayedTokens.cacheRead / denominator) * 100) : 0;
               return (
-                <div className="flex items-center justify-between rounded-lg border bg-muted/20 px-3 py-2 text-[10px]">
+                <div className="flex items-center justify-between rounded-lg border bg-muted/20 px-3 py-2 text-xs">
                   <span className="text-muted-foreground">Cache hit rate</span>
                   <span
                     className={cn("font-semibold tabular-nums", hitPct > 50 ? "text-emerald-400" : "text-amber-400")}
@@ -753,7 +790,7 @@ export default function DashboardPage() {
           {/* Right: daily bar chart */}
           <div className="flex min-h-0 flex-col">
             <div className="mb-2 flex items-center justify-between">
-              <div className="flex gap-3 text-[9px] text-muted-foreground">
+              <div className="flex gap-3 text-[11px] text-muted-foreground">
                 {(["input", "output", "cacheRead"] as const).map((k) => (
                   <span key={k} className="flex items-center gap-1">
                     <span
@@ -779,7 +816,7 @@ export default function DashboardPage() {
                     key={days}
                     onClick={() => setTokenDays(days)}
                     className={cn(
-                      "rounded px-2.5 py-0.5 text-[9px] font-medium transition-colors",
+                      "rounded px-2.5 py-0.5 text-[11px] font-medium transition-colors",
                       tokenDays === days
                         ? "bg-background text-foreground shadow-sm"
                         : "text-muted-foreground hover:text-foreground",
@@ -796,10 +833,10 @@ export default function DashboardPage() {
                 className="flex flex-1 items-center justify-center rounded-lg border bg-muted/10 text-xs text-muted-foreground"
                 style={{ minHeight: 180 }}
               >
-                No data
+                暂无数据
               </div>
             ) : (
-              <ChartContainer config={dailyTrendConfig} className="h-[200px] w-full">
+              <ChartContainer config={dailyTrendConfig} className="h-[240px] w-full">
                 <BarChart data={dailyTokenData} margin={{ top: 4, right: 4, bottom: 0, left: 0 }} maxBarSize={40}>
                   <CartesianGrid vertical={false} />
                   <XAxis
@@ -844,24 +881,24 @@ export default function DashboardPage() {
         </div>
       </Card>
 
-      {/* ── Row 3: Activity feed | Findings ── */}
-      <div className="grid grid-cols-1 gap-3 lg:grid-cols-2">
-        {/* Activity feed */}
-        <Card className="p-4">
+      {/* ── Row 3: 最近活动 | 发现结果 ── */}
+      <div className="grid grid-cols-1 gap-4 xl:grid-cols-2">
+        {/* 最近活动 */}
+        <Card className="rounded-xl border-border/70 bg-card/90 p-5 shadow-sm">
           <div className="mb-3 flex items-center justify-between">
             <div className="flex items-center gap-1.5 text-xs font-semibold">
               <ActivityIcon className="size-3.5 text-muted-foreground" />
-              Activity feed
+              最近活动
             </div>
             <div className="flex items-center gap-2">
-              <span className="text-[10px] text-muted-foreground">
+              <span className="text-xs text-muted-foreground">
                 {activity.filter((a) => a.kind !== "usage").length} events
               </span>
               <Link
                 href="/function/tasks"
-                className="flex items-center gap-0.5 text-[10px] text-muted-foreground hover:text-foreground"
+                className="flex items-center gap-0.5 text-xs text-muted-foreground hover:text-foreground"
               >
-                View tasks <ArrowUpRightIcon className="size-3" />
+                查看任务 <ArrowUpRightIcon className="size-3" />
               </Link>
             </div>
           </div>
@@ -871,7 +908,7 @@ export default function DashboardPage() {
               const count = activity.filter((a) => a.kind === kind).length;
               if (count === 0) return null;
               return (
-                <span key={kind} className="rounded border bg-muted/20 px-1.5 py-0.5 text-[9px] text-muted-foreground">
+                <span key={kind} className="rounded border bg-muted/20 px-1.5 py-0.5 text-[11px] text-muted-foreground">
                   {kind} <strong className="text-foreground/70">{count}</strong>
                 </span>
               );
@@ -880,27 +917,27 @@ export default function DashboardPage() {
 
           <div className="divide-y">
             {recentActivity.length === 0 ? (
-              <div className="py-4 text-center text-xs text-muted-foreground">No activity records</div>
+              <div className="py-4 text-center text-xs text-muted-foreground">暂无活动记录</div>
             ) : (
               recentActivity.map((a) => (
                 <div key={a.seq} className="flex gap-2.5 py-2">
                   <span
                     className={cn(
-                      "shrink-0 self-start rounded border px-1.5 py-0.5 font-mono text-[9px]",
+                      "shrink-0 self-start rounded border px-1.5 py-0.5 font-mono text-[11px]",
                       workerBg(a.worker),
                     )}
                   >
                     {a.worker}
                   </span>
                   <div className="min-w-0 flex-1">
-                    <div className="text-[11px] font-medium">{kindLabel(a)}</div>
-                    <div className="mt-0.5 truncate text-[10px] text-muted-foreground">{a.summary}</div>
+                    <div className="text-xs font-medium">{kindLabel(a)}</div>
+                    <div className="mt-0.5 truncate text-xs text-muted-foreground">{a.summary}</div>
                   </div>
                   <div className="shrink-0 text-right">
-                    <Badge variant="outline" className="px-1.5 py-0 text-[9px] text-muted-foreground">
+                    <Badge variant="outline" className="px-1.5 py-0 text-[11px] text-muted-foreground">
                       {a.kind}
                     </Badge>
-                    <div className="mt-0.5 text-[9px] tabular-nums text-muted-foreground">{fmtRel(a.ts)}</div>
+                    <div className="mt-0.5 text-[11px] tabular-nums text-muted-foreground">{fmtRel(a.ts)}</div>
                   </div>
                 </div>
               ))
@@ -908,16 +945,16 @@ export default function DashboardPage() {
           </div>
         </Card>
 
-        {/* Findings */}
-        <Card className="p-4">
+        {/* 发现结果 */}
+        <Card className="rounded-xl border-border/70 bg-card/90 p-5 shadow-sm">
           <div className="mb-3 flex items-center justify-between">
             <div className="flex items-center gap-1.5 text-xs font-semibold">
               <BugIcon className="size-3.5 text-muted-foreground" />
-              Findings
+              发现结果
             </div>
             <Link
               href="/function/findings"
-              className="flex items-center gap-0.5 text-[10px] text-muted-foreground hover:text-foreground"
+              className="flex items-center gap-0.5 text-xs text-muted-foreground hover:text-foreground"
             >
               All <ArrowUpRightIcon className="size-3" />
             </Link>
@@ -925,27 +962,27 @@ export default function DashboardPage() {
 
           <div className="divide-y">
             {recentFindings.length === 0 ? (
-              <div className="py-4 text-center text-xs text-muted-foreground">No findings</div>
+              <div className="py-4 text-center text-xs text-muted-foreground">暂无发现结果</div>
             ) : (
               recentFindings.map((f) => (
                 <div key={f.id} className="flex items-start gap-2 py-2">
                   <StatusBadge
                     domain="severity"
                     value={f.severity}
-                    className="mt-0.5 shrink-0 px-1.5 py-0 text-[10px]"
+                    className="mt-0.5 shrink-0 px-1.5 py-0 text-xs"
                   />
                   <div className="min-w-0 flex-1">
                     <div className="flex flex-wrap items-center gap-1.5">
-                      <span className="text-[11px] font-semibold">{f.vulnclass}</span>
+                      <span className="text-xs font-semibold">{f.vulnclass}</span>
                       {f.task_description && (
-                        <span className="truncate text-[10px] text-muted-foreground">{f.task_description}</span>
+                        <span className="truncate text-xs text-muted-foreground">{f.task_description}</span>
                       )}
                     </div>
-                    <div className="mt-0.5 line-clamp-2 text-[10px] leading-snug text-muted-foreground">
+                    <div className="mt-0.5 line-clamp-2 text-xs leading-snug text-muted-foreground">
                       {f.summary}
                     </div>
                   </div>
-                  <span className="shrink-0 text-[9px] tabular-nums text-muted-foreground">{fmtRel(f.ts)}</span>
+                  <span className="shrink-0 text-[11px] tabular-nums text-muted-foreground">{fmtRel(f.ts)}</span>
                 </div>
               ))
             )}
@@ -954,17 +991,17 @@ export default function DashboardPage() {
       </div>
 
       {/* ── Row 4: Task table ── */}
-      <Card className="overflow-hidden p-0">
+      <Card className="overflow-hidden rounded-xl border-border/70 bg-card/90 p-0 shadow-sm">
         <div className="flex items-center justify-between border-b px-4 py-3">
           <div className="flex items-center gap-1.5 text-xs font-semibold">
             <ClockIcon className="size-3.5 text-muted-foreground" />
             Tasks
           </div>
           <div className="flex items-center gap-2">
-            <span className="text-[10px] text-muted-foreground">{tasks.length} tasks</span>
+            <span className="text-xs text-muted-foreground">{tasks.length} tasks</span>
             <Link
               href="/function/tasks"
-              className="flex items-center gap-0.5 text-[10px] text-muted-foreground hover:text-foreground"
+              className="flex items-center gap-0.5 text-xs text-muted-foreground hover:text-foreground"
             >
               All <ArrowUpRightIcon className="size-3" />
             </Link>
@@ -976,7 +1013,7 @@ export default function DashboardPage() {
               {["Task", "Status", "Engine", "Goal progress", "In flight", "Last activity"].map((h) => (
                 <th
                   key={h}
-                  className="px-4 py-2 text-left text-[9px] font-semibold uppercase tracking-widest text-muted-foreground first:pl-4"
+                  className="px-4 py-2 text-left text-[11px] font-semibold uppercase tracking-widest text-muted-foreground first:pl-4"
                 >
                   {h}
                 </th>
@@ -998,17 +1035,17 @@ export default function DashboardPage() {
                     <td className="max-w-xs px-4 py-3">
                       <Link href={`/function/tasks/detail?id=${t.id}`} className="group flex flex-col">
                         <span className="truncate font-medium group-hover:underline">{t.description}</span>
-                        <span className="mt-0.5 truncate font-mono text-[10px] text-muted-foreground">{t.id}</span>
+                        <span className="mt-0.5 truncate font-mono text-xs text-muted-foreground">{t.id}</span>
                       </Link>
                     </td>
                     <td className="px-4 py-3">
-                      <StatusBadge domain="task" value={t.status} dot className="px-1.5 py-0 text-[10px]" />
+                      <StatusBadge domain="task" value={t.status} dot className="px-1.5 py-0 text-xs" />
                     </td>
                     <td className="px-4 py-3">
                       <StatusBadge
                         domain="engine"
                         value={t.engine_mode ?? "idle"}
-                        className="px-1.5 py-0 text-[10px]"
+                        className="px-1.5 py-0 text-xs"
                       />
                     </td>
                     <td className="px-4 py-3">
@@ -1041,10 +1078,10 @@ export default function DashboardPage() {
         </table>
       </Card>
 
-      {/* ── Row 5: Asset distribution | Traffic status codes | Interception & pending approvals ── */}
-      <div className="grid grid-cols-1 gap-3 lg:grid-cols-3">
+      {/* ── Row 5: Asset distribution | 流量状态分布 | Interception & pending approvals ── */}
+      <div className="grid grid-cols-1 gap-4 xl:grid-cols-3">
         {/* Asset distribution */}
-        <Card className="p-4">
+        <Card className="rounded-xl border-border/70 bg-card/90 p-5 shadow-sm">
           <SectionTitle icon={NetworkIcon} sub="By type">
             Asset distribution
           </SectionTitle>
@@ -1055,7 +1092,7 @@ export default function DashboardPage() {
             <div className="flex flex-col gap-2">
               {assetByType.map(([type, count]) => (
                 <div key={type} className="flex items-center gap-2 text-xs">
-                  <span className="w-8 shrink-0 text-right text-[10px] text-muted-foreground">
+                  <span className="w-8 shrink-0 text-right text-xs text-muted-foreground">
                     {ASSET_TYPE_LABELS[type] ?? type}
                   </span>
                   <div className="h-1.5 flex-1 overflow-hidden rounded-full bg-muted">
@@ -1070,41 +1107,41 @@ export default function DashboardPage() {
             </div>
           )}
 
-          <div className="mt-3 border-t pt-3 text-[10px] text-muted-foreground">{totalAssets} nodes in total</div>
+          <div className="mt-3 border-t pt-3 text-xs text-muted-foreground">{totalAssets} nodes in total</div>
         </Card>
 
-        {/* Traffic status codes */}
-        <Card className="p-4">
+        {/* 流量状态分布 */}
+        <Card className="rounded-xl border-border/70 bg-card/90 p-5 shadow-sm">
           <SectionTitle icon={ActivityIcon} sub={`${traffic.length} requests`}>
-            Traffic status codes
+            流量状态分布
           </SectionTitle>
 
           {/* bar chart */}
           {trafficByCodes.length === 0 ? (
-            <div className="py-6 text-center text-xs text-muted-foreground">No traffic data</div>
+            <div className="py-6 text-center text-xs text-muted-foreground">暂无流量记录</div>
           ) : (
             <>
               <div className="mb-3 flex items-end gap-2" style={{ height: 52 }}>
                 {trafficByCodes.map(({ code, n }) => (
                   <div key={code} className="flex flex-1 flex-col items-center gap-1">
-                    <span className="text-[9px] tabular-nums text-muted-foreground">{n}</span>
+                    <span className="text-[11px] tabular-nums text-muted-foreground">{n}</span>
                     <div
                       className={cn("w-full min-h-1 rounded-sm", statusBg(code), "opacity-80")}
                       style={{ height: Math.max(4, (n / trafficMax) * 36) }}
                     />
-                    <span className={cn("text-[9px] font-mono", statusColor(code))}>{code}</span>
+                    <span className={cn("text-[11px] font-mono", statusColor(code))}>{code}</span>
                   </div>
                 ))}
               </div>
 
               <div className="border-t pt-2.5">
-                <div className="mb-1.5 text-[10px] text-muted-foreground">Recent requests</div>
+                <div className="mb-1.5 text-xs text-muted-foreground">最近请求</div>
                 <div className="flex flex-col gap-1.5">
                   {recentTraffic.map((e) => (
-                    <div key={e.id} className="flex items-center gap-1.5 text-[10px]">
+                    <div key={e.id} className="flex items-center gap-1.5 text-xs">
                       <span
                         className={cn(
-                          "shrink-0 rounded border px-1 py-0 font-mono text-[9px]",
+                          "shrink-0 rounded border px-1 py-0 font-mono text-[11px]",
                           e.method === "GET"
                             ? "border-emerald-500/30 bg-emerald-500/10 text-emerald-400"
                             : "border-blue-500/30 bg-blue-500/10 text-blue-400",
@@ -1116,7 +1153,7 @@ export default function DashboardPage() {
                         {e.host}
                         {e.url.replace(/^https?:\/\/[^/]+/, "").substring(0, 30)}
                       </span>
-                      <span className={cn("shrink-0 font-mono text-[9px]", statusColor(e.status))}>{e.status}</span>
+                      <span className={cn("shrink-0 font-mono text-[11px]", statusColor(e.status))}>{e.status}</span>
                     </div>
                   ))}
                 </div>
@@ -1125,17 +1162,17 @@ export default function DashboardPage() {
           )}
         </Card>
 
-        {/* System status & pending approvals */}
-        <Card className="p-4">
-          <SectionTitle icon={ShieldCheckIcon}>System status</SectionTitle>
+        {/* 系统状态 & pending approvals */}
+        <Card className="rounded-xl border-border/70 bg-card/90 p-5 shadow-sm">
+          <SectionTitle icon={ShieldCheckIcon}>系统状态</SectionTitle>
 
           <div className="flex flex-col gap-2">
             <div className="flex items-center justify-between rounded-lg border bg-muted/20 px-3 py-2">
-              <div className="text-[10px] text-muted-foreground">LLM config</div>
+              <div className="text-xs text-muted-foreground">LLM config</div>
               <Badge
                 variant="outline"
                 className={cn(
-                  "text-[10px]",
+                  "text-xs",
                   stats?.llm_configured
                     ? "border-emerald-500/30 bg-emerald-500/10 text-emerald-400"
                     : "border-red-500/30 bg-red-500/10 text-red-400",
@@ -1146,11 +1183,11 @@ export default function DashboardPage() {
             </div>
 
             <div className="flex items-center justify-between rounded-lg border bg-muted/20 px-3 py-2">
-              <div className="text-[10px] text-muted-foreground">Traffic capture</div>
+              <div className="text-xs text-muted-foreground">Traffic capture</div>
               <Badge
                 variant="outline"
                 className={cn(
-                  "text-[10px]",
+                  "text-xs",
                   settings?.traffic_capture
                     ? "border-violet-500/30 bg-violet-500/10 text-violet-400"
                     : "text-muted-foreground",
@@ -1162,8 +1199,8 @@ export default function DashboardPage() {
 
             {activeProfile && (
               <div className="flex items-center justify-between rounded-lg border bg-muted/20 px-3 py-2">
-                <div className="text-[10px] text-muted-foreground">Active model</div>
-                <span className="font-mono text-[10px]">{activeProfile.model}</span>
+                <div className="text-xs text-muted-foreground">Active model</div>
+                <span className="font-mono text-xs">{activeProfile.model}</span>
               </div>
             )}
           </div>
@@ -1171,7 +1208,7 @@ export default function DashboardPage() {
           {/* pending approvals */}
           {pendingCount > 0 && (
             <div className="mt-3">
-              <div className="mb-1.5 text-[10px] font-medium text-amber-400">Pending approvals ({pendingCount})</div>
+              <div className="mb-1.5 text-xs font-medium text-amber-400">Pending approvals ({pendingCount})</div>
               <div className="flex flex-col gap-1.5">
                 {pending.slice(0, 3).map((p) => (
                   <Link
@@ -1180,8 +1217,8 @@ export default function DashboardPage() {
                     className="flex items-center justify-between rounded-lg border border-amber-500/20 bg-amber-500/5 px-2.5 py-2 hover:bg-amber-500/10"
                   >
                     <div className="min-w-0">
-                      <div className="text-[10px] font-medium">{p.tool_name}</div>
-                      <div className="text-[9px] text-muted-foreground">{p.agent_name}</div>
+                      <div className="text-xs font-medium">{p.tool_name}</div>
+                      <div className="text-[11px] text-muted-foreground">{p.agent_name}</div>
                     </div>
                     <ArrowUpRightIcon className="size-3 shrink-0 text-amber-400" />
                   </Link>
@@ -1189,7 +1226,7 @@ export default function DashboardPage() {
                 {pendingCount > 3 && (
                   <Link
                     href="/system/intercept/approvals"
-                    className="text-center text-[10px] text-muted-foreground hover:text-foreground"
+                    className="text-center text-xs text-muted-foreground hover:text-foreground"
                   >
                     {pendingCount - 3} more…
                   </Link>
@@ -1199,9 +1236,9 @@ export default function DashboardPage() {
           )}
 
           {pendingCount === 0 && (
-            <div className="mt-3 rounded-lg border bg-muted/10 px-3 py-3 text-center text-[10px] text-muted-foreground">
+            <div className="mt-3 rounded-lg border bg-muted/10 px-3 py-3 text-center text-xs text-muted-foreground">
               <ShieldCheckIcon className="mx-auto mb-1 size-4 text-emerald-500/50" />
-              No pending interception approvals
+              暂无待审批操作
             </div>
           )}
         </Card>
