@@ -45,10 +45,10 @@ internal sealed class DatabaseSetupForm : Form
         Width = 175,
         Enabled = false,
     };
-    private readonly Button detectLocal = new() { Text = "检测本机", Width = 94, Height = 30 };
-    private readonly Button startLocal = new() { Text = "启动所选服务", Width = 112, Height = 30, Enabled = false };
-    private readonly Button installLocal = new() { Text = "安装 PostgreSQL", Width = 140, Height = 30 };
-    private readonly Button provisionApp = new() { Text = "初始化专用账户", Width = 135, Height = 30 };
+    private readonly Button detectLocal = new() { Text = "检测本机" };
+    private readonly Button startLocal = new() { Text = "启动所选服务", Enabled = false };
+    private readonly Button installLocal = new() { Text = "安装 PostgreSQL" };
+    private readonly Button provisionApp = new() { Text = "初始化专用账户" };
     private readonly CancellationTokenSource discoveryLifetime = new();
     private readonly HashSet<Keys> passwordKeysHeld = new();
     private readonly bool editExisting;
@@ -145,6 +145,12 @@ internal sealed class DatabaseSetupForm : Form
         detectLocal.Click += async (_, _) => await DetectLocalAsync();
         startLocal.Click += async (_, _) => await StartLocalAsync();
         installLocal.Click += (_, _) => InstallPostgreSQL();
+        ConfigureActionButton(detectLocal, 104);
+        ConfigureActionButton(startLocal, 126);
+        ConfigureActionButton(installLocal, 150);
+        localServices.MinimumSize = new Size(184, 0);
+        localServices.Width = 184;
+        localServices.DropDownWidth = 240;
         diagnostics.Controls.Add(detectLocal);
         diagnostics.Controls.Add(localServices);
         diagnostics.Controls.Add(startLocal);
@@ -181,7 +187,9 @@ internal sealed class DatabaseSetupForm : Form
             WrapContents = true,
             Margin = new Padding(3, 8, 3, 8),
         };
-        var create = new Button { Text = "创建目标数据库", Width = 124, Height = 36 };
+        var create = new Button { Text = "创建目标数据库" };
+        ConfigureActionButton(create, 142);
+        ConfigureActionButton(provisionApp, 160);
         create.Click += async (_, _) => await RunDatabaseActionAsync(create, "-create-db");
         provisionApp.Click += async (_, _) => await ProvisionDedicatedAccountAsync();
         secondary.Controls.Add(create);
@@ -199,18 +207,16 @@ internal sealed class DatabaseSetupForm : Form
             Padding = new Padding(18, 8, 18, 8),
             Margin = Padding.Empty,
         };
-        var save = new Button { Text = "保存并连接", Width = 110, Height = 36 };
+        var save = new Button { Text = "保存并连接" };
         save.Click += (_, _) => Save();
-        var test = new Button { Text = "测试数据库连接", Width = 124, Height = 36 };
+        var test = new Button { Text = "测试数据库连接" };
         test.Click += async (_, _) => await RunDatabaseActionAsync(test, "-check-db");
-        var cancel = new Button { Text = "稍后配置", Width = 100, Height = 36, DialogResult = DialogResult.Cancel };
+        var cancel = new Button { Text = "稍后配置", DialogResult = DialogResult.Cancel };
+        ConfigureActionButton(save, 124);
+        ConfigureActionButton(test, 144);
+        ConfigureActionButton(cancel, 110);
         foreach (var button in new[] { save, test, cancel })
-        {
-            button.AutoSize = true;
-            button.AutoSizeMode = AutoSizeMode.GrowAndShrink;
-            button.MinimumSize = new Size(button.Width, 36);
             footer.Controls.Add(button);
-        }
 
         // Constrain wrapping labels to the actual visible content width.
         // This lets auto-sized table rows grow instead of covering controls.
@@ -245,12 +251,35 @@ internal sealed class DatabaseSetupForm : Form
                 work.Top + (work.Height - Height) / 2);
         };
         if (editExisting && File.Exists(ConfigPath)) LoadExistingConfiguration();
-        Shown += async (_, _) => await DetectLocalAsync();
+        Shown += async (_, _) =>
+        {
+            // WinForms scrolls to the first focused input on opening. Restore
+            // the first explanatory row after focus and initial layout settle.
+            ActiveControl = host;
+            scroll.AutoScrollPosition = Point.Empty;
+            BeginInvoke((Action)(() =>
+            {
+                if (!IsDisposed) scroll.AutoScrollPosition = Point.Empty;
+            }));
+            await DetectLocalAsync();
+            if (!IsDisposed) scroll.AutoScrollPosition = Point.Empty;
+        };
         FormClosed += (_, _) =>
         {
             discoveryLifetime.Cancel();
             discoveryLifetime.Dispose();
         };
+    }
+
+    private static void ConfigureActionButton(Button button, int minimumWidth)
+    {
+        // Measure the rendered label at the current font/DPI instead of
+        // clipping it to an old fixed pixel width.
+        button.AutoSize = true;
+        button.AutoSizeMode = AutoSizeMode.GrowAndShrink;
+        button.MinimumSize = new Size(minimumWidth, 36);
+        button.Padding = new Padding(10, 3, 10, 3);
+        button.Margin = new Padding(3, 3, 9, 8);
     }
 
     private void InstallPostgreSQL()
