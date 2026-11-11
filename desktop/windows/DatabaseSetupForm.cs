@@ -228,6 +228,22 @@ internal sealed class DatabaseSetupForm : Form
         AcceptButton = save;
         CancelButton = cancel;
         Controls.Add(root);
+        // At high scaling, even the initial client size can exceed a small
+        // monitor. Keep the whole dialog inside the active display's work area.
+        Load += (_, _) =>
+        {
+            var work = Screen.FromControl(this).WorkingArea;
+            var maxWidth = Math.Max(1, work.Width - 24);
+            var maxHeight = Math.Max(1, work.Height - 24);
+            if (Width <= maxWidth && Height <= maxHeight) return;
+            MinimumSize = new Size(
+                Math.Min(MinimumSize.Width, maxWidth),
+                Math.Min(MinimumSize.Height, maxHeight));
+            Size = new Size(Math.Min(Width, maxWidth), Math.Min(Height, maxHeight));
+            Location = new Point(
+                work.Left + (work.Width - Width) / 2,
+                work.Top + (work.Height - Height) / 2);
+        };
         if (editExisting && File.Exists(ConfigPath)) LoadExistingConfiguration();
         Shown += async (_, _) => await DetectLocalAsync();
         FormClosed += (_, _) =>
