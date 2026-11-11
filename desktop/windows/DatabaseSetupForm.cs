@@ -50,6 +50,7 @@ internal sealed class DatabaseSetupForm : Form
     private readonly Button installLocal = new() { Text = "安装 PostgreSQL", Width = 140, Height = 30 };
     private readonly Button provisionApp = new() { Text = "初始化专用账户", Width = 135, Height = 30 };
     private readonly CancellationTokenSource discoveryLifetime = new();
+    private readonly HashSet<Keys> passwordKeysHeld = new();
     private readonly bool editExisting;
 
     internal DatabaseSetupForm(bool editExisting = false)
@@ -111,6 +112,24 @@ internal sealed class DatabaseSetupForm : Form
         AddField(layout, 2, "端口", port);
         AddField(layout, 3, "用户名", user);
         AddField(layout, 4, "密码", password);
+        // Do not let a held printable key or Ctrl+V repeat an entire password.
+        // Paste through the clipboard and normal single keystrokes still work;
+        // Backspace, Delete and navigation retain standard repeat behavior.
+        password.KeyDown += (_, e) =>
+        {
+            var code = (int)e.KeyCode;
+            var printable = !e.Control && !e.Alt && (
+                code >= (int)Keys.A && code <= (int)Keys.Z ||
+                code >= (int)Keys.D0 && code <= (int)Keys.D9 ||
+                code >= (int)Keys.NumPad0 && code <= (int)Keys.Divide ||
+                code >= (int)Keys.Oem1 && code <= (int)Keys.OemClear ||
+                e.KeyCode == Keys.Space);
+            var paste = e.Control && !e.Alt && e.KeyCode == Keys.V;
+            if ((printable || paste) && !passwordKeysHeld.Add(e.KeyCode))
+                e.SuppressKeyPress = true;
+        };
+        password.KeyUp += (_, e) => passwordKeysHeld.Remove(e.KeyCode);
+        password.Leave += (_, _) => passwordKeysHeld.Clear();
         AddField(layout, 5, "数据库名", database);
         AddField(layout, 6, "SSL 模式", sslMode);
 
