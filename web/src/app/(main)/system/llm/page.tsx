@@ -363,6 +363,7 @@ function ProfileSheet({
   } | null>(null);
   const [saving, setSaving] = React.useState(false);
   const [models, setModels] = React.useState<string[]>([]);
+  const [modelListFeedback, setModelListFeedback] = React.useState<{ ok: boolean; message: string } | null>(null);
   const [loadingModels, setLoadingModels] = React.useState(false);
   const [modelsOpen, setModelsOpen] = React.useState(false);
   const [advancedOpen, setAdvancedOpen] = React.useState(false);
@@ -397,6 +398,7 @@ function ProfileSheet({
     setKeyHint(profile?.api_key_hint ?? "");
     setModels([]);
     setModelsOpen(false);
+    setModelListFeedback(null);
     testVersion.current += 1;
     setTestFeedback(null);
     setAdvancedOpen(Boolean(profile));
@@ -413,18 +415,22 @@ function ProfileSheet({
   async function loadModels() {
     if (loadingModels) return;
     setLoadingModels(true);
+    setModelsOpen(false);
     setModels([]);
+    setModelListFeedback(null);
     try {
       const r = await api.fetchLLMModels(format, baseUrl, apiKey, proxy, profileId);
       if (r.ok && r.models && r.models.length > 0) {
         setModels(r.models);
         setModelsOpen(true);
-        toast.success(`Loaded ${r.models.length} models`);
+        setModelListFeedback({ ok: true, message: `已找到 ${r.models.length} 个模型，请从列表中选择。` });
       } else {
-        toast.error(`Failed to load models: ${r.error ?? "no models returned"}`);
+        const reason = r.error || "服务端没有返回模型列表";
+        setModelListFeedback({ ok: false, message: `无法获取模型列表：${reason}。你仍可手动填写模型名称。` });
       }
     } catch (e) {
-      toast.error(`Error loading models: ${(e as Error).message}`);
+      const reason = e instanceof Error ? e.message : "请求失败";
+      setModelListFeedback({ ok: false, message: `无法获取模型列表：${reason}。请检查接口地址、网络或密钥，也可以手动输入。` });
     } finally {
       setLoadingModels(false);
     }
@@ -575,12 +581,12 @@ function ProfileSheet({
             </div>
           </div>
 
-          <div className="grid gap-2">
+          <div className="grid min-w-0 gap-2">
             <Label htmlFor="p-model">模型名称</Label>
-            <div className="flex gap-2">
+            <div className="flex min-w-0 flex-wrap gap-2">
               <Input
                 id="p-model"
-                className="min-w-0 flex-1 font-mono"
+                className="min-w-[10rem] flex-1 font-mono"
                 placeholder={format === "ollama" ? "llama3.2" : "claude-opus-4-8"}
                 value={model}
                 onChange={(e) => setModel(e.target.value)}
@@ -592,13 +598,15 @@ function ProfileSheet({
                   <Button
                     type="button"
                     variant="outline"
-                    size="icon"
+                    size="sm"
                     className="shrink-0"
                     disabled={loadingModels}
-                    onClick={loadModels}
-                    title="Load available models from the API"
+                    onClick={() => void loadModels()}
+                    aria-label="从接口获取可用模型列表"
+                    title="从当前接口获取可用模型；不支持列举时可手动输入"
                   >
-                    {loadingModels ? <Loader2Icon className="animate-spin" /> : <RefreshCwIcon />}
+                    {loadingModels ? <Loader2Icon className="size-4 animate-spin" /> : <RefreshCwIcon className="size-4" />}
+                    {loadingModels ? "正在获取…" : "获取列表"}
                   </Button>
                 </PopoverTrigger>
                 {models.length > 0 && (
@@ -620,6 +628,10 @@ function ProfileSheet({
                 )}
               </Popover>
             </div>
+            <p role={modelListFeedback?.ok ? "status" : modelListFeedback ? "alert" : undefined}
+              className={cn("text-xs leading-relaxed break-words", modelListFeedback?.ok ? "text-emerald-500" : "text-muted-foreground")}>
+              {modelListFeedback?.message ?? "可以直接输入模型名称；获取列表只是可选的辅助操作。"}
+            </p>
           </div>
 
           <div className="grid gap-2">
