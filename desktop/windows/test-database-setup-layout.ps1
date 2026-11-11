@@ -30,6 +30,9 @@ Require 'e.KeyCode == Keys.V' 'Repeated Ctrl+V must be covered'
 Require 'private static void ConfigureActionButton(Button button, int minimumWidth)' 'Shared autosize helper must exist'
 Require 'button.AutoSize = true;' 'Action width must be measured from button text'
 Require 'button.Padding = new Padding(10, 3, 10, 3);' 'Text needs space around the rendered label'
+Require 'TextRenderer.MeasureText(button.Text, button.Font)' 'Button labels must fit at large font scale'
+Require 'button.FontChanged +=' 'Hidden advanced buttons must resize when DPI text changes'
+Require 'button.TextChanged +=' 'Primary button must resize when the setup mode changes'
 foreach ($button in @('detectLocal','startLocal','installLocal','create','provisionApp','save','test','cancel')) {
     Require "ConfigureActionButton($button," "Missing DPI-aware sizing for $button"
 }
