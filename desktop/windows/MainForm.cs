@@ -123,6 +123,12 @@ public sealed class MainForm : Form
         return button;
     }
 
+    protected override void OnHandleCreated(EventArgs e)
+    {
+        base.OnHandleCreated(e);
+        DesktopChrome.UseDarkTitleBar(this);
+    }
+
     protected override async void OnShown(EventArgs e)
     {
         base.OnShown(e);
