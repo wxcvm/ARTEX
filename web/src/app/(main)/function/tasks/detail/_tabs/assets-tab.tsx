@@ -57,12 +57,12 @@ const METHOD_COLOR: Record<string, string> = {
 };
 
 const TABS: { key: NewAssetType; label: string; icon: LucideIcon }[] = [
-  { key: "root_domain", label: "Root domain", icon: GlobeIcon },
+  { key: "root_domain", label: "根域名", icon: GlobeIcon },
   { key: "ip", label: "IP", icon: NetworkIcon },
-  { key: "subdomain", label: "Subdomain", icon: GlobeIcon },
-  { key: "app", label: "App", icon: SmartphoneIcon },
-  { key: "service", label: "Service", icon: LayoutTemplateIcon },
-  { key: "endpoint", label: "Endpoint", icon: LinkIcon },
+  { key: "subdomain", label: "子域名", icon: GlobeIcon },
+  { key: "app", label: "应用", icon: SmartphoneIcon },
+  { key: "service", label: "服务", icon: LayoutTemplateIcon },
+  { key: "endpoint", label: "接口", icon: LinkIcon },
 ];
 
 function firstText(values: Array<string | undefined>, fallback: string): string {
@@ -192,16 +192,16 @@ function AssetCard({
     tableRows = (
       <TableRow>
         <TableCell colSpan={cols.length} className="py-10 text-center text-muted-foreground text-sm">
-          No test assets in this category yet
+          这个分类暂时没有测试资产
         </TableCell>
       </TableRow>
     );
   }
   return (
-    <Card className="flex min-h-0 flex-1 flex-col py-0">
-      <CardContent className="scrollbar-thin scrollbar-track-transparent min-h-0 flex-1 overflow-auto p-0">
+    <Card className="flex min-h-0 min-w-0 flex-1 flex-col overflow-hidden rounded-xl border-border/70 bg-card/90 py-0 shadow-sm">
+      <CardContent className="scrollbar-thin scrollbar-track-transparent max-h-[60dvh] min-h-52 min-w-0 flex-1 overflow-auto p-0">
         <Table>
-          <TableHeader className="sticky top-0 z-10 bg-card">
+          <TableHeader className="sticky top-0 z-10 bg-card/95">
             <TableRow>
               {cols.map((column) => (
                 <TableHead key={column}>{column}</TableHead>
@@ -212,7 +212,7 @@ function AssetCard({
         </Table>
       </CardContent>
       {total > 0 ? (
-        <CardFooter className="gap-2 px-3 py-1.5 text-muted-foreground text-xs">
+        <CardFooter className="flex flex-wrap items-center gap-2 border-t border-border/70 px-3 py-3 text-xs text-muted-foreground sm:px-4">
           <Select
             value={String(size)}
             onValueChange={(value) => {
@@ -227,7 +227,7 @@ function AssetCard({
               <SelectGroup>
                 {PAGE_SIZES.map((value) => (
                   <SelectItem key={value} value={String(value)}>
-                    {value} / page
+                    每页 {value} 条
                   </SelectItem>
                 ))}
               </SelectGroup>
@@ -243,7 +243,7 @@ function AssetCard({
                 size="icon-sm"
                 disabled={page <= 0}
                 onClick={() => onPage(Math.max(0, page - 1))}
-                aria-label="Previous page"
+                aria-label="上一页"
               >
                 <ChevronLeftIcon />
               </Button>
@@ -255,7 +255,7 @@ function AssetCard({
                 size="icon-sm"
                 disabled={page + 1 >= pageCount}
                 onClick={() => onPage(Math.min(pageCount - 1, page + 1))}
-                aria-label="Next page"
+                aria-label="下一页"
               >
                 <ChevronRightIcon />
               </Button>
@@ -474,27 +474,27 @@ export function AssetsTab({ taskId }: { taskId: string }) {
   );
 
   return (
-    <div className="flex min-h-0 flex-1 flex-col gap-4">
-      <div className="flex flex-wrap items-center justify-between gap-3">
+    <div className="flex min-h-0 min-w-0 flex-1 flex-col gap-4">
+      <div className="flex flex-wrap items-center justify-between gap-3 rounded-xl border border-border/70 bg-card/90 px-4 py-4 shadow-sm sm:px-5">
         <div className="min-w-0">
-          <h2 className="font-medium text-sm">Test assets</h2>
-          <p className="text-muted-foreground text-xs">This task is linked to {totalAll} assets in total</p>
+          <h2 className="text-base font-semibold">测试资产</h2>
+          <p className="mt-1 text-sm text-muted-foreground">当前任务关联了 <strong className="tabular-nums text-foreground">{totalAll}</strong> 项资产</p>
         </div>
         <Button size="sm" onClick={() => setAddOpen(true)}>
           <PlusIcon data-icon="inline-start" />
-          Add test assets
+          添加测试资产
         </Button>
       </div>
 
       <Tabs
         value={tab}
         onValueChange={(value) => setTab(value as NewAssetType)}
-        className="flex min-h-0 flex-1 flex-col gap-2"
+        className="flex min-h-0 min-w-0 flex-1 flex-col gap-3"
       >
-        <div className="overflow-x-auto overflow-y-hidden">
-          <TabsList className="w-max">
+        <div className="min-w-0 overflow-x-auto overflow-y-hidden pb-1">
+          <TabsList className="h-auto min-w-max gap-1 rounded-lg bg-muted/60 p-1">
             {TABS.map((item) => (
-              <TabsTrigger key={item.key} value={item.key}>
+              <TabsTrigger key={item.key} value={item.key} className="gap-2 rounded-md px-3 py-2 text-sm">
                 <item.icon data-icon="inline-start" />
                 {item.label}
                 <span className="text-muted-foreground tabular-nums">{counts[item.key] ?? 0}</span>
