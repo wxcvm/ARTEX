@@ -354,6 +354,7 @@ function ProfileSheet({
   const [userAgent, setUserAgent] = React.useState(""); // custom User-Agent; empty = keep the default UA
   const [retry, setRetry] = React.useState<LLMRetryOverride>(ZERO_OVERRIDE); // retry override for this profile; all 0 = follow the global
   const [testing, setTesting] = React.useState(false);
+  const testVersion = React.useRef(0);
   const [testFeedback, setTestFeedback] = React.useState<{
     ok: boolean;
     headline: string;
@@ -396,12 +397,14 @@ function ProfileSheet({
     setKeyHint(profile?.api_key_hint ?? "");
     setModels([]);
     setModelsOpen(false);
+    testVersion.current += 1;
     setTestFeedback(null);
     setAdvancedOpen(Boolean(profile));
   }, [open, profile]);
 
   // A connection test only applies to the exact endpoint settings tested.
   React.useEffect(() => {
+    testVersion.current += 1;
     setTestFeedback(null);
   }, [format, model, baseUrl, apiKey, proxy, thinkingType, effort, streaming, sessionHeaderKey, userAgent]);
 
@@ -431,6 +434,7 @@ function ProfileSheet({
     if (testing) return;
     setTesting(true);
     setTestFeedback(null);
+    const version = testVersion.current;
     try {
       // Use the same options as a normal LLM request; an empty key when editing
       // refers to the existing stored key, rather than accidentally testing blank credentials.
@@ -447,6 +451,7 @@ function ProfileSheet({
         sessionHeaderKey.trim(),
         userAgent.trim(),
       );
+      if (version !== testVersion.current) return;
       if (r.ok) {
         const latency = typeof r.latency_ms === "number" ? ` · ${r.latency_ms} ms` : "";
         setTestFeedback({
@@ -462,6 +467,7 @@ function ProfileSheet({
         toast.error("模型连接测试失败");
       }
     } catch (error) {
+      if (version !== testVersion.current) return;
       const detail = error instanceof Error ? error.message : String(error);
       setTestFeedback({ ok: false, headline: "无法完成连接测试", hint: modelTestAdvice(detail), detail });
       toast.error("模型连接测试失败");
