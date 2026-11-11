@@ -151,31 +151,64 @@ internal sealed class DatabaseSetupForm : Form
         layout.Controls.Add(configLabel, 0, 9);
         layout.SetColumnSpan(configLabel, 2);
 
-        var buttons = new FlowLayoutPanel
+        // Secondary database actions remain accessible by scrolling, while
+        // Save / Test / Later stay visible at every supported window height.
+        var secondary = new FlowLayoutPanel
         {
-            Dock = DockStyle.Fill,
-            FlowDirection = FlowDirection.RightToLeft,
-            WrapContents = false,
+            Dock = DockStyle.Top,
+            AutoSize = true,
+            AutoSizeMode = AutoSizeMode.GrowAndShrink,
+            FlowDirection = FlowDirection.LeftToRight,
+            WrapContents = true,
+            Margin = new Padding(3, 8, 3, 8),
         };
-        var save = new Button { Text = "保存并连接", Width = 110, Height = 30 };
-        save.Click += (_, _) => Save();
-        var test = new Button { Text = "测试数据库连接", Width = 124, Height = 30 };
-        test.Click += async (_, _) => await RunDatabaseActionAsync(test, "-check-db");
-        var create = new Button { Text = "创建目标数据库", Width = 124, Height = 30 };
+        var create = new Button { Text = "创建目标数据库", Width = 124, Height = 36 };
         create.Click += async (_, _) => await RunDatabaseActionAsync(create, "-create-db");
         provisionApp.Click += async (_, _) => await ProvisionDedicatedAccountAsync();
-        var cancel = new Button { Text = "稍后配置", Width = 100, Height = 30, DialogResult = DialogResult.Cancel };
-        buttons.Controls.Add(save);
-        buttons.Controls.Add(test);
-        buttons.Controls.Add(create);
-        buttons.Controls.Add(provisionApp);
-        buttons.Controls.Add(cancel);
-        layout.Controls.Add(buttons, 0, 10);
-        layout.SetColumnSpan(buttons, 2);
+        secondary.Controls.Add(create);
+        secondary.Controls.Add(provisionApp);
+        layout.Controls.Add(secondary, 0, 10);
+        layout.SetColumnSpan(secondary, 2);
 
+        var footer = new FlowLayoutPanel
+        {
+            Dock = DockStyle.Fill,
+            AutoSize = true,
+            AutoSizeMode = AutoSizeMode.GrowAndShrink,
+            FlowDirection = FlowDirection.RightToLeft,
+            WrapContents = true,
+            Padding = new Padding(18, 8, 18, 8),
+            Margin = Padding.Empty,
+        };
+        var save = new Button { Text = "保存并连接", Width = 110, Height = 36 };
+        save.Click += (_, _) => Save();
+        var test = new Button { Text = "测试数据库连接", Width = 124, Height = 36 };
+        test.Click += async (_, _) => await RunDatabaseActionAsync(test, "-check-db");
+        var cancel = new Button { Text = "稍后配置", Width = 100, Height = 36, DialogResult = DialogResult.Cancel };
+        foreach (var button in new[] { save, test, cancel })
+        {
+            button.AutoSize = true;
+            button.AutoSizeMode = AutoSizeMode.GrowAndShrink;
+            button.MinimumSize = new Size(button.Width, 36);
+            footer.Controls.Add(button);
+        }
+
+        // Constrain wrapping labels to the actual visible content width.
+        // This lets auto-sized table rows grow instead of covering controls.
+        layout.SizeChanged += (_, _) =>
+        {
+            var width = Math.Max(220, layout.ClientSize.Width - layout.Padding.Horizontal - 12);
+            if (intro.MaximumSize.Width == width) return;
+            intro.MaximumSize = new Size(width, 0);
+            discoveryStatus.MaximumSize = new Size(width, 0);
+        };
+
+        scroll.Controls.Add(layout);
+        root.Controls.Add(scroll, 0, 0);
+        root.Controls.Add(footer, 0, 1);
         AcceptButton = save;
         CancelButton = cancel;
-        Controls.Add(layout);
+        Controls.Add(root);
         if (editExisting && File.Exists(ConfigPath)) LoadExistingConfiguration();
         Shown += async (_, _) => await DetectLocalAsync();
         FormClosed += (_, _) =>
