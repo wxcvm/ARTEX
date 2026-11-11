@@ -18,12 +18,17 @@ export function GraphTab({ taskId }: { taskId: string }) {
   // Signature of the previous graph data: polling skips setState on identical data to avoid
   // rebuilding the whole graph (so dragging is not jarred by the 20s poll). Only render-affecting fields count.
   const sigRef = React.useRef("");
+  const lastTaskRef = React.useRef(taskId);
 
   React.useEffect(() => {
     let cancelled = false;
-    sigRef.current = "";
-    setNodes([]);
-    setEdges([]);
+    if (lastTaskRef.current !== taskId) {
+      // Task switch: old graph is unrelated. Manual retry: keep the last good graph.
+      lastTaskRef.current = taskId;
+      sigRef.current = "";
+      setNodes([]);
+      setEdges([]);
+    }
     setError("");
     setLoading(true);
 
@@ -73,7 +78,7 @@ export function GraphTab({ taskId }: { taskId: string }) {
           <div role="alert" className="mx-4 mt-3 flex min-w-0 items-start gap-2 rounded-lg border border-amber-500/30 bg-amber-500/10 p-3 text-sm sm:mx-5">
             <AlertCircleIcon className="mt-0.5 size-4 shrink-0 text-amber-500" />
             <div className="min-w-0">
-              <p className="font-medium">图谱更新失败，已保留上次成功加载的内容</p>
+              <p className="font-medium">{nodes.length ? "图谱更新失败，已保留上次成功加载的内容" : "暂时无法加载任务图谱"}</p>
               <p className="mt-1 break-words text-muted-foreground">{error}</p>
             </div>
           </div>
