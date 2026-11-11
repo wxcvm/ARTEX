@@ -125,6 +125,9 @@ jobs:
       - name: Build portable Windows desktop bundle
         shell: pwsh
         run: ./desktop/windows/package.ps1 -SkipWebBuild -Version preview
+      - name: Check database setup DPI layout and password input regression
+        shell: pwsh
+        run: ./desktop/windows/test-database-setup-layout.ps1
       - name: Smoke test native desktop window and WebView2 navigation
         shell: pwsh
         timeout-minutes: 3
