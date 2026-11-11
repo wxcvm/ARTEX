@@ -50,6 +50,7 @@ internal sealed class DatabaseSetupForm : Form
     private readonly Button installLocal = new() { Text = "安装 PostgreSQL", Width = 140, Height = 30 };
     private readonly Button provisionApp = new() { Text = "初始化专用账户", Width = 135, Height = 30 };
     private readonly CancellationTokenSource discoveryLifetime = new();
+    private readonly HashSet<Keys> passwordKeysHeld = new();
     private readonly bool editExisting;
 
     internal DatabaseSetupForm(bool editExisting = false)
@@ -58,22 +59,42 @@ internal sealed class DatabaseSetupForm : Form
         Text = editExisting ? "ARTEX · 修改数据库配置" : "ARTEX · 首次数据库配置";
         Icon = System.Drawing.Icon.ExtractAssociatedIcon(Application.ExecutablePath) ?? SystemIcons.Application;
         StartPosition = FormStartPosition.CenterParent;
-        ClientSize = new Size(760, 485);
-        MinimumSize = new Size(730, 455);
-        FormBorderStyle = FormBorderStyle.FixedDialog;
-        MaximizeBox = false;
+        AutoScaleMode = AutoScaleMode.Dpi;
+        ClientSize = new Size(860, 610);
+        MinimumSize = new Size(620, 440);
+        FormBorderStyle = FormBorderStyle.Sizable;
+        MaximizeBox = true;
         MinimizeBox = false;
 
-        var layout = new TableLayoutPanel
+        // Keep the primary actions visible when Windows text size/DPI grows.
+        // All editable settings and secondary actions live in an independently
+        // scrollable section instead of forcing eleven rows into a fixed height.
+        var root = new TableLayoutPanel
         {
             Dock = DockStyle.Fill,
+            ColumnCount = 1,
+            RowCount = 2,
+            Margin = Padding.Empty,
+            Padding = Padding.Empty,
+        };
+        root.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 100));
+        root.RowStyles.Add(new RowStyle(SizeType.Percent, 100));
+        root.RowStyles.Add(new RowStyle(SizeType.AutoSize));
+        var scroll = new Panel { Dock = DockStyle.Fill, AutoScroll = true };
+        var layout = new TableLayoutPanel
+        {
+            Dock = DockStyle.Top,
             ColumnCount = 2,
             RowCount = 11,
-            Padding = new Padding(16),
-            AutoSize = false,
+            Padding = new Padding(18, 16, 18, 12),
+            Margin = Padding.Empty,
+            AutoSize = true,
+            AutoSizeMode = AutoSizeMode.GrowAndShrink,
         };
         layout.ColumnStyles.Add(new ColumnStyle(SizeType.Absolute, 145));
         layout.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 100));
+        for (var row = 0; row < layout.RowCount; row++)
+            layout.RowStyles.Add(new RowStyle(SizeType.AutoSize));
 
         var intro = new Label
         {
@@ -81,7 +102,8 @@ internal sealed class DatabaseSetupForm : Form
                 "首次运行需要连接 PostgreSQL。请填写连接信息。") +
                 "\nDocker 手册示例端口是 5433；ARTEX_PG_DSN 环境变量优先于此配置。",
             AutoSize = true,
-            Dock = DockStyle.Fill,
+            Dock = DockStyle.Top,
+            Margin = new Padding(3, 0, 3, 12),
         };
         layout.Controls.Add(intro, 0, 0);
         layout.SetColumnSpan(intro, 2);
@@ -90,14 +112,35 @@ internal sealed class DatabaseSetupForm : Form
         AddField(layout, 2, "端口", port);
         AddField(layout, 3, "用户名", user);
         AddField(layout, 4, "密码", password);
+        // Do not let a held printable key or Ctrl+V repeat an entire password.
+        // Paste through the clipboard and normal single keystrokes still work;
+        // Backspace, Delete and navigation retain standard repeat behavior.
+        password.KeyDown += (_, e) =>
+        {
+            var code = (int)e.KeyCode;
+            var printable = !e.Control && !e.Alt && (
+                code >= (int)Keys.A && code <= (int)Keys.Z ||
+                code >= (int)Keys.D0 && code <= (int)Keys.D9 ||
+                code >= (int)Keys.NumPad0 && code <= (int)Keys.Divide ||
+                code >= (int)Keys.Oem1 && code <= (int)Keys.OemClear ||
+                e.KeyCode == Keys.Space);
+            var paste = e.Control && !e.Alt && e.KeyCode == Keys.V;
+            if ((printable || paste) && !passwordKeysHeld.Add(e.KeyCode))
+                e.SuppressKeyPress = true;
+        };
+        password.KeyUp += (_, e) => passwordKeysHeld.Remove(e.KeyCode);
+        password.Leave += (_, _) => passwordKeysHeld.Clear();
         AddField(layout, 5, "数据库名", database);
         AddField(layout, 6, "SSL 模式", sslMode);
 
         var diagnostics = new FlowLayoutPanel
         {
-            Dock = DockStyle.Fill,
+            Dock = DockStyle.Top,
+            AutoSize = true,
+            AutoSizeMode = AutoSizeMode.GrowAndShrink,
             FlowDirection = FlowDirection.LeftToRight,
-            WrapContents = false,
+            WrapContents = true,
+            Margin = new Padding(3, 12, 3, 8),
         };
         detectLocal.Click += async (_, _) => await DetectLocalAsync();
         startLocal.Click += async (_, _) => await StartLocalAsync();
@@ -110,43 +153,97 @@ internal sealed class DatabaseSetupForm : Form
         layout.SetColumnSpan(diagnostics, 2);
         layout.Controls.Add(discoveryStatus, 0, 8);
         layout.SetColumnSpan(discoveryStatus, 2);
+        discoveryStatus.AutoSize = true;
+        discoveryStatus.Dock = DockStyle.Top;
+        discoveryStatus.MinimumSize = new Size(0, 26);
+        discoveryStatus.Margin = new Padding(3, 3, 3, 10);
 
         var configLabel = new Label
         {
             Text = "配置保存位置：" + ConfigPath,
             AutoSize = false,
             AutoEllipsis = true,
-            Dock = DockStyle.Fill,
+            Dock = DockStyle.Top,
+            MinimumSize = new Size(0, 26),
             ForeColor = SystemColors.GrayText,
         };
         layout.Controls.Add(configLabel, 0, 9);
         layout.SetColumnSpan(configLabel, 2);
 
-        var buttons = new FlowLayoutPanel
+        // Secondary database actions remain accessible by scrolling, while
+        // Save / Test / Later stay visible at every supported window height.
+        var secondary = new FlowLayoutPanel
         {
-            Dock = DockStyle.Fill,
-            FlowDirection = FlowDirection.RightToLeft,
-            WrapContents = false,
+            Dock = DockStyle.Top,
+            AutoSize = true,
+            AutoSizeMode = AutoSizeMode.GrowAndShrink,
+            FlowDirection = FlowDirection.LeftToRight,
+            WrapContents = true,
+            Margin = new Padding(3, 8, 3, 8),
         };
-        var save = new Button { Text = "保存并连接", Width = 110, Height = 30 };
-        save.Click += (_, _) => Save();
-        var test = new Button { Text = "测试数据库连接", Width = 124, Height = 30 };
-        test.Click += async (_, _) => await RunDatabaseActionAsync(test, "-check-db");
-        var create = new Button { Text = "创建目标数据库", Width = 124, Height = 30 };
+        var create = new Button { Text = "创建目标数据库", Width = 124, Height = 36 };
         create.Click += async (_, _) => await RunDatabaseActionAsync(create, "-create-db");
         provisionApp.Click += async (_, _) => await ProvisionDedicatedAccountAsync();
-        var cancel = new Button { Text = "稍后配置", Width = 100, Height = 30, DialogResult = DialogResult.Cancel };
-        buttons.Controls.Add(save);
-        buttons.Controls.Add(test);
-        buttons.Controls.Add(create);
-        buttons.Controls.Add(provisionApp);
-        buttons.Controls.Add(cancel);
-        layout.Controls.Add(buttons, 0, 10);
-        layout.SetColumnSpan(buttons, 2);
+        secondary.Controls.Add(create);
+        secondary.Controls.Add(provisionApp);
+        layout.Controls.Add(secondary, 0, 10);
+        layout.SetColumnSpan(secondary, 2);
 
+        var footer = new FlowLayoutPanel
+        {
+            Dock = DockStyle.Fill,
+            AutoSize = true,
+            AutoSizeMode = AutoSizeMode.GrowAndShrink,
+            FlowDirection = FlowDirection.RightToLeft,
+            WrapContents = true,
+            Padding = new Padding(18, 8, 18, 8),
+            Margin = Padding.Empty,
+        };
+        var save = new Button { Text = "保存并连接", Width = 110, Height = 36 };
+        save.Click += (_, _) => Save();
+        var test = new Button { Text = "测试数据库连接", Width = 124, Height = 36 };
+        test.Click += async (_, _) => await RunDatabaseActionAsync(test, "-check-db");
+        var cancel = new Button { Text = "稍后配置", Width = 100, Height = 36, DialogResult = DialogResult.Cancel };
+        foreach (var button in new[] { save, test, cancel })
+        {
+            button.AutoSize = true;
+            button.AutoSizeMode = AutoSizeMode.GrowAndShrink;
+            button.MinimumSize = new Size(button.Width, 36);
+            footer.Controls.Add(button);
+        }
+
+        // Constrain wrapping labels to the actual visible content width.
+        // This lets auto-sized table rows grow instead of covering controls.
+        layout.SizeChanged += (_, _) =>
+        {
+            var width = Math.Max(220, layout.ClientSize.Width - layout.Padding.Horizontal - 12);
+            if (intro.MaximumSize.Width == width) return;
+            intro.MaximumSize = new Size(width, 0);
+            discoveryStatus.MaximumSize = new Size(width, 0);
+        };
+
+        scroll.Controls.Add(layout);
+        root.Controls.Add(scroll, 0, 0);
+        root.Controls.Add(footer, 0, 1);
         AcceptButton = save;
         CancelButton = cancel;
-        Controls.Add(layout);
+        Controls.Add(root);
+        // At high scaling, even the initial client size can exceed a small
+        // monitor. Keep the whole dialog inside the active display's work area.
+        Load += (_, _) =>
+        {
+            var work = Screen.FromControl(this).WorkingArea;
+            var maxWidth = Math.Max(1, work.Width - 24);
+            var maxHeight = Math.Max(1, work.Height - 24);
+            if (Width <= maxWidth && Height <= maxHeight) return;
+            MinimumSize = new Size(
+                Math.Min(MinimumSize.Width, maxWidth),
+                Math.Min(MinimumSize.Height, maxHeight));
+            Size = new Size(Math.Min(Width, maxWidth), Math.Min(Height, maxHeight));
+            Location = new Point(
+                work.Left + (work.Width - Width) / 2,
+                work.Top + (work.Height - Height) / 2);
+        };
         if (editExisting && File.Exists(ConfigPath)) LoadExistingConfiguration();
         Shown += async (_, _) => await DetectLocalAsync();
         FormClosed += (_, _) =>
