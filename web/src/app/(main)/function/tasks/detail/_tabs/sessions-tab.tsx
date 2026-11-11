@@ -1566,18 +1566,17 @@ export function SessionsTab({ taskId, taskPaused = false }: { taskId: string; ta
 
   return (
     <TooltipProvider delayDuration={300}>
-      {/* Height reserve: page header (title row + goal + Tabs ≈ 7.5rem) + content padding. Mobile p-4,
-        desktop lg:p-6, and desktop also needs scroll headroom, so the two tiers reserve 10rem / 13rem respectively — mobile
-        reusing 13rem would waste 3rem of transcript height. */}
+      {/* Limit the session workspace to a readable viewport height; the task header
+        wraps on narrow windows, so a fixed subtraction from 100vh can clip the transcript. */}
       <div
         className={cn(
-          "grid h-[calc(100svh-10rem)] min-h-0 grid-cols-1 gap-4",
+          "grid h-[clamp(24rem,68dvh,48rem)] min-h-0 min-w-0 grid-cols-1 gap-3 sm:gap-4",
           listOpen ? "grid-rows-[minmax(0,40svh)_minmax(0,1fr)]" : "grid-rows-[auto_minmax(0,1fr)]",
-          "lg:h-[calc(100svh-13rem)] lg:grid-cols-[18rem_1fr] lg:grid-rows-[minmax(0,1fr)]",
+          "xl:grid-cols-[16rem_minmax(0,1fr)] xl:grid-rows-[minmax(0,1fr)]",
         )}
       >
         {/* Left: session list */}
-        <div className="flex min-h-0 flex-col overflow-hidden rounded-lg border bg-card">
+        <div className="flex min-h-0 min-w-0 flex-col overflow-hidden rounded-xl border border-border/70 bg-card/90 shadow-sm">
           <div className="border-b px-3 py-2">
             <div className="flex items-center justify-between gap-2">
               <button
@@ -1585,19 +1584,19 @@ export function SessionsTab({ taskId, taskPaused = false }: { taskId: string; ta
                 onClick={() => setListOpen((open) => !open)}
                 aria-expanded={listOpen}
                 aria-controls="session-list-panel"
-                className="flex min-w-0 flex-1 items-center gap-1 text-left text-xs font-medium text-muted-foreground lg:pointer-events-none"
+                className="flex min-w-0 flex-1 items-center gap-1 text-left text-sm font-medium text-foreground xl:pointer-events-none"
               >
                 <ChevronDownIcon
-                  className={cn("size-3.5 shrink-0 transition-transform lg:hidden", !listOpen && "-rotate-90")}
+                  className={cn("size-3.5 shrink-0 transition-transform xl:hidden", !listOpen && "-rotate-90")}
                 />
-                <span className="shrink-0">Sessions</span>
+                <span className="shrink-0">会话列表</span>
                 {!listOpen && (
                   <>
-                    <span className="min-w-0 truncate text-foreground lg:hidden" title={activeDisplayTitle}>
+                    <span className="min-w-0 truncate text-foreground xl:hidden" title={activeDisplayTitle}>
                       · {activeDisplayTitle}
                     </span>
                     {hiddenUnread > 0 && (
-                      <span className="inline-flex min-w-4 shrink-0 items-center justify-center rounded-full bg-blue-500/15 px-1 text-[10px] font-medium tabular-nums text-blue-600 lg:hidden dark:text-blue-400">
+                      <span className="inline-flex min-w-4 shrink-0 items-center justify-center rounded-full bg-blue-500/15 px-1 text-[10px] font-medium tabular-nums text-blue-600 xl:hidden dark:text-blue-400">
                         {hiddenUnread > 99 ? "99+" : hiddenUnread}
                       </span>
                     )}
@@ -1652,7 +1651,7 @@ export function SessionsTab({ taskId, taskPaused = false }: { taskId: string; ta
             type="auto"
             className={cn(
               "min-h-0 flex-1 [&_[data-slot=scroll-area-viewport]>div]:block!",
-              !listOpen && "max-lg:hidden",
+              !listOpen && "max-xl:hidden",
             )}
           >
             <div className="flex w-full flex-col gap-3 p-2">
@@ -1738,7 +1737,7 @@ export function SessionsTab({ taskId, taskPaused = false }: { taskId: string; ta
           side={side}
           label={active.role === "worker" ? `Worker #${active.intent_id} · ${activeDisplayTitle}` : activeDisplayTitle}
         >
-          <div className="flex min-h-0 flex-1 min-w-0 flex-col overflow-hidden rounded-lg border bg-card">
+          <div className="flex min-h-0 min-w-0 flex-1 flex-col overflow-hidden rounded-xl border border-border/70 bg-card/90 shadow-sm">
             <div className="flex min-w-0 flex-wrap items-center gap-x-2 gap-y-1 border-b px-3 py-2 sm:px-4 sm:py-2.5">
               {(() => {
                 const isWorker = active.role === "worker";
@@ -1871,7 +1870,7 @@ export function SessionsTab({ taskId, taskPaused = false }: { taskId: string; ta
             out the width and defeat the truncation below — the transcript wraps to
             the panel instead of overflowing horizontally. */}
             <ScrollArea type="auto" className="min-h-0 min-w-0 flex-1 [&_[data-slot=scroll-area-viewport]>div]:block!">
-              <div className="min-w-0 max-w-full p-4" ref={contentRef}>
+              <div className="min-w-0 max-w-full p-3 sm:p-4" ref={contentRef}>
                 {activeState?.loadingMore && (
                   <div className="flex items-center justify-center gap-2 pb-2 text-xs text-muted-foreground">
                     <Loader2Icon className="size-3.5 animate-spin" />
