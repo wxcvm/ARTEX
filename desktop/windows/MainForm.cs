@@ -12,6 +12,9 @@ public sealed class MainForm : Form
 {
     private static readonly Uri Service = new("http://127.0.0.1:8787/");
     private readonly WebView2 browser = new() { Dock = DockStyle.Fill };
+    private readonly ToolStrip toolbar = new() { Dock = DockStyle.Top, GripStyle = ToolStripGripStyle.Hidden };
+    private readonly StatusStrip statusBar = new() { Dock = DockStyle.Bottom };
+    private readonly ToolStripButton fullScreenButton = new("全屏 (F11)");
     private readonly ToolStripStatusLabel status = new("正在启动 ARTEX…");
     private readonly HttpClient http = new() { Timeout = TimeSpan.FromSeconds(2) };
     private readonly CancellationTokenSource lifetime = new();
@@ -21,6 +24,10 @@ public sealed class MainForm : Form
     private StreamWriter? backendLog;
     private bool exiting;
     private bool ready;
+    private bool fullScreen;
+    private FormWindowState restoreWindowState = FormWindowState.Maximized;
+    private FormWindowState beforeFullScreenState;
+    private Rectangle beforeFullScreenBounds;
     private int connecting;
 
     private static string LocalData =>
@@ -35,8 +42,7 @@ public sealed class MainForm : Form
         MinimumSize = new Size(900, 620);
         Size = new Size(1360, 850);
         StartPosition = FormStartPosition.CenterScreen;
-
-        var toolbar = new ToolStrip { Dock = DockStyle.Top, GripStyle = ToolStripGripStyle.Hidden };
+        WindowState = FormWindowState.Maximized;
         toolbar.Items.Add(Button("后退", () =>
         {
             if (browser.CoreWebView2?.CanGoBack == true) browser.CoreWebView2.GoBack();
@@ -46,6 +52,8 @@ public sealed class MainForm : Form
             if (browser.CoreWebView2?.CanGoForward == true) browser.CoreWebView2.GoForward();
         }));
         toolbar.Items.Add(Button("刷新", () => browser.CoreWebView2?.Reload()));
+        fullScreenButton.Click += (_, _) => ToggleFullScreen();
+        toolbar.Items.Add(fullScreenButton);
         toolbar.Items.Add(new ToolStripSeparator());
         toolbar.Items.Add(Button("在浏览器打开", OpenInBrowser));
         toolbar.Items.Add(Button("数据库配置", EditDatabaseConfiguration));
@@ -56,7 +64,6 @@ public sealed class MainForm : Form
         toolbar.Items.Add(Button("重新连接", () => _ = ConnectAsync(lifetime.Token)));
         toolbar.Items.Add(Button("退出", ExitDesktop));
 
-        var statusBar = new StatusStrip { Dock = DockStyle.Bottom };
         statusBar.Items.Add(status);
 
         Controls.Add(browser);
@@ -144,6 +151,15 @@ public sealed class MainForm : Form
                 var environment = await CoreWebView2Environment.CreateAsync(userDataFolder: profile);
                 cancel.ThrowIfCancellationRequested();
                 await browser.EnsureCoreWebView2Async(environment);
+
+                // WebView2 forwards accelerator keys through the WinForms KeyDown event.
+                browser.KeyDown += (_, args) =>
+                {
+                    if (args.KeyCode != Keys.F11 && (!fullScreen || args.KeyCode != Keys.Escape)) return;
+                    args.Handled = true;
+                    args.SuppressKeyPress = true;
+                    if (!IsDisposed && !Disposing) BeginInvoke((Action)ToggleFullScreen);
+                };
 
                 browser.CoreWebView2.NewWindowRequested += (_, args) =>
                 {
@@ -304,9 +320,52 @@ public sealed class MainForm : Form
 
     private void ShowDesktop()
     {
+        var wasMinimized = WindowState == FormWindowState.Minimized;
+        var lastState = restoreWindowState;
         Show();
-        WindowState = FormWindowState.Normal;
+        if (wasMinimized)
+            WindowState = fullScreen ? FormWindowState.Normal : lastState;
+        if (fullScreen)
+            Bounds = Screen.FromControl(this).Bounds;
         Activate();
+    }
+
+    private void ToggleFullScreen()
+    {
+        if (!fullScreen)
+        {
+            var screen = Screen.FromControl(this);
+            beforeFullScreenState = WindowState;
+            beforeFullScreenBounds = WindowState == FormWindowState.Maximized ? RestoreBounds : Bounds;
+            fullScreen = true;
+            WindowState = FormWindowState.Normal;
+            FormBorderStyle = FormBorderStyle.None;
+            Bounds = screen.Bounds;
+            toolbar.Visible = false;
+            statusBar.Visible = false;
+            fullScreenButton.Text = "退出全屏 (F11)";
+        }
+        else
+        {
+            fullScreen = false;
+            FormBorderStyle = FormBorderStyle.Sizable;
+            WindowState = FormWindowState.Normal;
+            Bounds = beforeFullScreenBounds;
+            WindowState = beforeFullScreenState;
+            toolbar.Visible = true;
+            statusBar.Visible = true;
+            fullScreenButton.Text = "全屏 (F11)";
+        }
+    }
+
+    protected override bool ProcessCmdKey(ref Message msg, Keys keyData)
+    {
+        if (keyData == Keys.F11 || (fullScreen && keyData == Keys.Escape))
+        {
+            ToggleFullScreen();
+            return true;
+        }
+        return base.ProcessCmdKey(ref msg, keyData);
     }
 
     private void ExitDesktop()
@@ -318,8 +377,14 @@ public sealed class MainForm : Form
     protected override void OnResize(EventArgs e)
     {
         base.OnResize(e);
-        if (WindowState == FormWindowState.Minimized && ready)
-            Hide();
+        if (WindowState == FormWindowState.Minimized)
+        {
+            if (ready) Hide();
+        }
+        else if (!fullScreen)
+        {
+            restoreWindowState = WindowState;
+        }
     }
 
     protected override void OnFormClosing(FormClosingEventArgs e)
