@@ -84,13 +84,23 @@ public sealed class MainForm : Form
         toolbar.Items.Add(fullScreenButton);
         toolbar.Items.Add(new ToolStripSeparator());
         toolbar.Items.Add(Button("在浏览器打开", OpenInBrowser));
-        toolbar.Items.Add(Button("数据库配置", EditDatabaseConfiguration));
-        toolbar.Items.Add(Button("打开配置目录", () =>
+
+        // Keep common navigation visible at high DPI; secondary operations stay
+        // reachable under one menu instead of crowding the entire title toolbar.
+        var more = new ToolStripDropDownButton("更多")
+        {
+            ForeColor = Color.FromArgb(224, 235, 249),
+            Margin = new Padding(2, 0, 2, 0),
+            Padding = new Padding(5, 3, 5, 3),
+        };
+        more.DropDownItems.Add("数据库配置", null, (_, _) => EditDatabaseConfiguration());
+        more.DropDownItems.Add("打开配置目录", null, (_, _) =>
             Process.Start(new ProcessStartInfo("explorer.exe", "\"" + AppContext.BaseDirectory.TrimEnd('\\') + "\"")
-            { UseShellExecute = true })));
-        toolbar.Items.Add(new ToolStripSeparator());
-        toolbar.Items.Add(Button("重新连接", RetryConnection));
-        toolbar.Items.Add(Button("退出", ExitDesktop));
+            { UseShellExecute = true }));
+        more.DropDownItems.Add(new ToolStripSeparator());
+        more.DropDownItems.Add("重新连接", null, (_, _) => RetryConnection());
+        more.DropDownItems.Add("退出 ARTEX", null, (_, _) => ExitDesktop());
+        toolbar.Items.Add(more);
 
         statusBar.Items.Add(status);
 
