@@ -25,6 +25,7 @@ public sealed class MainForm : Form
     private readonly object logLock = new();
     private Process? ownedBackend;
     private StreamWriter? backendLog;
+    private long backendLogStartOffset;
     private bool exiting;
     private bool ready;
     private bool pageResourceFailed;
@@ -295,12 +296,15 @@ public sealed class MainForm : Form
                 ex.Message.Contains("8787", StringComparison.OrdinalIgnoreCase)
                     ? "本机服务端口被占用，ARTEX 无法连接到正确的服务。"
                     : "ARTEX 未能完成启动或页面加载，请检查下面的建议。";
+            var overridden = !string.IsNullOrWhiteSpace(Environment.GetEnvironmentVariable("ARTEX_PG_DSN"));
             ShowPageMessage("ARTEX 暂时无法启动", message, true,
                 databaseProblem: databaseFailure,
                 technical: ex.Message + "\n后端日志：" + LogPath,
-                nextStep: databaseFailure
-                    ? "建议先点击“修复数据库连接”，检查 PostgreSQL 服务、账号及数据库。"
-                    : "建议先点击“重新连接”；如仍失败，查看本机日志定位原因。");
+                nextStep: databaseFailure && overridden
+                    ? "已检测到 ARTEX_PG_DSN 环境变量，它会覆盖界面保存的配置。请先修改或移除该变量、重新启动 ARTEX，再检查数据库连接。"
+                    : databaseFailure
+                        ? "建议先点击“修复数据库连接”，检查 PostgreSQL 服务、账号及数据库。"
+                        : "建议先点击“重新连接”；如仍失败，查看本机日志定位原因。");
         }
         finally
         {
@@ -314,13 +318,19 @@ public sealed class MainForm : Form
         pageState.Display(title, details, canRetry, databaseProblem, technical, nextStep);
     }
 
-    private static string ExplainBackendFailure()
+    private string ExplainBackendFailure()
     {
         try
         {
             if (File.Exists(LogPath))
             {
-                var recent = string.Join("\n", File.ReadLines(LogPath).TakeLast(100));
+                // Old failures stay in the append-only log, so only inspect this
+                // startup's output rather than misdiagnosing from a previous run.
+                using var stream = new FileStream(LogPath, FileMode.Open, FileAccess.Read,
+                    FileShare.ReadWrite | FileShare.Delete);
+                stream.Seek(Math.Max(backendLogStartOffset, stream.Length - 131072), SeekOrigin.Begin);
+                using var reader = new StreamReader(stream);
+                var recent = reader.ReadToEnd();
                 if (recent.Contains("password authentication failed", StringComparison.OrdinalIgnoreCase))
                     return "PostgreSQL 拒绝了当前账号密码，请在数据库设置中更正后重试。";
                 if (recent.Contains("role", StringComparison.OrdinalIgnoreCase) &&
@@ -468,6 +478,7 @@ public sealed class MainForm : Form
         lock (logLock)
         {
             backendLog?.Dispose();
+            backendLogStartOffset = File.Exists(LogPath) ? new FileInfo(LogPath).Length : 0;
             backendLog = new StreamWriter(LogPath, append: true) { AutoFlush = true };
         }
 

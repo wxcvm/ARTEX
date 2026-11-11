@@ -124,6 +124,38 @@ internal static class Program
         if (paste.SuppressKeyPress || !pasteRepeat.SuppressKeyPress)
             throw new Exception("Held Ctrl+V was not suppressed");
         up.Invoke(password, new object[] { new KeyEventArgs(Keys.Control | Keys.V) });
+
+        // If the dedicated role was created but saving config.json failed, keep
+        // its credentials for retry. Only editing the connection invalidates it.
+        var ready = type.GetField("dedicatedAccountReady", BindingFlags.NonPublic | BindingFlags.Instance)!;
+        ready.SetValue(dialog, true);
+        var host = (TextBox)type.GetField("host", BindingFlags.NonPublic | BindingFlags.Instance)!
+            .GetValue(dialog)!;
+        host.Text = host.Text == "127.0.0.1" ? "localhost" : "127.0.0.1";
+        if ((bool)ready.GetValue(dialog)!)
+            throw new Exception("Changing the connection did not invalidate previously provisioned credentials");
+
+        // Never offer new-account provisioning as the default when a process
+        // environment variable would override the saved connection anyway.
+        var previousDsn = Environment.GetEnvironmentVariable("ARTEX_PG_DSN");
+        try
+        {
+            Environment.SetEnvironmentVariable("ARTEX_PG_DSN", "postgres://example@127.0.0.1:5432/example");
+            using var overridden = (Form)Activator.CreateInstance(
+                type, BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.Public,
+                binder: null, args: new object[] { false }, culture: null)!;
+            if (!AllChildren(overridden).OfType<RadioButton>()
+                .Single(r => r.Text == "已有账户 / 远程连接").Checked)
+                throw new Exception("Environment override should default to custom connection mode");
+            var note = (Label)type.GetField("overrideNotice", BindingFlags.NonPublic | BindingFlags.Instance)!
+                .GetValue(overridden)!;
+            if (!note.Text.Contains("ARTEX_PG_DSN", StringComparison.Ordinal))
+                throw new Exception("Database connection override is not explained");
+        }
+        finally
+        {
+            Environment.SetEnvironmentVariable("ARTEX_PG_DSN", previousDsn);
+        }
         dialog.Close();
     }
 

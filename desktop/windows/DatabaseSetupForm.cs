@@ -52,6 +52,15 @@ internal sealed class DatabaseSetupForm : Form
     private readonly CancellationTokenSource discoveryLifetime = new();
     private readonly HashSet<Keys> passwordKeysHeld = new();
     private readonly bool editExisting;
+    private bool dedicatedAccountReady;
+    private static bool HasDsnOverride =>
+        !string.IsNullOrWhiteSpace(Environment.GetEnvironmentVariable("ARTEX_PG_DSN"));
+    private readonly Label overrideNotice = new()
+    {
+        AutoSize = true, ForeColor = Color.FromArgb(251, 198, 112),
+        Margin = new Padding(0, 0, 0, 14),
+        Text = "检测到 ARTEX_PG_DSN 环境变量：它优先于向导保存的连接。请修改或移除该环境变量并重新启动 ARTEX，保存到配置文件的连接才会生效。",
+    };
     private readonly RadioButton quickMode = new()
     {
         Text = "本机安装 · 推荐", AutoSize = true, Checked = true,
@@ -136,8 +145,8 @@ internal sealed class DatabaseSetupForm : Form
             FlowDirection = FlowDirection.LeftToRight, WrapContents = true,
             AutoSize = true, Dock = DockStyle.Top, Margin = new Padding(0, 4, 0, 12),
         };
-        quickMode.Checked = !editExisting;
-        customMode.Checked = editExisting;
+        quickMode.Checked = !editExisting && !HasDsnOverride;
+        customMode.Checked = editExisting || HasDsnOverride;
         quickMode.ForeColor = Color.FromArgb(156, 195, 255);
         customMode.ForeColor = Color.FromArgb(218, 231, 248);
         quickMode.Margin = new Padding(0, 5, 28, 5);
@@ -146,14 +155,16 @@ internal sealed class DatabaseSetupForm : Form
         modes.Controls.Add(customMode);
         var heading = new TableLayoutPanel
         {
-            ColumnCount = 1, RowCount = 3, AutoSize = true,
+            ColumnCount = 1, RowCount = 4, AutoSize = true,
             Dock = DockStyle.Top, Margin = new Padding(0, 0, 0, 10),
         };
         heading.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 100));
-        for (var i = 0; i < 3; i++) heading.RowStyles.Add(new RowStyle(SizeType.AutoSize));
+        for (var i = 0; i < 4; i++) heading.RowStyles.Add(new RowStyle(SizeType.AutoSize));
         heading.Controls.Add(title, 0, 0);
         heading.Controls.Add(intro, 0, 1);
-        heading.Controls.Add(modes, 0, 2);
+        overrideNotice.Visible = HasDsnOverride;
+        heading.Controls.Add(overrideNotice, 0, 2);
+        heading.Controls.Add(modes, 0, 3);
         layout.Controls.Add(heading, 0, 0);
         layout.SetColumnSpan(heading, 2);
 
@@ -284,7 +295,14 @@ internal sealed class DatabaseSetupForm : Form
             if (passwordLabel != null) passwordLabel.Text = advanced ? "数据库密码" : "postgres 管理员密码";
         }
         quickMode.CheckedChanged += (_, _) => UpdateMode();
-        customMode.CheckedChanged += (_, _) => UpdateMode();
+        customMode.CheckedChanged += (_, _) =>
+        {
+            if (customMode.Checked) dedicatedAccountReady = false;
+            UpdateMode();
+        };
+        // Provisioning is not repeated when only writing config.json fails.
+        foreach (var field in new[] { host, port, user, password, database, sslMode })
+            field.TextChanged += (_, _) => dedicatedAccountReady = false;
         UpdateMode();
 
         foreach (var input in new[] { host, port, user, password, database, sslMode })
@@ -315,6 +333,7 @@ internal sealed class DatabaseSetupForm : Form
             var width = Math.Max(220, layout.ClientSize.Width - layout.Padding.Horizontal - 12);
             if (intro.MaximumSize.Width == width) return;
             intro.MaximumSize = new Size(width, 0);
+            overrideNotice.MaximumSize = new Size(width, 0);
             discoveryStatus.MaximumSize = new Size(width, 0);
         };
 
@@ -346,7 +365,7 @@ internal sealed class DatabaseSetupForm : Form
         {
             // WinForms scrolls to the first focused input on opening. Restore
             // the first explanatory row after focus and initial layout settle.
-            ActiveControl = host;
+            ActiveControl = quickMode.Checked ? password : host;
             scroll.AutoScrollPosition = Point.Empty;
             BeginInvoke((Action)(() =>
             {
@@ -490,7 +509,11 @@ internal sealed class DatabaseSetupForm : Form
         saveButton.Enabled = false;
         try
         {
-            if (await ProvisionDedicatedAccountAsync()) Save();
+            if (dedicatedAccountReady || await ProvisionDedicatedAccountAsync())
+            {
+                dedicatedAccountReady = true;
+                Save();
+            }
         }
         finally
         {
@@ -778,6 +801,11 @@ internal sealed class DatabaseSetupForm : Form
                 File.WriteAllText(tmp, root.ToJsonString(new JsonSerializerOptions { WriteIndented = true }) + "\n");
                 File.Move(tmp, path, overwrite: true);
             }
+            if (HasDsnOverride)
+                MessageBox.Show(this,
+                    "数据库连接已保存到配置文件，但当前 ARTEX_PG_DSN 环境变量仍优先于该文件。"
+                    + "\n请修改或移除该变量并重新启动 ARTEX，否则程序仍会使用原来的连接。",
+                    "环境变量优先", MessageBoxButtons.OK, MessageBoxIcon.Information);
             DialogResult = DialogResult.OK;
             Close();
         }
