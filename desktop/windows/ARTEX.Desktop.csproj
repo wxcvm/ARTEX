@@ -7,8 +7,11 @@
     <ImplicitUsings>enable</ImplicitUsings>
     <AssemblyName>ARTEX.Desktop</AssemblyName>
     <RootNamespace>Artex.Desktop</RootNamespace>
-    <ApplicationIcon>../../web/src/app/favicon.ico</ApplicationIcon>
+    <ApplicationIcon>generated/ARTEX.ico</ApplicationIcon>
   </PropertyGroup>
+  <Target Name="GenerateARTEXIcon" BeforeTargets="PrepareForBuild">
+    <Exec Command="powershell -NoProfile -NonInteractive -ExecutionPolicy Bypass -File &quot;$(MSBuildProjectDirectory)\generate-icon.ps1&quot;" />
+  </Target>
   <ItemGroup>
     <PackageReference Include="Microsoft.Web.WebView2" Version="1.0.4314.35" />
   </ItemGroup>
