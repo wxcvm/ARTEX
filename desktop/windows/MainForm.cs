@@ -13,29 +13,7 @@ public sealed class MainForm : Form
     private static readonly Uri Service = new("http://127.0.0.1:8787/");
     private WebView2 browser = new() { Dock = DockStyle.Fill };
     private readonly Panel viewHost = new() { Dock = DockStyle.Fill };
-    private readonly TableLayoutPanel pageState = new()
-    {
-        Dock = DockStyle.Fill,
-        ColumnCount = 1,
-        RowCount = 5,
-        BackColor = Color.FromArgb(23, 28, 38),
-        Padding = new Padding(24),
-    };
-    private readonly Label pageTitle = new()
-    {
-        Dock = DockStyle.Fill,
-        TextAlign = ContentAlignment.MiddleCenter,
-        ForeColor = Color.White,
-        Text = "正在启动 ARTEX…",
-    };
-    private readonly Label pageDetails = new()
-    {
-        Dock = DockStyle.Fill,
-        TextAlign = ContentAlignment.MiddleCenter,
-        ForeColor = Color.FromArgb(190, 201, 218),
-        Text = "正在连接本机服务并加载界面",
-    };
-    private readonly Button pageRetry = new() { Text = "重新连接", Width = 140, Height = 36, Anchor = AnchorStyles.None, Visible = false };
+    private readonly StartupView pageState = new();
     private readonly System.Windows.Forms.Timer pageLoadWatchdog = new() { Interval = 25000 };
     private readonly ToolStrip toolbar = new() { Dock = DockStyle.Top, GripStyle = ToolStripGripStyle.Hidden };
     private readonly StatusStrip statusBar = new() { Dock = DockStyle.Bottom };
@@ -71,17 +49,16 @@ public sealed class MainForm : Form
         Size = new Size(1360, 850);
         StartPosition = FormStartPosition.CenterScreen;
         WindowState = FormWindowState.Maximized;
-        pageTitle.Font = new Font(Font.FontFamily, 17f, FontStyle.Bold);
-        pageDetails.Font = new Font(Font.FontFamily, 10f);
-        pageState.RowStyles.Add(new RowStyle(SizeType.Percent, 42));
-        pageState.RowStyles.Add(new RowStyle(SizeType.Absolute, 50));
-        pageState.RowStyles.Add(new RowStyle(SizeType.Absolute, 90));
-        pageState.RowStyles.Add(new RowStyle(SizeType.Absolute, 48));
-        pageState.RowStyles.Add(new RowStyle(SizeType.Percent, 58));
-        pageState.Controls.Add(pageTitle, 0, 1);
-        pageState.Controls.Add(pageDetails, 0, 2);
-        pageState.Controls.Add(pageRetry, 0, 3);
-        pageRetry.Click += (_, _) => RetryConnection();
+        pageState.RetryRequested += (_, _) => RetryConnection();
+        pageState.RepairRequested += (_, _) => EditDatabaseConfiguration();
+        pageState.LogsRequested += (_, _) => OpenBackendLog();
+        toolbar.BackColor = Color.FromArgb(20, 32, 49);
+        toolbar.ForeColor = Color.FromArgb(232, 239, 250);
+        toolbar.Padding = new Padding(12, 7, 12, 7);
+        toolbar.Font = new Font("Microsoft YaHei UI", 9.5f);
+        statusBar.BackColor = Color.FromArgb(19, 29, 45);
+        statusBar.ForeColor = Color.FromArgb(171, 192, 218);
+        status.ForeColor = Color.FromArgb(171, 192, 218);
         pageLoadWatchdog.Tick += (_, _) =>
         {
             pageLoadWatchdog.Stop();
@@ -136,7 +113,12 @@ public sealed class MainForm : Form
 
     private static ToolStripButton Button(string label, Action click)
     {
-        var button = new ToolStripButton(label);
+        var button = new ToolStripButton(label)
+        {
+            ForeColor = Color.FromArgb(224, 235, 249),
+            Margin = new Padding(2, 0, 2, 0),
+            Padding = new Padding(5, 3, 5, 3),
+        };
         button.Click += (_, _) => click();
         return button;
     }
@@ -175,7 +157,8 @@ public sealed class MainForm : Form
                         if (setup.ShowDialog(this) != DialogResult.OK)
                         {
                             status.Text = "未配置数据库 · 点击“重新连接”继续设置";
-                            ShowPageMessage("需要配置数据库", "点击“重新连接”继续数据库设置", true);
+                            ShowPageMessage("完成数据库设置", "连接到 PostgreSQL 后才能进入 ARTEX 工作台。", true,
+                databaseProblem: true, nextStep: "点击“修复数据库连接”，按照引导完成安装或填写现有账户。");
                             return;
                         }
                     }
@@ -300,9 +283,18 @@ public sealed class MainForm : Form
             ready = false;
             status.Text = "连接失败 · 可点击“数据库配置”修正连接或“重新连接”重试";
             LogDesktopFailure("连接失败：" + ex);
-            ShowPageMessage("ARTEX 无法启动",
-                ex.Message + "\n请确认 PostgreSQL、WebView2 Runtime 和本机 8787 服务。\n后端日志：" + LogPath,
-                true);
+            var backendFailure = ex.Message.Contains("后端", StringComparison.OrdinalIgnoreCase);
+            var databaseFailure = backendFailure || ex.Message.Contains("PostgreSQL", StringComparison.OrdinalIgnoreCase);
+            var message = backendFailure ? ExplainBackendFailure() :
+                ex.Message.Contains("8787", StringComparison.OrdinalIgnoreCase)
+                    ? "本机服务端口被占用，ARTEX 无法连接到正确的服务。"
+                    : "ARTEX 未能完成启动或页面加载，请检查下面的建议。";
+            ShowPageMessage("ARTEX 暂时无法启动", message, true,
+                databaseProblem: databaseFailure,
+                technical: ex.Message + "\n后端日志：" + LogPath,
+                nextStep: databaseFailure
+                    ? "建议先点击“修复数据库连接”，检查 PostgreSQL 服务、账号及数据库。"
+                    : "建议先点击“重新连接”；如仍失败，查看本机日志定位原因。");
         }
         finally
         {
@@ -310,13 +302,48 @@ public sealed class MainForm : Form
         }
     }
 
-    private void ShowPageMessage(string title, string details, bool canRetry)
+    private void ShowPageMessage(string title, string details, bool canRetry,
+        bool databaseProblem = false, string? technical = null, string? nextStep = null)
     {
-        pageTitle.Text = title;
-        pageDetails.Text = details;
-        pageRetry.Visible = canRetry;
-        pageState.Show();
-        pageState.BringToFront();
+        pageState.Display(title, details, canRetry, databaseProblem, technical, nextStep);
+    }
+
+    private static string ExplainBackendFailure()
+    {
+        try
+        {
+            if (File.Exists(LogPath))
+            {
+                var recent = string.Join("\n", File.ReadLines(LogPath).TakeLast(100));
+                if (recent.Contains("password authentication failed", StringComparison.OrdinalIgnoreCase))
+                    return "PostgreSQL 拒绝了当前账号密码，请在数据库设置中更正后重试。";
+                if (recent.Contains("role", StringComparison.OrdinalIgnoreCase) &&
+                    recent.Contains("does not exist", StringComparison.OrdinalIgnoreCase))
+                    return "配置的 PostgreSQL 用户不存在，可以通过引导初始化专用账户。";
+                if (recent.Contains("database", StringComparison.OrdinalIgnoreCase) &&
+                    recent.Contains("does not exist", StringComparison.OrdinalIgnoreCase))
+                    return "目标数据库尚未建立，请在数据库向导中完成初始化。";
+                if (recent.Contains("connection refused", StringComparison.OrdinalIgnoreCase) ||
+                    recent.Contains("connectex", StringComparison.OrdinalIgnoreCase))
+                    return "PostgreSQL 连接被拒绝。请确认本机数据库服务已启动且端口正确。";
+            }
+        }
+        catch (IOException) { }
+        catch (UnauthorizedAccessException) { }
+        return "ARTEX 后端未能启动。数据库连接或启动依赖可能存在问题。";
+    }
+
+    private static void OpenBackendLog()
+    {
+        var target = File.Exists(LogPath) ? LogPath :
+            Path.Combine(LocalData, "desktop-ui.log");
+        if (File.Exists(target))
+            Process.Start(new ProcessStartInfo("notepad.exe", "\"" + target + "\"") { UseShellExecute = true });
+        else
+        {
+            Directory.CreateDirectory(LocalData);
+            Process.Start(new ProcessStartInfo("explorer.exe", "\"" + LocalData + "\"") { UseShellExecute = true });
+        }
     }
 
     private void RetryConnection()
