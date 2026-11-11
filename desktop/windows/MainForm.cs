@@ -48,7 +48,7 @@ public sealed class MainForm : Form
     private StreamWriter? backendLog;
     private bool exiting;
     private bool ready;
-    private bool staticAssetFailed;
+    private bool pageResourceFailed;
     private bool browserRecreationNeeded;
     private bool rendererRecoveryAttempted;
     private bool fullScreen;
@@ -208,7 +208,7 @@ public sealed class MainForm : Form
                 core.NavigationStarting += (_, args) =>
                 {
                     if (!args.Uri.StartsWith(Service.AbsoluteUri, StringComparison.OrdinalIgnoreCase)) return;
-                    staticAssetFailed = false;
+                    pageResourceFailed = false;
                     ShowPageMessage("正在加载 ARTEX 界面…", "正在等待网页完成加载", false);
                 };
                 core.NavigationCompleted += (_, args) =>
@@ -222,7 +222,7 @@ public sealed class MainForm : Form
                         ShowPageMessage("界面加载失败", details + "\n请确认本机服务可访问，再点击“重新连接”。", true);
                         return;
                     }
-                    if (staticAssetFailed) return;
+                    if (pageResourceFailed) return;
                     ready = true;
                     pageState.Hide();
                     status.Text = ownedBackend is { HasExited: false }
@@ -232,16 +232,21 @@ public sealed class MainForm : Form
                 core.WebResourceResponseReceived += (_, args) =>
                 {
                     if (!Uri.TryCreate(args.Request.Uri, UriKind.Absolute, out var uri) ||
-                        !uri.AbsolutePath.StartsWith("/_next/", StringComparison.OrdinalIgnoreCase) ||
-                        !(uri.AbsolutePath.EndsWith(".js", StringComparison.OrdinalIgnoreCase) ||
-                          uri.AbsolutePath.EndsWith(".css", StringComparison.OrdinalIgnoreCase)) ||
                         args.Response.StatusCode < 400) return;
-                    staticAssetFailed = true;
+                    var staticAsset = uri.AbsolutePath.StartsWith("/_next/", StringComparison.OrdinalIgnoreCase) &&
+                        (uri.AbsolutePath.EndsWith(".js", StringComparison.OrdinalIgnoreCase) ||
+                         uri.AbsolutePath.EndsWith(".css", StringComparison.OrdinalIgnoreCase));
+                    var document = uri.Host == Service.Host && uri.Port == Service.Port &&
+                        (uri.AbsolutePath == "/" ||
+                         (uri.AbsolutePath.EndsWith('/') &&
+                          !uri.AbsolutePath.StartsWith("/api/", StringComparison.OrdinalIgnoreCase)));
+                    if (!staticAsset && !document) return;
+                    pageResourceFailed = true;
                     ready = false;
-                    var details = "页面资源加载失败：HTTP " + args.Response.StatusCode + " " + uri.AbsolutePath;
+                    var details = "网页请求失败：HTTP " + args.Response.StatusCode + " " + uri.AbsolutePath;
                     LogDesktopFailure(details);
-                    status.Text = "网页脚本或样式加载失败 · 可重新连接";
-                    ShowPageMessage("界面资源加载失败", details + "\n请点击“重新连接”重新加载。", true);
+                    status.Text = "ARTEX 网页资源请求失败 · 可重新连接";
+                    ShowPageMessage("界面加载失败", details + "\n请点击“重新连接”重新加载。", true);
                 };
                 core.ProcessFailed += (_, args) =>
                 {
@@ -250,7 +255,10 @@ public sealed class MainForm : Form
                         CoreWebView2ProcessFailedKind.RenderProcessExited or
                         CoreWebView2ProcessFailedKind.RenderProcessUnresponsive)) return;
                     if (!IsHandleCreated || IsDisposed || Disposing) return;
-                    BeginInvoke((Action)(() => HandleBrowserFailure(kind)));
+                    BeginInvoke((Action)(() =>
+                    {
+                        if (ReferenceEquals(browser.CoreWebView2, core)) HandleBrowserFailure(kind);
+                    }));
                 };
                 core.NewWindowRequested += (_, args) =>
                 {
