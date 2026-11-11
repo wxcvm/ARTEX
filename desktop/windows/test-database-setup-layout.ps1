@@ -9,6 +9,8 @@ function Require([string]$needle, [string]$reason) {
 
 Require 'AutoScaleMode = AutoScaleMode.Dpi;' 'DPI scaling must be enabled'
 Require 'FormBorderStyle = FormBorderStyle.Sizable;' 'Wizard must allow resizing'
+Require 'Screen.FromControl(this).WorkingArea' 'Scaled wizard must fit the current monitor'
+Require 'Size = new Size(Math.Min(Width, maxWidth), Math.Min(Height, maxHeight));' 'Dialog size must be clamped on small displays'
 Require 'AutoScroll = true' 'Settings must remain scrollable'
 Require 'root.Controls.Add(scroll, 0, 0);' 'Scrollable controls must occupy the main row'
 Require 'root.Controls.Add(footer, 0, 1);' 'Primary action buttons must have a dedicated footer row'
