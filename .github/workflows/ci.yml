@@ -67,6 +67,8 @@ jobs:
         with:
           python-version: "3.12"
       - run: python -m unittest discover -s scripts/benchmark -p test_engineering.py
+      - name: Read-only knowledge retrieval regression
+        run: go test -race -count=20 ./kb
       - run: python scripts/benchmark/run_engineering.py --repeat 20 --race
       - uses: actions/upload-artifact@v4
         if: always()
@@ -82,6 +84,8 @@ jobs:
         with:
           go-version-file: go.mod
       - run: go build ./...
+      - name: Knowledge paths and literal search on Windows
+        run: go test ./kb -count=20
       - run: go test ./server -run 'TestTaskTransition|TestWebAPIEngineering|TestDownload' -count=20
       - run: go test ./server -run '^(TestExternalTool|TestJWTKey)' -count=1
       - run: go test ./mcphttp -run '^TestStreamableClient(ProtocolVersions|VersionRejectionForms)$' -count=1
