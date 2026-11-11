@@ -518,6 +518,26 @@ export default function DashboardPage() {
         </div>
       </section>
 
+      {stats && !stats.llm_configured && (
+        <section
+          role="status"
+          className="flex flex-wrap items-center justify-between gap-4 rounded-xl border border-amber-500/25 bg-amber-500/8 px-5 py-4"
+        >
+          <div className="flex min-w-0 items-start gap-3">
+            <ShieldCheckIcon className="mt-0.5 size-5 shrink-0 text-amber-400" />
+            <div>
+              <p className="text-sm font-semibold">还没有配置默认模型</p>
+              <p className="mt-1 text-xs leading-relaxed text-muted-foreground">
+                完成模型连接后，才可以正常使用需要大模型的任务能力。
+              </p>
+            </div>
+          </div>
+          <Link href="/system/llm" className="inline-flex h-9 items-center gap-1.5 rounded-lg border border-amber-500/30 px-3 text-xs font-semibold text-foreground transition-colors hover:bg-amber-500/10">
+            配置模型 <ArrowUpRightIcon className="size-3.5" />
+          </Link>
+        </section>
+      )}
+
       {/* ── Row 1: 5 stat cards ── */}
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-5">
         {/* 进行中任务 */}
