@@ -2,7 +2,7 @@ ARTEX Windows 桌面客户端（便携版）
 ================================
 
 运行方法（无需手工编写 config.json）：
-1. 将完整安装包解压至可写目录（例如 D:\\Apps\\ARTEX），运行 ARTEX.Desktop.exe。
+1. 将完整安装包解压至可写目录（例如 D:\Apps\ARTEX），运行 ARTEX.Desktop.exe。
 2. 第一次打开时自动检查本机 PostgreSQL：
    - 已安装：确认检测到的端口，填入安装 PostgreSQL 时设置的 postgres 管理员密码。
      选择「本机安装 · 推荐」，点击「初始化并连接」。向导会在你确认后调用
