@@ -52,16 +52,32 @@ internal sealed class DatabaseSetupForm : Form
     private readonly CancellationTokenSource discoveryLifetime = new();
     private readonly HashSet<Keys> passwordKeysHeld = new();
     private readonly bool editExisting;
+    private readonly RadioButton quickMode = new()
+    {
+        Text = "本机安装 · 推荐", AutoSize = true, Checked = true,
+        Font = new Font("Microsoft YaHei UI", 10f, FontStyle.Bold),
+    };
+    private readonly RadioButton customMode = new()
+    {
+        Text = "已有账户 / 远程连接", AutoSize = true,
+        Font = new Font("Microsoft YaHei UI", 10f),
+    };
+    private readonly Button saveButton = new() { Text = "初始化并连接" };
 
     internal DatabaseSetupForm(bool editExisting = false)
     {
-        this.editExisting = editExisting;
-        Text = editExisting ? "ARTEX · 修改数据库配置" : "ARTEX · 首次数据库配置";
+        this.editExisting = editExisting && File.Exists(ConfigPath);
+        editExisting = this.editExisting;
+        Text = editExisting ? "ARTEX · 数据库设置" : "ARTEX · 快速开始";
+        if (!editExisting) user.Text = "postgres";
         Icon = System.Drawing.Icon.ExtractAssociatedIcon(Application.ExecutablePath) ?? SystemIcons.Application;
         StartPosition = FormStartPosition.CenterParent;
         AutoScaleMode = AutoScaleMode.Dpi;
-        ClientSize = new Size(860, 610);
-        MinimumSize = new Size(620, 440);
+        ClientSize = new Size(830, 590);
+        MinimumSize = new Size(620, 460);
+        BackColor = Color.FromArgb(17, 27, 42);
+        ForeColor = Color.FromArgb(235, 242, 252);
+        Font = new Font("Microsoft YaHei UI", 9.5f);
         FormBorderStyle = FormBorderStyle.Sizable;
         MaximizeBox = true;
         MinimizeBox = false;
@@ -80,14 +96,16 @@ internal sealed class DatabaseSetupForm : Form
         root.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 100));
         root.RowStyles.Add(new RowStyle(SizeType.Percent, 100));
         root.RowStyles.Add(new RowStyle(SizeType.AutoSize));
-        var scroll = new Panel { Dock = DockStyle.Fill, AutoScroll = true };
+        var scroll = new Panel { Dock = DockStyle.Fill, AutoScroll = true,
+            BackColor = Color.FromArgb(17, 27, 42) };
         var layout = new TableLayoutPanel
         {
             Dock = DockStyle.Top,
             ColumnCount = 2,
             RowCount = 11,
-            Padding = new Padding(18, 16, 18, 12),
+            Padding = new Padding(26, 22, 26, 14),
             Margin = Padding.Empty,
+            BackColor = Color.FromArgb(17, 27, 42),
             AutoSize = true,
             AutoSizeMode = AutoSizeMode.GrowAndShrink,
         };
@@ -98,15 +116,46 @@ internal sealed class DatabaseSetupForm : Form
 
         var intro = new Label
         {
-            Text = (editExisting ? "修改 PostgreSQL 连接信息。保存后需要重启后端。" :
-                "首次运行需要连接 PostgreSQL。请填写连接信息。") +
-                "\nDocker 手册示例端口是 5433；ARTEX_PG_DSN 环境变量优先于此配置。",
+            Text = editExisting
+                ? "修改已有连接不会删除数据库数据。更改后重新连接即可生效。"
+                : "推荐使用本机 PostgreSQL：自动查找服务，输入安装时的管理员密码，接着初始化 ARTEX 专用账户。",
             AutoSize = true,
-            Dock = DockStyle.Top,
-            Margin = new Padding(3, 0, 3, 12),
+            ForeColor = Color.FromArgb(173, 192, 217),
+            Margin = new Padding(0, 4, 0, 16),
         };
-        layout.Controls.Add(intro, 0, 0);
-        layout.SetColumnSpan(intro, 2);
+        var title = new Label
+        {
+            Text = editExisting ? "数据库连接设置" : "欢迎使用 ARTEX",
+            AutoSize = true,
+            Font = new Font("Microsoft YaHei UI", 20f, FontStyle.Bold),
+            ForeColor = Color.White,
+            Margin = new Padding(0, 0, 0, 4),
+        };
+        var modes = new FlowLayoutPanel
+        {
+            FlowDirection = FlowDirection.LeftToRight, WrapContents = true,
+            AutoSize = true, Dock = DockStyle.Top, Margin = new Padding(0, 4, 0, 12),
+        };
+        quickMode.Checked = !editExisting;
+        customMode.Checked = editExisting;
+        quickMode.ForeColor = Color.FromArgb(156, 195, 255);
+        customMode.ForeColor = Color.FromArgb(218, 231, 248);
+        quickMode.Margin = new Padding(0, 5, 28, 5);
+        customMode.Margin = new Padding(0, 5, 0, 5);
+        modes.Controls.Add(quickMode);
+        modes.Controls.Add(customMode);
+        var heading = new TableLayoutPanel
+        {
+            ColumnCount = 1, RowCount = 3, AutoSize = true,
+            Dock = DockStyle.Top, Margin = new Padding(0, 0, 0, 10),
+        };
+        heading.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 100));
+        for (var i = 0; i < 3; i++) heading.RowStyles.Add(new RowStyle(SizeType.AutoSize));
+        heading.Controls.Add(title, 0, 0);
+        heading.Controls.Add(intro, 0, 1);
+        heading.Controls.Add(modes, 0, 2);
+        layout.Controls.Add(heading, 0, 0);
+        layout.SetColumnSpan(heading, 2);
 
         AddField(layout, 1, "服务器地址", host);
         AddField(layout, 2, "端口", port);
@@ -207,8 +256,8 @@ internal sealed class DatabaseSetupForm : Form
             Padding = new Padding(18, 8, 18, 8),
             Margin = Padding.Empty,
         };
-        var save = new Button { Text = "保存并连接" };
-        save.Click += (_, _) => Save();
+        var save = saveButton;
+        save.Click += async (_, _) => await SetupAndSaveAsync();
         var test = new Button { Text = "测试数据库连接" };
         test.Click += async (_, _) => await RunDatabaseActionAsync(test, "-check-db");
         var cancel = new Button { Text = "稍后配置", DialogResult = DialogResult.Cancel };
@@ -217,6 +266,47 @@ internal sealed class DatabaseSetupForm : Form
         ConfigureActionButton(cancel, 110);
         foreach (var button in new[] { save, test, cancel })
             footer.Controls.Add(button);
+        footer.BackColor = Color.FromArgb(23, 36, 54);
+        var advancedRows = new[] { 1, 2, 3, 6, 9, 10 };
+        void UpdateMode()
+        {
+            var advanced = customMode.Checked;
+            foreach (var row in advancedRows)
+                foreach (Control control in layout.Controls)
+                    if (layout.GetPositionFromControl(control).Row == row)
+                        control.Visible = advanced;
+            test.Visible = advanced;
+            save.Text = advanced ? "保存并连接" : "初始化并连接";
+            if (!advanced && !editExisting) user.Text = "postgres";
+            if (advanced && !editExisting && user.Text == "postgres")
+                user.Text = "artex";
+            var passwordLabel = layout.GetControlFromPosition(0, 4);
+            if (passwordLabel != null) passwordLabel.Text = advanced ? "数据库密码" : "postgres 管理员密码";
+        }
+        quickMode.CheckedChanged += (_, _) => UpdateMode();
+        customMode.CheckedChanged += (_, _) => UpdateMode();
+        UpdateMode();
+
+        foreach (var input in new[] { host, port, user, password, database, sslMode })
+        {
+            input.BackColor = Color.FromArgb(32, 48, 69);
+            input.ForeColor = Color.FromArgb(241, 247, 255);
+            input.BorderStyle = BorderStyle.FixedSingle;
+            input.MinimumSize = new Size(0, 34);
+        }
+        localServices.BackColor = Color.FromArgb(32, 48, 69);
+        localServices.ForeColor = Color.White;
+        foreach (var button in new[] { save, test, cancel, detectLocal, startLocal,
+            installLocal, create, provisionApp })
+        {
+            button.FlatStyle = FlatStyle.Flat;
+            button.BackColor = button == save ? Color.FromArgb(61, 122, 214) :
+                Color.FromArgb(37, 57, 81);
+            button.ForeColor = Color.White;
+            button.FlatAppearance.BorderSize = button == save ? 0 : 1;
+            button.FlatAppearance.BorderColor = Color.FromArgb(69, 99, 137);
+        }
+        discoveryStatus.ForeColor = Color.FromArgb(178, 202, 231);
 
         // Constrain wrapping labels to the actual visible content width.
         // This lets auto-sized table rows grow instead of covering controls.
