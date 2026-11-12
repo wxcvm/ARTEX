@@ -94,19 +94,33 @@ type RetryOverride struct {
 // list query; profileColsKey is the same with api_key for the single-row loads.
 const profileRetryCols = `COALESCE(retry_connect_attempts,0),COALESCE(retry_connect_interval_ms,0),COALESCE(retry_empty_attempts,0),COALESCE(retry_empty_interval_ms,0),COALESCE(retry_stream_attempts,0),COALESCE(retry_stream_interval_ms,0)`
 const profileCols = `id,name,format,COALESCE(base_url,''),COALESCE(proxy,''),model,COALESCE(api_key_hint,''),rate_per_second,rate_per_minute,context_window_k,COALESCE(reasoning_effort,''),is_default,priority,pool_exclude,COALESCE(thinking_type,''),COALESCE(streaming,true),COALESCE(max_tokens,0),COALESCE(max_tokens_field,''),COALESCE(session_header_key,''),` + profileRetryCols + `,COALESCE(price_input_per_m,0),COALESCE(price_output_per_m,0),COALESCE(price_cache_read_per_m,0),COALESCE(price_cache_write_per_m,0),COALESCE(user_agent,'')`
-const profileColsKey = `id,name,format,COALESCE(base_url,''),COALESCE(proxy,''),model,COALESCE(api_key,''),rate_per_second,rate_per_minute,context_window_k,COALESCE(reasoning_effort,''),is_default,priority,pool_exclude,COALESCE(thinking_type,''),COALESCE(streaming,true),COALESCE(max_tokens,0),COALESCE(max_tokens_field,''),COALESCE(session_header_key,''),` + profileRetryCols + `,COALESCE(price_input_per_m,0),COALESCE(price_output_per_m,0),COALESCE(price_cache_read_per_m,0),COALESCE(price_cache_write_per_m,0),COALESCE(user_agent,'')`
+const profileColsKey = `id,name,format,COALESCE(base_url,''),COALESCE(proxy,''),model,COALESCE(api_key,''),rate_per_second,rate_per_minute,context_window_k,COALESCE(reasoning_effort,''),is_default,priority,pool_exclude,COALESCE(thinking_type,''),COALESCE(streaming,true),COALESCE(max_tokens,0),COALESCE(max_tokens_field,''),COALESCE(session_header_key,''),` + profileRetryCols + `,COALESCE(price_input_per_m,0),COALESCE(price_output_per_m,0),COALESCE(price_cache_read_per_m,0),COALESCE(price_cache_write_per_m,0),COALESCE(user_agent,'')` + `,COALESCE(api_key_ciphertext,'')`
 
 // scanProfile reads one row in the profileCols / profileColsKey column order. The
 // 7th column lands in APIKeyHint or APIKey depending on which list the caller used.
-func scanProfile(sc interface{ Scan(...any) error }, into *string, p *LLMProfile) error {
-	return sc.Scan(&p.ID, &p.Name, &p.Format, &p.BaseURL, &p.Proxy, &p.Model, into,
+func scanProfile(sc interface{ Scan(...any) error }, into *string, p *LLMProfile, extra ...any) error {
+	args := []any{&p.ID, &p.Name, &p.Format, &p.BaseURL, &p.Proxy, &p.Model, into,
 		&p.RatePerSecond, &p.RatePerMinute, &p.ContextWindowK, &p.ReasoningEffort, &p.IsDefault, &p.Priority, &p.PoolExclude, &p.ThinkingType, &p.Streaming,
 		&p.MaxTokens, &p.MaxTokensField, &p.SessionHeaderKey,
 		&p.Retry.Connect.Attempts, &p.Retry.Connect.IntervalMS,
 		&p.Retry.Empty.Attempts, &p.Retry.Empty.IntervalMS,
 		&p.Retry.Stream.Attempts, &p.Retry.Stream.IntervalMS,
 		&p.PriceInputPerM, &p.PriceOutputPerM, &p.PriceCacheReadPerM, &p.PriceCacheWritePerM,
-		&p.UserAgent)
+		&p.UserAgent}
+	return sc.Scan(append(args, extra...)...)
+}
+
+func scanSecretProfile(sc interface{ Scan(...any) error }, p *LLMProfile) error {
+	var plain, encrypted string
+	if err := scanProfile(sc, &plain, p, &encrypted); err != nil {
+		return err
+	}
+	value, err := decodeProfileSecret(plain, encrypted)
+	if err != nil {
+		return err
+	}
+	p.APIKey = value
+	return nil
 }
 
 func (d *DB) ListProfiles() ([]*LLMProfile, error) {
@@ -129,22 +143,28 @@ func (d *DB) ListProfiles() ([]*LLMProfile, error) {
 // ActiveProfile returns the default (active) profile with its api key, or nil.
 func (d *DB) ActiveProfile() (*LLMProfile, error) {
 	var p LLMProfile
-	err := scanProfile(d.QueryRow(`SELECT `+profileColsKey+` FROM llm_profiles WHERE is_default LIMIT 1`), &p.APIKey, &p)
+	err := scanSecretProfile(d.QueryRow(`SELECT `+profileColsKey+` FROM llm_profiles WHERE is_default LIMIT 1`), &p)
 	if err == sql.ErrNoRows {
 		return nil, nil
 	}
-	return &p, err
+	if err != nil {
+		return nil, err
+	}
+	return &p, nil
 }
 
 // ProfileByID returns one profile with its api key by id, or nil if not found.
 // Used to run a task on a specific (non-default) LLM profile.
 func (d *DB) ProfileByID(id int64) (*LLMProfile, error) {
 	var p LLMProfile
-	err := scanProfile(d.QueryRow(`SELECT `+profileColsKey+` FROM llm_profiles WHERE id=$1`, id), &p.APIKey, &p)
+	err := scanSecretProfile(d.QueryRow(`SELECT `+profileColsKey+` FROM llm_profiles WHERE id=$1`, id), &p)
 	if err == sql.ErrNoRows {
 		return nil, nil
 	}
-	return &p, err
+	if err != nil {
+		return nil, err
+	}
+	return &p, nil
 }
 
 // PoolProfiles returns the failover chain in run order, api keys included: the
@@ -155,7 +175,7 @@ func (d *DB) ProfileByID(id int64) (*LLMProfile, error) {
 // slice front to back.
 func (d *DB) PoolProfiles() ([]*LLMProfile, error) {
 	rows, err := d.Query(`SELECT ` + profileColsKey + ` FROM llm_profiles
-WHERE (COALESCE(api_key,'') <> '' OR format='ollama') AND (is_default OR NOT pool_exclude)
+WHERE (COALESCE(api_key,'') <> '' OR COALESCE(api_key_ciphertext,'') <> '' OR format='ollama') AND (is_default OR NOT pool_exclude)
 ORDER BY is_default DESC, priority DESC, id ASC`)
 	if err != nil {
 		return nil, err
@@ -164,7 +184,7 @@ ORDER BY is_default DESC, priority DESC, id ASC`)
 	var out []*LLMProfile
 	for rows.Next() {
 		var p LLMProfile
-		if err := scanProfile(rows, &p.APIKey, &p); err != nil {
+		if err := scanSecretProfile(rows, &p); err != nil {
 			return nil, err
 		}
 		out = append(out, &p)
@@ -179,16 +199,22 @@ func (d *DB) SaveProfile(p *LLMProfile) (int64, error) {
 	// leaks into paths that assign it directly (the llm/test fallback).
 	p.APIKey = strings.TrimSpace(p.APIKey)
 	hint := p.APIKeyHint
-	if len(p.APIKey) >= 4 {
+	if len(p.APIKey) > 4 {
 		hint = "…" + p.APIKey[len(p.APIKey)-4:]
+	} else if p.APIKey != "" {
+		hint = "••••"
+	}
+	plain, encrypted, err := encodeProfileSecret(p.APIKey)
+	if err != nil {
+		return 0, err
 	}
 	r := p.Retry.Clamped()
 	if p.ID == 0 {
 		var id int64
-		err := d.QueryRow(`INSERT INTO llm_profiles(name,format,base_url,proxy,model,api_key,api_key_hint,rate_per_second,rate_per_minute,context_window_k,reasoning_effort,priority,pool_exclude,thinking_type,streaming,max_tokens,max_tokens_field,session_header_key,retry_connect_attempts,retry_connect_interval_ms,retry_empty_attempts,retry_empty_interval_ms,retry_stream_attempts,retry_stream_interval_ms,user_agent)
-VALUES ($1,$2,NULLIF($3,''),NULLIF($4,''),$5,NULLIF($6,''),NULLIF($7,''),$8,$9,$10,$11,$12,$13,$14,$15,$16,$17,$18,$19,$20,$21,$22,$23,$24,$25) RETURNING id`,
-			p.Name, p.Format, p.BaseURL, p.Proxy, p.Model, p.APIKey, hint, p.RatePerSecond, p.RatePerMinute, p.ContextWindowK, p.ReasoningEffort, p.Priority, p.PoolExclude, p.ThinkingType, p.Streaming, p.MaxTokens, p.MaxTokensField, p.SessionHeaderKey,
-			r.Connect.Attempts, r.Connect.IntervalMS, r.Empty.Attempts, r.Empty.IntervalMS, r.Stream.Attempts, r.Stream.IntervalMS, p.UserAgent).Scan(&id)
+		err := d.QueryRow(`INSERT INTO llm_profiles(name,format,base_url,proxy,model,api_key,api_key_hint,rate_per_second,rate_per_minute,context_window_k,reasoning_effort,priority,pool_exclude,thinking_type,streaming,max_tokens,max_tokens_field,session_header_key,retry_connect_attempts,retry_connect_interval_ms,retry_empty_attempts,retry_empty_interval_ms,retry_stream_attempts,retry_stream_interval_ms,user_agent,api_key_ciphertext)
+VALUES ($1,$2,NULLIF($3,''),NULLIF($4,''),$5,NULLIF($6,''),NULLIF($7,''),$8,$9,$10,$11,$12,$13,$14,$15,$16,$17,$18,$19,$20,$21,$22,$23,$24,$25,NULLIF($26,'')) RETURNING id`,
+			p.Name, p.Format, p.BaseURL, p.Proxy, p.Model, plain, hint, p.RatePerSecond, p.RatePerMinute, p.ContextWindowK, p.ReasoningEffort, p.Priority, p.PoolExclude, p.ThinkingType, p.Streaming, p.MaxTokens, p.MaxTokensField, p.SessionHeaderKey,
+			r.Connect.Attempts, r.Connect.IntervalMS, r.Empty.Attempts, r.Empty.IntervalMS, r.Stream.Attempts, r.Stream.IntervalMS, p.UserAgent, encrypted).Scan(&id)
 		if err == nil {
 			_, err = d.saveProfilePrices(id, p)
 		}
@@ -203,12 +229,20 @@ VALUES ($1,$2,NULLIF($3,''),NULLIF($4,''),$5,NULLIF($6,''),NULLIF($7,''),$8,$9,$
 		}
 		return p.ID, err
 	}
-	_, err := d.Exec(`UPDATE llm_profiles SET name=$1,format=$2,base_url=NULLIF($3,''),proxy=NULLIF($4,''),model=$5,api_key=$6,api_key_hint=$7,rate_per_second=$8,rate_per_minute=$9,context_window_k=$10,reasoning_effort=$11,priority=$12,pool_exclude=$13,thinking_type=$14,streaming=$15,max_tokens=$16,max_tokens_field=$17,session_header_key=$18,retry_connect_attempts=$19,retry_connect_interval_ms=$20,retry_empty_attempts=$21,retry_empty_interval_ms=$22,retry_stream_attempts=$23,retry_stream_interval_ms=$24,user_agent=$25 WHERE id=$26`,
-		p.Name, p.Format, p.BaseURL, p.Proxy, p.Model, p.APIKey, hint, p.RatePerSecond, p.RatePerMinute, p.ContextWindowK, p.ReasoningEffort, p.Priority, p.PoolExclude, p.ThinkingType, p.Streaming, p.MaxTokens, p.MaxTokensField, p.SessionHeaderKey,
-		r.Connect.Attempts, r.Connect.IntervalMS, r.Empty.Attempts, r.Empty.IntervalMS, r.Stream.Attempts, r.Stream.IntervalMS, p.UserAgent, p.ID)
-	if err == nil {
-		_, err = d.saveProfilePrices(p.ID, p)
+	result, err := d.Exec(`UPDATE llm_profiles SET name=$1,format=$2,base_url=NULLIF($3,''),proxy=NULLIF($4,''),model=$5,api_key=NULLIF($6,''),api_key_hint=$7,rate_per_second=$8,rate_per_minute=$9,context_window_k=$10,reasoning_effort=$11,priority=$12,pool_exclude=$13,thinking_type=$14,streaming=$15,max_tokens=$16,max_tokens_field=$17,session_header_key=$18,retry_connect_attempts=$19,retry_connect_interval_ms=$20,retry_empty_attempts=$21,retry_empty_interval_ms=$22,retry_stream_attempts=$23,retry_stream_interval_ms=$24,user_agent=$25,api_key_ciphertext=NULLIF($27,'') WHERE id=$26 AND ($27 <> '' OR COALESCE(api_key_ciphertext,'') = '')`,
+		p.Name, p.Format, p.BaseURL, p.Proxy, p.Model, plain, hint, p.RatePerSecond, p.RatePerMinute, p.ContextWindowK, p.ReasoningEffort, p.Priority, p.PoolExclude, p.ThinkingType, p.Streaming, p.MaxTokens, p.MaxTokensField, p.SessionHeaderKey,
+		r.Connect.Attempts, r.Connect.IntervalMS, r.Empty.Attempts, r.Empty.IntervalMS, r.Stream.Attempts, r.Stream.IntervalMS, p.UserAgent, p.ID, encrypted)
+	if err != nil {
+		return p.ID, err
 	}
+	affected, err := result.RowsAffected()
+	if err != nil {
+		return p.ID, err
+	}
+	if affected == 0 {
+		return p.ID, errProfileSecretDowngrade
+	}
+	_, err = d.saveProfilePrices(p.ID, p)
 	return p.ID, err
 }
 
