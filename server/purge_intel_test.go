@@ -72,6 +72,7 @@ func TestPurgeIntelDatabaseRoundTrip(t *testing.T) {
  mux.HandleFunc("POST /api/companies/{id}/purge-intel",s.importPurgeIntel)
  mux.HandleFunc("GET /api/companies/{id}/purge-intel",s.listPurgeIntel)
  mux.HandleFunc("GET /api/companies/{id}/purge-intel/{snapshot}",s.getPurgeIntel)
+ mux.HandleFunc("GET /api/companies/{id}/purge-intel/{snapshot}/analysis",s.getPurgeIntelAnalysis)
  mux.HandleFunc("POST /api/purge/intel-bridge",s.importPurgeIntelBridge)
  h:=s.requireAuth(mux)
  token,err:=signJWT(s.jwtKey);if err!=nil{t.Fatal(err)}
@@ -90,6 +91,11 @@ func TestPurgeIntelDatabaseRoundTrip(t *testing.T) {
  if w.Code!=200||second.ID!=first.ID{t.Fatal("duplicate snapshot not merged")}
  w=request("GET",fmt.Sprintf("%s/%d",path,first.ID),b);if w.Code!=200{t.Fatalf("read: %d %s",w.Code,w.Body.String())}
  w=request("GET",path,b);if w.Code!=200{t.Fatalf("list: %d",w.Code)}
+ w=request("GET",fmt.Sprintf("%s/%d/analysis",path,first.ID),b)
+ if w.Code!=200{t.Fatalf("analysis: %d %s",w.Code,w.Body.String())}
+ var analysis purgeIntelAnalysis
+ if json.Unmarshal(w.Body.Bytes(),&analysis)!=nil||analysis.PortObservations!=1||analysis.UnknownTransportPorts!=1||!analysis.HistoricalOnly{t.Fatalf("invalid analysis: %+v",analysis)}
+
  var count int
  if err:=d.QueryRow("SELECT count(*) FROM purge_intel_snapshots WHERE company_id=$1",id).Scan(&count);err!=nil||count!=1{t.Fatalf("snapshot count %d: %v",count,err)}
  if err:=d.QueryRow("SELECT count(*) FROM assets WHERE company_id=$1",id).Scan(&count);err!=nil||count!=0{t.Fatalf("verified assets changed: %d %v",count,err)}
@@ -143,4 +149,22 @@ func TestPurgeIntelBridgeCredentialIsolation(t *testing.T) {
  t.Setenv("ARTEX_PRIVACY_BRIDGE_TOKEN","listener-test")
  t.Setenv("ARTEX_PURGE_INTEL_COMPANY_ID","")
  if validPurgeIntelBridgeCredential(secret){t.Fatal("unbound token accepted")}
+}
+
+func TestPurgeIntelAnalysisEvidenceGaps(t *testing.T) {
+ b:=fixturePurgeIntel()
+ timestamp:="2026-11-12T00:00:00Z"
+ b.Names[0].DNSCollectedAt=&timestamp
+ b.Names[0].Evidence=append(b.Names[0].Evidence,purgeIntelEvidence{Source:"dns"})
+ b.Names=append(b.Names,purgeIntelName{Name:"b.example.test",Evidence:[]purgeIntelEvidence{{Source:"registered-scope"}}})
+ b.IPs=append(b.IPs,purgeIntelIP{IP:"192.0.2.11"})
+ b.Truncated=true
+ b.Excluded=map[string]int{"dns_outside_scope":3}
+ a:=analyzePurgeIntel(b)
+ if !a.HistoricalOnly||!a.Truncated||a.ExcludedDNS!=3||a.Names!=2||a.IPs!=2||a.PortObservations!=1||a.UnknownTransportPorts!=1||a.PortsWithoutObservationTime!=1{t.Fatalf("invalid counts: %+v",a)}
+ if len(a.NamesWithMultipleSources)!=1||a.NamesWithMultipleSources[0]!="a.example.test"||len(a.NamesWithoutDNS)!=1||a.NamesWithoutDNS[0]!="b.example.test" {t.Fatalf("invalid name gaps: %+v",a)}
+ if len(a.NamesWithoutRetainedAddress)!=1||len(a.IPsWithoutDomainLink)!=1||len(a.IPsWithoutPortEvidence)!=1||a.SourceCounts["registered-scope"]!=0{t.Fatalf("invalid evidence gaps: %+v",a)}
+ b.Names[1].DNS=[]purgeIntelDNS{{Type:"A",Value:"192.0.2.10"}}
+ b.Edges=append(b.Edges,purgeIntelEdge{From:"b.example.test",To:"192.0.2.10",Relation:"A"})
+ if got:=analyzePurgeIntel(b);got.SharedAddresses!=1{t.Fatalf("shared address count=%d",got.SharedAddresses)}
 }
