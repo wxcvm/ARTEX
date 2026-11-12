@@ -2,6 +2,7 @@ package server
 
 import (
 	"encoding/json"
+	"net"
 	"net/http"
 	"net/http/httptest"
 	"testing"
@@ -64,5 +65,54 @@ func TestExposureEndpointRequiresJWT(t *testing.T) {
 	}
 	if info.Scope != "all_interfaces" || info.PublicReachability != "not_tested" {
 		t.Fatalf("incorrect exposure assessment: %+v", info)
+	}
+}
+
+func TestExposureRuntimeListener(t *testing.T) {
+	for _, tc := range []struct {
+		configured string
+		bind       string
+		scope      string
+	}{
+		{"localhost:0", "127.0.0.1:0", "loopback"},
+		{"0.0.0.0:0", "0.0.0.0:0", "all_interfaces"},
+	} {
+		t.Run(tc.configured, func(t *testing.T) {
+			listener, err := net.Listen("tcp4", tc.bind)
+			if err != nil {
+				t.Fatal(err)
+			}
+			defer listener.Close()
+			s := &Server{}
+			s.SetListenAddress(tc.configured)
+			s.SetBoundListenAddress(listener.Addr().String())
+			w := httptest.NewRecorder()
+			s.exposureStatus(w, httptest.NewRequest(http.MethodGet, "/api/privacy/exposure", nil))
+			var info ExposureStatus
+			if err := json.Unmarshal(w.Body.Bytes(), &info); err != nil {
+				t.Fatal(err)
+			}
+			if info.ConfiguredAddress != tc.configured || info.BoundAddress != listener.Addr().String() ||
+				info.ListenAddress != info.BoundAddress || info.BindingSource != "runtime_listener" ||
+				info.Scope != tc.scope || info.PublicReachability != "not_tested" {
+				t.Fatalf("incorrect runtime exposure assessment: %+v", info)
+			}
+		})
+	}
+}
+
+func TestExposureConfiguredFallback(t *testing.T) {
+	s := &Server{}
+	s.SetListenAddress("127.0.0.1:8787")
+	w := httptest.NewRecorder()
+	s.exposureStatus(w, httptest.NewRequest(http.MethodGet, "/api/privacy/exposure", nil))
+	var info ExposureStatus
+	if err := json.Unmarshal(w.Body.Bytes(), &info); err != nil {
+		t.Fatal(err)
+	}
+	if info.BindingSource != "configured" || info.BoundAddress != "" ||
+		info.ConfiguredAddress != "127.0.0.1:8787" || info.Scope != "loopback" ||
+		info.PublicReachability != "not_tested" {
+		t.Fatalf("incorrect configured fallback: %+v", info)
 	}
 }
