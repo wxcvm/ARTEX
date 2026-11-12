@@ -8,6 +8,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { api } from "@/lib/api";
 import { PrivacyOverviewPanel } from "./_components/overview";
+import { StoragePermissionsPanel } from "./_components/storage-permissions";
 
 type Exposure = Awaited<ReturnType<typeof api.privacyExposure>>;
 
@@ -55,6 +56,7 @@ export default function PrivacyPage() {
       </div>
 
       <PrivacyOverviewPanel />
+      <StoragePermissionsPanel />
 
       <Card>
         <CardHeader>
