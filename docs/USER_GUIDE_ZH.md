@@ -249,7 +249,9 @@ docker compose ps
 docker compose logs -f artex
 ```
 
-`docker-compose.yml` 包含 `postgres` 与 `artex` 两个服务。默认映射 HTTP 8787，并将代理端口 8788 映射到宿主机回环地址；数据目录 `./data` 和 `./skills` 挂载到容器。数据库本体保存在 Docker 命名卷 `pgdata`。
+`docker-compose.yml` 包含 `postgres` 与 `artex` 两个服务。默认将 HTTP 8787 和代理端口 8788 映射到宿主机回环地址；HTTP 宿主机绑定可通过 `ARTEX_BIND` 自定义。数据目录 `./data` 和 `./skills` 挂载到容器，数据库本体保存在 Docker 命名卷 `pgdata`。
+
+**核对 HTTP 暴露状态**：登录后访问 `/api/privacy/exposure` 可查看 `configured_address`（启动参数）、`bound_address`（实际监听地址）、`binding_source`（`runtime_listener` 表示已读取真实监听器）及 `scope`。`listen_address` 在读取成功时也返回实际地址，否则返回配置值。该地址属于 ARTEX 进程所在的网络命名空间；容器内部绑定所有接口并不等于宿主机对公网开放。请在宿主机使用 `docker compose port artex 8787`、`docker compose port artex 8788` 和 `docker compose ps` 核对实际端口发布，并检查防火墙与反向代理。`public_reachability` 保持 `not_tested`，不代表已经验证公网不可达。
 
 **Docker 重建后保留登录状态**：本 fork 的新后端使用 `ARTEX_JWT_KEY_DIR=/app/keys`，由 Compose 挂载仓库根目录的 `./keys`，单独持久化 JWT 签名密钥。`keys/` 不会被 Git 跟踪，也不进入 Docker 镜像构建上下文；备份时应保护该目录。Linux/macOS 可先执行 `mkdir -p keys`，Windows PowerShell 可执行 `New-Item -ItemType Directory -Force keys`。新后端会自动搬迁仍在挂载的 `data/jwt.key`，但**旧容器内部 `/app/jwt.key` 在容器重建后可能无法恢复**。如果已有旧容器，并希望保留现有登录令牌，应在删除或重新创建旧容器前将其密钥复制到宿主机的 `keys/jwt.key`（例如 `docker cp <旧容器名>:/app/jwt.key ./keys/jwt.key`）；只在原文件确实存在时操作，**不要生成不同的密钥覆盖它**。如果旧容器已经删除且密钥没有备份，只能重新登录。此行为仅适用于运行本 fork 新后端的 Docker 镜像；当前 Compose 的默认历史上游镜像不会因此自动更新到本 fork。
 
