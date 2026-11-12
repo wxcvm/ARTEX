@@ -205,6 +205,17 @@ func extractToken(r *http.Request) string {
 func (s *Server) requireAuth(h http.Handler) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		p := r.URL.Path
+		// Dedicated, optional credential authorizes only this exact read-only route.
+		// It can never authorize general ARTEX API operations or a mutation.
+		if p == "/api/privacy/bridge-status" && r.Method == http.MethodGet {
+			w.Header().Set("Cache-Control", "no-store")
+			if !validSetupToken(r.Header.Get("X-Artex-Privacy-Token"), strings.TrimSpace(os.Getenv("ARTEX_PRIVACY_BRIDGE_TOKEN"))) {
+				writeErr(w, http.StatusUnauthorized, "Unauthorized")
+				return
+			}
+			h.ServeHTTP(w, r)
+			return
+		}
 		if strings.HasPrefix(p, "/api/auth/") || p == "/api/health" {
 			h.ServeHTTP(w, r)
 			return

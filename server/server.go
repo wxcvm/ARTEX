@@ -46,6 +46,7 @@ type Server struct {
 	skillDir   string // root directory for skill subdirectories
 	jwtKey     []byte // HS256 signing key loaded from / generated into dataDir/jwt.key
 	listenAddress string // HTTP listener configured by cmd/artex
+	boundListenAddress string // Actual HTTP listener address, set before serving
 	setupToken string // ephemeral first-time admin setup secret; never returned via HTTP
 
 	// concMu serializes concurrency-cap decisions (admission + reconcile) so a
@@ -682,6 +683,7 @@ func (s *Server) Handler() http.Handler {
 
 	mux.HandleFunc("GET /api/health", s.health)
 	mux.HandleFunc("GET /api/privacy/exposure", s.exposureStatus)
+	mux.HandleFunc("GET /api/privacy/bridge-status", s.privacyBridgeStatus)
 	mux.HandleFunc("GET /api/stats", s.stats)
 	mux.HandleFunc("GET /api/logs", s.getLogs)
 	mux.HandleFunc("GET /api/logs/history", s.getLogsHistory)

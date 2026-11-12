@@ -9,6 +9,7 @@ import (
 	"flag"
 	"fmt"
 	"log"
+	"net"
 	"net/http"
 	"os"
 	"os/signal"
@@ -157,8 +158,15 @@ func run() int {
 	if override := os.Getenv("ARTEX_JWT_KEY_DIR"); override != "" {
 		jwtKeyDir = override
 	}
+	listener, err := net.Listen("tcp", *addr)
+	if err != nil {
+		log.Printf("listen: %v", err)
+		return 1
+	}
+	defer listener.Close()
 	srv := server.New(ctx, mgr, skillDir, *dataDir, jwtKeyDir)
 	srv.SetListenAddress(*addr)
+	srv.SetBoundListenAddress(listener.Addr().String())
 	httpSrv := &http.Server{
 		Addr:              *addr,
 		Handler:           srv.Handler(),
@@ -166,8 +174,8 @@ func run() int {
 	}
 
 	go func() {
-		log.Printf("ARTEX %s backend listening on %s (data=%s, workers=%d)", version, *addr, *dataDir, mgr.Workers())
-		if err := httpSrv.ListenAndServe(); err != nil && err != http.ErrServerClosed {
+		log.Printf("ARTEX %s backend listening on %s (data=%s, workers=%d)", version, listener.Addr().String(), *dataDir, mgr.Workers())
+		if err := httpSrv.Serve(listener); err != nil && err != http.ErrServerClosed {
 			log.Fatalf("serve: %v", err)
 		}
 	}()

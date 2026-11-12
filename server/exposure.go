@@ -6,11 +6,14 @@ import (
 	"strings"
 )
 
-// ExposureStatus describes the configured HTTP listener, not an internet scan.
-// Firewalls, NAT, Docker port publication and reverse proxies are outside what
-// this process can establish by inspecting its listener address.
+// ExposureStatus describes the HTTP listener inside the process's current network
+// namespace, not an internet scan. Host firewalls, NAT, Docker port publication
+// and reverse proxies are outside this assessment.
 type ExposureStatus struct {
 	ListenAddress      string `json:"listen_address"`
+	ConfiguredAddress  string `json:"configured_address"`
+	BoundAddress       string `json:"bound_address,omitempty"`
+	BindingSource      string `json:"binding_source"`
 	Scope              string `json:"scope"`
 	PublicReachability string `json:"public_reachability"`
 	Detail             string `json:"detail"`
@@ -59,6 +62,40 @@ func (s *Server) SetListenAddress(address string) {
 	s.listenAddress = address
 }
 
+// SetBoundListenAddress records net.Listener.Addr().String() once, before serving.
+// Unlike the configured address, it includes the OS-selected port and IP.
+func (s *Server) SetBoundListenAddress(address string) {
+	s.boundListenAddress = address
+}
+
+func (s *Server) exposureSnapshot() ExposureStatus {
+	address, source := s.listenAddress, "not_inspected"
+	if address != "" {
+		source = "configured"
+	}
+	if s.boundListenAddress != "" {
+		address, source = s.boundListenAddress, "runtime_listener"
+	}
+	status := classifyListener(address)
+	status.ConfiguredAddress = s.listenAddress
+	status.BoundAddress = s.boundListenAddress
+	status.BindingSource = source
+	return status
+}
+
 func (s *Server) exposureStatus(w http.ResponseWriter, _ *http.Request) {
-	writeJSON(w, http.StatusOK, classifyListener(s.listenAddress))
+	writeJSON(w, http.StatusOK, s.exposureSnapshot())
+}
+
+// privacyBridgeStatus is guarded by requireAuth's exact-route token check.
+// Return only the coarse listener assessment; no raw IPs, paths, keys or JWTs.
+func (s *Server) privacyBridgeStatus(w http.ResponseWriter, _ *http.Request) {
+	status := s.exposureSnapshot()
+	w.Header().Set("Cache-Control", "no-store")
+	writeJSON(w, http.StatusOK, map[string]any{
+		"service":             "artex",
+		"scope":               status.Scope,
+		"binding_source":      status.BindingSource,
+		"public_reachability": status.PublicReachability,
+	})
 }
