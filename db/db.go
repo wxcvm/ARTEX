@@ -155,6 +155,9 @@ func ensureDatabase(dsn string) error {
 
 // Open connects, applies the schema (idempotent), and seeds builtin rows.
 func Open(dsn string) (*DB, error) {
+	if _, err := profileSecretCipher(); err != nil {
+		return nil, err
+	}
 	if err := ensureDatabase(dsn); err != nil {
 		return nil, err
 	}
