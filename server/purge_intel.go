@@ -221,14 +221,20 @@ func (s *Server) listPurgeIntel(w http.ResponseWriter,r *http.Request){
  writeJSON(w,200,map[string]any{"items":items,"historical_only":true})
 }
 
-func (s *Server) getPurgeIntel(w http.ResponseWriter,r *http.Request){
+func (s *Server) loadPurgeIntelSnapshot(w http.ResponseWriter,r *http.Request)(purgeIntelBundle,bool){
  w.Header().Set("Cache-Control","no-store")
- id,scope,ok:=s.purgeIntelCompany(w,r);if !ok{return}
- sid,err:=strconv.ParseInt(r.PathValue("snapshot"),10,64);if err!=nil||sid<1{writeErr(w,400,"invalid snapshot id");return}
+ var b purgeIntelBundle
+ id,scope,ok:=s.purgeIntelCompany(w,r);if !ok{return b,false}
+ sid,err:=strconv.ParseInt(r.PathValue("snapshot"),10,64);if err!=nil||sid<1{writeErr(w,400,"invalid snapshot id");return b,false}
  var payload []byte
  err=s.m.pg.QueryRowContext(r.Context(),`SELECT payload FROM purge_intel_snapshots WHERE company_id=$1 AND id=$2`,id,sid).Scan(&payload)
- if err!=nil{writeErr(w,404,"inventory unavailable");return}
- var b purgeIntelBundle
- if json.Unmarshal(payload,&b)!=nil || validatePurgeIntel(&b,scope)!=nil {writeErr(w,409,"inventory no longer matches company scope");return}
+ if err!=nil{writeErr(w,404,"inventory unavailable");return b,false}
+ if json.Unmarshal(payload,&b)!=nil || validatePurgeIntel(&b,scope)!=nil {writeErr(w,409,"inventory no longer matches company scope");return b,false}
+ return b,true
+}
+
+func (s *Server) getPurgeIntel(w http.ResponseWriter,r *http.Request){
+ b,ok:=s.loadPurgeIntelSnapshot(w,r)
+ if !ok{return}
  writeJSON(w,200,b)
 }
