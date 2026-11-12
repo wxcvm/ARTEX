@@ -14,6 +14,7 @@ import { Label } from "@/components/ui/label";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { api } from "@/lib/api";
+import { PurgeIntelPanel } from "./purge-intel-panel";
 import type { SSProject, SSTask } from "@/lib/types";
 
 type SSStatus = {
@@ -43,9 +44,13 @@ export default function AssetSyncPage() {
       <Tabs defaultValue="scopesentry">
         <TabsList>
           <TabsTrigger value="scopesentry">ScopeSentry</TabsTrigger>
+          <TabsTrigger value="purge-intel">Purge 情报</TabsTrigger>
         </TabsList>
         <TabsContent value="scopesentry" className="mt-4">
           <ScopeSentryPanel />
+        </TabsContent>
+        <TabsContent value="purge-intel" className="mt-4">
+          <PurgeIntelPanel />
         </TabsContent>
       </Tabs>
     </div>
