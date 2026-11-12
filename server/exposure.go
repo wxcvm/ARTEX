@@ -68,7 +68,7 @@ func (s *Server) SetBoundListenAddress(address string) {
 	s.boundListenAddress = address
 }
 
-func (s *Server) exposureStatus(w http.ResponseWriter, _ *http.Request) {
+func (s *Server) exposureSnapshot() ExposureStatus {
 	address, source := s.listenAddress, "not_inspected"
 	if address != "" {
 		source = "configured"
@@ -80,5 +80,22 @@ func (s *Server) exposureStatus(w http.ResponseWriter, _ *http.Request) {
 	status.ConfiguredAddress = s.listenAddress
 	status.BoundAddress = s.boundListenAddress
 	status.BindingSource = source
-	writeJSON(w, http.StatusOK, status)
+	return status
+}
+
+func (s *Server) exposureStatus(w http.ResponseWriter, _ *http.Request) {
+	writeJSON(w, http.StatusOK, s.exposureSnapshot())
+}
+
+// privacyBridgeStatus is guarded by requireAuth's exact-route token check.
+// Return only the coarse listener assessment; no raw IPs, paths, keys or JWTs.
+func (s *Server) privacyBridgeStatus(w http.ResponseWriter, _ *http.Request) {
+	status := s.exposureSnapshot()
+	w.Header().Set("Cache-Control", "no-store")
+	writeJSON(w, http.StatusOK, map[string]any{
+		"service":             "artex",
+		"scope":               status.Scope,
+		"binding_source":      status.BindingSource,
+		"public_reachability": status.PublicReachability,
+	})
 }
