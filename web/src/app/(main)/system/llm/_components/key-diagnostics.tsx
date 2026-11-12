@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 import { http } from "@/lib/api";
 import type { LLMProfile } from "@/lib/types";
+import { SensitiveConfigPanel } from "./sensitive-config";
 
 type KeyDiagnostics = {
   key_state: "configured" | "missing" | "invalid";
@@ -84,6 +85,7 @@ export function KeyDiagnosticsPanel({ profiles }: { profiles: LLMProfile[] }) {
 
   const names = new Map(profiles.map((p) => [String(p.id), p.name]));
   return (
+    <div className="grid min-w-0 gap-4">
     <Card className="min-w-0">
       <CardContent className="grid gap-4">
         <div className="flex flex-wrap items-start justify-between gap-3">
@@ -168,5 +170,7 @@ export function KeyDiagnosticsPanel({ profiles }: { profiles: LLMProfile[] }) {
         )}
       </CardContent>
     </Card>
+    <SensitiveConfigPanel />
+    </div>
   );
 }
