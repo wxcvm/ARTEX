@@ -18,10 +18,10 @@ var (
 // RedactLogText masks common credential representations before diagnostics are
 // displayed or persisted. It cannot recognize arbitrary unlabelled secrets.
 func RedactLogText(text string) string {
-	text = logURLUserinfo.ReplaceAllString(text, "1***@")
-	text = logAuthValue.ReplaceAllString(text, "1***")
-	text = logBearer.ReplaceAllString(text, "1***")
-	text = logQuerySecret.ReplaceAllString(text, "1***")
+	text = logURLUserinfo.ReplaceAllString(text, "${1}***@")
+	text = logAuthValue.ReplaceAllString(text, "${1}***")
+	text = logBearer.ReplaceAllString(text, "${1}***")
+	text = logQuerySecret.ReplaceAllString(text, "${1}***")
 	return logNamedSecret.ReplaceAllStringFunc(text, func(match string) string {
 		indices := logNamedSecret.FindStringSubmatchIndex(match)
 		if len(indices) < 4 {
