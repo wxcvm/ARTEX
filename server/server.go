@@ -49,6 +49,8 @@ type Server struct {
 	listenAddress string // HTTP listener configured by cmd/artex
 	boundListenAddress string // Actual HTTP listener address, set before serving
 	setupToken string // ephemeral first-time admin setup secret; never returned via HTTP
+	privacyJWTPath string // actual signing-key location, never returned by diagnostics
+	privacyDataRoot string // actual application data root
 
 	// concMu serializes concurrency-cap decisions (admission + reconcile) so a
 	// scheduler tick and an HTTP settings change / task creation can't both count
@@ -163,7 +165,7 @@ func New(ctx context.Context, m *Manager, skillDir string, dataDir string, keyDi
 			fmt.Fprintf(os.Stderr, "[auth] first-time setup token (enter on /setup): %s\n", setupToken)
 		}
 	}
-	s := &Server{m: m, engine: NewEngine(m), ctx: ctx, skillDir: skillDir, jwtKey: key, setupToken: setupToken, chatBusy: map[string]bool{},
+	s := &Server{m: m, engine: NewEngine(m), ctx: ctx, skillDir: skillDir, jwtKey: key, setupToken: setupToken, privacyJWTPath: filepath.Join(keyDir, jwtKeyFilename), privacyDataRoot: dataDir, chatBusy: map[string]bool{},
 		chatCancel: map[string]context.CancelCauseFunc{}, triggerQ: map[string][]triggeredRun{},
 		triggerActive: map[string]int{}, triggerCfg: map[string]triggerBehavior{},
 		profChatAgents: map[int64]*agent.ChatAgent{},
@@ -685,6 +687,7 @@ func (s *Server) Handler() http.Handler {
 	mux.HandleFunc("GET /api/health", s.health)
 	mux.HandleFunc("GET /api/privacy/exposure", s.exposureStatus)
 	mux.HandleFunc("GET /api/privacy/overview", s.privacyOverview)
+	mux.HandleFunc("GET /api/privacy/storage-permissions", s.storagePermissions)
 	mux.HandleFunc("GET /api/privacy/bridge-overview", s.privacyBridgeOverview)
 	mux.HandleFunc("GET /api/privacy/model-keys", s.modelKeyDiagnostics)
 	mux.HandleFunc("GET /api/privacy/model-outbound", s.modelOutboundAudit)
