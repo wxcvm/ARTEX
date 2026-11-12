@@ -40,6 +40,9 @@ func (s *Server) webuiHandler() http.Handler {
 				return
 			}
 		}
+		if segment := nextSegmentPath(p); segment != "" && serveFileIfExists(w, r, root, segment) {
+			return
+		}
 		http.ServeFileFS(w, r, root, "index.html")
 	})
 }

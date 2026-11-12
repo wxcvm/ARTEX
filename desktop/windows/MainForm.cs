@@ -24,6 +24,7 @@ public sealed class MainForm : Form
     private readonly NotifyIcon tray;
     private readonly object logLock = new();
     private Process? ownedBackend;
+    private string? ownedSetupToken;
     private StreamWriter? backendLog;
     private long backendLogStartOffset;
     private bool exiting;
@@ -168,9 +169,9 @@ public sealed class MainForm : Form
                         throw new InvalidOperationException(
                             "本机 8787 端口已被其他服务占用，但它不是 ARTEX。请检查占用端口的程序后重试。");
 
-                    if (DatabaseSetupForm.NeedsConfiguration)
+                    if (DatabaseSetupForm.NeedsConfiguration || !await DatabaseSetupForm.CheckConfiguredAsync(cancel))
                     {
-                        using var setup = new DatabaseSetupForm();
+                        using var setup = new DatabaseSetupForm(editExisting: File.Exists(DatabaseSetupForm.ConfigPath));
                         if (setup.ShowDialog(this) != DialogResult.OK)
                         {
                             status.Text = "未配置数据库 · 点击“重新连接”继续设置";
@@ -214,6 +215,26 @@ public sealed class MainForm : Form
                 };
 
                 var core = browser.CoreWebView2;
+                core.WebMessageReceived += async (_, args) =>
+                {
+                    if (ownedBackend is not { HasExited: false } || ownedSetupToken is null ||
+                        !SetupTokenBridge.IsSetupDocument(args.Source) || !SetupTokenBridge.IsSetupDocument(core.Source)) return;
+                    try
+                    {
+                        if (args.TryGetWebMessageAsString() != "artex:request-setup-token") return;
+                        using var response = await http.GetAsync(new Uri(Service, "api/auth/status"), lifetime.Token);
+                        response.EnsureSuccessStatusCode();
+                        using var state = JsonDocument.Parse(await response.Content.ReadAsStringAsync(lifetime.Token));
+                        if (!state.RootElement.TryGetProperty("initialized", out var initialized) ||
+                            initialized.ValueKind is not (JsonValueKind.True or JsonValueKind.False)) return;
+                        if (initialized.GetBoolean()) { ownedSetupToken = null; return; }
+                        if (!SetupTokenBridge.IsSetupDocument(core.Source) || ownedBackend is not { HasExited: false } || ownedSetupToken is null) return;
+                        // Re-check location inside the executed document too: navigation may race the status request.
+                        var payload = JsonSerializer.Serialize(ownedSetupToken);
+                        await core.ExecuteScriptAsync("if(location.origin==='http://127.0.0.1:8787' && /^\\/setup\\/?$/.test(location.pathname) && !location.search && !location.hash) window.dispatchEvent(new CustomEvent('artex:setup-token',{detail:" + payload + "}));");
+                    }
+                    catch (Exception ex) when (ex is HttpRequestException or JsonException or InvalidOperationException or ArgumentException or OperationCanceledException or System.Runtime.InteropServices.COMException) { }
+                };
                 core.NavigationStarting += (_, args) =>
                 {
                     if (!args.Uri.StartsWith(Service.AbsoluteUri, StringComparison.OrdinalIgnoreCase)) return;
@@ -502,6 +523,17 @@ public sealed class MainForm : Form
         };
         startInfo.ArgumentList.Add("-addr");
         startInfo.ArgumentList.Add("127.0.0.1:8787");
+        ownedSetupToken = Convert.ToHexString(System.Security.Cryptography.RandomNumberGenerator.GetBytes(24));
+        startInfo.Environment["ARTEX_SETUP_TOKEN"] = ownedSetupToken;
+        if (string.IsNullOrWhiteSpace(Environment.GetEnvironmentVariable("ARTEX_KB_DIR")) &&
+            File.Exists(Path.Combine(AppContext.BaseDirectory, "knowledge", "knowledge.db")))
+        {
+            using var configuration = File.Exists(DatabaseSetupForm.ConfigPath) ?
+                JsonDocument.Parse(File.ReadAllText(DatabaseSetupForm.ConfigPath)) : null;
+            if (configuration is null || !configuration.RootElement.TryGetProperty("knowledge_dir", out var knowledgeDir) ||
+                string.IsNullOrWhiteSpace(knowledgeDir.ToString()))
+                startInfo.Environment["ARTEX_KB_DIR"] = Path.Combine(AppContext.BaseDirectory, "knowledge");
+        }
 
         var process = new Process { StartInfo = startInfo, EnableRaisingEvents = true };
         process.OutputDataReceived += WriteBackendLog;
@@ -519,9 +551,11 @@ public sealed class MainForm : Form
     private void WriteBackendLog(object sender, DataReceivedEventArgs args)
     {
         if (args.Data is null) return;
+        // An automatically supplied initialization token never belongs in a persistent log.
+        var line = ownedSetupToken is { Length: > 0 } ? args.Data.Replace(ownedSetupToken, "***", StringComparison.Ordinal) : args.Data;
         lock (logLock)
         {
-            backendLog?.WriteLine(args.Data);
+            backendLog?.WriteLine(line);
         }
     }
 
@@ -645,7 +679,10 @@ public sealed class MainForm : Form
             try
             {
                 if (!ownedBackend.HasExited)
+                {
                     ownedBackend.Kill(entireProcessTree: true);
+                    ownedBackend.WaitForExit(5000);
+                }
             }
             catch (InvalidOperationException)
             {
@@ -653,6 +690,7 @@ public sealed class MainForm : Form
             }
             ownedBackend.Dispose();
         }
+        ManagedPostgres.StopOwned();
         lock (logLock)
         {
             backendLog?.Dispose();

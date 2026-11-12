@@ -1,142 +1,69 @@
 "use client";
 
 import { useEffect, useState } from "react";
-
 import { useRouter } from "next/navigation";
-
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
+import { OnboardingGuide } from "@/components/onboarding-guide";
 import { api } from "@/lib/api";
 import { auth } from "@/lib/auth";
 
 export default function SetupPage() {
   const router = useRouter();
   const [password, setPassword] = useState("");
-  const [setupToken, setSetupToken] = useState("");
   const [confirm, setConfirm] = useState("");
+  const [setupToken, setSetupToken] = useState("");
+  const [automatic, setAutomatic] = useState(false);
+  const [manual, setManual] = useState(false);
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
   const [checking, setChecking] = useState(true);
-  // when the initialization state cannot be fetched, do not default to "not initialized" — that would show the setup form to an
-  // instance that already has a password, and following it would overwrite the original. Close the entrance instead.
   const [unavailable, setUnavailable] = useState(false);
 
   useEffect(() => {
-    api
-      .authStatus()
-      .then(({ initialized }) => {
-        if (initialized) router.replace("/login");
-      })
-      .catch((err) => {
-        setError(err instanceof Error ? err.message : "Unable to connect to the backend service");
-        setUnavailable(true);
-      })
-      .finally(() => setChecking(false));
+    let alive = true;
+    const receive = (event: Event) => {
+      const value: unknown = (event as CustomEvent).detail;
+      if (alive && typeof value === "string" && /^[a-fA-F0-9]{48}$/.test(value)) { setSetupToken(value); setAutomatic(true); }
+    };
+    window.addEventListener("artex:setup-token", receive);
+    api.authStatus().then(({ initialized }) => {
+      if (!alive) return;
+      if (initialized) { router.replace("/login"); return; }
+      const desktop = (window as unknown as { chrome?: { webview?: { postMessage: (message: string) => void } } }).chrome?.webview;
+      if (desktop) desktop.postMessage("artex:request-setup-token");
+      else setManual(true);
+    }).catch(err => { if (alive) { setError(err instanceof Error ? err.message : "无法连接后端服务"); setUnavailable(true); } })
+      .finally(() => { if (alive) setChecking(false); });
+    return () => { alive = false; window.removeEventListener("artex:setup-token", receive); };
   }, [router]);
 
-  async function handleSubmit(e: React.FormEvent) {
-    e.preventDefault();
-    if (password !== confirm) {
-      setError("The two passwords do not match");
-      return;
-    }
-    if (password.length < 8) {
-      setError("Password must be at least 8 characters");
-      return;
-    }
-    setLoading(true);
-    setError("");
-    try {
-      const { token } = await api.initPassword(password, setupToken.trim());
-      auth.setToken(token);
-      router.replace("/function/tasks");
-    } catch (err) {
-      setError(err instanceof Error ? err.message : "Initialization failed");
-    } finally {
-      setLoading(false);
-    }
+  async function submit(event: React.FormEvent) {
+    event.preventDefault();
+    if (loading) return;
+    if (password !== confirm) { setError("两次密码不一致，请重新核对。"); return; }
+    if (password.length < 8) { setError("登录密码至少需要 8 位。"); return; }
+    setLoading(true); setError("");
+    try { const { token } = await api.initPassword(password, setupToken.trim()); auth.setToken(token); setSetupToken(""); router.replace("/welcome"); }
+    catch (err) { setError(err instanceof Error ? err.message : "设置未完成，请重试。"); }
+    finally { setLoading(false); }
   }
 
-  if (checking) return null;
-
-  return (
-    <div className="flex h-dvh">
-      {/* Left panel */}
-      <div className="hidden flex-col items-center justify-center bg-primary p-12 text-center lg:flex lg:w-1/3">
-        <div className="relative flex items-center justify-center">
-          <div className="absolute size-80 rounded-full border border-primary-foreground/10" />
-          <div className="absolute size-60 rounded-full border border-primary-foreground/15" />
-          <div className="absolute size-40 rounded-full border border-primary-foreground/20" />
-          {/* eslint-disable-next-line @next/next/no-img-element */}
-          <img src="/logo.jpg" alt="ARTEX" width={160} height={160} className="relative size-40 rounded-[28px] object-cover shadow-2xl ring-1 ring-white/15" />
-        </div>
-      </div>
-
-      {/* Right panel */}
-      <div className="flex w-full items-center justify-center bg-background p-8 lg:w-2/3">
-        <div className="w-full max-w-md space-y-10 py-24 lg:py-32">
-          <div className="space-y-4 text-center">
-            <h2 className="text-2xl font-medium tracking-tight">{unavailable ? "Cannot confirm initialization state" : "Set initial password"}</h2>
-            <p className="mx-auto max-w-xl text-muted-foreground">
-              {unavailable
-                ? "The backend or database is temporarily unavailable. To avoid overwriting a password already set on this instance, setup is temporarily closed — restore the service and try again."
-                : "First time using ARTEX? Set a login password for the account (at least 8 characters)"}
-            </p>
-          </div>
-          {unavailable ? (
-            <div className="flex flex-col gap-4">
-              {error && <p className="text-center text-sm text-destructive">{error}</p>}
-              <Button type="button" className="w-full" onClick={() => window.location.reload()}>
-                Retry
-              </Button>
-            </div>
-          ) : (
-            <form onSubmit={handleSubmit} className="flex flex-col gap-4">
-              <div className="space-y-1.5">
-                <Label htmlFor="setup-token">Setup token</Label>
-                <Input
-                  id="setup-token"
-                  type="password"
-                  value={setupToken}
-                  onChange={(e) => setSetupToken(e.target.value)}
-                  placeholder="From the ARTEX backend startup log"
-                  autoComplete="off"
-                  required
-                />
-                <p className="text-xs text-muted-foreground">Find the one-time token in the backend startup log. Docker: docker compose logs artex. Windows Desktop: %LOCALAPPDATA%\\ARTEX\\desktop-backend.log.</p>
-              </div>
-              <div className="space-y-1.5">
-                <Label htmlFor="password">New password</Label>
-                <Input
-                  id="password"
-                  type="password"
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  placeholder="At least 8 characters"
-                  autoFocus
-                  autoComplete="new-password"
-                />
-              </div>
-              <div className="space-y-1.5">
-                <Label htmlFor="confirm">Confirm password</Label>
-                <Input
-                  id="confirm"
-                  type="password"
-                  value={confirm}
-                  onChange={(e) => setConfirm(e.target.value)}
-                  placeholder="Enter the password again"
-                  autoComplete="new-password"
-                />
-              </div>
-              {error && <p className="text-sm text-destructive">{error}</p>}
-              <Button type="submit" className="w-full" disabled={loading || !password || !confirm || !setupToken.trim()}>
-                {loading ? "Saving..." : "Set password and sign in"}
-              </Button>
-            </form>
-          )}
-        </div>
-      </div>
-    </div>
-  );
+  if (checking) return <main className="p-8" role="status">正在确认账号初始化状态…</main>;
+  return <main className="mx-auto min-h-dvh w-full max-w-xl space-y-6 px-4 py-10 sm:px-8">
+    <header className="space-y-2"><p className="text-sm text-muted-foreground">准备数据库 ✓ → 设置登录密码 → 连接 AI → 开始使用</p>
+      <h1 className="text-2xl font-semibold">{unavailable ? "暂时无法确认账号状态" : "第 2 步：设置 ARTEX 登录密码"}</h1>
+      <p className="text-sm text-muted-foreground">{unavailable ? "后端或数据库暂时不可用。为保留已有账号，此时不开放初始化。恢复服务后重试。" : "这是以后进入 ARTEX 使用的密码，不是数据库密码或 AI API Key。"}</p></header>
+    {unavailable ? <Button onClick={() => window.location.reload()}>重新检查服务</Button> : <form onSubmit={submit} className="space-y-4">
+      {automatic && <p role="status" className="rounded-lg border p-3 text-sm">桌面已自动取得一次性初始化令牌，无需查日志或复制。</p>}
+      {!automatic && <div className="space-y-3 rounded-lg border p-3"><p className="text-sm">桌面自启实例会自动取得令牌；外部实例或浏览器请使用手动入口。</p><Button type="button" variant="outline" onClick={() => setManual(!manual)}>手动提供初始化令牌</Button></div>}
+      {manual && <div className="space-y-2"><Label htmlFor="setup-token">一次性初始化令牌</Label><Input id="setup-token" type="password" value={setupToken} onChange={e => { setSetupToken(e.target.value); setAutomatic(false); }} autoComplete="off" /><p className="text-xs text-muted-foreground">从当前后端启动日志的 first-time setup token 行获取。具体位置见下方详细指南。不要填写数据库密码。</p></div>}
+      <div className="space-y-2"><Label htmlFor="password">登录密码（至少 8 位）</Label><Input id="password" type="password" autoComplete="new-password" value={password} onChange={e => setPassword(e.target.value)} required minLength={8} /></div>
+      <div className="space-y-2"><Label htmlFor="confirm">再次填写登录密码</Label><Input id="confirm" type="password" autoComplete="new-password" value={confirm} onChange={e => setConfirm(e.target.value)} required minLength={8} /></div>
+      <Button type="submit" disabled={loading || !password || !confirm || !setupToken.trim()}>{loading ? "正在设置…" : "设置密码并继续"}</Button>
+    </form>}
+    {error && <p role="alert" className="break-words text-sm text-destructive">{error}</p>}
+    <OnboardingGuide step="account" />
+  </main>;
 }

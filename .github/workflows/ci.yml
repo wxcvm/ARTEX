@@ -144,6 +144,15 @@ jobs:
         shell: pwsh
         timeout-minutes: 3
         run: ./desktop/windows/test-desktop-smoke.ps1
+      - name: Install PostgreSQL 16 runtime for independent-cluster integration
+        shell: pwsh
+        run: |
+          choco install postgresql16 --yes --no-progress --params '/Password:ArtexCIFixtureOnly /Port:25432'
+          if ($LASTEXITCODE -ne 0) { throw "PostgreSQL runtime installation failed" }
+      - name: Ordinary-user database preparation and onboarding boundaries
+        shell: pwsh
+        timeout-minutes: 8
+        run: ./desktop/windows/test-onboarding.ps1
       - uses: actions/upload-artifact@v4
         with:
           name: artex-windows-desktop-preview

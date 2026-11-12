@@ -30,7 +30,8 @@ internal static class Program
         using var dialog = (Form)Activator.CreateInstance(
             type, BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.Public,
             binder: null, args: new object[] { false }, culture: null)!;
-        using var largeFont = new Font(SystemFonts.MessageBoxFont.FontFamily, 18f);
+        var fontSize = float.TryParse(Environment.GetEnvironmentVariable("ARTEX_TEST_FONT_SIZE"), System.Globalization.CultureInfo.InvariantCulture, out var requested) ? requested : 18f;
+        using var largeFont = new Font(SystemFonts.MessageBoxFont.FontFamily, fontSize);
 
         dialog.Font = largeFont;
         dialog.ClientSize = new Size(680, 460);
@@ -45,12 +46,12 @@ internal static class Program
 
         var children = AllChildren(dialog).ToArray();
         Button GetButton(string name) => children.OfType<Button>()
-            .Single(button => button.Text == name);
+            .First(button => button.Text == name);
         var buttons = new[]
         {
             "检测本机", "启动所选服务", "安装 PostgreSQL",
             "创建目标数据库", "初始化专用账户",
-            "稍后配置", "测试数据库连接", "初始化并连接",
+            "稍后配置", "测试数据库连接", "自动准备本机数据库",
         }.Select(GetButton).ToArray();
 
         foreach (var button in buttons)
@@ -67,31 +68,40 @@ internal static class Program
             var items = panel.Controls.OfType<Button>().ToArray();
             for (var i = 0; i < items.Length; i++)
                 for (var j = i + 1; j < items.Length; j++)
-                    if (items[i].Bounds.IntersectsWith(items[j].Bounds))
+                    if (items[i].Visible && items[j].Visible && items[i].Bounds.IntersectsWith(items[j].Bounds))
                         throw new Exception($"Buttons overlap: {items[i].Text}, {items[j].Text}");
         }
 
         var root = dialog.Controls.OfType<TableLayoutPanel>().Single();
         var scroll = root.Controls.OfType<Panel>().Single(panel => panel.AutoScroll);
         var footer = root.Controls.OfType<FlowLayoutPanel>().Single();
-        foreach (var name in new[] { "初始化并连接", "测试数据库连接", "稍后配置" })
+        foreach (var name in new[] { "自动准备本机数据库", "测试数据库连接", "稍后配置" })
             if (!footer.Controls.Contains(GetButton(name)))
                 throw new Exception("Primary action escaped pinned footer: " + name);
 
         // Recommended setup must be simple by default, with advanced fields
         // and the original save/test operations available on demand.
         var radioButtons = children.OfType<RadioButton>().ToArray();
-        var recommended = radioButtons.Single(r => r.Text == "本机安装 · 推荐");
-        var custom = radioButtons.Single(r => r.Text == "已有账户 / 远程连接");
-        if (!recommended.Checked || GetButton("初始化并连接").Visible == false)
+        var recommended = radioButtons.Single(r => r.Text == "自动准备本机数据库 · 推荐");
+        var custom = radioButtons.Single(r => r.Text == "已有数据库 / 高级设置");
+        if (!recommended.Checked || GetButton("自动准备本机数据库").Visible == false)
             throw new Exception("Recommended setup is not the default");
+        if (children.OfType<TextBox>().Any(box => box.UseSystemPasswordChar && box.Visible))
+            throw new Exception("Default setup should not require a database password");
+        var screenshot = Environment.GetEnvironmentVariable("ARTEX_LAYOUT_SCREENSHOT");
+        if (!string.IsNullOrWhiteSpace(screenshot))
+        {
+            using var bitmap = new Bitmap(dialog.Width, dialog.Height);
+            dialog.DrawToBitmap(bitmap, new Rectangle(Point.Empty, bitmap.Size));
+            bitmap.Save(screenshot);
+        }
         custom.Checked = true;
         Application.DoEvents();
-        if (!GetButton("保存并连接").Visible || !GetButton("测试数据库连接").Visible)
+        if (!GetButton("验证并保存连接").Visible || !GetButton("测试数据库连接").Visible)
             throw new Exception("Custom database options were not restored");
         recommended.Checked = true;
         Application.DoEvents();
-        if (!GetButton("初始化并连接").Visible)
+        if (!GetButton("自动准备本机数据库").Visible)
             throw new Exception("Recommended setup was not restored");
 
         var frame = dialog.RectangleToScreen(dialog.ClientRectangle);
@@ -125,16 +135,6 @@ internal static class Program
             throw new Exception("Held Ctrl+V was not suppressed");
         up.Invoke(password, new object[] { new KeyEventArgs(Keys.Control | Keys.V) });
 
-        // If the dedicated role was created but saving config.json failed, keep
-        // its credentials for retry. Only editing the connection invalidates it.
-        var ready = type.GetField("dedicatedAccountReady", BindingFlags.NonPublic | BindingFlags.Instance)!;
-        ready.SetValue(dialog, true);
-        var host = (TextBox)type.GetField("host", BindingFlags.NonPublic | BindingFlags.Instance)!
-            .GetValue(dialog)!;
-        host.Text = host.Text == "127.0.0.1" ? "localhost" : "127.0.0.1";
-        if ((bool)ready.GetValue(dialog)!)
-            throw new Exception("Changing the connection did not invalidate previously provisioned credentials");
-
         // Never offer new-account provisioning as the default when a process
         // environment variable would override the saved connection anyway.
         var previousDsn = Environment.GetEnvironmentVariable("ARTEX_PG_DSN");
@@ -145,7 +145,7 @@ internal static class Program
                 type, BindingFlags.Instance | BindingFlags.NonPublic | BindingFlags.Public,
                 binder: null, args: new object[] { false }, culture: null)!;
             if (!AllChildren(overridden).OfType<RadioButton>()
-                .Single(r => r.Text == "已有账户 / 远程连接").Checked)
+                .Single(r => r.Text == "已有数据库 / 高级设置").Checked)
                 throw new Exception("Environment override should default to custom connection mode");
             var note = (Label)type.GetField("overrideNotice", BindingFlags.NonPublic | BindingFlags.Instance)!
                 .GetValue(overridden)!;

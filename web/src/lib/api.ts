@@ -240,6 +240,8 @@ function interceptPageQuery(page: number, size: number, filter: InterceptApprova
 }
 
 export const api = {
+  knowledgeSearch: (query: string) => get<{ hits: { id: number; title: string; snippet?: string; category?: string; verified: boolean }[] | null; degraded: boolean }>(`/knowledge?q=${encodeURIComponent(query)}`),
+  knowledgeEntry: (id: number) => get<{ id: number; title: string; usage?: string; content: string; verified: boolean }>(`/knowledge?id=${id}`),
   // Backend application version (injected via ldflags at release, default "dev").
   health: () => get<{ ok: boolean; service: string; version: string }>("/health"),
   privacyExposure: () => get<{ listen_address: string; scope: "loopback" | "all_interfaces" | "specific_interface" | "unknown"; public_reachability: "not_tested"; detail: string }>("/privacy/exposure"),

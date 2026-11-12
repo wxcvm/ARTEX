@@ -52,7 +52,7 @@ internal sealed class DatabaseSetupForm : Form
     private readonly CancellationTokenSource discoveryLifetime = new();
     private readonly HashSet<Keys> passwordKeysHeld = new();
     private readonly bool editExisting;
-    private bool dedicatedAccountReady;
+    private Control? editableContent;
     private static bool HasDsnOverride =>
         !string.IsNullOrWhiteSpace(Environment.GetEnvironmentVariable("ARTEX_PG_DSN"));
     private readonly Label overrideNotice = new()
@@ -63,12 +63,12 @@ internal sealed class DatabaseSetupForm : Form
     };
     private readonly RadioButton quickMode = new()
     {
-        Text = "本机安装 · 推荐", AutoSize = true, Checked = true,
+        Text = "自动准备本机数据库 · 推荐", AutoSize = true, Checked = true,
         Font = new Font("Microsoft YaHei UI", 10f, FontStyle.Bold),
     };
     private readonly RadioButton customMode = new()
     {
-        Text = "已有账户 / 远程连接", AutoSize = true,
+        Text = "已有数据库 / 高级设置", AutoSize = true,
         Font = new Font("Microsoft YaHei UI", 10f),
     };
     private readonly Button saveButton = new() { Text = "初始化并连接" };
@@ -111,7 +111,7 @@ internal sealed class DatabaseSetupForm : Form
         {
             Dock = DockStyle.Top,
             ColumnCount = 2,
-            RowCount = 11,
+            RowCount = 12,
             Padding = new Padding(26, 22, 26, 14),
             Margin = Padding.Empty,
             BackColor = Color.FromArgb(17, 27, 42),
@@ -119,6 +119,7 @@ internal sealed class DatabaseSetupForm : Form
             AutoSizeMode = AutoSizeMode.GrowAndShrink,
         };
         layout.ColumnStyles.Add(new ColumnStyle(SizeType.Absolute, 145));
+        editableContent = layout;
         layout.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 100));
         for (var row = 0; row < layout.RowCount; row++)
             layout.RowStyles.Add(new RowStyle(SizeType.AutoSize));
@@ -126,15 +127,15 @@ internal sealed class DatabaseSetupForm : Form
         var intro = new Label
         {
             Text = editExisting
-                ? "修改已有连接不会删除数据库数据。更改后重新连接即可生效。"
-                : "推荐使用本机 PostgreSQL：自动查找服务，输入安装时的管理员密码，接着初始化 ARTEX 专用账户。",
+                ? "第 1/4 步 · 准备数据库 → 设置登录密码 → 连接 AI → 开始使用。旧配置将备份，原服务不变。"
+                : "第 1/4 步 · 点下方主按钮即可自动准备，无需填写数据库密码。已有可用连接会优先复用。",
             AutoSize = true,
             ForeColor = Color.FromArgb(173, 192, 217),
             Margin = new Padding(0, 4, 0, 16),
         };
         var title = new Label
         {
-            Text = editExisting ? "数据库连接设置" : "欢迎使用 ARTEX",
+            Text = "第 1 步：准备数据库",
             AutoSize = true,
             Font = new Font("Microsoft YaHei UI", 20f, FontStyle.Bold),
             ForeColor = Color.White,
@@ -145,8 +146,8 @@ internal sealed class DatabaseSetupForm : Form
             FlowDirection = FlowDirection.LeftToRight, WrapContents = true,
             AutoSize = true, Dock = DockStyle.Top, Margin = new Padding(0, 4, 0, 12),
         };
-        quickMode.Checked = !editExisting && !HasDsnOverride;
-        customMode.Checked = editExisting || HasDsnOverride;
+        quickMode.Checked = !HasDsnOverride;
+        customMode.Checked = HasDsnOverride;
         quickMode.ForeColor = Color.FromArgb(156, 195, 255);
         customMode.ForeColor = Color.FromArgb(218, 231, 248);
         quickMode.Margin = new Padding(0, 5, 28, 5);
@@ -224,14 +225,11 @@ internal sealed class DatabaseSetupForm : Form
         discoveryStatus.MinimumSize = new Size(0, 26);
         discoveryStatus.Margin = new Padding(3, 3, 3, 10);
 
-        var configLabel = new Label
+        var configLabel = new TextBox
         {
             Text = "配置保存位置：" + ConfigPath,
-            AutoSize = false,
-            AutoEllipsis = true,
-            Dock = DockStyle.Top,
-            MinimumSize = new Size(0, 26),
-            ForeColor = SystemColors.GrayText,
+            ReadOnly = true, Dock = DockStyle.Top, BorderStyle = BorderStyle.None,
+            BackColor = BackColor, ForeColor = ForeColor,
         };
         layout.Controls.Add(configLabel, 0, 9);
         layout.SetColumnSpan(configLabel, 2);
@@ -278,7 +276,7 @@ internal sealed class DatabaseSetupForm : Form
         foreach (var button in new[] { save, test, cancel })
             footer.Controls.Add(button);
         footer.BackColor = Color.FromArgb(23, 36, 54);
-        var advancedRows = new[] { 1, 2, 3, 6, 9, 10 };
+        var advancedRows = new[] { 1, 2, 3, 4, 5, 6, 7, 9, 10 };
         void UpdateMode()
         {
             var advanced = customMode.Checked;
@@ -287,22 +285,15 @@ internal sealed class DatabaseSetupForm : Form
                     if (layout.GetPositionFromControl(control).Row == row)
                         control.Visible = advanced;
             test.Visible = advanced;
-            save.Text = advanced ? "保存并连接" : "初始化并连接";
-            if (!advanced && !editExisting) user.Text = "postgres";
-            if (advanced && !editExisting && user.Text == "postgres")
-                user.Text = "artex";
+            save.Text = advanced ? "验证并保存连接" : "自动准备本机数据库";
             var passwordLabel = layout.GetControlFromPosition(0, 4);
             if (passwordLabel != null) passwordLabel.Text = advanced ? "数据库密码" : "postgres 管理员密码";
         }
         quickMode.CheckedChanged += (_, _) => UpdateMode();
         customMode.CheckedChanged += (_, _) =>
         {
-            if (customMode.Checked) dedicatedAccountReady = false;
             UpdateMode();
         };
-        // Provisioning is not repeated when only writing config.json fails.
-        foreach (var field in new[] { host, port, user, password, database, sslMode })
-            field.TextChanged += (_, _) => dedicatedAccountReady = false;
         UpdateMode();
 
         foreach (var input in new[] { host, port, user, password, database, sslMode })
@@ -337,6 +328,34 @@ internal sealed class DatabaseSetupForm : Form
             discoveryStatus.MaximumSize = new Size(width, 0);
         };
 
+        var helpPanel = new FlowLayoutPanel { AutoSize = true, Dock = DockStyle.Top,
+            FlowDirection = FlowDirection.TopDown, WrapContents = false };
+        var helpToggle = new LinkLabel { Text = "详细指南：用途、操作、安装选项和报错处理", AutoSize = true, LinkColor = Color.LightSkyBlue };
+        var guide = new TextBox { ReadOnly = true, Multiline = true, ScrollBars = ScrollBars.Vertical,
+            Width = 680, Height = 330, Visible = false, BackColor = BackColor, ForeColor = ForeColor,
+            Text = "用途：数据库保存登录账号、任务与结果。新手不需要自己管理数据库参数。\r\n\r\n" +
+            "准备材料：正常打开 ARTEX，不要以管理员身份运行。未安装 PostgreSQL 时需联网安装其程序。\r\n\r\n" +
+            "具体操作：点击“自动准备本机数据库”。程序先检查已保存连接，再自动完成独立初始化、启动、创建专用账户、验证和保存。旧配置会备份；新库没有旧任务，原服务与目录不变。\r\n\r\n" +
+            "缺少程序：点击“安装 PostgreSQL”，在官方安装器选择 PostgreSQL Server；安装目录保留默认，数据目录选择可写位置，记住安装器要求的 postgres 管理员密码，端口无冲突时保留默认，额外 Stack Builder 可跳过。完成后返回 ARTEX，它会重新检测；自动独立库不需要你输入安装器密码。Windows 管理员提示只用于安装，ARTEX 本身正常运行即可。\r\n\r\n" +
+            "填写示例：默认独立库使用 127.0.0.1、15432–15442 之间可用端口、artex 账户及数据库，密码自动生成。无需照抄。手动连接的地址、端口、账户和密码须来自已有数据库管理员；SSL 按其要求填写。\r\n\r\n" +
+            "成功表现：真实连接验证通过后保存并进入登录密码设置。仅检测到端口或服务不代表账号可用。\r\n\r\n" +
+            "失败处理：目录缺失不等于密码错误；可另建独立新库。权限错误请正常启动 ARTEX；端口占用请关闭占用程序或使用高级连接；密码错误请核对数据库密码而非 ARTEX 登录密码。失败可重试，不会重置旧账户或删除旧库。日志位于独立数据库目录。\r\n\r\n" +
+            "独立库目录：" + ManagedPostgres.Root };
+        helpToggle.LinkClicked += (_, _) => guide.Visible = !guide.Visible;
+        var quickInstall = new Button { Text = "安装 PostgreSQL" };
+        ConfigureActionButton(quickInstall, 150);
+        quickInstall.Click += (_, _) => InstallPostgreSQL();
+        quickInstall.Visible = ManagedPostgres.FindBinaries() is null;
+        Activated += async (_, _) => {
+            if (IsDisposed || !quickInstall.Visible || ManagedPostgres.FindBinaries() is null) return;
+            quickInstall.Visible = false;
+            if (saveButton.Enabled) await SetupAndSaveAsync();
+        };
+        helpPanel.Controls.Add(quickInstall);
+        helpPanel.Controls.Add(helpToggle);
+        helpPanel.Controls.Add(guide);
+        layout.Controls.Add(helpPanel, 0, 11); layout.SetColumnSpan(helpPanel, 2);
+        layout.SizeChanged += (_, _) => guide.Width = Math.Max(220, layout.ClientSize.Width - layout.Padding.Horizontal - 12);
         scroll.Controls.Add(layout);
         root.Controls.Add(scroll, 0, 0);
         root.Controls.Add(footer, 0, 1);
@@ -365,7 +384,7 @@ internal sealed class DatabaseSetupForm : Form
         {
             // WinForms scrolls to the first focused input on opening. Restore
             // the first explanatory row after focus and initial layout settle.
-            ActiveControl = quickMode.Checked ? password : host;
+            ActiveControl = quickMode.Checked ? saveButton : host;
             scroll.AutoScrollPosition = Point.Empty;
             BeginInvoke((Action)(() =>
             {
@@ -445,16 +464,14 @@ internal sealed class DatabaseSetupForm : Form
 
             if (found is int detectedPort)
             {
-                if (!editExisting && (host.Text.Trim() is "127.0.0.1" or "localhost") &&
-                    (port.Text.Trim() is "5432" or "5433"))
-                    port.Text = detectedPort.ToString();
+                // Detection never overwrites an operator-entered connection.
                 discoveryStatus.Text = $"发现本机 PostgreSQL，端口 {detectedPort}。" +
                     " 仅确认服务可连接，账号和密码仍需填写。";
             }
             else
             {
                 discoveryStatus.Text = localServices.Items.Count > 0
-                    ? "已发现已安装的 PostgreSQL 服务，但常用端口尚未响应。可选择服务启动，或填写自定义端口。"
+                    ? PostgresDiscovery.DescribeLocalInstallation()
                     : "未检测到 PostgreSQL。可点“安装 PostgreSQL”打开官方安装器，或填写远程数据库。";
             }
         }
@@ -505,20 +522,78 @@ internal sealed class DatabaseSetupForm : Form
 
     private async Task SetupAndSaveAsync()
     {
-        if (!quickMode.Checked) { Save(); return; }
+        if (!saveButton.Enabled) return;
         saveButton.Enabled = false;
+        if (editableContent is not null) editableContent.Enabled = false;
+        quickMode.Enabled = customMode.Enabled = false;
         try
         {
-            if (dedicatedAccountReady || await ProvisionDedicatedAccountAsync())
+            var backend = Path.Combine(AppContext.BaseDirectory, "artex.exe");
+            if (HasDsnOverride)
             {
-                dedicatedAccountReady = true;
-                Save();
+                await ManagedPostgres.RunAsync(backend, ["-check-db"], discoveryLifetime.Token);
+                discoveryStatus.Text = "环境变量指定的连接已验证；未保存无效的覆盖配置。";
+                DialogResult = DialogResult.OK; Close(); return;
             }
+            if (quickMode.Checked)
+            {
+                if (await CheckConfiguredAsync(discoveryLifetime.Token))
+                { DialogResult = DialogResult.OK; Close(); return; }
+                if (File.Exists(ConfigPath))
+                {
+                    var backup = ConfigPath + ".backup-" + DateTime.Now.ToString("yyyyMMdd-HHmmss") + "-" + Guid.NewGuid().ToString("N")[..6];
+                    File.Copy(ConfigPath, backup, overwrite: false);
+                    discoveryStatus.Text = "将使用新数据库，旧配置已备份：" + backup + "。旧任务不会自动迁移。";
+                }
+                var cluster = await ManagedPostgres.PrepareAsync(backend,
+                    new Progress<string>(message => { if (!IsDisposed) discoveryStatus.Text = message; }), discoveryLifetime.Token);
+                host.Text = "127.0.0.1"; port.Text = cluster.Port.ToString(); user.Text = "artex";
+                password.Text = cluster.AppPassword; database.Text = "artex"; sslMode.Text = "disable";
+            }
+            else
+            {
+                var dsn = CurrentDsn(); if (dsn is null) return;
+                await ManagedPostgres.EnsureForConfigurationAsync(dsn, discoveryLifetime.Token);
+                await ManagedPostgres.RunAsync(backend, ["-check-db"], discoveryLifetime.Token,
+                    new() { ["ARTEX_PG_DSN"] = dsn }, secrets: [password.Text]);
+            }
+            Save();
         }
+        catch (OperationCanceledException) { if (!IsDisposed) discoveryStatus.Text = "操作已取消或超时。输入和已有数据已保留，可以重试。"; }
+        catch (Exception ex) { if (!IsDisposed) discoveryStatus.Text = "准备未完成：" + ex.Message; }
         finally
         {
-            if (!IsDisposed) saveButton.Enabled = true;
+            if (!IsDisposed) { saveButton.Enabled = true; quickMode.Enabled = customMode.Enabled = true; if (editableContent is not null) editableContent.Enabled = true; }
         }
+    }
+
+    internal static string? ConfiguredDsn()
+    {
+        var env = Environment.GetEnvironmentVariable("ARTEX_PG_DSN");
+        if (!string.IsNullOrWhiteSpace(env)) return env;
+        if (!File.Exists(ConfigPath)) return null;
+        var db = JsonNode.Parse(File.ReadAllText(ConfigPath))?["database"];
+        if (db is null) return null;
+        if (!string.IsNullOrWhiteSpace(db["dsn"]?.ToString())) return db["dsn"]!.ToString();
+        var builder = new UriBuilder("postgres", db["host"]?.ToString() ?? "127.0.0.1",
+            int.TryParse(db["port"]?.ToString(), out var p) ? p : 5432, db["dbname"]?.ToString() ?? "artex")
+        { UserName = Uri.EscapeDataString(db["user"]?.ToString() ?? "artex"), Password = Uri.EscapeDataString(db["password"]?.ToString() ?? ""),
+            Query = "sslmode=" + Uri.EscapeDataString(db["sslmode"]?.ToString() ?? "disable") };
+        return builder.Uri.AbsoluteUri;
+    }
+
+    internal static async Task<bool> CheckConfiguredAsync(CancellationToken cancel)
+    {
+        try
+        {
+            var dsn = ConfiguredDsn(); if (dsn is null) return false;
+            await ManagedPostgres.EnsureForConfigurationAsync(dsn, cancel);
+            await ManagedPostgres.RunAsync(Path.Combine(AppContext.BaseDirectory, "artex.exe"), ["-check-db"], cancel,
+                new() { ["ARTEX_PG_DSN"] = dsn }, secrets: [dsn]);
+            return true;
+        }
+        catch (OperationCanceledException) when (cancel.IsCancellationRequested) { throw; }
+        catch { return false; }
     }
 
     private async Task<bool> ProvisionDedicatedAccountAsync()
@@ -746,9 +821,22 @@ internal sealed class DatabaseSetupForm : Form
 
     private static void AddField(TableLayoutPanel layout, int row, string name, TextBox field)
     {
-        layout.Controls.Add(new Label { Text = name, Dock = DockStyle.Fill, TextAlign = ContentAlignment.MiddleLeft }, 0, row);
-        field.Dock = DockStyle.Fill;
-        layout.Controls.Add(field, 1, row);
+        var hints = new Dictionary<string, string> {
+            ["服务器地址"] = "数据库所在电脑；本机填写 127.0.0.1，远程填写实际主机地址。",
+            ["端口"] = "数据库监听端口；通常 5432，必须与现有服务一致。",
+            ["用户名"] = "数据库账户名，不是 Windows 或 ARTEX 登录账号。",
+            ["密码"] = "此数据库账户的密码；不是 ARTEX 登录密码或 AI API Key。",
+            ["数据库名"] = "用于保存 ARTEX 数据的库名，例如 artex；需实际存在。",
+            ["SSL 模式"] = "本机通常 disable；远程按管理员要求填写 require、verify-full 等。",
+        };
+        layout.Controls.Add(new Label { Text = name, AutoSize = true, TextAlign = ContentAlignment.MiddleLeft }, 0, row);
+        var cell = new TableLayoutPanel { ColumnCount = 1, RowCount = 2, AutoSize = true, Dock = DockStyle.Top };
+        cell.ColumnStyles.Add(new ColumnStyle(SizeType.Percent, 100));
+        field.Dock = DockStyle.Top;
+        var hint = new Label { Text = hints[name], AutoSize = true, ForeColor = Color.FromArgb(173, 192, 217), Margin = new Padding(0, 3, 0, 8) };
+        cell.Controls.Add(field, 0, 0); cell.Controls.Add(hint, 0, 1);
+        cell.SizeChanged += (_, _) => hint.MaximumSize = new Size(Math.Max(100, cell.Width - 10), 0);
+        layout.Controls.Add(cell, 1, row);
     }
 
     private void Save()
