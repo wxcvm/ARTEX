@@ -5,6 +5,12 @@ on:
     branches: [main]
   pull_request:
 
+# Superseded commits on the same PR should not occupy scarce Windows runners.
+# Every main commit still has its own independent CI run.
+concurrency:
+  group: ci-${{ github.event_name }}-${{ github.event.pull_request.number || github.run_id }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
 jobs:
   go:
     runs-on: ubuntu-latest
@@ -76,22 +82,6 @@ jobs:
           name: deterministic-engineering
           path: benchmark-results/engineering/
 
-  windows:
-    runs-on: windows-latest
-    steps:
-      - uses: actions/checkout@v4
-      - uses: actions/setup-go@v5
-        with:
-          go-version-file: go.mod
-      - run: go build ./...
-      - name: Knowledge paths and literal search on Windows
-        run: go test ./kb -count=20
-      - name: Native Windows storage permission diagnostics
-        run: go test ./server -run '^(TestInspectStorage|TestStoragePermissions)' -count=1
-      - run: go test ./server -run 'TestTaskTransition|TestWebAPIEngineering|TestDownload' -count=20
-      - run: go test ./server -run '^(TestExternalTool|TestJWTKey)' -count=1
-      - run: go test ./mcphttp -run '^TestStreamableClient(ProtocolVersions|VersionRejectionForms)$' -count=1
-
   web:
     runs-on: ubuntu-latest
     defaults:
@@ -113,7 +103,8 @@ jobs:
           name: ci-web-dist
           path: web/out
 
-  desktop:
+  windows:
+    # One Windows runner for the native tests and desktop artifacts.
     needs: web
     runs-on: windows-latest
     steps:
@@ -121,6 +112,14 @@ jobs:
       - uses: actions/setup-go@v5
         with:
           go-version-file: go.mod
+      - run: go build ./...
+      - name: Knowledge paths and literal search on Windows
+        run: go test ./kb -count=20
+      - name: Native Windows storage permission diagnostics
+        run: go test ./server -run '^(TestInspectStorage|TestStoragePermissions)' -count=1
+      - run: go test ./server -run 'TestTaskTransition|TestWebAPIEngineering|TestDownload' -count=20
+      - run: go test ./server -run '^(TestExternalTool|TestJWTKey)' -count=1
+      - run: go test ./mcphttp -run '^TestStreamableClient(ProtocolVersions|VersionRejectionForms)$' -count=1
       - uses: actions/setup-dotnet@v4
         with:
           dotnet-version: "10.0.x"
@@ -158,3 +157,15 @@ jobs:
         with:
           name: artex-windows-setup-preview
           path: dist/ARTEX-Windows-Setup-amd64.exe
+
+  # Keep the existing desktop check name for branch protection. Its result
+  # reflects the full Windows job, including the desktop and installer tests.
+  desktop:
+    needs: windows
+    if: ${{ always() }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Require Windows desktop validation
+        env:
+          WINDOWS_RESULT: ${{ needs.windows.result }}
+        run: test "$WINDOWS_RESULT" = success
