@@ -6,6 +6,10 @@ using Artex.Desktop;
 
 internal static class Program
 {
+    private sealed class UnpumpedContext : SynchronizationContext
+    {
+        public override void Post(SendOrPostCallback callback, object? state) { }
+    }
     private static readonly Assembly Desktop = typeof(MainForm).Assembly;
     private static readonly Type Manager = Desktop.GetType("Artex.Desktop.ManagedPostgres", true)!;
     private static object? Call(string method, params object[] args) => Manager.GetMethod(method, BindingFlags.Static | BindingFlags.NonPublic)!.Invoke(null, args);
@@ -28,7 +32,12 @@ internal static class Program
             foreach (var uri in new[] { "https://example.com/setup", "http://localhost:8787/setup", "http://127.0.0.1:8788/setup", "http://127.0.0.1:8787/welcome", "http://127.0.0.1:8787/setup?next=external", "http://127.0.0.1:8787/setup#external", "http://x@127.0.0.1:8787/setup" })
                 Check(!(bool)bridge.Invoke(null, [uri])!, "Unexpected setup token recipient: " + uri);
             var listener = new TcpListener(IPAddress.Loopback, 15432);
-            try { listener.Start(); Check((int)Call("ChoosePort")! > 15432, "Occupied port reused"); }
+            try
+            {
+                try { listener.Start(); }
+                catch (SocketException ex) when (ex.SocketErrorCode == SocketError.AddressAlreadyInUse) { }
+                Check((int)Call("ChoosePort")! > 15432, "Occupied port reused");
+            }
             finally { listener.Stop(); }
             Console.WriteLine("Setup-token route boundary and occupied-port tests passed.");
             if (args.Length == 0) return 0;
@@ -51,7 +60,13 @@ internal static class Program
             Check(!File.Exists(Path.Combine(root, "init-password.tmp")), "Password scratch file survived initialization");
             var bin = Field<string>(first, "Bin"); var port = Field<int>(first, "Port");
             await Psql(bin, port, Field<string>(first, "AppPassword"), "CREATE TABLE onboarding_fixture(value text); INSERT INTO onboarding_fixture VALUES ('persisted');");
-            Call("StopOwned");
+            var previousContext = SynchronizationContext.Current;
+            try
+            {
+                SynchronizationContext.SetSynchronizationContext(new UnpumpedContext());
+                Call("StopOwned");
+            }
+            finally { SynchronizationContext.SetSynchronizationContext(previousContext); }
             var dsn = (string)first.GetType().GetMethod("Dsn", BindingFlags.Instance | BindingFlags.NonPublic)!.Invoke(first, [false])!;
             await (Task)Call("EnsureForConfigurationAsync", dsn, CancellationToken.None)!;
             var value = await Psql(bin, port, Field<string>(first, "AppPassword"), "SELECT value FROM onboarding_fixture;");

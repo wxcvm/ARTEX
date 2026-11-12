@@ -132,7 +132,9 @@ internal static class ManagedPostgres
         try
         {
             var c = ReadManifest();
-            if (c is not null) RunAsync(Path.Combine(c.Bin, "pg_ctl.exe"), ["stop", "-D", Data, "-m", "fast", "-w", "-t", "15"], CancellationToken.None).GetAwaiter().GetResult();
+            // FormClosed runs on the WinForms context. Do not block that context
+            // while the async process waiter tries to resume back onto it.
+            if (c is not null) Task.Run(() => RunAsync(Path.Combine(c.Bin, "pg_ctl.exe"), ["stop", "-D", Data, "-m", "fast", "-w", "-t", "15"], CancellationToken.None)).GetAwaiter().GetResult();
             startedHere = false;
         }
         catch (Exception ex) { Debug.WriteLine("独立数据库未能正常停止：" + ex.GetType().Name); }
