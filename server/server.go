@@ -686,6 +686,7 @@ func (s *Server) Handler() http.Handler {
 	mux.HandleFunc("GET /api/privacy/exposure", s.exposureStatus)
 	mux.HandleFunc("GET /api/privacy/model-keys", s.modelKeyDiagnostics)
 	mux.HandleFunc("GET /api/privacy/model-outbound", s.modelOutboundAudit)
+	mux.HandleFunc("GET /api/privacy/sensitive-config", s.sensitiveConfigDiagnostics)
 	mux.HandleFunc("POST /api/privacy/model-keys/migrate", s.migrateModelKeys)
 	mux.HandleFunc("GET /api/privacy/bridge-status", s.privacyBridgeStatus)
 	mux.HandleFunc("GET /api/stats", s.stats)
