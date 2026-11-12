@@ -32,6 +32,7 @@ import { cn } from "@/lib/utils";
 
 import { ProfileRetryFields, RetryPolicyPanel, ZERO_OVERRIDE } from "./_components/retry";
 import { KeyDiagnosticsPanel } from "./_components/key-diagnostics";
+import { OutboundAuditPanel } from "./_components/outbound-audit";
 
 // The thinking switch (thinking.type) and the thinking effort (reasoning_effort) are two [independent] fields,
 // each set on its own — some APIs have no thinking field and activate thinking via the effort parameter alone, hence the decoupling.
@@ -1043,6 +1044,7 @@ export default function LLMPage() {
           <TabsTrigger value="profiles">模型连接</TabsTrigger>
           <TabsTrigger value="retry">重试与退避</TabsTrigger>
           <TabsTrigger value="privacy">密钥保护</TabsTrigger>
+          <TabsTrigger value="outbound">连接审计</TabsTrigger>
         </TabsList>
 
         <TabsContent value="profiles" className="mt-4">
@@ -1152,6 +1154,10 @@ export default function LLMPage() {
 
         <TabsContent value="privacy" className="mt-4">
           <KeyDiagnosticsPanel profiles={profiles} />
+        </TabsContent>
+
+        <TabsContent value="outbound" className="mt-4">
+          <OutboundAuditPanel />
         </TabsContent>
 
         <TabsContent value="retry" className="mt-4">
