@@ -18,12 +18,15 @@ jobs:
       - name: Require successful main CI for the exact release commit
         env:
           GH_TOKEN: ${{ github.token }}
-          RELEASE_SHA: 3da94efe95d250d3118d371adddf39f84a78e4ae
-          CI_RUN: "43191028522"
+          RELEASE_SHA: 96b5964b227b1ace75d103020d4be038e5a20161
         run: |
           set -euo pipefail
           for attempt in $(seq 1 60); do
-            run=$(gh api "repos/$GITHUB_REPOSITORY/actions/runs/$CI_RUN")
+            run=$(gh api "repos/$GITHUB_REPOSITORY/actions/runs?head_sha=$RELEASE_SHA&branch=main&event=push" --jq '.workflow_runs | map(select(.name == "ci")) | first // empty')
+            if [ -z "$run" ]; then
+              sleep 30
+              continue
+            fi
             test "$(jq -r .head_sha <<< "$run")" = "$RELEASE_SHA"
             test "$(jq -r .head_branch <<< "$run")" = main
             if [ "$(jq -r .status <<< "$run")" = completed ]; then
@@ -42,7 +45,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
         with:
-          ref: 3da94efe95d250d3118d371adddf39f84a78e4ae
+          ref: 96b5964b227b1ace75d103020d4be038e5a20161
           persist-credentials: false
       - uses: actions/setup-node@v4
         with:
@@ -63,6 +66,7 @@ jobs:
     needs: frontend
     runs-on: ubuntu-latest
     strategy:
+      fail-fast: false
       matrix:
         include:
           - { goos: linux, goarch: amd64 }
@@ -73,7 +77,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
         with:
-          ref: 3da94efe95d250d3118d371adddf39f84a78e4ae
+          ref: 96b5964b227b1ace75d103020d4be038e5a20161
           persist-credentials: false
       - uses: actions/setup-go@v5
         with:
@@ -119,7 +123,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
         with:
-          ref: 3da94efe95d250d3118d371adddf39f84a78e4ae
+          ref: 96b5964b227b1ace75d103020d4be038e5a20161
           persist-credentials: false
       - uses: actions/setup-go@v5
         with:
@@ -163,7 +167,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
         with:
-          ref: 3da94efe95d250d3118d371adddf39f84a78e4ae
+          ref: 96b5964b227b1ace75d103020d4be038e5a20161
           persist-credentials: false
       - uses: actions/download-artifact@v4
         with:
@@ -204,7 +208,7 @@ jobs:
             dist/*.exe
             dist/SHA256SUMS
           tag_name: v0.4.1
-          target_commitish: 3da94efe95d250d3118d371adddf39f84a78e4ae
+          target_commitish: 96b5964b227b1ace75d103020d4be038e5a20161
           generate_release_notes: false
           body_path: RELEASE_NOTES.md
           fail_on_unmatched_files: true
@@ -222,7 +226,7 @@ jobs:
     steps:
       - uses: actions/checkout@v4
         with:
-          ref: 3da94efe95d250d3118d371adddf39f84a78e4ae
+          ref: 96b5964b227b1ace75d103020d4be038e5a20161
           persist-credentials: false
       - uses: actions/download-artifact@v4
         with:
