@@ -86,6 +86,8 @@ jobs:
       - run: go build ./...
       - name: Knowledge paths and literal search on Windows
         run: go test ./kb -count=20
+      - name: Native Windows storage permission diagnostics
+        run: go test ./server -run '^(TestInspectStorage|TestStoragePermissions)' -count=1
       - run: go test ./server -run 'TestTaskTransition|TestWebAPIEngineering|TestDownload' -count=20
       - run: go test ./server -run '^(TestExternalTool|TestJWTKey)' -count=1
       - run: go test ./mcphttp -run '^TestStreamableClient(ProtocolVersions|VersionRejectionForms)$' -count=1

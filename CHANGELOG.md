@@ -4,17 +4,23 @@ All notable changes to this project are documented in this file. The format is b
 
 ## [Unreleased]
 
-## [0.4.1] - 2026-11-11
+## [0.4.1]
 
 ### Fixed
 
 - **Read-only knowledge paths**: preserve literal `#`, `%` and `?` characters in SQLite file URIs, so the opened database matches the configured path and read-only options are retained.
 - **Literal knowledge search**: escape `%`, `_` and backslashes in LIKE fallback queries; sort LIKE results by id and equal-rank FTS results by id for repeatable limited results.
 - **Knowledge startup validation**: reject an existing SQLite file that lacks the `poc` table or any required read column; propagate index-discovery errors instead of advertising an unusable knowledge base.
+- **Model connection and workspace reliability**: actionable connection-test feedback, recovery of empty model responses, improved task session layouts and graph/report controls.
 - **Desktop recovery**: retain the mainline WebView2/React error recovery, stalled navigation diagnostics, window restore and fullscreen fixes.
 
 ### Added
 
+- **Ollama support**: an `ollama` LLM profile format for a local or LAN Ollama server. Keyless by design: no API key is needed, `OPENAI_API_KEY` is never inherited, the base URL defaults to `http://127.0.0.1:11434/v1` and is normalized to the `/v1` root, and the profile works in the failover pool, task LLM chains, model listing and connection tests. Contributed by @glauberportella (#128).
+- **Windows desktop refresh**: eagle-shield identity, simplified model setup, modernized dashboard and task workspaces, compact desktop toolbar, maximized launch and tray restore. First-run PostgreSQL setup includes connectivity checks, explicit database creation, optional official installer and recoverable onboarding.
+- **Local privacy diagnostics**: authenticated exposure overview, actual listener reporting, sensitive configuration checks, model HTTP attempt statistics and native Windows storage-permission inspection. Windows ACL inspection is read-only, non-recursive, and does not claim effective-access or external reachability validation.
+- **Model credential protection**: optional AES-GCM encryption at rest, integrity diagnostics, transactional migration of legacy model keys and credential redaction in diagnostic errors. Keep the encryption key backed up separately; encryption is opt-in.
+- **Purge privacy integration**: independently scoped read-only listener and overview interfaces, without granting access to detailed diagnostic data or configuration changes.
 - **Native Windows distribution**: portable desktop ZIP and installer, a first-run database setup flow, and an in-app Chinese user guide. Existing configuration and edited skills are preserved by the installer upgrade path.
 - **Knowledge regression coverage**: literal-query, special-directory, incomplete-schema and stable-order fixtures, with repeated Linux race checks and Windows checks in CI.
 
@@ -35,7 +41,6 @@ All notable changes to this project are documented in this file. The format is b
 
 - `.github/workflows/bot.yml` + `.github/scripts/bot.sh`: the workflow checked out pull-request code and injected `DEEPSEEK_API_KEY` into it (indirect pipeline poisoning).
 
-- **Ollama support**: an `ollama` LLM profile format for a local or LAN Ollama server. Keyless by design: no API key is needed, `OPENAI_API_KEY` is never inherited, the base URL defaults to `http://127.0.0.1:11434/v1` and is normalized to the `/v1` root, and the profile works in the failover pool, task LLM chains, model listing and connection tests. Contributed by @glauberportella (#128).
 
 ## [0.4.0] - 2026-10-23
 
