@@ -9,6 +9,7 @@ import (
 	"sync"
 	"time"
 
+	"github.com/Autumn-27/artex/config"
 	"github.com/Autumn-27/artex/db"
 )
 
@@ -97,7 +98,7 @@ func (s *logSinkT) SetDB(ctx context.Context, pg *db.DB) {
 					}
 					id, err := pg.InsertLog(req.ll.Level, req.ll.Tag, req.ll.Text)
 					if err != nil {
-						_, _ = os.Stderr.Write([]byte("[logsink] db write: " + err.Error() + "\n"))
+						_, _ = os.Stderr.Write([]byte("[logsink] db write: " + config.RedactLogText(err.Error()) + "\n"))
 						continue
 					}
 					// Stamp DBID back into the ring entry so history pagination works.
@@ -119,8 +120,9 @@ func (s *logSinkT) SetDB(ctx context.Context, pg *db.DB) {
 
 // Write implements io.Writer for the log package: one call per log.Printf line.
 func (s *logSinkT) Write(p []byte) (int, error) {
-	_, _ = s.out.Write(p) // keep the terminal output
-	line := strings.TrimRight(string(p), "\n")
+	redacted := config.RedactLogText(string(p))
+	_, _ = s.out.Write([]byte(redacted)) // keep the terminal output, without recognized credentials
+	line := strings.TrimRight(redacted, "\n")
 	if strings.TrimSpace(line) != "" {
 		s.add(parseLog(line))
 	}
