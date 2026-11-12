@@ -194,16 +194,18 @@ func (d Database) buildDSN() string {
 	return u.String()
 }
 
-// String is a redacted view of the resolved DSN (password masked) for logging.
+// Redact returns a diagnostic-only PostgreSQL address. Invalid or keyword-style
+// DSNs must not be echoed, and URI query parameters can contain credentials too.
 func Redact(dsn string) string {
 	u, err := url.Parse(dsn)
-	if err != nil {
-		return dsn
+	if err != nil || u.Opaque != "" ||
+		(!strings.EqualFold(u.Scheme, "postgres") && !strings.EqualFold(u.Scheme, "postgresql")) {
+		return "[redacted PostgreSQL DSN]"
 	}
-	if u.User != nil {
-		if _, hasPw := u.User.Password(); hasPw {
-			u.User = url.UserPassword(u.User.Username(), "****")
-		}
-	}
-	return fmt.Sprintf("%s", u.String())
+	u.User = nil
+	u.RawQuery = ""
+	u.ForceQuery = false
+	u.Fragment = ""
+	u.RawFragment = ""
+	return u.String()
 }
