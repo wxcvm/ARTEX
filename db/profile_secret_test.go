@@ -114,6 +114,25 @@ func TestEncryptedModelProfileStorage(t *testing.T) {
 	if got, err := d.ProfileByID(id); err != nil || got == nil || got.APIKey != secret || got.Model != p.Model {
 		t.Fatal("encrypted profile read failed")
 	}
+	var previousID int64
+	if err := d.QueryRow("SELECT COALESCE((SELECT id FROM llm_profiles WHERE is_default LIMIT 1),0)").Scan(&previousID); err != nil {
+		t.Fatal(err)
+	}
+	if err := d.SetActiveProfile(id); err != nil {
+		t.Fatal(err)
+	}
+	defer func() {
+		if previousID != 0 {
+			if err := d.SetActiveProfile(previousID); err != nil {
+				t.Error("restore active profile:", err)
+			}
+		} else if _, err := d.Exec("UPDATE llm_profiles SET is_default=false WHERE id=$1", id); err != nil {
+			t.Error("restore active profile:", err)
+		}
+	}()
+	if got, err := d.ActiveProfile(); err != nil || got == nil || got.ID != id || got.APIKey != secret {
+		t.Fatal("active encrypted profile could not be resolved")
+	}
 	chain, err := d.PoolProfiles()
 	if err != nil {
 		t.Fatal(err)
