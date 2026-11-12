@@ -17,7 +17,7 @@ AI autonomous penetration testing system (Go backend + Next.js frontend)
 
 运行本 fork 的最新前端后，也可以在左侧 **System → 使用指南 / Help** 打开站内版（支持搜索和章节跳转）。
 
-本 fork 的最新功能应从本仓库源码构建，或使用自行构建的 fork 镜像；默认 Docker Compose 镜像仍是历史上游版本。请先阅读指南中的[安装方式选择](docs/USER_GUIDE_ZH.md#1-快速选择安装方式)，避免版本不一致。
+本 fork 的最新功能应从本仓库源码构建，或使用自行构建的 fork 镜像；默认 Docker Compose 镜像为本地构建的 `artex:local`，历史上游镜像仅在显式配置时使用。请先阅读指南中的[安装方式选择](docs/USER_GUIDE_ZH.md#1-快速选择安装方式)，避免版本不一致。
 
 **Docker 登录状态持久化（来自 BaaRai 上游）**：本 fork 的后端支持用 `ARTEX_JWT_KEY_DIR` 指定 JWT 密钥目录；`docker-compose.yml` 将 `/app/keys` 映射至仓库的 `./keys`，避免重建容器时密钥丢失和用户被迫重新登录。`keys/` 已加入 Git 与 Docker 构建忽略名单。**需使用包含该修复的 fork 镜像/二进制才生效**；历史上游镜像可能不会使用此环境变量。已有容器升级前，请查看[中文指南的密钥迁移说明](docs/USER_GUIDE_ZH.md#33-docker-compose镜像部署)。
 
@@ -28,6 +28,8 @@ AI autonomous penetration testing system (Go backend + Next.js frontend)
 **外部工具管理**：系统 → Tools → External binaries 支持本机 nuclei、httpx、subfinder、katana、ffuf、naabu、dnsx 的路径与版本检测；Windows x64 可在页面查看官方 GitHub Release 并按需下载安装，通过 GitHub API 的 SHA-256 校验 ZIP，升级保留上一版，支持在管理页面一键恢复上一版或卸载受管理版本。还可将已管理的工具导出成带 EXE SHA-256 清单的离线 ZIP，再到另一台 Windows x64 主机导入；离线端无需访问 GitHub。不覆盖 `ARTEX_TOOL_DIRS` 自定义目录、不改 PATH 或 Agent 绑定，也不自动下载其他依赖。详情见 [中文操作指南](docs/USER_GUIDE_ZH.md#28-windows-外部工具检测tool-manager-第一阶段)。
 
 ## Windows 桌面客户端 / Native desktop (Windows 11)
+
+正式版本下载后可使用 `SHA256SUMS` 核验文件完整性；安装器目前未签名。升级前建议备份配置、数据库及密钥，安装器保留同一路径的配置和已编辑 Skills。
 
 除传统浏览器界面外，本 fork 提供 **ARTEX.Desktop.exe** 原生 Windows 桌面窗口（WinForms + WebView2）。与传统 Web UI 使用同一个 Go 后端、任务和配置，支持启动/连接本地服务、托盘、刷新、重新连接以及在浏览器中打开。
 
@@ -181,7 +183,7 @@ Once installed, open **http://localhost:8787** (on first entry, `/setup` sets th
 git clone https://github.com/wxcvm/ARTEX.git
 cd ARTEX
 cp .env.example .env          # set POSTGRES_PASSWORD, optionally ANTHROPIC_API_KEY
-docker compose up -d          # pulls ARTEX_IMAGE (legacy upstream by default) + postgres
+docker compose up -d          # uses the local fork image (artex:local by default) + postgres
 # → http://localhost:8787
 ```
 
@@ -334,7 +336,7 @@ Optional: `ARTEX_LLM_PROVIDER` (anthropic | openai | openai-responses | ollama) 
 
 ### Build a Docker image from this fork's source
 
-The default Compose image `autumn27/artex:latest` is a **historical upstream image**, not a build of this fork. Even when that image is available, it does not include security fixes committed only to `wxcvm/ARTEX`. To build the current checkout without needing Node or Go on the host, use Docker Buildx:
+The historical upstream image `autumn27/artex:latest` is not a build of this fork. Compose defaults to the locally built `artex:local` image. Even when that image is available, it does not include security fixes committed only to `wxcvm/ARTEX`. To build the current checkout without needing Node or Go on the host, use Docker Buildx:
 
 ```bash
 bash scripts/docker-build-fork.sh
@@ -353,7 +355,7 @@ This local diagnosis does **not** inspect Docker host publication, NAT, reverse 
 
 - Bare-metal ARTEX now listens on `127.0.0.1:8787` unless you explicitly pass `-addr`. Docker Compose publishes port 8787 to host loopback by default; set `ARTEX_BIND` in `.env` only if you intentionally want to make the console reachable from another network. The traffic-recording proxy remains local.
 - **Admin bootstrap (this fork's binaries only):** On a new instance, open `/setup` and paste the one-time setup token from ARTEX's startup logs before setting the administrator password. On Windows Desktop, check `%LOCALAPPDATA%\\ARTEX\\desktop-backend.log`; for a local terminal check its output; for the fork's Docker image use `docker compose logs artex`. Restarting an uninitialized backend generates a new token. You can explicitly set `ARTEX_SETUP_TOKEN` for unattended installations. Never publish this token or log file.
-- The historical `autumn27/artex:latest` image selected by the included Compose file **does not automatically contain fixes from wxcvm/ARTEX**. To use the new bootstrap protection, deploy a binary/image built from this fork and set `ARTEX_IMAGE`/`ARTEX_TAG` accordingly. The repository Dockerfile expects a prebuilt `dist/<arch>/artex` binary; a plain `docker compose build` without that artifact is not sufficient.
+- The historical `autumn27/artex:latest` image, if explicitly selected, **does not automatically contain fixes from wxcvm/ARTEX**. To use the new bootstrap protection, deploy a binary/image built from this fork and set `ARTEX_IMAGE`/`ARTEX_TAG` accordingly. The repository Dockerfile expects a prebuilt `dist/<arch>/artex` binary; a plain `docker compose build` without that artifact is not sufficient.
 - For remote management, prefer an authenticated VPN or SSH tunnel to localhost rather than publishing the administration API directly. Local bind alone does not prove a host is unreachable if a reverse proxy forwards to it.
 
 ### Reverse proxy deployment (HTTPS / only exposing 443)

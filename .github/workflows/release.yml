@@ -96,6 +96,10 @@ jobs:
       - name: Package native Windows desktop
         shell: pwsh
         run: ./desktop/windows/package.ps1 -SkipWebBuild -Version "${{ github.ref_name }}"
+      - name: Smoke test release desktop
+        shell: pwsh
+        timeout-minutes: 3
+        run: ./desktop/windows/test-desktop-smoke.ps1
       - uses: actions/upload-artifact@v4
         with:
           name: pkg-windows-desktop-amd64
@@ -103,6 +107,10 @@ jobs:
       - name: Build Windows desktop installer
         shell: pwsh
         run: ./desktop/windows/build-installer.ps1 -Version "${{ github.ref_name }}"
+      - name: Smoke test release installer and upgrade
+        shell: pwsh
+        timeout-minutes: 8
+        run: ./desktop/windows/test-installer.ps1
       - uses: actions/upload-artifact@v4
         with:
           name: pkg-windows-setup-amd64
@@ -113,6 +121,7 @@ jobs:
     needs: [binaries, desktop]
     runs-on: ubuntu-latest
     steps:
+      - uses: actions/checkout@v4
       - uses: actions/download-artifact@v4
         with:
           pattern: pkg-*
@@ -120,7 +129,31 @@ jobs:
           path: dist
       - name: Generate checksums
         working-directory: dist
-        run: sha256sum *.zip *.exe > SHA256SUMS
+        env:
+          RELEASE_TAG: ${{ github.ref_name }}
+        run: |
+          version="${RELEASE_TAG#v}"
+          for platform in linux-amd64 linux-arm64 darwin-amd64 darwin-arm64 windows-amd64; do
+            test -s "artex-${version}-${platform}.zip"
+          done
+          test -s ARTEX-Windows-Desktop-amd64.zip
+          test -s ARTEX-Windows-Setup-amd64.exe
+          sha256sum *.zip *.exe > SHA256SUMS
+      - name: Extract versioned release notes
+        env:
+          RELEASE_TAG: ${{ github.ref_name }}
+        run: |
+          version="${RELEASE_TAG#v}"
+          awk -v version="$version" '
+            /^## / {
+              if (found) exit
+              if (index($0, "## [" version "]") == 1) { found=1; next }
+            }
+            found { print }
+            END { if (!found) exit 1 }
+          ' CHANGELOG.md > RELEASE_NOTES.md
+          test -s RELEASE_NOTES.md
+          printf '\nSource: https://github.com/%s/tree/%s\n' "$GITHUB_REPOSITORY" "$RELEASE_TAG" >> RELEASE_NOTES.md
       - uses: softprops/action-gh-release@v2
         with:
           files: |
@@ -128,7 +161,8 @@ jobs:
             dist/*.exe
             dist/SHA256SUMS
           generate_release_notes: false
-          body: "See CHANGELOG.md for the list of changes in this release."
+          body_path: RELEASE_NOTES.md
+          fail_on_unmatched_files: true
 
   # ⑤ Multi-arch image → push to Docker Hub (reuses the Linux binaries built by the
   #    binaries job; the image only installs tools + ships the binary; arm64 only needs
