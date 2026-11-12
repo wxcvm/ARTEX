@@ -67,6 +67,19 @@ func TestPurgeIntelDatabaseRoundTrip(t *testing.T) {
   {Kind:"domain",Value:"example.test"},{Kind:"cidr",Value:"192.0.2.0/24"}},"test")
  if err!=nil{t.Fatal(err)}
  defer d.Exec("DELETE FROM companies WHERE id=$1",id)
+ // Creating scope can attribute existing assets to the new company. Compare
+ // the actual asset rows rather than assuming an initially empty inventory.
+ assetSnapshot:=func() string {
+  t.Helper()
+  var snapshot string
+  if err:=d.QueryRow("SELECT COALESCE(jsonb_agg(to_jsonb(a) ORDER BY a.id), '[]'::jsonb)::text FROM assets a WHERE a.company_id=$1",id).Scan(&snapshot);err!=nil{t.Fatal(err)}
+  return snapshot
+ }
+ beforeAssets:=assetSnapshot()
+ assertAssetsUnchanged:=func(){
+  t.Helper()
+  if after:=assetSnapshot();after!=beforeAssets{t.Fatal("verified assets changed during historical intel import")}
+ }
  s:=&Server{m:&Manager{pg:d},jwtKey:[]byte("01234567890123456789012345678901")}
  mux:=http.NewServeMux()
  mux.HandleFunc("POST /api/companies/{id}/purge-intel",s.importPurgeIntel)
@@ -98,7 +111,7 @@ func TestPurgeIntelDatabaseRoundTrip(t *testing.T) {
 
  var count int
  if err:=d.QueryRow("SELECT count(*) FROM purge_intel_snapshots WHERE company_id=$1",id).Scan(&count);err!=nil||count!=1{t.Fatalf("snapshot count %d: %v",count,err)}
- if err:=d.QueryRow("SELECT count(*) FROM assets WHERE company_id=$1",id).Scan(&count);err!=nil||count!=0{t.Fatalf("verified assets changed: %d %v",count,err)}
+ assertAssetsUnchanged()
  // The direct bridge reuses the validated import path and the same snapshot.
  const secret="fixture-only-long-intelligence-token-123"
  t.Setenv("ARTEX_PURGE_INTEL_TOKEN",secret)
@@ -115,6 +128,7 @@ func TestPurgeIntelDatabaseRoundTrip(t *testing.T) {
  if err:=d.QueryRow("SELECT count(*) FROM purge_intel_snapshots WHERE company_id=$1",id).Scan(&count);err!=nil||count!=1{t.Fatalf("bridge duplicated snapshot: %d %v",count,err)}
  b.IPs[0].IP="198.51.100.1"
  if w=request("POST",path,b);w.Code!=400{t.Fatal("out-of-scope import accepted")}
+ assertAssetsUnchanged()
 }
 
 func TestPurgeIntelBridgeCredentialIsolation(t *testing.T) {
