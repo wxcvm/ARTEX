@@ -672,3 +672,12 @@ docker compose logs --tail=100 postgres
 - GET /api/companies/{id}/purge-intel/{snapshot}：读取历史证据，范围变更后不再匹配的快照拒绝返回。
 
 本阶段采用手动 JSON 导入，不需要额外 API Key，不自动传输数据；不包含跨项目后台同步、自动扫描、向智能体注入证据或把历史情报提升为已验证资产。需要安装包含本阶段代码的 ARTEX 版本及 Purge 关联清单功能。
+
+
+### Purge 本机一键同步
+
+可选启用独立写入桥接：在 ARTEX 服务端设置 `ARTEX_PURGE_INTEL_TOKEN`（至少 32 字符的独立随机秘密）及 `ARTEX_PURGE_INTEL_COMPANY_ID`（已存在的公司数字 ID）。在 DSH/Purge 宿主设置相同的 `DSH_PURGE_ARTEX_INTEL_TOKEN` 和 `DSH_PURGE_ARTEX_INTEL_COMPANY_ID`，重启两端。Docker Compose 已透传 ARTEX 两个变量。不要复用隐私桥接、总览或安装令牌，不要将秘密提交到仓库。
+
+Purge 测绘中心先生成统一关联清单，再检查接收公司、勾选确认并点击「同步至 ARTEX」。发送端只使用 `http://127.0.0.1:8787`，不接受自定义远程 URL。ARTEX 接口 `POST /api/purge/intel-bridge` 使用 X-Artex-Purge-Intel-Token 和 X-Artex-Purge-Intel-Company 两个请求头；接收公司由服务端配置决定，发送端 ID 不匹配则拒绝。复用管理员手动导入的验证及去重逻辑，成功返回快照 ID。令牌不授予任何读取、管理或其他公司写入权限。
+
+仅在同一可信本机使用，保持 ARTEX 管理监听回环或受保护。服务身份探测不等于加密认证。传输不启动扫描或智能体；响应丢失时在 ARTEX 历史中确认，重复提交相同证据会复用快照。尚无定时同步或 ARTEX 智能体自动消费。
