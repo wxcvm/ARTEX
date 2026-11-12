@@ -1,17 +1,49 @@
-name: release
+name: publish v0.4.1
 on:
   push:
-    tags: ["v*"]
+    branches: ["release/publish-v0.4.1"]
 
+# One-time publication entrypoint. Build the exact validated main commit,
+# not this orchestration branch. The normal tag-triggered workflow on main
+# is unchanged. GITHUB_TOKEN-created tags do not recursively trigger it.
 permissions:
-  contents: write # required to create the Release
+  contents: read
+  actions: read
 
 jobs:
+  gate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 35
+    steps:
+      - name: Require successful main CI for the exact release commit
+        env:
+          GH_TOKEN: ${{ github.token }}
+          RELEASE_SHA: 3da94efe95d250d3118d371adddf39f84a78e4ae
+          CI_RUN: "43191028522"
+        run: |
+          set -euo pipefail
+          for attempt in $(seq 1 60); do
+            run=$(gh api "repos/$GITHUB_REPOSITORY/actions/runs/$CI_RUN")
+            test "$(jq -r .head_sha <<< "$run")" = "$RELEASE_SHA"
+            test "$(jq -r .head_branch <<< "$run")" = main
+            if [ "$(jq -r .status <<< "$run")" = completed ]; then
+              test "$(jq -r .conclusion <<< "$run")" = success
+              exit 0
+            fi
+            sleep 30
+          done
+          echo "Main CI did not finish within the release gate window" >&2
+          exit 1
+
   # ① Frontend static export (once), reused by the cross-compiled platform builds
   frontend:
+    needs: gate
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+        with:
+          ref: 3da94efe95d250d3118d371adddf39f84a78e4ae
+          persist-credentials: false
       - uses: actions/setup-node@v4
         with:
           node-version: "22"
@@ -40,6 +72,9 @@ jobs:
           - { goos: windows, goarch: amd64 }
     steps:
       - uses: actions/checkout@v4
+        with:
+          ref: 3da94efe95d250d3118d371adddf39f84a78e4ae
+          persist-credentials: false
       - uses: actions/setup-go@v5
         with:
           go-version: "1.26"
@@ -52,7 +87,7 @@ jobs:
         env:
           ARTEX_TARGET_OS: ${{ matrix.goos }}
           ARTEX_TARGET_ARCH: ${{ matrix.goarch }}
-          ARTEX_BUILD_VERSION: ${{ github.ref_name }}
+          ARTEX_BUILD_VERSION: v0.4.1
           ARTEX_SKIP_FRONTEND: "1"
           ARTEX_SKIP_NPM_CI: "1"
           # UPX self-extracting ELF binaries crash on some Linux kernels, virtualization
@@ -83,6 +118,9 @@ jobs:
     runs-on: windows-latest
     steps:
       - uses: actions/checkout@v4
+        with:
+          ref: 3da94efe95d250d3118d371adddf39f84a78e4ae
+          persist-credentials: false
       - uses: actions/setup-go@v5
         with:
           go-version-file: go.mod
@@ -95,7 +133,7 @@ jobs:
           path: server/webui/dist
       - name: Package native Windows desktop
         shell: pwsh
-        run: ./desktop/windows/package.ps1 -SkipWebBuild -Version "${{ github.ref_name }}"
+        run: ./desktop/windows/package.ps1 -SkipWebBuild -Version "v0.4.1"
       - name: Smoke test release desktop
         shell: pwsh
         timeout-minutes: 3
@@ -106,7 +144,7 @@ jobs:
           path: dist/ARTEX-Windows-Desktop-amd64.zip
       - name: Build Windows desktop installer
         shell: pwsh
-        run: ./desktop/windows/build-installer.ps1 -Version "${{ github.ref_name }}"
+        run: ./desktop/windows/build-installer.ps1 -Version "v0.4.1"
       - name: Smoke test release installer and upgrade
         shell: pwsh
         timeout-minutes: 8
@@ -119,9 +157,14 @@ jobs:
   # ④ Collect all zips → create the GitHub Release
   release:
     needs: [binaries, desktop]
+    permissions:
+      contents: write
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
+        with:
+          ref: 3da94efe95d250d3118d371adddf39f84a78e4ae
+          persist-credentials: false
       - uses: actions/download-artifact@v4
         with:
           pattern: pkg-*
@@ -130,7 +173,7 @@ jobs:
       - name: Generate checksums
         working-directory: dist
         env:
-          RELEASE_TAG: ${{ github.ref_name }}
+          RELEASE_TAG: v0.4.1
         run: |
           version="${RELEASE_TAG#v}"
           for platform in linux-amd64 linux-arm64 darwin-amd64 darwin-arm64 windows-amd64; do
@@ -141,7 +184,7 @@ jobs:
           sha256sum *.zip *.exe > SHA256SUMS
       - name: Extract versioned release notes
         env:
-          RELEASE_TAG: ${{ github.ref_name }}
+          RELEASE_TAG: v0.4.1
         run: |
           version="${RELEASE_TAG#v}"
           awk -v version="$version" '
@@ -160,6 +203,8 @@ jobs:
             dist/*.zip
             dist/*.exe
             dist/SHA256SUMS
+          tag_name: v0.4.1
+          target_commitish: 3da94efe95d250d3118d371adddf39f84a78e4ae
           generate_release_notes: false
           body_path: RELEASE_NOTES.md
           fail_on_unmatched_files: true
@@ -175,7 +220,10 @@ jobs:
     if: ${{ vars.DOCKERHUB_ENABLED == 'true' }}
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4 # fetch the Dockerfile and skills/
+      - uses: actions/checkout@v4
+        with:
+          ref: 3da94efe95d250d3118d371adddf39f84a78e4ae
+          persist-credentials: false
       - uses: actions/download-artifact@v4
         with:
           name: bin-linux-amd64
@@ -195,7 +243,7 @@ jobs:
         with:
           images: ${{ vars.DOCKERHUB_IMAGE }}
           tags: |
-            type=ref,event=tag
+            type=raw,value=v0.4.1
             type=raw,value=latest
       - uses: docker/build-push-action@v6
         with:
