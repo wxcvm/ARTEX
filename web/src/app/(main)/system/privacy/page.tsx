@@ -7,6 +7,7 @@ import { AlertTriangle, CheckCircle2, Globe2, LockKeyhole, RefreshCw, ShieldChec
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { api } from "@/lib/api";
+import { PrivacyOverviewPanel } from "./_components/overview";
 
 type Exposure = Awaited<ReturnType<typeof api.privacyExposure>>;
 
@@ -53,12 +54,14 @@ export default function PrivacyPage() {
         </Button>
       </div>
 
+      <PrivacyOverviewPanel />
+
       <Card>
         <CardHeader>
           <CardTitle className="flex items-center gap-2 text-base">
             <ShieldCheck className="size-4" /> ARTEX 管理接口
           </CardTitle>
-          <CardDescription>后端报告配置的监听地址，不扫描公网，也不修改系统网络配置。</CardDescription>
+          <CardDescription>后端优先报告实际监听地址；未观测时使用配置地址，不扫描公网或修改网络。</CardDescription>
         </CardHeader>
         <CardContent className="space-y-4">
           {error ? <p role="alert" className="text-sm text-destructive">读取失败：{error}</p> : null}

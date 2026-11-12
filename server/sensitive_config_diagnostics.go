@@ -1,6 +1,7 @@
 package server
 
 import (
+	"context"
 	"net/http"
 	"strconv"
 
@@ -11,17 +12,19 @@ import (
 // endpoints, open connections to providers, or change stored configuration.
 func (s *Server) sensitiveConfigDiagnostics(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Cache-Control", "no-store")
+	writeJSON(w, http.StatusOK, s.sensitiveConfigSnapshot(r.Context()))
+}
+
+func (s *Server) sensitiveConfigSnapshot(ctx context.Context) config.SensitiveConfigStatus {
 	status := config.SensitiveConfigDiagnostics()
 	if s.m == nil || s.m.pg == nil {
 		status.ProfilesState = "unavailable"
-		writeJSON(w, http.StatusOK, status)
-		return
+		return status
 	}
-	rows, err := s.m.pg.QueryContext(r.Context(), `SELECT id, COALESCE(base_url,''), COALESCE(proxy,'') FROM llm_profiles ORDER BY id`)
+	rows, err := s.m.pg.QueryContext(ctx, `SELECT id, COALESCE(base_url,''), COALESCE(proxy,'') FROM llm_profiles ORDER BY id`)
 	if err != nil {
 		status.ProfilesState = "unavailable"
-		writeJSON(w, http.StatusOK, status)
-		return
+		return status
 	}
 	defer rows.Close()
 	status.ProfilesState = "complete"
@@ -40,5 +43,5 @@ func (s *Server) sensitiveConfigDiagnostics(w http.ResponseWriter, r *http.Reque
 	if rows.Err() != nil {
 		status.ProfilesState = "partial"
 	}
-	writeJSON(w, http.StatusOK, status)
+	return status
 }
