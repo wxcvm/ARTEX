@@ -3,6 +3,8 @@ package db
 import (
 	"context"
 	"time"
+
+	"github.com/Autumn-27/artex/config"
 )
 
 // DBLog is one persisted backend log row from the server_logs table.
@@ -41,6 +43,8 @@ func (d *DB) RecentLogs(limit int) ([]*DBLog, error) {
 		if err := rows.Scan(&l.ID, &l.CreatedAt, &l.Level, &l.Tag, &l.Text); err != nil {
 			return nil, err
 		}
+		l.Text = config.RedactLogText(l.Text)
+		l.Tag = config.RedactLogText(l.Tag)
 		out = append(out, l)
 	}
 	// Reverse to oldest-first
@@ -68,6 +72,8 @@ func (d *DB) ListLogsBefore(beforeID int64, limit int) ([]*DBLog, error) {
 		if err := rows.Scan(&l.ID, &l.CreatedAt, &l.Level, &l.Tag, &l.Text); err != nil {
 			return nil, err
 		}
+		l.Text = config.RedactLogText(l.Text)
+		l.Tag = config.RedactLogText(l.Tag)
 		out = append(out, l)
 	}
 	// Reverse to oldest-first
