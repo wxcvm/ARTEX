@@ -113,6 +113,18 @@ DROP TRIGGER IF EXISTS trg_av2_upd ON assets;
 CREATE TRIGGER trg_av2_upd BEFORE UPDATE ON assets
     FOR EACH ROW EXECUTE FUNCTION set_updated_at();
 
+-- Purge historical intelligence is deliberately separate from verified assets.
+CREATE TABLE IF NOT EXISTS purge_intel_snapshots (
+    id BIGSERIAL PRIMARY KEY,
+    company_id BIGINT NOT NULL REFERENCES companies(id) ON DELETE CASCADE,
+    digest TEXT NOT NULL,
+    payload JSONB NOT NULL,
+    received_at TIMESTAMPTZ NOT NULL DEFAULT now(),
+    UNIQUE(company_id, digest)
+);
+CREATE INDEX IF NOT EXISTS idx_purge_intel_company_received
+    ON purge_intel_snapshots(company_id, received_at DESC, id DESC);
+
 CREATE TABLE IF NOT EXISTS company_scope (
     id         BIGSERIAL PRIMARY KEY,
     company_id BIGINT NOT NULL REFERENCES companies(id) ON DELETE CASCADE,

@@ -35,6 +35,11 @@ func wireAgentAugment(pg *db.DB, skillDir string, hostTools func() ([]actool.Cor
 			return nil, agent.DeferredInfo{}, nil
 		}
 		var extra []actool.CoreTool
+		// Capture runtime task identity, never a caller-selected task ID.
+		if ri := agent.RunInfoFrom(ctx); ri.TaskID > 0 {
+			extra = append(extra, taskPurgeIntelTool(pg, ri.TaskID))
+		}
+
 
 		// --- skills: load visible skills into reg (used for the Skill meta-tool
 		// and to know which MCP servers are skill-gated). ---
@@ -232,6 +237,9 @@ func wireTools(pg *db.DB, domainReg map[string]actool.CoreTool) {
 		if err := pg.SeedTool(s.Key, s.Desc, schema, agents); err != nil {
 			log.Printf("[tools] seed %s failed: %v", s.Key, err)
 		}
+	}
+	if err := seedTaskPurgeIntelTool(pg); err != nil {
+		log.Printf("[tools] %v", err)
 	}
 	// Seed the traffic host tools so they're bindable per-agent like built-ins.
 	// Default binding = worker (preserves prior behavior). Their runtime availability
