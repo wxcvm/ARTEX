@@ -216,6 +216,17 @@ func (s *Server) requireAuth(h http.Handler) http.Handler {
 			h.ServeHTTP(w, r)
 			return
 		}
+		// Independent opt-in overview credential; the original listener token
+		// remains limited to its existing route.
+		if p == "/api/privacy/bridge-overview" && r.Method == http.MethodGet {
+			w.Header().Set("Cache-Control", "no-store")
+			if !validSetupToken(r.Header.Get("X-Artex-Privacy-Overview-Token"), strings.TrimSpace(os.Getenv("ARTEX_PRIVACY_OVERVIEW_TOKEN"))) {
+				writeErr(w, http.StatusUnauthorized, "Unauthorized")
+				return
+			}
+			h.ServeHTTP(w, r)
+			return
+		}
 		if strings.HasPrefix(p, "/api/auth/") || p == "/api/health" {
 			h.ServeHTTP(w, r)
 			return
