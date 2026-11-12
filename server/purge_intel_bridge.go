@@ -28,6 +28,9 @@ func (s *Server) importPurgeIntelBridge(w http.ResponseWriter,r *http.Request) {
  if !ok || !validPurgeIntelBridgeCredential(r.Header.Get("X-Artex-Purge-Intel-Token")) {
   writeErr(w,http.StatusUnauthorized,"Unauthorized");return
  }
+ if r.Header.Get("X-Artex-Purge-Intel-Company")!=strconv.FormatInt(id,10) {
+  writeErr(w,http.StatusConflict,"receiving company does not match configured company");return
+ }
  // The receiving company is configured by the administrator, never by the sender.
  r.SetPathValue("id",strconv.FormatInt(id,10))
  s.importPurgeIntel(w,r)
