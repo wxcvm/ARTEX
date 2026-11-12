@@ -63,7 +63,10 @@ func Open(dir string) (*KB, error) {
 		}
 		return nil, err
 	}
-	dsn := fmt.Sprintf("file:%s?mode=ro&_pragma=busy_timeout(2000)", filepath.ToSlash(path))
+	// Escape URI delimiters before adding connection options. In particular a
+	// literal # must not truncate the file name or discard mode=ro.
+	uriPath := strings.NewReplacer("%", "%25", "?", "%3F", "#", "%23").Replace(filepath.ToSlash(path))
+	dsn := fmt.Sprintf("file:%s?mode=ro&_pragma=busy_timeout(2000)", uriPath)
 	db, err := sql.Open("sqlite", dsn)
 	if err != nil {
 		return nil, err
@@ -72,8 +75,24 @@ func Open(dir string) (*KB, error) {
 		db.Close()
 		return nil, err
 	}
+	// Ping only proves that this is a readable SQLite file, not that either
+	// knowledge tool can use it. Prepare the complete read contract without
+	// loading bodies or changing the source database.
+	rows, err := db.Query(`SELECT id, title, category, kind, tags, verified, description, usage, content FROM poc LIMIT 0`)
+	if err != nil {
+		db.Close()
+		return nil, fmt.Errorf("knowledge base schema: %w", err)
+	}
+	if err := rows.Close(); err != nil {
+		db.Close()
+		return nil, fmt.Errorf("knowledge base schema: %w", err)
+	}
 	k := &KB{db: db, path: path}
-	k.fts = k.hasFTS()
+	k.fts, err = k.hasFTS()
+	if err != nil {
+		db.Close()
+		return nil, fmt.Errorf("knowledge base index: %w", err)
+	}
 	return k, nil
 }
 
@@ -91,12 +110,12 @@ func (k *KB) Close() error {
 	return k.db.Close()
 }
 
-func (k *KB) hasFTS() bool {
+func (k *KB) hasFTS() (bool, error) {
 	var n int
 	if err := k.db.QueryRow(`SELECT count(*) FROM sqlite_master WHERE name = 'poc_fts'`).Scan(&n); err != nil {
-		return false
+		return false, err
 	}
-	return n > 0
+	return n > 0, nil
 }
 
 // ftsQuery turns free text into an FTS5 AND query: every whitespace-separated
@@ -172,7 +191,7 @@ func (k *KB) searchFTS(match string, limit int) ([]Hit, error) {
 		`SELECT p.id, p.title, IFNULL(p.category,''), IFNULL(p.kind,''), IFNULL(p.tags,''),
 		        IFNULL(p.verified,0), substr(IFNULL(p.content,''),1,240)
 		   FROM poc_fts f JOIN poc p ON p.id = f.poc_id
-		  WHERE poc_fts MATCH ? ORDER BY rank LIMIT ?`, match, limit)
+		  WHERE poc_fts MATCH ? ORDER BY rank, p.id LIMIT ?`, match, limit)
 	if err != nil {
 		return nil, err
 	}
@@ -181,13 +200,16 @@ func (k *KB) searchFTS(match string, limit int) ([]Hit, error) {
 }
 
 func (k *KB) searchLike(q string, limit int) ([]Hit, error) {
-	like := "%" + q + "%"
+	// Search accepts literal text, matching the phrase-based FTS path. Escape
+	// the escape character too, so adding ESCAPE cannot change backslash input.
+	literal := strings.NewReplacer(`\`, `\\`, `%`, `\%`, `_`, `\_`).Replace(q)
+	like := "%" + literal + "%"
 	rows, err := k.db.Query(
 		`SELECT id, title, IFNULL(category,''), IFNULL(kind,''), IFNULL(tags,''),
 		        IFNULL(verified,0), substr(IFNULL(content,''),1,240)
 		   FROM poc
-		  WHERE title LIKE ? OR IFNULL(description,'') LIKE ? OR IFNULL(content,'') LIKE ?
-		  LIMIT ?`, like, like, like, limit)
+		  WHERE title LIKE ? ESCAPE '\' OR IFNULL(description,'') LIKE ? ESCAPE '\' OR IFNULL(content,'') LIKE ? ESCAPE '\'
+		  ORDER BY id LIMIT ?`, like, like, like, limit)
 	if err != nil {
 		return nil, err
 	}

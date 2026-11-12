@@ -4,11 +4,23 @@ All notable changes to this project are documented in this file. The format is b
 
 ## [Unreleased]
 
+## [0.4.1] - 2026-11-11
+
+### Fixed
+
+- **Read-only knowledge paths**: preserve literal `#`, `%` and `?` characters in SQLite file URIs, so the opened database matches the configured path and read-only options are retained.
+- **Literal knowledge search**: escape `%`, `_` and backslashes in LIKE fallback queries; sort LIKE results by id and equal-rank FTS results by id for repeatable limited results.
+- **Knowledge startup validation**: reject an existing SQLite file that lacks the `poc` table or any required read column; propagate index-discovery errors instead of advertising an unusable knowledge base.
+- **Desktop recovery**: retain the mainline WebView2/React error recovery, stalled navigation diagnostics, window restore and fullscreen fixes.
+
 ### Added
+
+- **Native Windows distribution**: portable desktop ZIP and installer, a first-run database setup flow, and an in-app Chinese user guide. Existing configuration and edited skills are preserved by the installer upgrade path.
+- **Knowledge regression coverage**: literal-query, special-directory, incomplete-schema and stable-order fixtures, with repeated Linux race checks and Windows checks in CI.
 
 - **Knowledge layer shipped in-repo** (`knowledge/`): a 448-entry SQLite ledger (`knowledge.db`, FTS5) plus 429 per-entry POC/playbook directories, the 14 agent role prompts and the 4 armor presets, six operator runbooks (`knowledge/ops/`), deployment defaults (`knowledge/prompts/config/`) and a weapon manifest that indexes 197 tools without committing any binaries. Desensitised on import: public IPv4 → `203.0.113.x`, non-allowlisted hosts → `<target>`, local user paths → `<HOME>`.
 - **43 additional skills** (`skills/`), including the `chains-*` decision-chain sets (`chains-web/ad/priv/recon/app/meta/pivot/rev/pwn`, 52 reference documents).
-- **`patches/0002-knowledge-runtime.patch`**: optional runtime that makes `knowledge/` consumable by the engine — `knowledge_dir` / `ARTEX_KB_DIR` config, a read-only `kb` package over `knowledge.db` with FTS5 `AND` → `OR` → `LIKE` degradation, and the `kb_search` / `kb_get` tools bound to planner and worker. Not applied: needs `go build` validation.
+- **Read-only knowledge runtime**: `knowledge_dir` / `ARTEX_KB_DIR` configuration, SQLite FTS5 `AND` → `OR` → `LIKE` fallback, and `kb_search` / `kb_get` tools are integrated into the runtime. The Windows desktop bundle includes `knowledge/knowledge.db`; command-line archives require the configured knowledge directory to be supplied separately. `patches/0002-knowledge-runtime.patch` is retained as reference material, not a required install step.
 - **`patches/0001-guard-hooks.patch`**: wires `Guard` hooks into `Planner` and `MainAgent`. Both hold `actool.DefaultTools()` (which includes Bash) but were never gated, so the intercept rules, human approval and the LLM reviewer never saw their shell calls. Not applied: needs `go build` validation.
 - **`knowledge/tools/kb_check.py`** + `tools/scan_sensitive.py`: corpus health (ledger/FTS consistency is the only blocking check) and an import-time guard against leaking public IPs, local user paths or customer data files.
 

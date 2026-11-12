@@ -4,6 +4,7 @@ param(
 )
 
 $ErrorActionPreference = "Stop"
+$Version = $Version -replace '^v(?=\d)', ''
 $root = (Resolve-Path (Join-Path $PSScriptRoot "../..")).Path
 $stage = Join-Path $root (Join-Path $OutputDir "ARTEX-Windows-Desktop-amd64")
 $dist = Join-Path $root $OutputDir

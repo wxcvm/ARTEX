@@ -6,6 +6,10 @@ param(
 )
 
 $ErrorActionPreference = "Stop"
+# Match build.sh: tags may start with v, binary versions do not.
+$Version = $Version -replace '^v(?=\d)', ''
+# CI uses labels such as preview/dev; assembly versions must remain numeric.
+$assemblyVersion = if ($Version -match '^(\d+\.\d+\.\d+)(?:[-+].*)?$') { $Matches[1] } else { '0.0.0' }
 $root = (Resolve-Path (Join-Path $PSScriptRoot "../..")).Path
 Set-Location $root
 
@@ -77,7 +81,7 @@ $env:CGO_ENABLED = "0"
 if ($LASTEXITCODE -ne 0) { throw "Go backend build failed" }
 
 # A native Windows window powered by WebView2, not an Edge app shortcut.
-& dotnet publish (Join-Path $root "desktop/windows/ARTEX.Desktop.csproj") -c Release -r win-x64 --self-contained true -p:PublishSingleFile=true -p:IncludeNativeLibrariesForSelfExtract=true -o $stage
+& dotnet publish (Join-Path $root "desktop/windows/ARTEX.Desktop.csproj") -c Release -r win-x64 --self-contained true -p:PublishSingleFile=true -p:IncludeNativeLibrariesForSelfExtract=true "-p:Version=$assemblyVersion" "-p:InformationalVersion=$Version" -o $stage
 if ($LASTEXITCODE -ne 0) { throw "Windows desktop publish failed" }
 
 Copy-Item -Path (Join-Path $root "skills") -Destination (Join-Path $stage "skills") -Recurse -Force
