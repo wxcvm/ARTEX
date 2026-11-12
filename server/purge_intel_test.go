@@ -72,6 +72,7 @@ func TestPurgeIntelDatabaseRoundTrip(t *testing.T) {
  mux.HandleFunc("POST /api/companies/{id}/purge-intel",s.importPurgeIntel)
  mux.HandleFunc("GET /api/companies/{id}/purge-intel",s.listPurgeIntel)
  mux.HandleFunc("GET /api/companies/{id}/purge-intel/{snapshot}",s.getPurgeIntel)
+ mux.HandleFunc("POST /api/purge/intel-bridge",s.importPurgeIntelBridge)
  h:=s.requireAuth(mux)
  token,err:=signJWT(s.jwtKey);if err!=nil{t.Fatal(err)}
  path:=fmt.Sprintf("/api/companies/%d/purge-intel",id)
@@ -92,6 +93,54 @@ func TestPurgeIntelDatabaseRoundTrip(t *testing.T) {
  var count int
  if err:=d.QueryRow("SELECT count(*) FROM purge_intel_snapshots WHERE company_id=$1",id).Scan(&count);err!=nil||count!=1{t.Fatalf("snapshot count %d: %v",count,err)}
  if err:=d.QueryRow("SELECT count(*) FROM assets WHERE company_id=$1",id).Scan(&count);err!=nil||count!=0{t.Fatalf("verified assets changed: %d %v",count,err)}
+ // The direct bridge reuses the validated import path and the same snapshot.
+ const secret="fixture-only-long-intelligence-token-123"
+ t.Setenv("ARTEX_PURGE_INTEL_TOKEN",secret)
+ t.Setenv("ARTEX_PURGE_INTEL_COMPANY_ID",fmt.Sprint(id))
+ bridge:=func(company string)*httptest.ResponseRecorder{
+  payload,_:=json.Marshal(b)
+  r:=httptest.NewRequest("POST","/api/purge/intel-bridge",strings.NewReader(string(payload)))
+  r.Header.Set("X-Artex-Purge-Intel-Token",secret)
+  r.Header.Set("X-Artex-Purge-Intel-Company",company)
+  w:=httptest.NewRecorder();h.ServeHTTP(w,r);return w
+ }
+ if w=bridge(fmt.Sprint(id+1));w.Code!=409{t.Fatalf("mismatched company: %d",w.Code)}
+ if w=bridge(fmt.Sprint(id));w.Code!=200{t.Fatalf("bridge import: %d %s",w.Code,w.Body.String())}
+ if err:=d.QueryRow("SELECT count(*) FROM purge_intel_snapshots WHERE company_id=$1",id).Scan(&count);err!=nil||count!=1{t.Fatalf("bridge duplicated snapshot: %d %v",count,err)}
  b.IPs[0].IP="198.51.100.1"
  if w=request("POST",path,b);w.Code!=400{t.Fatal("out-of-scope import accepted")}
+}
+
+func TestPurgeIntelBridgeCredentialIsolation(t *testing.T) {
+ const secret="fixture-only-long-intelligence-token-123"
+ t.Setenv("ARTEX_PURGE_INTEL_TOKEN",secret)
+ t.Setenv("ARTEX_PURGE_INTEL_COMPANY_ID","12")
+ t.Setenv("ARTEX_PRIVACY_BRIDGE_TOKEN","listener-test")
+ t.Setenv("ARTEX_PRIVACY_OVERVIEW_TOKEN","overview-test")
+ t.Setenv("ARTEX_SETUP_TOKEN","setup-test")
+ s:=&Server{jwtKey:[]byte("01234567890123456789012345678901")}
+ mux:=http.NewServeMux()
+ mux.HandleFunc("POST /api/purge/intel-bridge",s.importPurgeIntelBridge)
+ mux.HandleFunc("POST /api/companies/{id}/purge-intel",s.importPurgeIntel)
+ h:=s.requireAuth(mux)
+ req:=func(method,path,token,company string)int{
+  r:=httptest.NewRequest(method,path,nil)
+  r.Header.Set("X-Artex-Purge-Intel-Token",token)
+  r.Header.Set("X-Artex-Purge-Intel-Company",company)
+  w:=httptest.NewRecorder();h.ServeHTTP(w,r);return w.Code
+ }
+ for _,tc:=range []struct{method,path,token,company string}{
+  {"POST","/api/purge/intel-bridge","","12"},
+  {"POST","/api/purge/intel-bridge","listener-test","12"},
+  {"POST","/api/purge/intel-bridge","overview-test","12"},
+  {"GET","/api/purge/intel-bridge",secret,"12"},
+  {"POST","/api/companies/12/purge-intel",secret,"12"},
+ } {if got:=req(tc.method,tc.path,tc.token,tc.company);got!=401{t.Fatalf("unexpected authorization %d",got)}}
+ if got:=req("POST","/api/purge/intel-bridge",secret,"13");got!=409{t.Fatalf("company mismatch %d",got)}
+ if got:=req("POST","/api/purge/intel-bridge",secret,"12");got!=503{t.Fatalf("expected DB unavailable, got %d",got)}
+ t.Setenv("ARTEX_PRIVACY_BRIDGE_TOKEN",secret)
+ if validPurgeIntelBridgeCredential(secret){t.Fatal("reused read-only token accepted")}
+ t.Setenv("ARTEX_PRIVACY_BRIDGE_TOKEN","listener-test")
+ t.Setenv("ARTEX_PURGE_INTEL_COMPANY_ID","")
+ if validPurgeIntelBridgeCredential(secret){t.Fatal("unbound token accepted")}
 }
