@@ -368,6 +368,7 @@ CREATE TABLE IF NOT EXISTS llm_profiles (
     proxy            TEXT,
     model            TEXT NOT NULL,
     api_key          TEXT,
+    api_key_ciphertext TEXT,
     api_key_hint     TEXT,
     rate_per_second  DOUBLE PRECISION NOT NULL DEFAULT 0,
     rate_per_minute  DOUBLE PRECISION NOT NULL DEFAULT 0,
@@ -413,6 +414,8 @@ CREATE UNIQUE INDEX IF NOT EXISTS uq_llm_one_default ON llm_profiles(is_default)
 DROP TRIGGER IF EXISTS trg_llm_upd ON llm_profiles;
 CREATE TRIGGER trg_llm_upd BEFORE UPDATE ON llm_profiles
     FOR EACH ROW EXECUTE FUNCTION set_updated_at();
+-- Optional application-level encryption; existing plaintext rows remain compatible.
+ALTER TABLE llm_profiles ADD COLUMN IF NOT EXISTS api_key_ciphertext TEXT;
 -- Rotation order/exclusion flags; backfills old databases. Default 0 / false = every profile joins the rotation.
 ALTER TABLE llm_profiles ADD COLUMN IF NOT EXISTS priority     INTEGER NOT NULL DEFAULT 0;
 ALTER TABLE llm_profiles ADD COLUMN IF NOT EXISTS pool_exclude BOOLEAN NOT NULL DEFAULT false;
