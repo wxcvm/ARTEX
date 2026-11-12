@@ -115,3 +115,14 @@ func (s *Server) privacyOverview(w http.ResponseWriter, r *http.Request) {
 	w.Header().Set("Cache-Control", "no-store")
 	writeJSON(w, http.StatusOK, s.privacyOverviewSnapshot(r.Context()))
 }
+
+// privacyBridgeOverview uses the same aggregate snapshot as the administrator
+// overview, but only the separately scoped opt-in credential can read it.
+func (s *Server) privacyBridgeOverview(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Cache-Control", "no-store")
+	writeJSON(w, http.StatusOK, struct {
+		Service string `json:"service"`
+		SchemaVersion int `json:"schema_version"`
+		Overview PrivacyOverview `json:"overview"`
+	}{Service: "artex", SchemaVersion: 1, Overview: s.privacyOverviewSnapshot(r.Context())})
+}
