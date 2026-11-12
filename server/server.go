@@ -774,6 +774,7 @@ func (s *Server) Handler() http.Handler {
 
 	// asset system
 	mux.HandleFunc("POST /api/companies/{id}/purge-intel", s.importPurgeIntel)
+	mux.HandleFunc("POST /api/purge/intel-bridge", s.importPurgeIntelBridge)
 	mux.HandleFunc("GET /api/companies/{id}/purge-intel", s.listPurgeIntel)
 	mux.HandleFunc("GET /api/companies/{id}/purge-intel/{snapshot}", s.getPurgeIntel)
 	mux.HandleFunc("GET /api/assets", s.listAssets)
