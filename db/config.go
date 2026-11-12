@@ -240,6 +240,13 @@ VALUES ($1,$2,NULLIF($3,''),NULLIF($4,''),$5,NULLIF($6,''),NULLIF($7,''),$8,$9,$
 		return p.ID, err
 	}
 	if affected == 0 {
+		var exists bool
+		if err := d.QueryRow("SELECT EXISTS(SELECT 1 FROM llm_profiles WHERE id=$1)", p.ID).Scan(&exists); err != nil {
+			return p.ID, err
+		}
+		if !exists {
+			return p.ID, ErrLLMProfileNotFound
+		}
 		return p.ID, errProfileSecretDowngrade
 	}
 	_, err = d.saveProfilePrices(p.ID, p)
