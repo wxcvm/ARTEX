@@ -6,11 +6,14 @@ import (
 	"strings"
 )
 
-// ExposureStatus describes the configured HTTP listener, not an internet scan.
-// Firewalls, NAT, Docker port publication and reverse proxies are outside what
-// this process can establish by inspecting its listener address.
+// ExposureStatus describes the HTTP listener inside the process's current network
+// namespace, not an internet scan. Host firewalls, NAT, Docker port publication
+// and reverse proxies are outside this assessment.
 type ExposureStatus struct {
 	ListenAddress      string `json:"listen_address"`
+	ConfiguredAddress  string `json:"configured_address"`
+	BoundAddress       string `json:"bound_address,omitempty"`
+	BindingSource      string `json:"binding_source"`
 	Scope              string `json:"scope"`
 	PublicReachability string `json:"public_reachability"`
 	Detail             string `json:"detail"`
@@ -59,6 +62,23 @@ func (s *Server) SetListenAddress(address string) {
 	s.listenAddress = address
 }
 
+// SetBoundListenAddress records net.Listener.Addr().String() once, before serving.
+// Unlike the configured address, it includes the OS-selected port and IP.
+func (s *Server) SetBoundListenAddress(address string) {
+	s.boundListenAddress = address
+}
+
 func (s *Server) exposureStatus(w http.ResponseWriter, _ *http.Request) {
-	writeJSON(w, http.StatusOK, classifyListener(s.listenAddress))
+	address, source := s.listenAddress, "not_inspected"
+	if address != "" {
+		source = "configured"
+	}
+	if s.boundListenAddress != "" {
+		address, source = s.boundListenAddress, "runtime_listener"
+	}
+	status := classifyListener(address)
+	status.ConfiguredAddress = s.listenAddress
+	status.BoundAddress = s.boundListenAddress
+	status.BindingSource = source
+	writeJSON(w, http.StatusOK, status)
 }
