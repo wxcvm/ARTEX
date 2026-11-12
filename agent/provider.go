@@ -523,7 +523,9 @@ func quotaAwareHTTPClient(proxy, sessionHeaderKey, userAgent string) (*http.Clie
 		}
 		transport.Proxy = http.ProxyURL(proxyURL)
 	}
-	return &http.Client{Transport: quotaAwareTransport{base: transport, sessionHeaderKey: strings.TrimSpace(sessionHeaderKey), userAgent: strings.TrimSpace(userAgent)}}, nil
+	// Audit the original HTTP result before quota normalization, without consuming bodies.
+	audited := modelAuditTransport{base: transport, audit: outboundAudit, proxyConfigured: proxy != ""}
+	return &http.Client{Transport: quotaAwareTransport{base: audited, sessionHeaderKey: strings.TrimSpace(sessionHeaderKey), userAgent: strings.TrimSpace(userAgent)}}, nil
 }
 
 // ValidateUserAgent trims the optional header value. HTTP header values must
