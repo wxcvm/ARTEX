@@ -1500,6 +1500,8 @@ function ArchiveConfirmDialog({
   trigger: React.ReactNode;
   onConfirm: () => Promise<void>;
 }) {
+  const locale = useUiLocale();
+  const t = (zh: string, en: string) => uiText(locale, zh, en);
   const [open, setOpen] = React.useState(false);
   const [pending, setPending] = React.useState(false);
   return (
@@ -1507,13 +1509,13 @@ function ArchiveConfirmDialog({
       <AlertDialogTrigger asChild>{trigger}</AlertDialogTrigger>
       <AlertDialogContent>
         <AlertDialogHeader>
-          <AlertDialogTitle>{count === 1 ? "归档任务" : `归档 ${count} 个任务`}</AlertDialogTitle>
+          <AlertDialogTitle>{count === 1 ? t("归档任务", "Archive task") : t(`归档 ${count} 个任务`, `Archive ${count} tasks`)}</AlertDialogTitle>
           <AlertDialogDescription className="[overflow-wrap:anywhere]">
-            归档会停止任务调度，并将图谱、模型历史、文件、独占资产和流量压缩到本地冷存储。归档后可在「已归档」中恢复任务。
+            {t("归档会停止任务调度，并将图谱、模型历史、文件、独占资产和流量压缩到本地冷存储。归档后可在「已归档」中恢复任务。", "Archiving stops scheduling and compresses graphs, model history, files, exclusive assets and traffic into local cold storage. Restore from Archived tasks.")}
           </AlertDialogDescription>
         </AlertDialogHeader>
         <AlertDialogFooter>
-          <AlertDialogCancel disabled={pending}>取消</AlertDialogCancel>
+          <AlertDialogCancel disabled={pending}>{t("取消", "Cancel")}</AlertDialogCancel>
           <AlertDialogAction
             disabled={pending}
             onClick={async (event) => {
@@ -1528,7 +1530,7 @@ function ArchiveConfirmDialog({
             }}
           >
             {pending && <Spinner data-icon="inline-start" />}
-            确认归档
+            {t("确认归档", "Confirm archive")}
           </AlertDialogAction>
         </AlertDialogFooter>
       </AlertDialogContent>
@@ -1537,9 +1539,11 @@ function ArchiveConfirmDialog({
 }
 
 function TaskArchiveAction({ task, onArchive }: { task: Task; onArchive: (task: Task) => Promise<void> }) {
+  const locale = useUiLocale();
+  const t = (zh: string, en: string) => uiText(locale, zh, en);
   const reason = archiveBlockReason(task);
   const trigger = (
-    <Button size="icon" variant="ghost" disabled={Boolean(reason)} aria-label={`归档任务 #${task.id}`}>
+    <Button size="icon" variant="ghost" disabled={Boolean(reason)} aria-label={t(`归档任务 #${task.id}`, `Archive task #${task.id}`)}>
       <ArchiveIcon />
     </Button>
   );
@@ -1567,7 +1571,7 @@ const ARCHIVE_PROCESSING_STATES = new Set<TaskArchiveState>([
 
 const ARCHIVE_FAILED_STATES = new Set<TaskArchiveState>(["archive_failed", "restore_failed", "delete_failed"]);
 
-function archiveStateLabel(state: TaskArchiveState): string {
+function archiveStateLabel(state: TaskArchiveState, locale: "zh-CN" | "en" = "zh-CN"): string {
   const labels: Record<TaskArchiveState, string> = {
     archive_queued: "Archive queued",
     archiving: "Archiving",
@@ -1580,15 +1584,17 @@ function archiveStateLabel(state: TaskArchiveState): string {
     deleting: "Deleting",
     delete_failed: "Delete failed",
   };
-  return labels[state];
+  const zh: Record<TaskArchiveState, string> = { archive_queued: "等待归档", archiving: "正在归档", archive_failed: "归档失败", ready: "可恢复", restore_queued: "等待恢复", restoring: "正在恢复", restore_failed: "恢复失败", delete_queued: "等待删除", deleting: "正在删除", delete_failed: "删除失败" };
+  return locale === "en" ? labels[state] : zh[state];
 }
 
 function ArchiveStateBadge({ state }: { state: TaskArchiveState }) {
+  const locale = useUiLocale();
   let variant: "default" | "secondary" | "destructive" | "outline" = "outline";
   if (state === "ready") variant = "secondary";
   if (ARCHIVE_PROCESSING_STATES.has(state)) variant = "default";
   if (ARCHIVE_FAILED_STATES.has(state)) variant = "destructive";
-  return <Badge variant={variant}>{archiveStateLabel(state)}</Badge>;
+  return <Badge variant={variant}>{archiveStateLabel(state, locale)}</Badge>;
 }
 
 function formatArchiveBytes(bytes: number): string {
@@ -1599,21 +1605,21 @@ function formatArchiveBytes(bytes: number): string {
   return `${bytes} B`;
 }
 
-function archiveCompressionLabel(archive: TaskArchive): string {
+function archiveCompressionLabel(archive: TaskArchive, locale: "zh-CN" | "en"): string {
   if (archive.original_size <= 0 || archive.compressed_size <= 0) return "—";
   const saved = Math.max(0, 100 - (archive.compressed_size / archive.original_size) * 100);
-  return `${formatArchiveBytes(archive.compressed_size)} · saves ${saved.toFixed(0)}%`;
+  return uiText(locale, `${formatArchiveBytes(archive.compressed_size)} · 节省 ${saved.toFixed(0)}%`, `${formatArchiveBytes(archive.compressed_size)} · saves ${saved.toFixed(0)}%`);
 }
 
 function archiveDataTotal(archive: TaskArchive): number {
   return Object.values(archive.data_counts).reduce((sum, value) => sum + (Number(value) || 0), 0);
 }
 
-function archiveDate(value?: string): string {
+function archiveDate(value: string | undefined, locale: "zh-CN" | "en"): string {
   if (!value) return "—";
   const date = new Date(value);
   if (Number.isNaN(date.getTime())) return "—";
-  return date.toLocaleString();
+  return date.toLocaleString(locale);
 }
 
 function ArchiveDeleteDialog({
@@ -1625,6 +1631,8 @@ function ArchiveDeleteDialog({
   onConfirm: () => Promise<void>;
   trigger: React.ReactNode;
 }) {
+  const locale = useUiLocale();
+  const t = (zh: string, en: string) => uiText(locale, zh, en);
   const [open, setOpen] = React.useState(false);
   const [pending, setPending] = React.useState(false);
   const rows = archives.reduce((sum, archive) => sum + archiveDataTotal(archive), 0);
@@ -1634,13 +1642,13 @@ function ArchiveDeleteDialog({
       <AlertDialogTrigger asChild>{trigger}</AlertDialogTrigger>
       <AlertDialogContent>
         <AlertDialogHeader>
-          <AlertDialogTitle>永久删除 {archives.length} 个任务归档？</AlertDialogTitle>
+          <AlertDialogTitle>{t(`永久删除 ${archives.length} 个任务归档？`, `Permanently delete ${archives.length} task archives?`)}</AlertDialogTitle>
           <AlertDialogDescription className="[overflow-wrap:anywhere]">
-            About {formatArchiveBytes(bytes)} of archive packages and {rows.toLocaleString()} related data snapshots will be permanently deleted. This action cannot be undone.
+            {t(`约 ${formatArchiveBytes(bytes)} 的归档包及 ${rows.toLocaleString()} 条关联数据快照将永久删除。此操作无法撤销。`, `About ${formatArchiveBytes(bytes)} of archives and ${rows.toLocaleString()} data snapshots will be permanently deleted. This cannot be undone.`)}
           </AlertDialogDescription>
         </AlertDialogHeader>
         <AlertDialogFooter>
-          <AlertDialogCancel disabled={pending}>取消</AlertDialogCancel>
+          <AlertDialogCancel disabled={pending}>{t("取消", "Cancel")}</AlertDialogCancel>
           <AlertDialogAction
             variant="destructive"
             disabled={pending}
@@ -1656,7 +1664,7 @@ function ArchiveDeleteDialog({
             }}
           >
             {pending && <Spinner data-icon="inline-start" />}
-            永久删除
+            {t("永久删除", "Permanently delete")}
           </AlertDialogAction>
         </AlertDialogFooter>
       </AlertDialogContent>
@@ -1665,6 +1673,8 @@ function ArchiveDeleteDialog({
 }
 
 function TaskArchivesPanel({ onChanged }: { onChanged: () => void }) {
+  const locale = useUiLocale();
+  const t = (zh: string, en: string) => uiText(locale, zh, en);
   const [archives, setArchives] = React.useState<TaskArchive[]>([]);
   const [query, setQuery] = React.useState("");
   const [stateFilter, setStateFilter] = React.useState("all");
@@ -1702,7 +1712,7 @@ function TaskArchivesPanel({ onChanged }: { onChanged: () => void }) {
         if (restored) onChanged();
       }
     } catch (error) {
-      toast.error(`加载归档列表失败：${(error as Error).message}`);
+      toast.error(`${t("加载归档列表失败：", "Failed to load archives: ")}${(error as Error).message}`);
     } finally {
       setLoading(false);
     }
@@ -1758,11 +1768,11 @@ function TaskArchivesPanel({ onChanged }: { onChanged: () => void }) {
         const archiveID = Number(item.archive_id ?? item.id);
         if (item.ok && Number.isSafeInteger(archiveID) && archiveID > 0) pendingRestoreIDs.current.add(archiveID);
       }
-      if (succeeded > 0) toast.success(`已将 ${succeeded} 个任务加入恢复队列`);
-      if (failed > 0) toast.error(`${failed} 个任务无法恢复`);
+      if (succeeded > 0) toast.success(t(`已将 ${succeeded} 个任务加入恢复队列`, `Queued ${succeeded} tasks for restoration`));
+      if (failed > 0) toast.error(t(`${failed} 个任务无法恢复`, `${failed} tasks could not be restored`));
       afterAction();
     } catch (error) {
-      toast.error(`恢复失败：${(error as Error).message}`);
+      toast.error(`${t("恢复失败：", "Restore failed: ")}${(error as Error).message}`);
     }
   }
 
@@ -1783,11 +1793,11 @@ function TaskArchivesPanel({ onChanged }: { onChanged: () => void }) {
           : await api.deleteTaskArchives(items.map((archive) => archive.id));
       const succeeded = result.items.filter((item) => item.ok).length;
       const failed = result.items.length - succeeded;
-      if (succeeded > 0) toast.success(`已将 ${succeeded} 个归档加入永久删除队列`);
-      if (failed > 0) toast.error(`${failed} 个归档无法删除`);
+      if (succeeded > 0) toast.success(t(`已将 ${succeeded} 个归档加入永久删除队列`, `Queued ${succeeded} archives for permanent deletion`));
+      if (failed > 0) toast.error(t(`${failed} 个归档无法删除`, `${failed} archives could not be deleted`));
       afterAction();
     } catch (error) {
-      toast.error(`永久删除失败：${(error as Error).message}`);
+      toast.error(`${t("永久删除失败：", "Permanent deletion failed: ")}${(error as Error).message}`);
       throw error;
     }
   }
@@ -1797,10 +1807,10 @@ function TaskArchivesPanel({ onChanged }: { onChanged: () => void }) {
       if (archive.state === "archive_failed") await api.archiveTask(String(archive.task_id));
       if (archive.state === "restore_failed") await api.restoreTaskArchive(archive.id);
       if (archive.state === "delete_failed") await api.deleteTaskArchive(archive.id);
-      toast.success("已重新加入处理队列");
+      toast.success(t("已重新加入处理队列", "Requeued for processing"));
       afterAction();
     } catch (error) {
-      toast.error(`重试失败：${(error as Error).message}`);
+      toast.error(`${t("重试失败：", "Retry failed: ")}${(error as Error).message}`);
     }
   }
 
@@ -1816,7 +1826,7 @@ function TaskArchivesPanel({ onChanged }: { onChanged: () => void }) {
                 setQuery(event.target.value);
                 setPage(1);
               }}
-              placeholder="搜索任务名称、描述或 ID"
+              placeholder={t("搜索任务名称、描述或 ID", "Search task names, descriptions or IDs")}
               className="pl-8"
             />
           </div>
@@ -1828,32 +1838,32 @@ function TaskArchivesPanel({ onChanged }: { onChanged: () => void }) {
             }}
           >
             <SelectTrigger className="w-36">
-              <SelectValue placeholder="状态" />
+              <SelectValue placeholder={t("状态", "Status")} />
             </SelectTrigger>
             <SelectContent>
               <SelectGroup>
-                <SelectItem value="all">全部状态</SelectItem>
-                <SelectItem value="archive_queued">等待归档</SelectItem>
-                <SelectItem value="archiving">正在归档</SelectItem>
-                <SelectItem value="ready">可恢复</SelectItem>
-                <SelectItem value="restore_queued">等待恢复</SelectItem>
-                <SelectItem value="restoring">正在恢复</SelectItem>
-                <SelectItem value="delete_queued">等待删除</SelectItem>
-                <SelectItem value="deleting">正在删除</SelectItem>
-                <SelectItem value="archive_failed">归档失败</SelectItem>
-                <SelectItem value="restore_failed">恢复失败</SelectItem>
-                <SelectItem value="delete_failed">删除失败</SelectItem>
+                <SelectItem value="all">{t("全部状态", "All statuses")}</SelectItem>
+                <SelectItem value="archive_queued">{t("等待归档", "Archive queued")}</SelectItem>
+                <SelectItem value="archiving">{t("正在归档", "Archiving")}</SelectItem>
+                <SelectItem value="ready">{t("可恢复", "Restorable")}</SelectItem>
+                <SelectItem value="restore_queued">{t("等待恢复", "Restore queued")}</SelectItem>
+                <SelectItem value="restoring">{t("正在恢复", "Restoring")}</SelectItem>
+                <SelectItem value="delete_queued">{t("等待删除", "Delete queued")}</SelectItem>
+                <SelectItem value="deleting">{t("正在删除", "Deleting")}</SelectItem>
+                <SelectItem value="archive_failed">{t("归档失败", "Archive failed")}</SelectItem>
+                <SelectItem value="restore_failed">{t("恢复失败", "Restore failed")}</SelectItem>
+                <SelectItem value="delete_failed">{t("删除失败", "Delete failed")}</SelectItem>
               </SelectGroup>
             </SelectContent>
           </Select>
-          <span className="text-muted-foreground text-xs tabular-nums">{total} archives</span>
+          <span className="text-muted-foreground text-xs tabular-nums">{t(`${total} 个归档`, `${total} archives`)}</span>
           {selectedArchives.length > 0 && (
             <>
-              <span className="text-xs tabular-nums">{selectedArchives.length} selected</span>
+              <span className="text-xs tabular-nums">{t(`已选择 ${selectedArchives.length} 项`, `${selectedArchives.length} selected`)}</span>
               {restorable.length > 0 && (
                 <Button size="sm" variant="outline" onClick={() => void restoreMany(restorable)}>
                   <Undo2Icon data-icon="inline-start" />
-                  Restore {restorable.length}
+                  {t("恢复", "Restore")} {restorable.length}
                 </Button>
               )}
               {deletable.length > 0 && (
@@ -1863,7 +1873,7 @@ function TaskArchivesPanel({ onChanged }: { onChanged: () => void }) {
                   trigger={
                     <Button size="sm" variant="destructive">
                       <Trash2Icon data-icon="inline-start" />
-                      Permanently delete {deletable.length}
+                      {t("永久删除", "Permanently delete")} {deletable.length}
                     </Button>
                   }
                 />
@@ -1878,8 +1888,8 @@ function TaskArchivesPanel({ onChanged }: { onChanged: () => void }) {
         ) : archives.length === 0 ? (
           <Empty className="mx-4 border border-dashed lg:mx-6">
             <EmptyHeader>
-              <EmptyTitle>No task archives</EmptyTitle>
-              <EmptyDescription>Paused or terminal tasks can be archived from the current task list.</EmptyDescription>
+              <EmptyTitle>{t("暂无任务归档", "No task archives")}</EmptyTitle>
+              <EmptyDescription>{t("可在当前任务列表中归档已暂停或已结束的任务。", "Paused or terminal tasks can be archived from the current task list.")}</EmptyDescription>
             </EmptyHeader>
           </Empty>
         ) : (
@@ -1892,17 +1902,17 @@ function TaskArchivesPanel({ onChanged }: { onChanged: () => void }) {
                     onCheckedChange={(checked) =>
                       setSelected(checked === true ? new Set(selectable.map((archive) => archive.id)) : new Set())
                     }
-                    aria-label="Select the archives on this page"
+                    aria-label={t("选择本页归档", "Select the archives on this page")}
                   />
                 </TableHead>
-                <TableHead>任务</TableHead>
-                <TableHead>原始状态</TableHead>
-                <TableHead>分类</TableHead>
-                <TableHead>归档时间</TableHead>
-                <TableHead>压缩大小</TableHead>
-                <TableHead>数据记录</TableHead>
-                <TableHead className="min-w-44">状态</TableHead>
-                <TableHead className="text-right">操作</TableHead>
+                <TableHead>{t("任务", "Task")}</TableHead>
+                <TableHead>{t("原始状态", "Original status")}</TableHead>
+                <TableHead>{t("分类", "Category")}</TableHead>
+                <TableHead>{t("归档时间", "Archived at")}</TableHead>
+                <TableHead>{t("压缩大小", "Compressed size")}</TableHead>
+                <TableHead>{t("数据记录", "Data records")}</TableHead>
+                <TableHead className="min-w-44">{t("状态", "Status")}</TableHead>
+                <TableHead className="text-right">{t("操作", "Actions")}</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
@@ -1924,7 +1934,7 @@ function TaskArchivesPanel({ onChanged }: { onChanged: () => void }) {
                             return next;
                           })
                         }
-                        aria-label={`Select task archive #${archive.task_id}`}
+                        aria-label={t(`选择任务归档 #${archive.task_id}`, `Select task archive #${archive.task_id}`)}
                       />
                     </TableCell>
                     <TableCell className="max-w-sm">
@@ -1940,15 +1950,15 @@ function TaskArchivesPanel({ onChanged }: { onChanged: () => void }) {
                     <TableCell>
                       <StatusBadge domain="task" value={archive.original_status} dot />
                     </TableCell>
-                    <TableCell className="text-muted-foreground">{archive.category_name || "Uncategorized"}</TableCell>
+                    <TableCell className="text-muted-foreground">{archive.category_name || t("未分类", "Uncategorized")}</TableCell>
                     <TableCell className="text-muted-foreground whitespace-nowrap text-xs">
-                      {archiveDate(archive.archived_at || archive.requested_at)}
+                      {archiveDate(archive.archived_at || archive.requested_at, locale)}
                     </TableCell>
                     <TableCell
                       className="whitespace-nowrap text-xs"
-                      title={`压缩前：${formatArchiveBytes(archive.original_size)}`}
+                      title={t(`压缩前：${formatArchiveBytes(archive.original_size)}`, `Before compression: ${formatArchiveBytes(archive.original_size)}`)}
                     >
-                      {archiveCompressionLabel(archive)}
+                      {archiveCompressionLabel(archive, locale)}
                     </TableCell>
                     <TableCell className="text-xs tabular-nums">{archiveDataTotal(archive).toLocaleString()}</TableCell>
                     <TableCell>
@@ -1978,8 +1988,8 @@ function TaskArchivesPanel({ onChanged }: { onChanged: () => void }) {
                             size="icon"
                             variant="ghost"
                             onClick={() => void retry(archive)}
-                            aria-label="Retry archive operation"
-                            title="重试"
+                            aria-label={t("重试归档操作", "Retry archive operation")}
+                            title={t("重试", "Retry")}
                           >
                             <Undo2Icon />
                           </Button>
@@ -1989,8 +1999,8 @@ function TaskArchivesPanel({ onChanged }: { onChanged: () => void }) {
                             size="icon"
                             variant="ghost"
                             onClick={() => void restoreMany([archive])}
-                            aria-label="Restore task"
-                            title="恢复任务"
+                            aria-label={t("恢复任务", "Restore task")}
+                            title={t("恢复任务", "Restore task")}
                           >
                             <Undo2Icon />
                           </Button>
@@ -2000,7 +2010,7 @@ function TaskArchivesPanel({ onChanged }: { onChanged: () => void }) {
                             archives={[archive]}
                             onConfirm={() => deleteMany([archive])}
                             trigger={
-                              <Button size="icon" variant="ghost" aria-label="永久删除归档" title="永久删除">
+                              <Button size="icon" variant="ghost" aria-label={t("永久删除归档", "Permanently delete archive")} title={t("永久删除", "Permanently delete")}>
                                 <Trash2Icon />
                               </Button>
                             }
