@@ -1,6 +1,8 @@
 "use client";
 
 import * as React from "react";
+import { useUiLocale } from "@/lib/ui-locale.client";
+import { uiText, type UiLocale } from "@/lib/ui-locale";
 import { AlertCircleIcon, RefreshCwIcon } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
@@ -10,6 +12,8 @@ import { api } from "@/lib/api";
 import type { Edge, TaskNode } from "@/lib/types";
 
 export function GraphTab({ taskId }: { taskId: string }) {
+  const locale = useUiLocale();
+  const tr = (zh: string, en: string) => uiText(locale, zh, en);
   const [nodes, setNodes] = React.useState<TaskNode[]>([]);
   const [edges, setEdges] = React.useState<Edge[]>([]);
   const [loading, setLoading] = React.useState(true);
@@ -70,13 +74,13 @@ export function GraphTab({ taskId }: { taskId: string }) {
     <Card className="min-w-0 gap-0 overflow-hidden rounded-xl border-border/70 bg-card/90 py-0 shadow-sm">
       <CardHeader className="flex flex-wrap items-center justify-between gap-3 border-b border-border/70 px-4 py-4 sm:px-5">
         <div className="min-w-0">
-          <CardTitle className="text-base font-semibold">任务探索图谱</CardTitle>
+          <CardTitle className="text-base font-semibold">{tr("任务探索图谱", "Task exploration graph")}</CardTitle>
           <p className="mt-1 text-xs text-muted-foreground">
-            {loading ? "正在加载图谱…" : `${nodes.length} 个节点 · ${edges.length} 条关系 · 每 20 秒自动更新`}
+            {loading ? tr("正在加载图谱…", "Loading graph…") : tr(`${nodes.length} 个节点 · ${edges.length} 条关系 · 每 20 秒自动更新`, `${nodes.length} nodes · ${edges.length} edges · refreshes every 20s`)}
           </p>
         </div>
         <Button size="sm" variant="outline" disabled={loading} onClick={() => setRefresh((n) => n + 1)}>
-          <RefreshCwIcon className={loading ? "animate-spin" : ""} /> 刷新图谱
+          <RefreshCwIcon className={loading ? "animate-spin" : ""} /> {tr("刷新图谱", "Refresh graph")}
         </Button>
       </CardHeader>
       <CardContent className="min-w-0 p-0">
@@ -84,7 +88,7 @@ export function GraphTab({ taskId }: { taskId: string }) {
           <div role="alert" className="mx-4 mt-3 flex min-w-0 items-start gap-2 rounded-lg border border-amber-500/30 bg-amber-500/10 p-3 text-sm sm:mx-5">
             <AlertCircleIcon className="mt-0.5 size-4 shrink-0 text-amber-500" />
             <div className="min-w-0">
-              <p className="font-medium">{nodes.length ? "图谱更新失败，已保留上次成功加载的内容" : "暂时无法加载任务图谱"}</p>
+              <p className="font-medium">{nodes.length ? tr("图谱更新失败，已保留上次成功加载的内容", "Graph refresh failed; previous data is retained") : tr("暂时无法加载任务图谱", "Unable to load task graph")}</p>
               <p className="mt-1 break-words text-muted-foreground">{error}</p>
             </div>
           </div>
@@ -93,7 +97,7 @@ export function GraphTab({ taskId }: { taskId: string }) {
           nodes={nodes}
           edges={edges}
           className="h-[clamp(22rem,65dvh,52rem)] min-w-0"
-          emptyHint={loading ? "图谱加载中…" : error ? "暂时无法加载图谱，请重试" : "该任务暂时没有探索图谱节点"}
+          emptyHint={loading ? tr("图谱加载中…", "Loading graph…") : error ? tr("暂时无法加载图谱，请重试", "Unable to load graph; retry") : tr("该任务暂时没有探索图谱节点", "No exploration nodes yet")}
         />
       </CardContent>
     </Card>
