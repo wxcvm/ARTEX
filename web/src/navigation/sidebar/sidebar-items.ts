@@ -84,6 +84,8 @@ export const sidebarItems: NavGroup[] = [
     id: 2,
     label: "系统与配置",
     items: [
+      { id: "welcome", title: "开始使用 / 配置引导", url: "/welcome", icon: BookOpen },
+      { id: "knowledge", title: "浏览知识库", url: "/system/knowledge", icon: BookOpen },
       { id: "llm", title: "模型配置", url: "/system/llm", icon: Brain },
       { id: "agents", title: "智能体", url: "/system/agents", icon: Bot },
       { id: "mcp", title: "MCP 服务", url: "/system/mcp", icon: Plug },

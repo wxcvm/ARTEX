@@ -781,6 +781,7 @@ export default function TasksPage() {
 
   return (
     <Tabs value={activeTab} onValueChange={setActiveTab} className="min-w-0 gap-4">
+      <aside className="rounded-lg border bg-muted/20 p-3 text-sm">首次使用：创建任务 → 核对目标与设置 → 自行启动 → 在详情查看进度和报告。<a className="ml-2 text-primary underline" href="/welcome">打开配置引导</a><a className="ml-2 text-primary underline" href="/help#6-第一个任务从创建到查看结果">任务、结果与导出指南</a></aside>
       <div className="flex flex-wrap items-center justify-between gap-4 rounded-2xl border border-border/70 bg-gradient-to-br from-card to-primary/5 px-5 py-5 shadow-sm sm:px-7">
         <div className="min-w-0">
           <p className="mb-1 text-[11px] font-semibold tracking-[0.16em] text-primary">ARTEX / TASKS</p>

@@ -70,3 +70,9 @@ benchmark-results/
 # knowledge base is versioned on purpose (see knowledge/absorb/INDEX.md)
 !/knowledge/knowledge.db
 
+# .NET onboarding/layout test build products
+/tests/**/bin/
+/tests/**/obj/
+/desktop/windows/bin/
+/desktop/windows/obj/
+

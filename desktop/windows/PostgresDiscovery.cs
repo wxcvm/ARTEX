@@ -9,6 +9,20 @@ namespace Artex.Desktop;
 // No authentication or database mutation takes place during discovery.
 internal static class PostgresDiscovery
 {
+    internal static string DescribeLocalInstallation()
+    {
+        using var services = Registry.LocalMachine.OpenSubKey(@"SYSTEM\CurrentControlSet\Services");
+        foreach (var name in InstalledWindowsServices())
+        {
+            using var service = services?.OpenSubKey(name);
+            var command = service?.GetValue("ImagePath") as string ?? "";
+            var match = System.Text.RegularExpressions.Regex.Match(command, "(?:^|\\s)-D\\s+(?:\"([^\"]+)\"|(\\S+))");
+            if (match.Success && !Directory.Exists(match.Groups[1].Success ? match.Groups[1].Value : match.Groups[2].Value))
+                return "找到了 PostgreSQL 程序，但原服务的数据目录不存在；可使用独立新数据库继续，原服务不变。";
+        }
+        return "已发现 PostgreSQL 服务注册信息，但常用端口尚未响应；这不代表账号、密码或目标数据库可用。可自动准备独立新库，或在高级设置检查原服务。";
+    }
+
     internal static async Task<int?> FindLocalPortAsync(CancellationToken cancel = default)
     {
         foreach (var port in new[] { 5432, 5433 })

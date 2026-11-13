@@ -49,7 +49,22 @@ func provisionDedicatedDatabase(ctx context.Context, adminDSN, appUser, appPassw
 		return fmt.Errorf("check dedicated role: %w", err)
 	}
 	if roleExists && !dbExists {
-		return fmt.Errorf("role %q already exists; existing role password was not changed", appUser)
+		// Resume only when the supplied role credentials actually authenticate.
+		// An unrelated pre-existing role is never adopted or reset.
+		parsed, parseErr := url.Parse(maintenance)
+		if parseErr != nil {
+			return parseErr
+		}
+		parsed.User = url.UserPassword(appUser, appPassword)
+		probe, probeErr := sql.Open("pgx", parsed.String())
+		if probeErr != nil {
+			return probeErr
+		}
+		probeErr = probe.PingContext(ctx)
+		probe.Close()
+		if probeErr != nil {
+			return fmt.Errorf("role %q already exists; supplied credentials did not authenticate; existing role password was not changed", appUser)
+		}
 	}
 
 	if !roleExists {

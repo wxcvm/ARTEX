@@ -9,7 +9,7 @@ import { Input } from "@/components/ui/input";
 import { guideLinks, guideSlug, parseGuide } from "@/lib/user-guide";
 
 const quickStart = [
-  { title: "选择安装方式", heading: "1. 快速选择安装方式", page: "" },
+  { title: "四步配置引导", heading: "0. 新手四步引导", page: "/welcome" },
   { title: "连接 AI 模型", heading: "5.1 创建模型 Profile", page: "/system/llm" },
   { title: "创建并运行任务", heading: "6.1 创建任务", page: "/function/tasks" },
   { title: "查看任务结果", heading: "6.3 任务详情页逐项看", page: "/function/tasks" },
