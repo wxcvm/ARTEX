@@ -19,6 +19,17 @@ internal static class ManagedPostgres
     private static string Data => Path.Combine(Root, "data");
     private static readonly SemaphoreSlim Gate = new(1, 1);
     private static bool startedHere;
+    [System.Runtime.InteropServices.DllImport("kernel32.dll", CharSet = System.Runtime.InteropServices.CharSet.Unicode, SetLastError = true)]
+    private static extern uint GetShortPathName(string path, StringBuilder buffer, uint length);
+    private static string CliDirectory()
+    {
+        // PostgreSQL 16's Windows CLI converts its absolute child-process paths
+        // through the system ANSI code page. Keep the actual data in the user's
+        // Unicode directory, but launch through its existing NTFS short name.
+        var buffer = new StringBuilder(32768);
+        var size = GetShortPathName(Root, buffer, (uint)buffer.Capacity);
+        return size > 0 && size < buffer.Capacity ? buffer.ToString() : Root;
+    }
     internal sealed record Cluster(string Bin, int Port, string AdminPassword, string AppPassword)
     {
         internal string Dsn(bool admin = false) => $"postgres://{(admin ? "postgres" : "artex")}:{(admin ? AdminPassword : AppPassword)}@127.0.0.1:{Port}/artex?sslmode=disable";
@@ -89,7 +100,7 @@ internal static class ManagedPostgres
                 try
                 {
                     File.WriteAllText(passwordFile, cluster.AdminPassword + "\n", new UTF8Encoding(false));
-                    await RunAsync(Path.Combine(cluster.Bin, "initdb.exe"), ["-D", "data", "-U", "postgres", "--auth=scram-sha-256", "--encoding=UTF8", "--locale=C", "--pwfile=init-password.tmp"], cancel, workingDirectory: Root);
+                    await RunAsync(Path.Combine(cluster.Bin, "initdb.exe"), ["-D", "data", "-U", "postgres", "--auth=scram-sha-256", "--encoding=UTF8", "--locale=C", "--pwfile=init-password.tmp"], cancel, workingDirectory: CliDirectory());
                 }
                 finally { File.Delete(passwordFile); }
             }
@@ -121,8 +132,8 @@ internal static class ManagedPostgres
     private static async Task EnsureStartedCoreAsync(Cluster c, CancellationToken cancel)
     {
         var ctl = Path.Combine(c.Bin, "pg_ctl.exe");
-        if (await RunAsync(ctl, ["status", "-D", "data"], cancel, allowFailure: true, workingDirectory: Root) == 0) return;
-        await RunAsync(ctl, ["start", "-D", "data", "-l", "postgresql.log", "-w", "-t", "30", "-o", $"-h 127.0.0.1 -p {c.Port}"], cancel, captureOutput: false, workingDirectory: Root);
+        if (await RunAsync(ctl, ["status", "-D", "data"], cancel, allowFailure: true, workingDirectory: CliDirectory()) == 0) return;
+        await RunAsync(ctl, ["start", "-D", "data", "-l", "postgresql.log", "-w", "-t", "30", "-o", $"-h 127.0.0.1 -p {c.Port}"], cancel, captureOutput: false, workingDirectory: CliDirectory());
         startedHere = true;
     }
 
@@ -134,7 +145,7 @@ internal static class ManagedPostgres
             var c = ReadManifest();
             // FormClosed runs on the WinForms context. Do not block that context
             // while the async process waiter tries to resume back onto it.
-            if (c is not null) Task.Run(() => RunAsync(Path.Combine(c.Bin, "pg_ctl.exe"), ["stop", "-D", "data", "-m", "fast", "-w", "-t", "15"], CancellationToken.None, workingDirectory: Root)).GetAwaiter().GetResult();
+            if (c is not null) Task.Run(() => RunAsync(Path.Combine(c.Bin, "pg_ctl.exe"), ["stop", "-D", "data", "-m", "fast", "-w", "-t", "15"], CancellationToken.None, workingDirectory: CliDirectory())).GetAwaiter().GetResult();
             startedHere = false;
         }
         catch (Exception ex) { Debug.WriteLine("独立数据库未能正常停止：" + ex.GetType().Name); }
