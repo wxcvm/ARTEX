@@ -189,10 +189,10 @@ function SkillsOverview({
   }
 
   const stats: { label: string; value: React.ReactNode; hint?: string }[] = [
-    { label: tr("技能总数", "Total skills"), value: skills.length, hint: `${agg.usedCount} 个已调用` },
+    { label: tr("技能总数", "Total skills"), value: skills.length, hint: tr(`${agg.usedCount} 个已调用`, `${agg.usedCount} used`) },
     { label: tr("调用总数", "Total calls"), value: agg.totalCalls },
     { label: tr("未使用", "Unused"), value: agg.neverUsed.length, hint: agg.neverUsed.length > 0 ? tr("尚未被任何智能体加载", "Not loaded by any agent") : tr("全部已使用", "All used") },
-    { label: tr("缺失技能调用", "Missing skill calls"), value: missingCalls, hint: missingTotal > 0 ? `${missingTotal} 个缺失技能` : "none" },
+    { label: tr("缺失技能调用", "Missing skill calls"), value: missingCalls, hint: missingTotal > 0 ? tr(`${missingTotal} 个缺失技能`, `${missingTotal} missing skills`) : tr("无", "None") },
   ];
 
   return (
@@ -237,7 +237,7 @@ function SkillsOverview({
                   />
                 </span>
                 <span className="w-16 shrink-0 text-right text-xs tabular-nums text-muted-foreground">
-                  {s.calls} calls
+                  {tr(`${s.calls} 次调用`, `${s.calls} calls`)}
                 </span>
               </button>
             ))}
@@ -1028,11 +1028,17 @@ export default function SkillsPage() {
                 <span className="font-medium text-foreground">{selected.skill}</span>
                 <span>/</span>
                 <span className="font-mono">{selected.path}</span>
-                {locale !== "en" && skillSummary(selected.skill) && <span className="truncate" title={skillSummary(selected.skill)}>{tr("原文 · 中文简介见技能详情", "Original source · summary in skill details")}</span>}
                 <Button size="sm" className="ml-auto" onClick={saveFile} disabled={!dirty || saving}>
                   {saving ? tr("正在保存…", "Saving…") : tr("保存", "Save")}
                 </Button>
               </div>
+              {locale === "zh-CN" && skillSummary(selected.skill) && (
+                <details className="shrink-0 rounded-md border p-3 text-sm" open>
+                  <summary className="cursor-pointer font-medium">中文阅读导引 · {skillLabel(selected.skill)}</summary>
+                  <p className="mt-2">{skillSummary(selected.skill)}</p>
+                  <p className="mt-2 text-xs text-muted-foreground">下方为可编辑的原始文件。导引仅说明技能主题，不替代正文；代码、命令、参数和文件路径保持原样。</p>
+                </details>
+              )}
               {fileLoading ? (
                 <p className="text-xs text-muted-foreground">{tr("正在加载…", "Loading…")}</p>
               ) : (
