@@ -1,6 +1,6 @@
 import assert from "node:assert/strict";
 import test from "node:test";
-import { skillLabel, skillSummary, toolLabel, toolSummary, knowledgeCategory, knowledgeKind } from "./resource-labels.ts";
+import { skillLabel, skillSummary, toolLabel, toolSummary, knowledgeCategory, knowledgeKind, knowledgeCategorySummary } from "./resource-labels.ts";
 
 test("shipped resources have Chinese display labels without rewriting their identifiers", () => {
   assert.equal(skillLabel("playwright-cli"), "Playwright 浏览器自动化");
@@ -51,4 +51,14 @@ test("every shipped skill has a Chinese catalog introduction", () => {
     assert.match(toolSummary(key), /[\u3400-\u9fff]/u, key);
     assert.equal(toolSummary(key, false), undefined);
   }
+});
+
+test("knowledge category guides cover the shipped taxonomy and preserve unknown categories", () => {
+  const keys = ["info-leak","auth-bypass","unauthorized","rce","recon","methodology","file-upload","weak-password","frontend-reverse","app-audit","env","waf","path-traversal","ssrf","tunnel","sqli","deserialization","protocol","privesc"];
+  for (const key of keys) {
+    assert.notEqual(knowledgeCategory(key), key);
+    assert.match(knowledgeCategorySummary(key), /[\u3400-\u9fff]/u, key);
+  }
+  assert.equal(knowledgeCategorySummary("unknown"), undefined);
+  assert.equal(knowledgeCategorySummary("constructor"), undefined);
 });
