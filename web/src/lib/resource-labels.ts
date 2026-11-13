@@ -276,3 +276,30 @@ const toolSummaries: Record<string, string> = {
 export function toolSummary(key: string, system = true): string | undefined {
   return system && Object.hasOwn(toolSummaries, key) ? toolSummaries[key] : undefined;
 }
+
+// Category reading aids describe the topic, not the contents or validity of an entry.
+const categorySummaries: Record<string, string> = {
+  "info-leak": "涉及敏感信息、配置或内部数据的意外暴露。",
+  "auth-bypass": "涉及身份认证流程或认证状态校验缺陷。",
+  "unauthorized": "涉及未获授权的资源访问或操作。",
+  "rce": "涉及远程输入引发的代码执行风险。",
+  "recon": "涉及资产信息、服务识别与记录整理。",
+  "methodology": "涉及评估流程、证据整理与结果复核。",
+  "file-upload": "涉及上传文件的类型、存储和访问控制。",
+  "weak-password": "涉及密码强度、认证策略及账户保护。",
+  "frontend-reverse": "涉及前端程序结构、接口与数据流分析。",
+  "app-audit": "涉及应用代码、配置与业务逻辑审计。",
+  "env": "涉及运行环境、依赖和配置问题。",
+  "waf": "涉及 Web 应用防火墙的行为与防护配置。",
+  "path-traversal": "涉及文件路径解析与目录访问边界。",
+  "ssrf": "涉及服务端发起请求时的目标访问边界。",
+  "tunnel": "涉及网络连接、隧道配置与访问边界。",
+  "sqli": "涉及数据库查询中的输入处理与参数绑定。",
+  "deserialization": "涉及反序列化数据处理及对象构造风险。",
+  "protocol": "涉及通信协议结构、消息与状态分析。",
+  "privesc": "涉及权限配置、授权边界及权限提升风险。"
+};
+
+export function knowledgeCategorySummary(key: string): string | undefined {
+  return Object.hasOwn(categorySummaries, key) ? categorySummaries[key] : undefined;
+}
