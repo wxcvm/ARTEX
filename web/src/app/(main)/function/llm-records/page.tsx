@@ -1,5 +1,8 @@
 "use client";
 
+import { useUiLocale } from "@/lib/ui-locale.client";
+import { uiText } from "@/lib/ui-locale";
+
 import * as React from "react";
 import {
   RadioIcon,
@@ -78,6 +81,8 @@ function tryFormatJSON(s: string): string {
 
 // Small button that copies the text in the current pane. Shows a brief checkmark after copying. Disabled when text is empty/only placeholders.
 function CopyButton({ text }: { text: string }) {
+  const locale = useUiLocale();
+  const tr = (zh: string, en: string) => uiText(locale, zh, en);
   const [copied, setCopied] = React.useState(false);
   const timer = React.useRef<ReturnType<typeof setTimeout> | null>(null);
   React.useEffect(() => () => { if (timer.current) clearTimeout(timer.current); }, []);
@@ -109,7 +114,7 @@ function CopyButton({ text }: { text: string }) {
       size="icon"
       className="size-5 shrink-0"
       disabled={disabled}
-      title={copied ? "已复制" : "复制内容"}
+      title={copied ? tr("已复制", "Copied") : tr("复制内容", "Copy content")}
       onClick={copy}
     >
       {copied ? <CheckIcon className="size-3 text-emerald-600" /> : <CopyIcon className="size-3" />}
@@ -120,6 +125,8 @@ function CopyButton({ text }: { text: string }) {
 const PAGE_SIZES = [25, 50, 100];
 
 export default function LLMRecordsPage() {
+  const locale = useUiLocale();
+  const tr = (zh: string, en: string) => uiText(locale, zh, en);
   const [page, setPage] = React.useState(0);
   const [size, setSize] = React.useState(50);
   const [session, setSession] = React.useState("");
@@ -260,7 +267,7 @@ export default function LLMRecordsPage() {
       <div className="flex items-center justify-between gap-4">
         <div className="flex items-center gap-2">
           <RadioIcon className="h-5 w-5 text-muted-foreground" />
-          <h1 className="text-xl font-semibold tracking-tight">模型调用记录</h1>
+          <h1 className="text-xl font-semibold tracking-tight">{tr("模型调用记录", "Model call records")}</h1>
           <Badge variant="secondary">{total}</Badge>
         </div>
       </div>
@@ -270,26 +277,26 @@ export default function LLMRecordsPage() {
         <div className="relative max-w-sm flex-1">
           <SearchIcon className="absolute top-1/2 left-2.5 size-4 -translate-y-1/2 text-muted-foreground" />
           <Input
-            placeholder="搜索会话 ID…"
+            placeholder={tr("搜索会话 ID…", "Search session ID…")}
             value={session}
             onChange={(e) => setSession(e.target.value)}
             className="h-8 pl-8"
           />
         </div>
         <Input
-          placeholder="模型"
+          placeholder={tr("模型", "Model")}
           className="h-8 w-48"
           value={model}
           onChange={(e) => setModel(e.target.value)}
         />
         <Select value={pickedTask} onValueChange={setPickedTask}>
           <SelectTrigger size="sm" className="w-56">
-            <SelectValue placeholder="选择任务…" />
+            <SelectValue placeholder={tr("选择任务…", "Select task…")} />
           </SelectTrigger>
           <SelectContent>
             {tasks.length === 0 ? (
               <SelectItem value="__none__" disabled>
-                暂无任务记录
+                {tr("暂无任务记录", "No task records")}
               </SelectItem>
             ) : (
               tasks.map((t) => (
@@ -306,11 +313,11 @@ export default function LLMRecordsPage() {
           size="sm"
           className="h-8"
           disabled={!pickedTask || deleting}
-          title={pickedTask ? undefined : "请先在上方选择任务"}
+          title={pickedTask ? undefined : tr("请先在上方选择任务", "Select a task first")}
           onClick={() => setDeleteOpen(true)}
         >
           <Trash2Icon className="size-3.5" />
-          删除任务对话
+          {tr("删除任务对话", "Delete task conversations")}
         </Button>
         <Select value={String(size)} onValueChange={(v) => setSize(Number(v))}>
           <SelectTrigger size="sm" className="w-28">
@@ -341,7 +348,7 @@ export default function LLMRecordsPage() {
               recEnabled ? "text-foreground" : "text-muted-foreground",
             )}
           >
-            {recEnabled ? "正在记录" : "已关闭"}
+            {recEnabled ? tr("正在记录", "Recording") : tr("已关闭", "Off")}
           </label>
         </div>
 
@@ -380,14 +387,14 @@ export default function LLMRecordsPage() {
             <Table>
               <TableHeader className="sticky top-0 z-10 bg-card">
                 <TableRow>
-                  <TableHead className="w-[130px]">时间</TableHead>
-                  <TableHead className="w-[60px]">任务</TableHead>
-                  <TableHead className="w-[90px]">执行智能体</TableHead>
-                  <TableHead className="w-[100px]">模型配置</TableHead>
-                  <TableHead className="w-[140px]">模型</TableHead>
-                  <TableHead className="w-[70px]">延迟</TableHead>
-                  <TableHead className="w-[90px]">Token 数</TableHead>
-                  <TableHead className="w-[60px]">状态</TableHead>
+                  <TableHead className="w-[130px]">{tr("时间", "Time")}</TableHead>
+                  <TableHead className="w-[60px]">{tr("任务", "Task")}</TableHead>
+                  <TableHead className="w-[90px]">{tr("执行智能体", "Worker")}</TableHead>
+                  <TableHead className="w-[100px]">{tr("模型配置", "Model profile")}</TableHead>
+                  <TableHead className="w-[140px]">{tr("模型", "Model")}</TableHead>
+                  <TableHead className="w-[70px]">{tr("延迟", "Latency")}</TableHead>
+                  <TableHead className="w-[90px]">{tr("Token 数", "Tokens")}</TableHead>
+                  <TableHead className="w-[60px]">{tr("状态", "Status")}</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
@@ -400,7 +407,7 @@ export default function LLMRecordsPage() {
                 ) : records.length === 0 ? (
                   <TableRow>
                     <TableCell colSpan={8} className="py-12 text-center text-sm text-muted-foreground">
-                      暂无模型调用记录
+                      {tr("暂无模型调用记录", "No model call records")}
                     </TableCell>
                   </TableRow>
                 ) : (
@@ -442,9 +449,9 @@ export default function LLMRecordsPage() {
                       </TableCell>
                       <TableCell>
                         {rec.status === "ok" ? (
-                          <Badge variant="secondary" className="text-xs text-emerald-600">成功</Badge>
+                          <Badge variant="secondary" className="text-xs text-emerald-600">{tr("成功", "Succeeded")}</Badge>
                         ) : (
-                          <Badge variant="destructive" className="text-xs">错误</Badge>
+                          <Badge variant="destructive" className="text-xs">{tr("错误", "Error")}</Badge>
                         )}
                       </TableCell>
                     </TableRow>
@@ -481,9 +488,9 @@ export default function LLMRecordsPage() {
                 {fmtLatency(selected.latency_ms)}
               </span>
               {selected.status === "ok" ? (
-                <Badge variant="secondary" className="text-xs text-emerald-600">成功</Badge>
+                <Badge variant="secondary" className="text-xs text-emerald-600">{tr("成功", "Succeeded")}</Badge>
               ) : (
-                <Badge variant="destructive" className="text-xs">错误</Badge>
+                <Badge variant="destructive" className="text-xs">{tr("错误", "Error")}</Badge>
               )}
               {/* Raw view toggle. Old records have no raw data; disable it rather than silently
                   falling back, to avoid looking like "raw matches parsed". */}
@@ -492,10 +499,10 @@ export default function LLMRecordsPage() {
                 size="sm"
                 className="ml-auto h-7 shrink-0 text-xs"
                 disabled={!hasRaw}
-                title={hasRaw ? "查看与模型提供方实际交换的原始 HTTP" : "此记录早于原始数据记录功能上线，暂无原始数据"}
+                title={hasRaw ? tr("查看与模型提供方实际交换的原始 HTTP", "View raw HTTP exchanged with the model provider") : tr("此记录早于原始数据记录功能上线，暂无原始数据", "This record predates raw data capture")}
                 onClick={() => setRawView((v) => !v)}
               >
-                原始数据
+                {tr("原始数据", "Raw data")}
               </Button>
               <Button
                 variant="ghost"
@@ -517,7 +524,7 @@ export default function LLMRecordsPage() {
                   {detailLoading ? (
                     <div className="flex items-center gap-2 p-3 text-xs text-muted-foreground">
                       <Loader2Icon className="size-3.5 animate-spin" />
-                      正在加载…
+                      {tr("正在加载…", "Loading…")}
                     </div>
                   ) : (
                     <pre className="p-3 font-mono text-xs break-all whitespace-pre-wrap">
@@ -535,7 +542,7 @@ export default function LLMRecordsPage() {
                   {detailLoading ? (
                     <div className="flex items-center gap-2 p-3 text-xs text-muted-foreground">
                       <Loader2Icon className="size-3.5 animate-spin" />
-                      正在加载…
+                      {tr("正在加载…", "Loading…")}
                     </div>
                   ) : (
                     <pre className={cn(
@@ -555,13 +562,13 @@ export default function LLMRecordsPage() {
       <AlertDialog open={deleteOpen} onOpenChange={setDeleteOpen}>
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle>删除任务「{pickedTask}」的全部模型对话？</AlertDialogTitle>
+            <AlertDialogTitle>{tr(`删除任务「${pickedTask}」的全部模型对话？`, `Delete all model conversations for task "${pickedTask}"?`)}</AlertDialogTitle>
             <AlertDialogDescription>
-              此操作将永久删除该任务的全部模型调用记录（含原始请求和响应），且无法撤销。
+              {tr("此操作将永久删除该任务的全部模型调用记录（含原始请求和响应），且无法撤销。", "This permanently deletes all model call records for the task, including raw requests and responses.")}
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel disabled={deleting}>取消</AlertDialogCancel>
+            <AlertDialogCancel disabled={deleting}>{tr("取消", "Cancel")}</AlertDialogCancel>
             <AlertDialogAction
               onClick={(e) => {
                 e.preventDefault();
@@ -570,7 +577,7 @@ export default function LLMRecordsPage() {
               disabled={deleting}
               className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
             >
-              {deleting ? "正在删除…" : "确认删除"}
+              {deleting ? tr("正在删除…", "Deleting…") : tr("确认删除", "Confirm deletion")}
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
