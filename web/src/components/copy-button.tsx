@@ -1,5 +1,8 @@
 "use client";
 
+import { useUiLocale } from "@/lib/ui-locale.client";
+import { uiText } from "@/lib/ui-locale";
+
 import * as React from "react";
 
 import { CheckIcon, CopyIcon } from "lucide-react";
@@ -23,12 +26,14 @@ type CopyButtonProps = {
 // contexts it degrades automatically (see copyText).
 export function CopyButton({
   text,
-  successMessage = "Copied",
-  label = "Copy",
+  successMessage,
+  label,
   size = "sm",
   variant = "outline",
   className,
 }: CopyButtonProps) {
+  const locale = useUiLocale();
+  const tr = (zh: string, en: string) => uiText(locale, zh, en);
   const [copied, setCopied] = React.useState(false);
   const timer = React.useRef<ReturnType<typeof setTimeout> | null>(null);
 
@@ -43,11 +48,11 @@ export function CopyButton({
     const ok = await copyText(text);
     if (ok) {
       setCopied(true);
-      toast.success(successMessage);
+      toast.success(successMessage ?? tr("已复制", "Copied"));
       if (timer.current) clearTimeout(timer.current);
       timer.current = setTimeout(() => setCopied(false), 1500);
     } else {
-      toast.error("Copy failed; select the text manually to copy");
+      toast.error(tr("复制失败，请手动选择文本复制", "Copy failed; select the text manually to copy"));
     }
   }
 
@@ -61,7 +66,7 @@ export function CopyButton({
       onClick={handleCopy}
     >
       {copied ? <CheckIcon /> : <CopyIcon />}
-      {label}
+      {label ?? tr("复制", "Copy")}
     </Button>
   );
 }
