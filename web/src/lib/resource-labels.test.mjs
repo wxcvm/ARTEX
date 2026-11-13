@@ -1,6 +1,6 @@
 import assert from "node:assert/strict";
 import test from "node:test";
-import { skillLabel, skillSummary, toolLabel, knowledgeCategory, knowledgeKind } from "./resource-labels.ts";
+import { skillLabel, skillSummary, toolLabel, toolSummary, knowledgeCategory, knowledgeKind } from "./resource-labels.ts";
 
 test("shipped resources have Chinese display labels without rewriting their identifiers", () => {
   assert.equal(skillLabel("playwright-cli"), "Playwright 浏览器自动化");
@@ -33,4 +33,12 @@ test("every shipped skill has a Chinese catalog introduction", () => {
     assert.notEqual(skillLabel(key), key);
     assert.match(skillSummary(key), /[\u3400-\u9fff]/u, key);
   }
+});
+
+ test("tool catalog summaries are display-only and do not apply to custom tools", () => {
+  assert.match(toolSummary("kb_search"), /知识库/);
+  assert.match(toolSummary("get_finding_traffic"), /流量证据/);
+  assert.equal(toolSummary("kb_search", false), undefined);
+  assert.equal(toolSummary("custom_tool"), undefined);
+  assert.equal(toolSummary("constructor"), undefined);
 });
