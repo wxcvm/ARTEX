@@ -628,7 +628,7 @@ function ApprovalTable({
                 </TableCell>
                 <TableCell className="hidden md:table-cell">
                   <div className="flex flex-col gap-1">
-                    <span className="truncate" title={originLabel(row)}>
+                    <span className="truncate" title={originLabel(row, locale)}>
                       <ApprovalOrigin row={row} />
                     </span>
                     <span className="truncate text-muted-foreground text-xs">
