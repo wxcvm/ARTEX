@@ -207,7 +207,7 @@ function ToolEditor({
       <div className="flex min-h-0 flex-1 flex-col gap-4 overflow-y-auto px-4">
         {trafficGated && (
           <div className="border-amber-500/40 bg-amber-500/10 text-muted-foreground rounded-md border px-3 py-2 text-xs">
-            此工具依赖<b>流量采集</b>。请先在「系统设置」中开启流量采集，再绑定智能体并启用工具。
+            {tr("此工具依赖流量采集。请先在「系统设置」中开启流量采集，再绑定智能体并启用工具。", "This tool requires traffic capture. Enable traffic capture in System Settings, then bind an agent and enable the tool.")}
           </div>
         )}
         {/* binding + switch */}
@@ -484,8 +484,8 @@ export default function ToolsPage() {
                   <CardTitle>{tr("自定义工具", "Custom tools")}</CardTitle>
                   <CardDescription>
                     {query.trim()
-                      ? `shell/command/script/http，匹配 ${customTools.length} / ${allCustomCount} 项；点击卡片编辑`
-                      : `shell（Bash 声明）/ command（命令模板）/ script（Python）/ http（API），共 ${allCustomCount} 项；点击卡片编辑`}
+                      ? tr(`shell/command/script/http，匹配 ${customTools.length} / ${allCustomCount} 项；点击卡片编辑`, `shell/command/script/http: ${customTools.length} / ${allCustomCount} matches; click a card to edit`)
+                      : tr(`shell（Bash 声明）/ command（命令模板）/ script（Python）/ http（API），共 ${allCustomCount} 项；点击卡片编辑`, `shell (Bash declaration) / command (template) / script (Python) / http (API), ${allCustomCount} tools; click a card to edit`)}
                   </CardDescription>
                 </div>
                 <Button size="sm" onClick={() => setCustomEdit("new")}>
@@ -827,7 +827,7 @@ function CustomToolDialog({
             </label>
             {kind !== "shell" && (
               <label className="flex items-center gap-2 text-sm">
-                <Switch checked={deferred} onCheckedChange={setDeferred} /> deferred (enable only for many rarely-used tools)
+                <Switch checked={deferred} onCheckedChange={setDeferred} /> {tr("延迟加载（仅在有大量低频工具时启用）", "Deferred (enable only for many rarely-used tools)")}
               </label>
             )}
           </div>
