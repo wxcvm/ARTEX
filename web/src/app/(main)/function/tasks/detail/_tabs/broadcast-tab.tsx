@@ -43,49 +43,49 @@ type KindMeta = { label: string; icon: LucideIcon; dot: string; chip: string };
 // the broadcast a stream view (timeline rows); the two differ in information density and color needs, so they evolve separately.
 const KIND_META: Record<string, KindMeta> = {
   begin: {
-    label: "Start",
+    label: "起点",
     icon: FlagIcon,
     dot: "bg-slate-500",
     chip: "bg-slate-500/15 text-slate-600 dark:text-slate-300",
   },
   task: {
-    label: "Root task",
+    label: "根任务",
     icon: FlagIcon,
     dot: "bg-slate-500",
     chip: "bg-slate-500/15 text-slate-600 dark:text-slate-300",
   },
   goal: {
-    label: "Goal",
+    label: "目标",
     icon: TargetIcon,
     dot: "bg-emerald-500",
     chip: "bg-emerald-500/15 text-emerald-600 dark:text-emerald-400",
   },
   intent: {
-    label: "Intent",
+    label: "探索意图",
     icon: CompassIcon,
     dot: "bg-blue-500",
     chip: "bg-blue-500/15 text-blue-600 dark:text-blue-400",
   },
   fact: {
-    label: "Fact",
+    label: "事实",
     icon: FlaskConicalIcon,
     dot: "bg-amber-500",
     chip: "bg-amber-500/15 text-amber-600 dark:text-amber-400",
   },
   finding: {
-    label: "Vulnerability",
+    label: "漏洞",
     icon: BugIcon,
     dot: "bg-rose-500",
     chip: "bg-rose-500/15 text-rose-600 dark:text-rose-400",
   },
   hint: {
-    label: "Hint",
+    label: "提示",
     icon: LightbulbIcon,
     dot: "bg-violet-500",
     chip: "bg-violet-500/15 text-violet-600 dark:text-violet-400",
   },
   digest: {
-    label: "Digest",
+    label: "摘要",
     icon: LayersIcon,
     dot: "bg-teal-500",
     chip: "bg-teal-500/15 text-teal-600 dark:text-teal-400",
@@ -97,7 +97,7 @@ const FILTER_KINDS: ExploreKind[] = ["goal", "intent", "fact", "finding", "hint"
 
 const REL_LABEL: Record<string, string> = {
   spawns: "Spawns",
-  derived_from: "Intent chain",
+  derived_from: "意图链",
   yields: "Yields",
   proves: "Proves",
   covers: "Compresses",
@@ -107,21 +107,21 @@ const REL_LABEL: Record<string, string> = {
 // appear in the graph and broadcast, so they are defined here.
 const STATE_META: Record<string, Record<string, { label: string; tone: Tone }>> = {
   fact: {
-    origin: { label: "Start", tone: "slate" },
-    confirmed: { label: "Confirmed", tone: "green" },
-    dismissed: { label: "Dismissed", tone: "slate" },
+    origin: { label: "起点", tone: "slate" },
+    confirmed: { label: "已确认", tone: "green" },
+    dismissed: { label: "已排除", tone: "slate" },
   },
   finding: {
-    confirmed: { label: "Confirmed", tone: "red" },
-    dismissed: { label: "Excluded", tone: "slate" },
+    confirmed: { label: "已确认", tone: "red" },
+    dismissed: { label: "已排除", tone: "slate" },
   },
   hint: {
-    active: { label: "Pending adoption", tone: "violet" },
-    consumed: { label: "Adopted", tone: "slate" },
+    active: { label: "待采纳", tone: "violet" },
+    consumed: { label: "已采纳", tone: "slate" },
   },
   digest: {
-    active: { label: "Active", tone: "green" },
-    superseded: { label: "Superseded", tone: "slate" },
+    active: { label: "有效", tone: "green" },
+    superseded: { label: "已替代", tone: "slate" },
   },
 };
 
@@ -303,7 +303,7 @@ function RelatedList({
                       className="flex min-w-0 cursor-help items-center gap-2 text-left hover:underline"
                     >
                       <KindChip kind={viewKind(node)} />
-                      <span className="truncate">{summaryOf(node) || `Node #${node.id}`}</span>
+                      <span className="truncate">{summaryOf(node) || `节点 #${node.id}`}</span>
                     </button>
                   </HoverCardTrigger>
                   <HoverCardContent align="start" className="w-96">
@@ -386,12 +386,12 @@ function BroadcastRow({
               )}
               {fresh && (
                 <span className="rounded bg-primary px-1.5 py-0.5 text-[10px] font-semibold text-primary-foreground">
-                  New
+                  新建
                 </span>
               )}
               <span className="ml-auto shrink-0 text-xs text-muted-foreground">{node.origin || "system"}</span>
             </div>
-            <p className={cn("mt-1 text-sm", !open && "line-clamp-2")}>{summary || `Node #${node.id}`}</p>
+            <p className={cn("mt-1 text-sm", !open && "line-clamp-2")}>{summary || `节点 #${node.id}`}</p>
           </div>
         </button>
 
@@ -407,15 +407,15 @@ function BroadcastRow({
             </div>
             {node.state === "deleted" && node.delete_reason && (
               <div className="rounded-md border border-destructive/30 bg-destructive/5 px-3 py-2 text-xs">
-                <span className="font-medium text-destructive">Deletion reason</span>
+                <span className="font-medium text-destructive">删除原因</span>
                 <span className="ml-2 break-words text-muted-foreground">{node.delete_reason}</span>
               </div>
             )}
             <AssetList assets={assets[node.id] ?? []} />
             {(upstream.length > 0 || downstream.length > 0) && (
               <div className="flex flex-col gap-3 sm:flex-row">
-                <RelatedList title="Upstream · comes from these" rows={upstream} refs={refs} assets={assets} />
-                <RelatedList title="Downstream · produced by this" rows={downstream} refs={refs} assets={assets} />
+                <RelatedList title="上游 · 来源" rows={upstream} refs={refs} assets={assets} />
+                <RelatedList title="下游 · 产出" rows={downstream} refs={refs} assets={assets} />
               </div>
             )}
             <div>
@@ -558,7 +558,7 @@ export function BroadcastTab({ taskId }: { taskId: string }) {
   const groups: Array<{ day: string; rows: TaskNode[] }> = [];
   for (const node of items) {
     const ts = Date.parse(node.ts);
-    const day = Number.isNaN(ts) ? "Unknown date" : dayFmt.format(ts);
+    const day = Number.isNaN(ts) ? "未知日期" : dayFmt.format(ts);
     const last = groups[groups.length - 1];
     if (last && last.day === day) last.rows.push(node);
     else groups.push({ day, rows: [node] });
@@ -573,9 +573,9 @@ export function BroadcastTab({ taskId }: { taskId: string }) {
           <Input
             value={queryInput}
             onChange={(e) => setQueryInput(e.target.value)}
-            placeholder="Search content / source / node id"
+            placeholder="搜索内容、来源或节点 ID"
             className="h-8 pl-8"
-            aria-label="Search broadcasts"
+            aria-label="搜索广播"
           />
         </div>
         <div className="flex flex-wrap items-center gap-1">
@@ -607,7 +607,7 @@ export function BroadcastTab({ taskId }: { taskId: string }) {
                 setPage(1);
               }}
             >
-              Clear
+              清除
             </Button>
           )}
         </div>
@@ -620,17 +620,17 @@ export function BroadcastTab({ taskId }: { taskId: string }) {
               setOrder((o) => (o === "desc" ? "asc" : "desc"));
               setPage(1);
             }}
-            aria-label={order === "desc" ? "Currently newest first; click to switch to oldest first" : "Currently oldest first; click to switch to newest first"}
+            aria-label={order === "desc" ? "当前最新优先，点击切换为最早优先" : "当前最早优先，点击切换为最新优先"}
           >
             {order === "desc" ? <ArrowDownIcon /> : <ArrowUpIcon />}
-            {order === "desc" ? "Newest first" : "Oldest first"}
+            {order === "desc" ? "最新优先" : "最早优先"}
           </Button>
           <Button
             variant={live ? "outline" : "secondary"}
             size="sm"
             className="h-8"
             onClick={() => setLive((v) => !v)}
-            aria-label={live ? "Pause auto-refresh" : "Resume auto-refresh"}
+            aria-label={live ? "暂停自动刷新" : "恢复自动刷新"}
           >
             {live ? <PauseIcon /> : <PlayIcon />}
             {live ? "Auto-refresh" : "Paused"}
@@ -659,7 +659,7 @@ export function BroadcastTab({ taskId }: { taskId: string }) {
           </div>
         ) : items.length === 0 ? (
           <p className="py-10 text-center text-sm text-muted-foreground">
-            {query || kinds.length > 0 ? "No broadcasts match the filters." : "This task has not produced any exploration nodes yet."}
+            {query || kinds.length > 0 ? "暂无符合筛选条件的广播。" : "此任务尚未产生探索节点。"}
           </p>
         ) : (
           groups.map((group) => (
@@ -711,7 +711,7 @@ export function BroadcastTab({ taskId }: { taskId: string }) {
             size="icon-sm"
             disabled={page <= 1}
             onClick={() => setPage((p) => Math.max(1, p - 1))}
-            aria-label="Previous page"
+            aria-label="上一页"
           >
             <ChevronLeftIcon />
           </Button>
@@ -723,7 +723,7 @@ export function BroadcastTab({ taskId }: { taskId: string }) {
             size="icon-sm"
             disabled={page >= pageCount}
             onClick={() => setPage((p) => Math.min(pageCount, p + 1))}
-            aria-label="Next page"
+            aria-label="下一页"
           >
             <ChevronRightIcon />
           </Button>

@@ -37,13 +37,13 @@ type Kind = CoverageGraphNode["kind"];
 type KindMeta = { label: string; icon: LucideIcon; iconBg: string; hex: string; size: number };
 
 const kindMeta: Record<Kind, KindMeta> = {
-  company: { label: "Company", icon: Building2, iconBg: "bg-slate-500", hex: "#64748b", size: 46 },
-  root_domain: { label: "Root domain", icon: Globe, iconBg: "bg-indigo-500", hex: "#6366f1", size: 38 },
-  subdomain: { label: "Subdomain", icon: Waypoints, iconBg: "bg-blue-500", hex: "#3b82f6", size: 30 },
+  company: { label: "企业", icon: Building2, iconBg: "bg-slate-500", hex: "#64748b", size: 46 },
+  root_domain: { label: "根域名", icon: Globe, iconBg: "bg-indigo-500", hex: "#6366f1", size: 38 },
+  subdomain: { label: "子域名", icon: Waypoints, iconBg: "bg-blue-500", hex: "#3b82f6", size: 30 },
   ip: { label: "IP", icon: Server, iconBg: "bg-cyan-600", hex: "#0891b2", size: 28 },
-  service: { label: "Service", icon: Radio, iconBg: "bg-amber-500", hex: "#f59e0b", size: 26 },
-  app: { label: "App", icon: AppWindow, iconBg: "bg-fuchsia-500", hex: "#d946ef", size: 26 },
-  endpoint: { label: "Endpoint", icon: Link2, iconBg: "bg-rose-500", hex: "#f43f5e", size: 20 },
+  service: { label: "服务", icon: Radio, iconBg: "bg-amber-500", hex: "#f59e0b", size: 26 },
+  app: { label: "应用", icon: AppWindow, iconBg: "bg-fuchsia-500", hex: "#d946ef", size: 26 },
+  endpoint: { label: "接口", icon: Link2, iconBg: "bg-rose-500", hex: "#f43f5e", size: 20 },
 };
 
 // G6 node icons use the platform's lucide icons: render lucide SVG paths (v1.22) as white-stroked
@@ -345,42 +345,42 @@ function AssetSheet({
             <ScrollArea className="min-h-0 flex-1">
               <div className="flex w-full min-w-0 flex-col gap-4 p-4">
                 <section>
-                  <h4 className="text-muted-foreground mb-1 text-xs font-medium">Properties</h4>
+                  <h4 className="text-muted-foreground mb-1 text-xs font-medium">属性</h4>
                   <DetailRow label="Type">{meta.label}</DetailRow>
-                  <DetailRow label="Test status">
+                  <DetailRow label="测试状态">
                     {node.in_scope ? (
                       node.tested ? (
-                        <span className="text-emerald-600 dark:text-emerald-400">Tested</span>
+                        <span className="text-emerald-600 dark:text-emerald-400">已测试</span>
                       ) : (
-                        <span className="text-neutral-500">Untested</span>
+                        <span className="text-neutral-500">未测试</span>
                       )
                     ) : (
-                      <span className="text-neutral-400">Out of scope (connecting node)</span>
+                      <span className="text-neutral-400">范围外（连接节点）</span>
                     )}
                   </DetailRow>
                   <DetailRow label="Domain">{node.domain}</DetailRow>
-                  <DetailRow label="Root domain">{node.root_domain}</DetailRow>
+                  <DetailRow label="根域名">{node.root_domain}</DetailRow>
                   <DetailRow label="IP">{node.ip}</DetailRow>
                   <DetailRow label="Port">{node.port ? node.port : undefined}</DetailRow>
                   <DetailRow label="URL">
                     {node.url ? <span className="font-mono text-xs break-all">{node.url}</span> : undefined}
                   </DetailRow>
                   <DetailRow label="Title">{node.page_title}</DetailRow>
-                  <DetailRow label="Status code">{node.status_code ? node.status_code : undefined}</DetailRow>
+                  <DetailRow label="状态码">{node.status_code ? node.status_code : undefined}</DetailRow>
                   <DetailRow label="App">{node.app_name}</DetailRow>
-                  <DetailRow label="Asset ID">
+                  <DetailRow label="资产 ID">
                     {node.asset_id ? <span className="font-mono text-xs">{node.asset_id}</span> : undefined}
                   </DetailRow>
                 </section>
                 {refs && (refs.intents.length > 0 || refs.facts.length > 0 || refs.findings.length > 0) && (
                   <section className="flex flex-col gap-3 border-t pt-3">
-                    <RefList title="Related intents" items={refs.intents} />
-                    <RefList title="Related facts" items={refs.facts} />
-                    <RefList title="Related findings" items={refs.findings} />
+                    <RefList title="关联意图" items={refs.intents} />
+                    <RefList title="关联事实" items={refs.facts} />
+                    <RefList title="关联发现" items={refs.findings} />
                   </section>
                 )}
                 <section className="border-t pt-3">
-                  <h4 className="text-muted-foreground mb-1.5 text-xs font-medium">Raw data</h4>
+                  <h4 className="text-muted-foreground mb-1.5 text-xs font-medium">原始数据</h4>
                   <pre className="bg-muted/50 text-foreground max-w-full overflow-hidden rounded-md border p-3 font-mono text-xs leading-relaxed break-all whitespace-pre-wrap">
                     {raw}
                   </pre>
@@ -416,7 +416,7 @@ function FoldSheet({
               <SheetTitle className="text-base">
                 Hidden {meta.label} ({fold.hidden.length})
               </SheetTitle>
-              <p className="text-muted-foreground text-xs">Tested items are shown first. Click "Show more" to pull the next batch into the graph.</p>
+              <p className="text-muted-foreground text-xs">优先显示已测试项，点击「显示更多」将下一批资产加入图谱。</p>
             </SheetHeader>
             <ScrollArea className="min-h-0 flex-1">
               <div className="flex flex-col gap-1 p-3">
@@ -445,7 +445,7 @@ function FoldSheet({
             </ScrollArea>
             <div className="border-t p-3">
               <Button className="w-full" variant="outline" onClick={() => onShowMore(fold.groupId)}>
-                Show more (+{FOLD_STEP})
+                显示更多（+{FOLD_STEP}）
               </Button>
             </div>
           </>
@@ -644,7 +644,7 @@ function GraphInner({ taskId, coverageEnabled = true }: { taskId: string; covera
         <div className="flex items-center justify-between gap-3">
           {total > 0 ? (
             <span className="text-muted-foreground">
-              In scope <span className="text-foreground font-semibold tabular-nums">{inScope}</span>
+              范围内 <span className="text-foreground font-semibold tabular-nums">{inScope}</span>
               {coverageEnabled && (
                 <>
                   {" "}
@@ -654,7 +654,7 @@ function GraphInner({ taskId, coverageEnabled = true }: { taskId: string; covera
               )}
             </span>
           ) : (
-            <span className="text-muted-foreground">{loading ? "Loading…" : "No in-scope assets yet (anchor the task scope first)"}</span>
+            <span className="text-muted-foreground">{loading ? "正在加载…" : "暂无范围内资产（请先登记任务范围）"}</span>
           )}
           <Button variant="ghost" size="icon" className="size-6" onClick={fetchGraph} title="Refresh">
             <RefreshCw className={cn("size-3.5", loading && "animate-spin")} />
