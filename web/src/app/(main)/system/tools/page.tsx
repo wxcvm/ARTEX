@@ -182,7 +182,7 @@ function ToolEditor({
         agents: bound,
         enabled,
       });
-      toast.success(`已保存工具「${tool.key}」`);
+      toast.success(tr(`已保存工具「${tool.key}」`, `Saved tool “${tool.key}”`));
       onSaved();
       onClose();
     } catch (e) {
@@ -194,7 +194,7 @@ function ToolEditor({
   async function reset() {
     try {
       await api.resetTool(tool.key);
-      toast.success(`已将「${tool.key}」恢复为代码默认配置`);
+      toast.success(tr(`已将「${tool.key}」恢复为代码默认配置`, `Restored code defaults for “${tool.key}”`));
       onSaved();
       onClose();
     } catch (e) {
@@ -357,7 +357,7 @@ function ToolGridCard({ tool, onClick }: { tool: Tool; onClick: () => void }) {
         <Badge
           variant="secondary"
           className="ml-auto px-1.5 py-0 text-[10px] tabular-nums"
-          title={`共调用 ${tool.calls ?? 0} 次`}
+          title={tr(`共调用 ${tool.calls ?? 0} 次`, `${tool.calls ?? 0} calls`)}
         >
           {tool.calls ?? 0} calls
         </Badge>
@@ -707,7 +707,7 @@ function CustomToolDialog({
       >
         <SheetHeader className="px-4">
           <SheetTitle>{isNew ? tr("创建自定义工具", "Create custom tool") : tr(`编辑 ${tool?.key}`, `Edit ${tool?.key}`)}</SheetTitle>
-          <SheetDescription>shell 为 Bash 环境声明（仅名称和说明，告知模型可在 Bash 中调用）；command、script、http 需要执行配置。</SheetDescription>
+          <SheetDescription>{tr("shell 为 Bash 环境声明（仅名称和说明，告知模型可在 Bash 中调用）；command、script、http 需要执行配置。", "Shell declares a Bash tool by name and description; command, script and http require execution configuration.")}</SheetDescription>
         </SheetHeader>
 
         <div className="flex min-h-0 flex-1 flex-col gap-4 overflow-y-auto px-4 pb-4">
@@ -798,7 +798,7 @@ function CustomToolDialog({
           {kind !== "shell" && (
             <div className="grid gap-1.5">
               <Label className="text-xs">
-                参数 JSON Schema{kind === "http" ? "（HTTP 工具必填，必须包含 properties）" : "（留空自动生成简单的 {args} Shell 模板）"}
+                {tr("参数 JSON Schema", "Parameter JSON Schema")}{kind === "http" ? tr("（HTTP 工具必填，必须包含 properties）", " (required for HTTP tools; must contain properties)") : tr("（留空自动生成简单的 {args} Shell 模板）", " (leave empty to generate a simple {args} shell template)")}
               </Label>
               <Textarea className="font-mono text-xs" rows={4} value={schemaText}
                 placeholder={'{"type":"object","properties":{"target":{"type":"string"}},"required":["target"]}'}
