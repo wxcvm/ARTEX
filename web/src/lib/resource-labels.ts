@@ -214,3 +214,45 @@ export function skillSummary(key: string): string | undefined { return Object.ha
 export function toolLabel(key: string, system = true): string { return system ? labelFor(toolLabels, key) : key; }
 export function knowledgeCategory(key: string): string { return labelFor(categoryLabels, key); }
 export function knowledgeKind(key: string): string { return labelFor(kindLabels, key); }
+
+// Display-only catalog summaries; never replace model-facing descriptions.
+const toolSummaries: Record<string, string> = {
+  "graph_overview": "查看当前任务的图谱结构及探索进展。",
+  "list_findings": "列出任务已登记的发现结果。",
+  "list_facts": "查看任务中已记录的事实。",
+  "node_detail": "读取指定图谱节点的详细记录。",
+  "list_goals": "查看当前任务目标及其状态。",
+  "prove_goal": "为指定目标登记达成依据。",
+  "goal_met": "记录任务目标完成状态。",
+  "report_finding": "登记发现结果及相关证据。",
+  "record_fact": "保存任务事实供后续分析使用。",
+  "set_goals": "设置当前任务的目标。",
+  "set_constraints": "设置当前任务的约束条件。",
+  "add_hint": "向任务添加补充提示。",
+  "get_worker_output": "读取执行单元的输出结果。",
+  "get_worker_trace": "读取执行单元的过程记录。",
+  "search_all_worker_traces": "在执行轨迹中检索相关记录。",
+  "list_worker_traces": "列出可查看的执行轨迹。",
+  "expand_digest": "展开已有摘要以查看详细内容。",
+  "list_assets": "查看已登记的资产记录。",
+  "list_companies": "查看已登记的组织记录。",
+  "list_untested_assets": "查看尚未测试的资产记录。",
+  "mcp_status": "查看 MCP 服务连接和运行状态。",
+  "kb_search": "按查询条件检索知识库资料。",
+  "kb_get": "读取指定知识库条目的原始资料。",
+  "list_tasks": "查看任务列表及其状态。",
+  "get_task_graph": "读取指定任务的图谱。",
+  "list_task_findings": "查看指定任务的发现记录。",
+  "get_task_worker_trace": "读取指定任务的执行轨迹。",
+  "list_task_worker_traces": "列出指定任务的执行轨迹。",
+  "search_task_worker_traces": "检索指定任务的执行轨迹。",
+  "get_task_node_detail": "读取指定任务的图谱节点详情。",
+  "get_finding_traffic": "查看与发现结果关联的流量证据。",
+  "traffic_search": "检索已采集的流量记录。",
+  "traffic_get": "读取指定流量记录的详细内容。",
+  "asset_neighbors": "查看资产之间已记录的关联关系。"
+};
+
+export function toolSummary(key: string, system = true): string | undefined {
+  return system && Object.hasOwn(toolSummaries, key) ? toolSummaries[key] : undefined;
+}
