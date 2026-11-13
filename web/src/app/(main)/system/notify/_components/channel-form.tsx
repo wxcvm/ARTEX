@@ -1,5 +1,9 @@
 "use client";
 
+import { useUiLocale } from "@/lib/ui-locale.client";
+import { uiText } from "@/lib/ui-locale";
+
+
 import { CheckIcon } from "lucide-react";
 
 import { Input } from "@/components/ui/input";
@@ -34,6 +38,47 @@ function inputType(kind: FieldKind): "text" | "password" | "number" {
 // 「已保存」提示。这样界面上就只有一个规则——框里有字就是用户填的，
 // 空框就是空值。若把 "__masked__:…abc123" 塞进输入框，用户会以为那是要自己
 // 删掉的占位文本，反而更容易误清凭据。
+const notificationEnglish: Record<string, string> = {
+  "Webhook 地址": "Webhook URL",
+  "加签密钥": "Signing secret",
+  "签名校验密钥": "Signature verification secret",
+  "目标 URL": "Destination URL",
+  "请求方法": "Request method",
+  "POST（带请求体）": "POST (with body)",
+  "PUT（带请求体）": "PUT (with body)",
+  "PATCH（带请求体）": "PATCH (with body)",
+  "GET（不带请求体）": "GET (no body)",
+  "自定义请求头": "Custom headers",
+  "请求体模板": "Request body template",
+  "API 地址": "API URL",
+  "SMTP 服务器": "SMTP server",
+  "端口": "Port",
+  "账号": "Username",
+  "密码 / 授权码": "Password / app password",
+  "发件人": "Sender",
+  "收件人": "Recipients",
+  "隐式 TLS": "Implicit TLS",
+  "机器人安全设置选「加签」时填写；选「自定义关键词」或未开启安全设置则留空": "Set when signing is enabled in bot security settings; otherwise leave empty.",
+  "机器人开启「签名校验」时填写，否则留空": "Set when bot signature verification is enabled; otherwise leave empty.",
+  "每行 KEY=VALUE，例如 Authorization=Bearer xxx": "One KEY=VALUE per line, e.g. Authorization=Bearer xxx",
+  "留空用官方地址；自建 Bot API 反代时填写": "Leave empty for official URL; enter a custom Bot API reverse proxy URL if used.",
+  "587 走 STARTTLS；465 请把「隐式 TLS」打开": "587 uses STARTTLS; enable implicit TLS for 465.",
+  "多个地址用逗号分隔": "Separate multiple addresses with commas.",
+  "465 端口打开；587 保持关闭（会自动 STARTTLS）": "Enable for 465; disable for 587 (automatic STARTTLS).",
+  "不限": "Any severity",
+  "低危及以上": "Low and above",
+  "中危及以上": "Medium and above",
+  "高危及以上": "High and above",
+  "仅严重": "Critical only",
+  "钉钉": "DingTalk",
+  "飞书": "Lark",
+  "企业微信": "WeCom",
+  "通用 Webhook": "Generic webhook",
+  "邮件": "Email",
+  "留空用内置默认模板。变量：{{.Title}} {{.Batch}} {{.Count}} {{.HomeURL}} {{.SentAt}}，以及 range .Items 下的 .Name/.VulnClass/.Severity/.Summary/.Assets/.DetailURL/.StatusLabel。插入字符串请用 {{json .Xxx}} 而不是 {{.Xxx}}，否则标题里的引号会破坏 JSON。": "Empty uses the built-in template. Variables: {{.Title}} {{.Batch}} {{.Count}} {{.HomeURL}} {{.SentAt}}, and .Name/.VulnClass/.Severity/.Summary/.Assets/.DetailURL/.StatusLabel inside range .Items. Insert strings using {{json .Xxx}} rather than {{.Xxx}} to keep quotes from breaking JSON."
+};
+export function notificationText(value: string, locale: "zh-CN" | "en") { return locale === "en" ? notificationEnglish[value] ?? value : value; }
+
 export function ConfigField({
   def,
   value,
@@ -45,6 +90,8 @@ export function ConfigField({
   isSecret: boolean;
   onChange: (v: unknown) => void;
 }) {
+  const locale = useUiLocale();
+  const tr = (zh: string, en: string) => uiText(locale, zh, en);
   const id = `n-cfg-${def.key}`;
   const raw = asText(value);
   // 后端回显的掩码值：形如 "__masked__:…abc123"，尾部是原值的可辨识片段。
@@ -54,9 +101,9 @@ export function ConfigField({
   if (def.kind === "switch") {
     return (
       <div className="flex items-center gap-2 text-sm">
-        <Switch checked={value === true} onCheckedChange={onChange} aria-label={def.label} />
-        {def.label}
-        {def.help && <span className="text-muted-foreground">（{def.help}）</span>}
+        <Switch checked={value === true} onCheckedChange={onChange} aria-label={notificationText(def.label, locale)} />
+        {notificationText(def.label, locale)}
+        {def.help && <span className="text-muted-foreground">（{notificationText(def.help, locale)}）</span>}
       </div>
     );
   }
@@ -64,7 +111,7 @@ export function ConfigField({
   if (def.kind === "select") {
     return (
       <div className="grid gap-2">
-        <Label>{def.label}</Label>
+        <Label>{notificationText(def.label, locale)}</Label>
         <Select value={raw || def.options?.[0]?.value} onValueChange={onChange}>
           <SelectTrigger>
             <SelectValue />
@@ -72,7 +119,7 @@ export function ConfigField({
           <SelectContent>
             {(def.options ?? []).map((o) => (
               <SelectItem key={o.value} value={o.value}>
-                {o.label}
+                {notificationText(o.label, locale)}
               </SelectItem>
             ))}
           </SelectContent>
@@ -120,15 +167,15 @@ export function ConfigField({
   const hint = masked ? (
     <p className="text-muted-foreground flex items-center gap-1 text-xs">
       <CheckIcon className="size-3" />
-      已保存{maskedTail ? `（尾号 ${maskedTail}）` : ""} · 填入新值即覆盖，清空则删除该项
+      {tr(`已保存${maskedTail ? `（尾号 ${maskedTail}）` : ""} · 填入新值即覆盖，清空则删除该项`, `Saved${maskedTail ? ` (ending ${maskedTail})` : ""} · Enter a new value to replace; clearing removes it`)}
     </p>
   ) : (
-    def.help && <p className="text-muted-foreground text-xs">{def.help}</p>
+    def.help && <p className="text-muted-foreground text-xs">{notificationText(def.help, locale)}</p>
   );
 
   return (
     <div className="grid gap-2">
-      <Label htmlFor={id}>{def.label}</Label>
+      <Label htmlFor={id}>{notificationText(def.label, locale)}</Label>
       {control()}
       {hint}
     </div>
@@ -137,17 +184,19 @@ export function ConfigField({
 
 // FilterSummary 把过滤条件摘要成一行，让卡片不用展开就能看出这个渠道推什么。
 export function FilterSummary({ filter }: { filter: NotificationFilter }) {
+  const locale = useUiLocale();
+  const tr = (zh: string, en: string) => uiText(locale, zh, en);
   const parts: string[] = [];
   if (filter.min_severity) {
-    parts.push(SEVERITY_OPTIONS.find((o) => o.value === filter.min_severity)?.label ?? filter.min_severity);
+    parts.push(notificationText(SEVERITY_OPTIONS.find((o) => o.value === filter.min_severity)?.label ?? filter.min_severity, locale));
   }
-  if (filter.vulnclass_include?.length) parts.push(`类型含 ${filter.vulnclass_include.length} 词`);
-  if (filter.vulnclass_exclude?.length) parts.push(`排除 ${filter.vulnclass_exclude.length} 词`);
-  if (filter.task_ids?.length) parts.push(`${filter.task_ids.length} 个任务`);
-  if (filter.asset_ids?.length) parts.push(`${filter.asset_ids.length} 个资产`);
-  if (filter.on_status_change) parts.push("含状态变更");
+  if (filter.vulnclass_include?.length) parts.push(tr(`类型含 ${filter.vulnclass_include.length} 词`, `${filter.vulnclass_include.length} included keywords`));
+  if (filter.vulnclass_exclude?.length) parts.push(tr(`排除 ${filter.vulnclass_exclude.length} 词`, `${filter.vulnclass_exclude.length} excluded keywords`));
+  if (filter.task_ids?.length) parts.push(tr(`${filter.task_ids.length} 个任务`, `${filter.task_ids.length} tasks`));
+  if (filter.asset_ids?.length) parts.push(tr(`${filter.asset_ids.length} 个资产`, `${filter.asset_ids.length} assets`));
+  if (filter.on_status_change) parts.push(tr("含状态变更", "Includes status changes"));
   if (parts.length === 0) {
-    return <p className="text-muted-foreground text-sm">全部漏洞</p>;
+    return <p className="text-muted-foreground text-sm">{tr("全部漏洞", "All findings")}</p>;
   }
   return <p className="text-muted-foreground text-sm">{parts.join(" · ")}</p>;
 }

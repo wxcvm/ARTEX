@@ -45,17 +45,23 @@ func parseFinding(n *db.Node) findingView {
 
 var sevRank = map[string]int{"critical": 0, "high": 1, "medium": 2, "low": 3, "": 4}
 
-// Markdown renders the report.
+// Markdown retains the original English rendering for existing callers.
 func Markdown(in Input) string {
+	return MarkdownLocalized(in, "en")
+}
+
+// MarkdownLocalized translates the report structure, not stored evidence.
+func MarkdownLocalized(in Input, locale string) string {
+	tr := func(zh, en string) string { return reportText(locale, zh, en) }
 	var b strings.Builder
-	fmt.Fprintf(&b, "# Penetration Test Report — %s\n\n", nz(in.Title, "Unnamed task"))
-	fmt.Fprintf(&b, "- **Task goal**: %s\n", nz(in.Goal, "(unspecified)"))
-	fmt.Fprintf(&b, "- **Generated at**: %s\n\n", in.GeneratedAt.Format("2006-01-02 15:04:05"))
+	fmt.Fprintf(&b, tr("# 安全测试报告 — %s\n\n", "# Penetration Test Report — %s\n\n"), nz(in.Title, tr("未命名任务", "Unnamed task")))
+	fmt.Fprintf(&b, tr("- **任务目标**：%s\n", "- **Task goal**: %s\n"), nz(in.Goal, tr("（未指定）", "(unspecified)")))
+	fmt.Fprintf(&b, tr("- **生成时间**：%s\n\n", "- **Generated at**: %s\n\n"), in.GeneratedAt.Format("2006-01-02 15:04:05"))
 
 	// summary
-	fmt.Fprintf(&b, "## Summary\n\n")
-	fmt.Fprintf(&b, "- Confirmed findings: **%d**\n", len(in.Findings))
-	fmt.Fprintf(&b, "- Assets: ")
+	b.WriteString(tr("## 摘要\n\n", "## Summary\n\n"))
+	fmt.Fprintf(&b, tr("- 已确认发现：**%d**\n", "- Confirmed findings: **%d**\n"), len(in.Findings))
+	b.WriteString(tr("- 资产：", "- Assets: "))
 	var types []string
 	for t := range in.AssetCounts {
 		types = append(types, t)
@@ -65,14 +71,14 @@ func Markdown(in Input) string {
 		if i > 0 {
 			b.WriteString(", ")
 		}
-		fmt.Fprintf(&b, "%s %d", t, in.AssetCounts[t])
+		fmt.Fprintf(&b, "%s %d", reportAssetLabel(locale, t), in.AssetCounts[t])
 	}
 	b.WriteString("\n\n")
 
 	// findings
-	fmt.Fprintf(&b, "## Findings\n\n")
+	b.WriteString(tr("## 发现结果\n\n", "## Findings\n\n"))
 	if len(in.Findings) == 0 {
-		b.WriteString("_No vulnerabilities confirmed this time._\n\n")
+		b.WriteString(tr("_本次未确认漏洞；这不代表不存在安全问题。_\n\n", "_No vulnerabilities confirmed this time._\n\n"))
 	} else {
 		fs := make([]findingView, 0, len(in.Findings))
 		for _, n := range in.Findings {
@@ -80,10 +86,10 @@ func Markdown(in Input) string {
 		}
 		sort.SliceStable(fs, func(i, j int) bool { return sevRank[fs[i].Severity] < sevRank[fs[j].Severity] })
 		for i, f := range fs {
-			fmt.Fprintf(&b, "### %d. [%s] %s\n\n", i+1, strings.ToUpper(nz(f.Severity, "info")), nz(f.Name, nz(f.VulnClass, "Uncategorized")))
+			fmt.Fprintf(&b, "### %d. [%s] %s\n\n", i+1, reportSeverity(locale, nz(f.Severity, "info")), nz(f.Name, nz(f.VulnClass, tr("未分类", "Uncategorized"))))
 			fmt.Fprintf(&b, "%s\n\n", nz(f.Summary, ""))
 			if f.PoC != "" {
-				fmt.Fprintf(&b, "**PoC / Evidence:**\n\n```\n%s\n```\n\n", f.PoC)
+				fmt.Fprintf(&b, tr("**PoC / 证据：**\n\n```\n%s\n```\n\n", "**PoC / Evidence:**\n\n```\n%s\n```\n\n"), f.PoC)
 			}
 		}
 	}
@@ -96,4 +102,39 @@ func nz(s, d string) string {
 		return d
 	}
 	return s
+}
+
+// ReportLocale normalizes the requested report language; Chinese is the default.
+func ReportLocale(value string) string {
+	if value == "en" {
+		return "en"
+	}
+	return "zh-CN"
+}
+
+func reportText(locale, zh, en string) string {
+	if locale == "en" {
+		return en
+	}
+	return zh
+}
+
+func reportSeverity(locale, value string) string {
+	if locale == "en" {
+		return strings.ToUpper(value)
+	}
+	if label, ok := map[string]string{"critical": "严重", "high": "高危", "medium": "中危", "low": "低危", "info": "信息"}[value]; ok {
+		return label
+	}
+	return value
+}
+
+func reportAssetLabel(locale, value string) string {
+	if locale == "en" {
+		return value
+	}
+	if label, ok := map[string]string{"root_domain": "根域名", "subdomain": "子域名", "ip": "IP", "app": "应用", "service": "服务", "endpoint": "接口"}[value]; ok {
+		return label
+	}
+	return value
 }

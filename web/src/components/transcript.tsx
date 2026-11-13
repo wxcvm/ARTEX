@@ -1,5 +1,8 @@
 "use client";
 
+import { useUiLocale } from "@/lib/ui-locale.client";
+import { uiText } from "@/lib/ui-locale";
+
 import * as React from "react";
 import {
   CheckIcon,
@@ -132,12 +135,13 @@ function groupSteps(steps: Activity[], chat: boolean): Group[] {
 const kindLabel = (k: string) => (k === "thinking" ? "Thinking" : k === "result" ? "Summary" : "Note");
 
 function ActivityTime({ ts }: { ts: string }) {
+  const locale = useUiLocale();
   const date = new Date(ts);
   if (!ts || Number.isNaN(date.getTime())) return null;
   return (
     <time
       dateTime={date.toISOString()}
-      title={date.toLocaleString("zh-CN")}
+      title={date.toLocaleString(locale)}
       className="text-[10px] text-muted-foreground tabular-nums"
       suppressHydrationWarning
     >
@@ -191,6 +195,8 @@ function InterceptCard({
   step: Activity;
   getDetail: (seq: number) => Promise<string>;
 }) {
+  const locale = useUiLocale();
+  const tr = (zh: string, en: string) => uiText(locale, zh, en);
   // extract pending_id from summary: "tool Bash requests approval (#42)"
   const pendingId = React.useMemo(() => {
     const m = /\(#(\d+)\)/.exec(step.summary);
@@ -244,7 +250,7 @@ function InterceptCard({
     try {
       await api.interceptDecide(pendingId, decision);
       setDecided(decision);
-      toast.success(decision === "allowed" ? "Execution allowed" : "Execution denied");
+      toast.success(decision === "allowed" ? tr("已允许执行", "Execution allowed") : tr("已拒绝执行", "Execution denied"));
     } catch (e) {
       toast.error((e as Error).message);
     } finally {
@@ -265,7 +271,7 @@ function InterceptCard({
           <ShieldAlertIcon className="mt-0.5 h-3.5 w-3.5 shrink-0 text-amber-500" />
           <div className="min-w-0 space-y-0.5">
             <div className="flex items-center gap-1.5 font-medium">
-              <span className="text-amber-700 dark:text-amber-400">Approval request</span>
+              <span className="text-amber-700 dark:text-amber-400">{tr("审批请求", "Approval request")}</span>
               <code className="rounded bg-amber-100 dark:bg-amber-900/50 px-1 font-mono text-amber-800 dark:text-amber-300">
                 {toolName}
               </code>
@@ -280,7 +286,7 @@ function InterceptCard({
         </div>
 
         {step.inherited ? (
-          <Badge variant="outline">History · Read-only</Badge>
+          <Badge variant="outline">{tr("历史 · 只读", "History · Read-only")}</Badge>
         ) : decided ? (
           <span className={
             "shrink-0 rounded px-2 py-0.5 text-[11px] font-medium " +
@@ -290,7 +296,7 @@ function InterceptCard({
                 ? "bg-zinc-100 text-zinc-600 dark:bg-zinc-800 dark:text-zinc-400"
                 : "bg-red-100 text-red-700 dark:bg-red-900/40 dark:text-red-400")
           }>
-            {decided === "allowed" ? "Allowed" : decided === "timeout" ? "Timed out" : "Denied"}
+            {decided === "allowed" ? tr("已允许", "Allowed") : decided === "timeout" ? tr("已超时", "Timed out") : tr("已拒绝", "Denied")}
           </span>
         ) : (
           <div className="flex shrink-0 gap-1.5">
@@ -301,7 +307,7 @@ function InterceptCard({
               onClick={() => decide("allowed")}
             >
               <CheckIcon className="h-3 w-3" />
-              Allow
+              {tr("允许", "Allow")}
             </Button>
             <Button
               size="sm"
@@ -311,7 +317,7 @@ function InterceptCard({
               onClick={() => decide("denied")}
             >
               <XIcon className="h-3 w-3" />
-              Deny
+              {tr("拒绝", "Deny")}
             </Button>
           </div>
         )}
@@ -319,9 +325,9 @@ function InterceptCard({
       {pendingId ? (
         <Collapsible open={expanded} onOpenChange={setExpanded} className="mt-2 min-w-0">
           <CollapsibleTrigger asChild>
-            <Button variant="ghost" size="sm" aria-label={expanded ? "Collapse approval details" : "Expand approval details"}>
+            <Button variant="ghost" size="sm" aria-label={expanded ? tr("收起审批详情", "Collapse approval details") : tr("展开审批详情", "Expand approval details")}>
               {expanded ? <ChevronDown data-icon="inline-start" /> : <ChevronRight data-icon="inline-start" />}
-              {expanded ? "Collapse approval details" : "Expand approval details"}
+              {expanded ? tr("收起审批详情", "Collapse approval details") : tr("展开审批详情", "Expand approval details")}
             </Button>
           </CollapsibleTrigger>
           <CollapsibleContent>
@@ -338,9 +344,9 @@ function InterceptCard({
             ) : statusError ? (
               <div className="flex flex-wrap items-center gap-2 p-3" role="alert">
                 <span>{statusError}</span>
-                <Button variant="outline" size="sm" onClick={() => setRetry((value) => value + 1)}>Retry details</Button>
+                <Button variant="outline" size="sm" onClick={() => setRetry((value) => value + 1)}>{tr("重试详情", "Retry details")}</Button>
               </div>
-            ) : <p className="p-3 text-muted-foreground">Loading approval details…</p>}
+            ) : <p className="p-3 text-muted-foreground">{tr("正在加载审批详情…", "Loading approval details…")}</p>}
           </CollapsibleContent>
         </Collapsible>
       ) : null}
@@ -362,9 +368,11 @@ function ToolBlock({
   showWorker?: boolean;
   focused?: boolean;
 }) {
+  const locale = useUiLocale();
+  const tr = (zh: string, en: string) => uiText(locale, zh, en);
   const [open, setOpen] = React.useState(focused);
   const targetRef = React.useRef<HTMLElement>(null);
-  const [detail, setDetail] = React.useState<string | null>(null);
+  const [detail, setDetail] = React.useState<{ label: string; text: string }[] | null>(null);
   // what we last loaded, keyed by the underlying step seqs. When the tool result
   // arrives after we expanded mid-run (command only), this key changes and the
   // effect below re-fetches — so the output shows up instead of being cached out.
@@ -383,7 +391,7 @@ function ToolBlock({
     use && use.summary.startsWith(toolName) ? use.summary.slice(toolName.length).trimStart() : (use?.summary ?? "");
   const cmd = toolInputText(toolName, rawCmd);
   // status only — the full result lives behind the expand ([Output]), not previewed inline
-  const statusText = running ? "Running…" : ok ? "✓" : "✕ Failed";
+  const statusText = running ? tr("运行中…", "Running…") : ok ? "✓" : tr("✕ 失败", "✕ Failed");
 
   // key over the seqs we'd load; changes when the result (or command) arrives.
   const detailKey = `${use?.seq ?? ""}:${result?.seq ?? ""}`;
@@ -402,9 +410,7 @@ function ToolBlock({
     ).then((parts) => {
       if (!live) return;
       setDetail(
-        segs
-          .map((x, i) => `[${x.label}]\n${x.label === "Command" ? toolInputText(toolName, parts[i]) : parts[i]}`)
-          .join("\n\n"),
+        segs.map((x, i) => ({ label: x.label, text: x.label === "Command" ? toolInputText(toolName, parts[i]) : parts[i] })),
       );
       loadedKey.current = detailKey;
     });
@@ -457,7 +463,7 @@ function ToolBlock({
   return (
     <section
       ref={targetRef}
-      aria-label={focused ? `Focused tool call #${use?.seq}` : undefined}
+      aria-label={focused ? tr(`定位工具调用 #${use?.seq}`, `Focused tool call #${use?.seq}`) : undefined}
       className={focused ? "rounded-lg border-2 border-primary bg-primary/5 p-3 text-xs" : "text-xs"}
     >
       <button type="button" onClick={toggle} className="flex w-full items-start gap-2 py-1 text-left hover:bg-muted/40">
@@ -472,7 +478,7 @@ function ToolBlock({
       </button>
       {open && (
         <pre className="ml-7 mb-1 max-h-72 overflow-auto whitespace-pre-wrap break-all rounded bg-muted/50 p-2 font-mono text-[11px] leading-relaxed">
-          {detail ?? "Loading…"}
+          {detail ? detail.map(({ label, text }) => `[${locale === "en" ? label : label === "Command" ? "命令" : label.replace("Output", "输出")}]\n${text}`).join("\n\n") : tr("正在加载…", "Loading…")}
         </pre>
       )}
     </section>
@@ -490,8 +496,10 @@ function MessageBlock({
   getDetail: (seq: number) => Promise<string>;
   showWorker?: boolean;
 }) {
+  const locale = useUiLocale();
+  const tr = (zh: string, en: string) => uiText(locale, zh, en);
   const [open, setOpen] = React.useState(false);
-  const [detail, setDetail] = React.useState<string | null>(null);
+  const [detail, setDetail] = React.useState<{ kind: string; text: string }[] | null>(null);
   // like ToolBlock: keyed by the group's step seqs so streamed steps arriving
   // after an early expand re-fetch instead of being cached out.
   const loadedKey = React.useRef<string | null>(null);
@@ -514,7 +522,7 @@ function MessageBlock({
       ),
     ).then((parts) => {
       if (!live) return;
-      setDetail(group.steps.map((s, i) => `[${kindLabel(s.kind)}]\n${parts[i]}`).join("\n\n"));
+      setDetail(group.steps.map((s, i) => ({ kind: s.kind, text: parts[i] })));
       loadedKey.current = detailKey;
     });
     return () => {
@@ -536,12 +544,12 @@ function MessageBlock({
         {showWorker && <span className={chip(group.worker)}>{group.worker}</span>}
         <span className={"min-w-0 flex-1 truncate " + tone}>
           {body}
-          {hasThinking && <span className="ml-1 text-[10px] text-muted-foreground">· includes thinking</span>}
+          {hasThinking && <span className="ml-1 text-[10px] text-muted-foreground">{tr("· 包含思考过程", "· includes thinking")}</span>}
         </span>
       </button>
       {open && (
         <pre className="ml-7 mb-1 max-h-72 overflow-auto whitespace-pre-wrap break-all rounded bg-muted/50 p-2 font-mono text-[11px] leading-relaxed">
-          {detail ?? "Loading…"}
+          {detail ? detail.map(({ kind, text }) => `[${locale === "en" ? kindLabel(kind) : kind === "thinking" ? "思考" : kind === "result" ? "总结" : "说明"}]\n${text}`).join("\n\n") : tr("正在加载…", "Loading…")}
         </pre>
       )}
     </div>
@@ -745,6 +753,8 @@ export function Transcript({
   fetchDetail?: (seq: number) => Promise<string>;
   focusedSeq?: number;
 }) {
+  const locale = useUiLocale();
+  const tr = (zh: string, en: string) => uiText(locale, zh, en);
   const transcriptRef = React.useRef<HTMLDivElement>(null);
   const [focusPadding, setFocusPadding] = React.useState(0);
   React.useLayoutEffect(() => {
@@ -767,7 +777,7 @@ export function Transcript({
             <span className="size-1.5 animate-bounce rounded-full bg-blue-500 [animation-delay:-0.15s]" />
             <span className="size-1.5 animate-bounce rounded-full bg-blue-500" />
           </span>
-          Live streaming…
+          {tr("实时生成中…", "Live streaming…")}
         </div>
       )}
     </div>

@@ -1,3 +1,4 @@
+import { navigationTitle, uiText, type UiLocale } from "@/lib/ui-locale";
 import {
   Activity,
   Ban,
@@ -102,3 +103,11 @@ export const sidebarItems: NavGroup[] = [
     ],
   },
 ];
+
+export function localizedSidebarItems(locale: UiLocale): NavGroup[] {
+  return sidebarItems.map(group => ({
+    ...group,
+    label: group.id === 1 ? uiText(locale, "工作台", "Workspace") : group.id === 2 ? uiText(locale, "系统与配置", "System & configuration") : group.label,
+    items: group.items.map(item => item.subItems ? { ...item, title: navigationTitle(locale, item.id, item.title), subItems: item.subItems.map(sub => ({ ...sub, title: navigationTitle(locale, sub.id, sub.title) })) } : { ...item, title: navigationTitle(locale, item.id, item.title) }),
+  }));
+}

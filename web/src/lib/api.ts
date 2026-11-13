@@ -241,7 +241,7 @@ function interceptPageQuery(page: number, size: number, filter: InterceptApprova
 
 export const api = {
   knowledgeSearch: (query: string) => get<{ hits: { id: number; title: string; snippet?: string; category?: string; verified: boolean }[] | null; degraded: boolean }>(`/knowledge?q=${encodeURIComponent(query)}`),
-  knowledgeEntry: (id: number) => get<{ id: number; title: string; usage?: string; content: string; verified: boolean }>(`/knowledge?id=${id}`),
+  knowledgeEntry: (id: number) => get<{ id: number; title: string; category?: string; kind?: string; usage?: string; content: string; verified: boolean }>(`/knowledge?id=${id}`),
   // Backend application version (injected via ldflags at release, default "dev").
   health: () => get<{ ok: boolean; service: string; version: string }>("/health"),
   privacyExposure: () => get<{ listen_address: string; scope: "loopback" | "all_interfaces" | "specific_interface" | "unknown"; public_reachability: "not_tested"; detail: string }>("/privacy/exposure"),
@@ -582,11 +582,12 @@ export const api = {
   // sends ids (a finding_id list); scope=filtered sends the current filters (the FindingQuery filter fields); scope=all ignores filters.
   exportFindings: async (opts: {
     format: "md-single" | "md-zip" | "csv" | "json" | "sarif";
+    locale?: "zh-CN" | "en";
     scope: "filtered" | "all" | "selected";
     filters?: Omit<FindingQuery, "page" | "pageSize">;
     ids?: string[];
   }) => {
-    const p = new URLSearchParams({ format: opts.format, scope: opts.scope });
+    const p = new URLSearchParams({ format: opts.format, scope: opts.scope, lang: opts.locale ?? "zh-CN" });
     if (opts.scope === "selected") {
       p.set("ids", (opts.ids ?? []).join(","));
     } else if (opts.scope === "filtered" && opts.filters) {
@@ -884,10 +885,12 @@ export const api = {
     ).then((r) => ({ ...r, deliveries: arr(r.deliveries) }));
   },
   notifyRetryDelivery: (id: number) => post<{ ok: boolean }>(`/notify/deliveries/${id}/retry`),
-  report: async (task?: string) => {
+  report: async (task?: string, locale: "zh-CN" | "en" = "zh-CN") => {
     if (MOCK) return taskOutcomeScenarioReport(task ?? "") ?? mockReport(task);
     const token = getToken();
-    const r = await fetch(`/api/report${tq(task)}`, {
+    const params = new URLSearchParams({ lang: locale });
+    if (task) params.set("task", task);
+    const r = await fetch(`/api/report?${params}`, {
       headers: token ? { Authorization: `Bearer ${token}` } : {},
     });
     if (!r.ok) throw new Error(`report: ${r.status}`);

@@ -2312,10 +2312,10 @@ func (s *Server) findingsExport(w http.ResponseWriter, r *http.Request) {
 	switch format {
 	case "md-single":
 		setDownload("text/markdown; charset=utf-8", "findings-"+stamp+".md")
-		_, _ = w.Write([]byte(report.FindingsMarkdown(fs, now)))
+		_, _ = w.Write([]byte(report.FindingsMarkdownLocalized(fs, now, report.ReportLocale(q.Get("lang")))))
 	case "md-zip":
 		path := filepath.Join(stage, "findings.zip")
-		if err := buildFindingsEvidenceZip(path, fs, stage, now); err != nil {
+		if err := buildFindingsEvidenceZip(path, fs, stage, now, report.ReportLocale(q.Get("lang"))); err != nil {
 			writeErr(w, 500, err.Error())
 			return
 		}
@@ -4014,10 +4014,10 @@ func (s *Server) getReport(w http.ResponseWriter, r *http.Request) {
 			counts[ty] = len(ns)
 		}
 	}
-	md := report.Markdown(report.Input{
+	md := report.MarkdownLocalized(report.Input{
 		Title: t.Description, Goal: t.Goal, GeneratedAt: time.Now(),
 		AssetCounts: counts, Findings: findings,
-	})
+	}, report.ReportLocale(r.URL.Query().Get("lang")))
 	w.Header().Set("Content-Type", "text/markdown; charset=utf-8")
 	w.WriteHeader(200)
 	_, _ = w.Write([]byte(md))

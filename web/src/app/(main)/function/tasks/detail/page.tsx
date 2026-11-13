@@ -37,6 +37,8 @@ import { SidebarTrigger } from "@/components/ui/sidebar";
 import { Spinner } from "@/components/ui/spinner";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
+import { useUiLocale } from "@/lib/ui-locale.client";
+import { uiText } from "@/lib/ui-locale";
 import { api } from "@/lib/api";
 import { guideHref } from "@/lib/user-guide";
 import type { LLMProfile, Task } from "@/lib/types";
@@ -54,17 +56,17 @@ import { RetestsTab } from "./_tabs/retests-tab";
 import { SessionsTab } from "./_tabs/sessions-tab";
 
 const TABS = [
-  { value: "sessions", label: "会话" },
-  { value: "overview", label: "概览" },
-  { value: "graph", label: "探索图谱" },
-  { value: "broadcast", label: "任务广播" },
-  { value: "findings", label: "发现结果" },
-  { value: "retests", label: "复测" },
-  { value: "assets", label: "测试资产" },
-  { value: "credentials", label: "测试凭据" },
-  { value: "coverage", label: "资产覆盖" },
-  { value: "intercept", label: "操作审批" },
-  { value: "report", label: "报告" },
+  { value: "sessions", label: "会话", en: "Sessions" },
+  { value: "overview", label: "概览", en: "Overview" },
+  { value: "graph", label: "探索图谱", en: "Exploration graph" },
+  { value: "broadcast", label: "任务广播", en: "Task broadcasts" },
+  { value: "findings", label: "发现结果", en: "Findings" },
+  { value: "retests", label: "复测", en: "Retests" },
+  { value: "assets", label: "测试资产", en: "Test assets" },
+  { value: "credentials", label: "测试凭据", en: "Test credentials" },
+  { value: "coverage", label: "资产覆盖", en: "Asset coverage" },
+  { value: "intercept", label: "操作审批", en: "Approvals" },
+  { value: "report", label: "报告", en: "Report" },
 ];
 
 function taskProfileIDs(task: Task): string[] {
@@ -75,6 +77,8 @@ function taskProfileIDs(task: Task): string[] {
 }
 
 function TaskLLMControl({ task, profiles, onUpdated }: { task: Task; profiles: LLMProfile[]; onUpdated: () => void }) {
+  const locale = useUiLocale();
+  const tr = (zh: string, en: string) => uiText(locale, zh, en);
   const [open, setOpen] = React.useState(false);
   const [profileIDs, setProfileIDs] = React.useState<string[]>(() => taskProfileIDs(task));
   const [activeProfileID, setActiveProfileID] = React.useState(
@@ -96,18 +100,18 @@ function TaskLLMControl({ task, profiles, onUpdated }: { task: Task; profiles: L
   if (task.active_llm_profile_id) activeID = String(task.active_llm_profile_id);
   const activeProfile = profiles.find((profile) => profile.id === activeID);
   const currentLabel = exhausted
-    ? "Configuration chain exhausted"
-    : (activeProfile?.name ?? (activeID ? `Config #${activeID}` : "Follow default config"));
+    ? tr("配置链已耗尽", "Model chain exhausted")
+    : (activeProfile?.name ?? (activeID ? tr(`配置 #${activeID}`, `Profile #${activeID}`) : tr("跟随默认配置", "Follow default")));
   const activeIndex = chain.indexOf(activeID);
   const backupCount = activeIndex >= 0 ? Math.max(0, chain.length - activeIndex - 1) : 0;
   const currentTitle = [currentLabel, activeProfile?.model, backupCount > 0 ? `${backupCount} backups` : ""]
     .filter(Boolean)
     .join(" · ");
-  let editorDescription = "Changes to the order or the current config take effect from the next LLM call.";
-  if (terminal) editorDescription = "The task has ended; changes only affect subsequent main agent conversations.";
-  let saveLabel = "Save";
-  if (exhausted) saveLabel = "Save and reset";
-  if (saving) saveLabel = "Saving";
+  let editorDescription = tr("顺序或当前配置的修改将在下一次模型调用时生效。", "Order or active profile changes apply on the next model call.");
+  if (terminal) editorDescription = tr("任务已结束，修改仅影响后续主智能体对话。", "The task has ended; changes affect only future main-agent conversations.");
+  let saveLabel = tr("保存", "Save");
+  if (exhausted) saveLabel = tr("保存并重置", "Save and reset");
+  if (saving) saveLabel = tr("正在保存", "Saving");
 
   const syncDraft = React.useCallback(() => {
     const next = taskProfileIDs(task);
@@ -145,7 +149,7 @@ function TaskLLMControl({ task, profiles, onUpdated }: { task: Task; profiles: L
       setOpen(false);
       onUpdated();
     } catch (error) {
-      toast.error("Update failed: " + (error as Error).message);
+      toast.error(tr("更新失败：", "Update failed: ") + (error as Error).message);
     } finally {
       setSaving(false);
     }
@@ -157,7 +161,7 @@ function TaskLLMControl({ task, profiles, onUpdated }: { task: Task; profiles: L
         <Button
           size="sm"
           variant={exhausted ? "destructive" : "outline"}
-          aria-label="View or switch the task LLM config"
+          aria-label={tr("查看或切换任务模型配置", "View or switch task model")}
           title={currentTitle}
         >
           <BrainIcon data-icon="inline-start" />
@@ -167,16 +171,16 @@ function TaskLLMControl({ task, profiles, onUpdated }: { task: Task; profiles: L
       </PopoverTrigger>
       <PopoverContent ref={popoverContentRef} align="start" className="w-[min(28rem,calc(100vw-2rem))] gap-4 p-4">
         <PopoverHeader>
-          <PopoverTitle>Task LLM config chain</PopoverTitle>
+          <PopoverTitle>{tr("任务模型配置链", "Task model chain")}</PopoverTitle>
           <PopoverDescription>{editorDescription}</PopoverDescription>
         </PopoverHeader>
 
         {exhausted && (
           <Alert variant="destructive">
             <CircleAlertIcon />
-            <AlertTitle>Configuration chain quota exhausted</AlertTitle>
+            <AlertTitle>{tr("配置链额度耗尽", "Model chain quota exhausted")}</AlertTitle>
             <AlertDescription>
-              {task.llm_failover_reason ?? "All selected configs were judged to be out of quota. Saving the chain resets the failure state."}
+              {task.llm_failover_reason ?? tr("选中的配置均被判定为额度耗尽。保存配置链可重置失败状态。", "All selected profiles are out of quota. Save the chain to reset failures.")}
             </AlertDescription>
           </Alert>
         )}
@@ -194,7 +198,7 @@ function TaskLLMControl({ task, profiles, onUpdated }: { task: Task; profiles: L
 
         <div className="flex justify-end gap-2">
           <Button type="button" variant="outline" size="sm" onClick={() => setOpen(false)}>
-            Close
+            {tr("关闭", "Close")}
           </Button>
           <Button type="button" size="sm" onClick={save} disabled={saving}>
             {saving && <Spinner data-icon="inline-start" />}
@@ -207,6 +211,8 @@ function TaskLLMControl({ task, profiles, onUpdated }: { task: Task; profiles: L
 }
 
 function TaskDetailInner() {
+  const locale = useUiLocale();
+  const tr = (zh: string, en: string) => uiText(locale, zh, en);
   const router = useRouter();
   const searchParams = useSearchParams();
   const id = searchParams.get("id") ?? "";
@@ -285,9 +291,9 @@ function TaskDetailInner() {
     try {
       await api.controlTask(id, next ? "pause" : "resume");
       setPaused(next);
-      toast.success(next ? "Exploration paused" : "Exploration resumed");
+      toast.success(next ? tr("探索已暂停", "Exploration paused") : tr("探索已恢复", "Exploration resumed"));
     } catch (e) {
-      toast.error("Operation failed: " + (e as Error).message);
+      toast.error(tr("操作失败：", "Operation failed: ") + (e as Error).message);
     }
   }
 
@@ -296,10 +302,10 @@ function TaskDetailInner() {
     setArchiving(true);
     try {
       await api.archiveTask(task.id);
-      toast.success("Task queued for archiving");
+      toast.success(tr("任务已加入归档队列", "Task queued for archiving"));
       router.push("/function/tasks");
     } catch (error) {
-      toast.error(`Archive failed: ${(error as Error).message}`);
+      toast.error(`归档失败：${(error as Error).message}`);
       setArchiving(false);
     }
   }
@@ -307,11 +313,11 @@ function TaskDetailInner() {
   if (!task) {
     return (
       <div className="flex flex-1 flex-col items-center justify-center gap-3 p-10 text-center">
-        <p className="text-muted-foreground">{loaded ? `Task ${id} was deleted, archived, or does not exist` : "Loading…"}</p>
+        <p className="text-muted-foreground">{loaded ? tr(`任务 ${id} 已删除、已归档或不存在`, `Task ${id} was deleted, archived or does not exist`) : tr("正在加载…", "Loading…")}</p>
         {loaded && (
           <Button asChild variant="outline">
             <Link href="/function/tasks">
-              <ArrowLeftIcon /> Back to task list
+              <ArrowLeftIcon /> {tr("返回任务列表", "Back to task list")}
             </Link>
           </Button>
         )}
@@ -323,29 +329,29 @@ function TaskDetailInner() {
   const terminal = ["done", "failed", "timeout"].includes(task.status);
   const archiveLifecycleEligible = terminal || paused || task.status === "paused";
   const canArchive = archiveLifecycleEligible && !task.archive_blocked_by_task_id;
-  let archiveDisabledReason = task.queued ? "Queued tasks must be paused first" : "Running tasks must be paused first";
+  let archiveDisabledReason = task.queued ? tr("排队任务需先暂停", "Pause queued tasks first") : tr("运行中任务需先暂停", "Pause running tasks first");
   if (archiveLifecycleEligible && task.archive_blocked_by_task_id) {
-    archiveDisabledReason = `The task is directly inherited by unarchived task #${task.archive_blocked_by_task_id}; archive the dependent task first`;
+    archiveDisabledReason = tr(`此任务被未归档任务 #${task.archive_blocked_by_task_id} 直接继承；请先归档依赖任务`, `Task #${task.archive_blocked_by_task_id} directly inherits this task; archive the dependent task first`);
   }
   const engineMode = paused ? "paused" : (task.engine_mode ?? "idle");
   let controlVariant: "default" | "secondary" | "outline" = "outline";
   let controlIcon = <PauseIcon data-icon="inline-start" />;
-  let controlLabel = "Pause";
+  let controlLabel = tr("暂停", "Pause");
   if (terminal) {
     controlVariant = "secondary";
     controlIcon = <CheckIcon data-icon="inline-start" />;
-    controlLabel = completed ? "Completed" : "Ended";
+    controlLabel = completed ? tr("已完成", "Completed") : tr("已结束", "Ended");
   } else if (paused) {
     controlVariant = "default";
     controlIcon = <PlayIcon data-icon="inline-start" />;
-    controlLabel = "Resume";
+    controlLabel = tr("恢复", "Resume");
   }
   const archiveTrigger = (
     <Button
       size="icon-sm"
       variant="ghost"
       disabled={!canArchive || archiving}
-      aria-label={canArchive ? "Archive task" : archiveDisabledReason}
+      aria-label={canArchive ? tr("归档任务", "Archive task") : archiveDisabledReason}
     >
       {archiving ? <Spinner /> : <ArchiveIcon />}
     </Button>
@@ -369,8 +375,8 @@ function TaskDetailInner() {
             {task.id}
           </code>
           <Button asChild variant="ghost" size="icon" className="size-7 shrink-0"
-            title="任务详情操作指南">
-            <Link href={guideHref("/function/tasks/detail")} aria-label="任务详情操作指南">
+            title={tr("任务详情操作指南", "Task detail guide")}>
+            <Link href={guideHref("/function/tasks/detail")} aria-label={tr("任务详情操作指南", "Task detail guide")}>
               <CircleHelpIcon />
             </Link>
           </Button>
@@ -382,15 +388,14 @@ function TaskDetailInner() {
               <AlertDialogTrigger asChild>{archiveTrigger}</AlertDialogTrigger>
               <AlertDialogContent>
                 <AlertDialogHeader>
-                  <AlertDialogTitle>Archive task #{task.id}?</AlertDialogTitle>
+                  <AlertDialogTitle>{tr(`归档任务 #${task.id}？`, `Archive task #${task.id}?`)}</AlertDialogTitle>
                   <AlertDialogDescription>
-                    The task graph, related records, exclusive assets and traffic, working files, and LLM
-                    history will be compressed into cold storage. Once archiving completes, restore it from the "Archived" tab of the task list.
+                    {tr("任务图谱、关联记录、独占资产和流量、工作文件及模型历史将压缩到冷存储。归档完成后可在任务列表的「已归档」中恢复。", "The task graph, related records, exclusive assets and traffic, working files and LLM history are compressed into cold storage. Restore from the Archived tab.")}
                   </AlertDialogDescription>
                 </AlertDialogHeader>
                 <AlertDialogFooter>
-                  <AlertDialogCancel>Cancel</AlertDialogCancel>
-                  <AlertDialogAction onClick={() => void archiveTask()}>Confirm archive</AlertDialogAction>
+                  <AlertDialogCancel>{tr("取消", "Cancel")}</AlertDialogCancel>
+                  <AlertDialogAction onClick={() => void archiveTask()}>{tr("确认归档", "Confirm archive")}</AlertDialogAction>
                 </AlertDialogFooter>
               </AlertDialogContent>
             </AlertDialog>
@@ -413,7 +418,7 @@ function TaskDetailInner() {
           <TabsList variant="default" className="h-auto min-w-max gap-1 rounded-lg bg-muted/55 p-1">
             {TABS.map((t) => (
               <TabsTrigger key={t.value} value={t.value} className="rounded-md px-3 py-2 text-sm">
-                {t.label}
+                {locale === "en" ? t.en : t.label}
                 {t.value === "intercept" && interceptPendingCount > 0 && (
                   <span className="ml-1.5 inline-flex h-4 min-w-[16px] items-center justify-center rounded-full bg-amber-500 px-1 text-[10px] font-semibold leading-none text-white">
                     {interceptPendingCount > 99 ? "99+" : interceptPendingCount}

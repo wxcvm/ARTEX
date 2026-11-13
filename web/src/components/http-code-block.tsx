@@ -1,4 +1,7 @@
 "use client";
+
+import { useUiLocale } from "@/lib/ui-locale.client";
+import { uiText } from "@/lib/ui-locale";
 import * as React from "react";
 
 import { CheckIcon, CopyIcon, WrapTextIcon } from "lucide-react";
@@ -112,6 +115,8 @@ function HighlightedBody({ body, format }: { body: string; format: BodyFormat })
 }
 
 export function HttpCodeBlock({ raw }: { raw: string }) {
+  const locale = useUiLocale();
+  const tr = (zh: string, en: string) => uiText(locale, zh, en);
   const [wrapLines, setWrapLines] = React.useState(true);
   const [copied, setCopied] = React.useState(false);
   const value = raw || "(empty)";
@@ -132,7 +137,7 @@ export function HttpCodeBlock({ raw }: { raw: string }) {
       setCopied(true);
       return;
     }
-    toast.error("Copy failed; use Ctrl/Cmd+A then copy");
+    toast.error(tr("复制失败，请使用 Ctrl/Cmd+A 后复制", "Copy failed; use Ctrl/Cmd+A then copy"));
   };
 
   const renderLine = (line: string, index: number) => {
@@ -151,14 +156,14 @@ export function HttpCodeBlock({ raw }: { raw: string }) {
               type="button"
               variant="ghost"
               size="icon-xs"
-              aria-label={wrapLines ? "Disable word wrap" : "Enable word wrap"}
+              aria-label={wrapLines ? tr("取消自动换行", "Disable word wrap") : tr("启用自动换行", "Enable word wrap")}
               aria-pressed={wrapLines}
               onClick={() => setWrapLines((current) => !current)}
             >
               <WrapTextIcon />
             </Button>
           </TooltipTrigger>
-          <TooltipContent side="bottom">{wrapLines ? "Disable word wrap" : "Enable word wrap"}</TooltipContent>
+          <TooltipContent side="bottom">{wrapLines ? tr("取消自动换行", "Disable word wrap") : tr("启用自动换行", "Enable word wrap")}</TooltipContent>
         </Tooltip>
         <Tooltip>
           <TooltipTrigger asChild>
@@ -166,19 +171,19 @@ export function HttpCodeBlock({ raw }: { raw: string }) {
               type="button"
               variant="ghost"
               size="icon-xs"
-              aria-label={copied ? "Message copied" : "Copy message"}
+              aria-label={copied ? tr("报文已复制", "Message copied") : tr("复制报文", "Copy message")}
               onClick={() => void copyPacket()}
             >
               {copied ? <CheckIcon /> : <CopyIcon />}
             </Button>
           </TooltipTrigger>
-          <TooltipContent side="bottom">{copied ? "Copied" : "Copy message"}</TooltipContent>
+          <TooltipContent side="bottom">{copied ? tr("已复制", "Copied") : tr("复制报文", "Copy message")}</TooltipContent>
         </Tooltip>
       </div>
       {/* biome-ignore lint/a11y/useSemanticElements: textarea cannot preserve line numbers and syntax-highlighting markup. */}
       <div
         role="textbox"
-        aria-label="HTTP message code"
+        aria-label={tr("HTTP 报文代码", "HTTP message code")}
         aria-multiline="true"
         aria-readonly="true"
         tabIndex={0}

@@ -1,5 +1,9 @@
 "use client";
 
+import { useUiLocale } from "@/lib/ui-locale.client";
+import { uiText } from "@/lib/ui-locale";
+
+
 import * as React from "react";
 
 import { toast } from "sonner";
@@ -28,6 +32,8 @@ export function LinkTrafficDialog({
   onClose: () => void;
   onBound: () => void;
 }) {
+  const locale = useUiLocale();
+  const tr = (zh: string, en: string) => uiText(locale, zh, en);
   const [query, setQuery] = React.useState("");
   const [page, setPage] = React.useState(1);
   const [data, setData] = React.useState<FindingsPage | null>(null);
@@ -66,7 +72,7 @@ export function LinkTrafficDialog({
         selected.finding_id,
         trafficIds.map((traffic_id) => ({ traffic_id })),
       );
-      toast.success(`Linked ${trafficIds.length} traffic records to vulnerability #${selected.finding_id}`);
+      toast.success(tr(`已将 ${trafficIds.length} 条流量关联到漏洞 #${selected.finding_id}`, `Linked ${trafficIds.length} traffic records to vulnerability #${selected.finding_id}`));
       onBound();
       onClose();
     } catch (e) {
@@ -84,15 +90,15 @@ export function LinkTrafficDialog({
     >
       <DialogContent className="max-h-[90vh] overflow-y-auto sm:max-w-2xl">
         <DialogHeader>
-          <DialogTitle>Link to vulnerability</DialogTitle>
-          <DialogDescription>Save the {trafficIds.length} selected traffic records as evidence of an existing vulnerability.</DialogDescription>
+          <DialogTitle>{tr("关联漏洞", "Link to vulnerability")}</DialogTitle>
+          <DialogDescription>{tr(`将选中的 ${trafficIds.length} 条流量记录保存为已有漏洞的证据。`, `Save the ${trafficIds.length} selected traffic records as evidence of an existing vulnerability.`)}</DialogDescription>
         </DialogHeader>
         <FieldGroup>
           <Field>
-            <FieldLabel htmlFor="link-finding-query">Find vulnerability</FieldLabel>
+            <FieldLabel htmlFor="link-finding-query">{tr("查找漏洞", "Find vulnerability")}</FieldLabel>
             <Input
               id="link-finding-query"
-              placeholder="Name / summary / vulnerability class"
+              placeholder={tr("名称 / 摘要 / 漏洞类型", "Name / summary / vulnerability class")}
               value={query}
               onChange={(e) => {
                 setQuery(e.target.value);
@@ -126,16 +132,16 @@ export function LinkTrafficDialog({
           ))}
           {!data?.items.length ? (
             <p className="py-6 text-center text-sm text-muted-foreground">
-              {loading ? "Loading…" : "No matching vulnerabilities; register one first"}
+              {loading ? tr("正在加载…", "Loading…") : tr("没有匹配的漏洞，请先登记漏洞", "No matching vulnerabilities; register one first")}
             </p>
           ) : null}
         </div>
         <div className="flex items-center justify-between gap-2">
           <Button variant="outline" size="sm" disabled={loading || page <= 1} onClick={() => setPage((p) => p - 1)}>
-            Previous
+            {tr("上一页", "Previous")}
           </Button>
           <span className="text-xs">
-            Page {page} · {data?.total ?? 0} total
+            {tr(`第 ${page} 页 · 共 ${data?.total ?? 0} 条`, `Page ${page} · ${data?.total ?? 0} total`)}
           </span>
           <Button
             variant="outline"
@@ -143,18 +149,18 @@ export function LinkTrafficDialog({
             disabled={loading || page * 20 >= (data?.total ?? 0)}
             onClick={() => setPage((p) => p + 1)}
           >
-            Next
+            {tr("下一页", "Next")}
           </Button>
         </div>
         <p className="text-sm">
-          {selected ? `Selected: #${selected.finding_id} ${selected.name || selected.vulnclass}` : "Select a vulnerability"}
+          {selected ? tr(`已选：#${selected.finding_id} ${selected.name || selected.vulnclass}`, `Selected: #${selected.finding_id} ${selected.name || selected.vulnclass}`) : tr("请选择漏洞", "Select a vulnerability")}
         </p>
         <DialogFooter>
           <Button variant="outline" disabled={busy} onClick={onClose}>
-            Cancel
+            {tr("取消", "Cancel")}
           </Button>
           <Button disabled={busy || !selected} onClick={() => void save()}>
-            {busy ? "Saving…" : "Link"}
+            {busy ? tr("正在保存…", "Saving…") : tr("关联", "Link")}
           </Button>
         </DialogFooter>
       </DialogContent>

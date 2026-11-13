@@ -22,44 +22,46 @@ export function taskOutcomePresentation(
   task: Lifecycle,
   outcome: TaskOutcome | null,
   requestError = "",
+  locale: "zh-CN" | "en" = "en",
 ): TaskOutcomePresentation {
+  const tr = (zh: string, en: string) => locale === "en" ? en : zh;
   if (requestError) {
     return {
       state: "environment_error",
-      title: "Result data unavailable",
-      detail: "The outcome request failed. The assessment result is unknown; this does not change the task status.",
+      title: tr("结果数据暂不可用", "Result data unavailable"),
+      detail: tr("结果请求失败，评估结论未知；任务状态不受影响。", "The outcome request failed. The assessment result is unknown; this does not change the task status."),
     };
   }
-  if (!outcome) return { state: "loading", title: "Loading result data…", detail: "No result conclusion is available yet." };
+  if (!outcome) return { state: "loading", title: tr("正在加载结果…", "Loading result data…"), detail: tr("尚无可用的评估结论。", "No result conclusion is available yet.") };
 
   const status = task.queued ? "queued" : task.paused ? "paused" : task.status;
   if (status === "failed") {
     return {
       state: "task_failed",
-      title: "Task failed — assessment incomplete",
-      detail: "The task ended in failure. The result alone does not identify an environment failure or establish a clean assessment.",
+      title: tr("任务失败 — 评估未完成", "Task failed — assessment incomplete"),
+      detail: tr("任务以失败结束。不能仅凭此结果认定环境故障或评估无风险。", "The task ended in failure. The result alone does not identify an environment failure or establish a clean assessment."),
     };
   }
   if (status !== "done" || outcome.status !== "done") {
     return {
       state: "incomplete",
-      title: status === "timeout" ? "Time limit reached — assessment incomplete" : "Assessment incomplete",
+      title: status === "timeout" ? tr("达到时限 — 评估未完成", "Time limit reached — assessment incomplete") : tr("评估未完成", "Assessment incomplete"),
       detail: status === "done"
-        ? "The task and outcome snapshots are still settling. Wait for a consistent completed result."
-        : `Task state: ${status}. Counts are observations so far, not a completed assessment.`,
+        ? tr("任务与结果快照尚未一致，请等待一致的完成结果。", "The task and outcome snapshots are still settling. Wait for a consistent completed result.")
+        : tr(`任务状态：${({ created: "已创建", queued: "排队中", running: "运行中", paused: "已暂停", timeout: "已超时", done: "已完成" } as Record<string, string>)[status] ?? status}。这些数量仅为当前观察记录，不代表评估已完成。`, `Task state: ${status}. Counts are observations so far, not a completed assessment.`),
     };
   }
   if (outcome.findings.total === 0) {
     return {
       state: "completed_no_findings",
-      title: "Completed — no findings recorded",
-      detail: "The task is done and the outcome contains zero recorded findings. This is not proof that the target is vulnerability-free.",
+      title: tr("已完成 — 未登记发现", "Completed — no findings recorded"),
+      detail: tr("任务已结束，结果中的登记发现为零。这不能证明目标不存在漏洞。", "The task is done and the outcome contains zero recorded findings. This is not proof that the target is vulnerability-free."),
     };
   }
   return {
     state: "completed_with_findings",
-    title: "Completed — findings recorded",
-    detail: "Recorded findings include their individual review dispositions; the total is not a count of confirmed vulnerabilities.",
+    title: tr("已完成 — 已登记发现", "Completed — findings recorded"),
+    detail: tr("登记发现含各自的复核状态；总数不等于已确认漏洞数。", "Recorded findings include their individual review dispositions; the total is not a count of confirmed vulnerabilities."),
   };
 }
 

@@ -1,5 +1,8 @@
 "use client";
 
+import { useUiLocale } from "@/lib/ui-locale.client";
+import { uiText } from "@/lib/ui-locale";
+
 import * as React from "react";
 
 import Link from "next/link";
@@ -13,7 +16,7 @@ import { Card, CardContent } from "@/components/ui/card";
 import { Select, SelectContent, SelectGroup, SelectItem, SelectTrigger } from "@/components/ui/select";
 import { api } from "@/lib/api";
 import { useStoredSortPreference } from "@/lib/sort-preference";
-import { statusMeta } from "@/lib/status";
+import { statusLabel } from "@/lib/status";
 import type { Finding, FindingStatus } from "@/lib/types";
 import { cn } from "@/lib/utils";
 
@@ -22,10 +25,10 @@ type FindingSortField = "time";
 const FINDING_SORT_FIELDS: readonly FindingSortField[] = ["time"];
 const FINDING_SORT_PREFERENCE_KEY = "artex_task_findings_sort";
 
-function findingLabel(finding: Finding): string {
+function findingLabel(finding: Finding, locale: "zh-CN" | "en"): string {
   if (finding.name?.trim()) return finding.name;
   if (finding.vulnclass?.trim()) return finding.vulnclass;
-  return "Uncategorized";
+  return uiText(locale, "未分类", "Uncategorized");
 }
 
 const FINDING_STATUSES: FindingStatus[] = [
@@ -49,6 +52,8 @@ function Row({
   contextTaskId: string;
   onStatus: (f: Finding, next: FindingStatus) => void;
 }) {
+  const locale = useUiLocale();
+  const tr = (zh: string, en: string) => uiText(locale, zh, en);
   const [open, setOpen] = React.useState(false);
   return (
     <div className="border-b last:border-b-0">
@@ -64,17 +69,17 @@ function Row({
           <StatusBadge domain="severity" value={f.severity} dot />
           <div className="flex min-w-0 flex-1 flex-col gap-1">
             <div className="flex min-w-0 items-center gap-2">
-              <span className="truncate font-medium">{findingLabel(f)}</span>
+              <span className="truncate font-medium">{findingLabel(f, locale)}</span>
               {f.inherited && f.source_task_id && (
                 <Badge variant="outline" className="shrink-0">
-                  Source #{f.source_task_id} · read-only
+                  {tr(`来源 #${f.source_task_id} · 只读`, `Source #${f.source_task_id} · read-only`)}
                 </Badge>
               )}
             </div>
             <span className="truncate text-xs text-muted-foreground">{f.summary}</span>
           </div>
         </button>
-        <Badge variant="outline">Traffic evidence {f.traffic_count ?? 0}</Badge>
+        <Badge variant="outline">{tr("流量证据", "Traffic evidence")} {f.traffic_count ?? 0}</Badge>
         {f.assets && f.assets.length > 0 && (
           <div className="hidden shrink-0 flex-wrap justify-end gap-1 sm:flex">
             {f.assets.slice(0, 2).map((a) => (
@@ -98,7 +103,7 @@ function Row({
               <SelectGroup>
                 {FINDING_STATUSES.map((st) => (
                   <SelectItem key={st} value={st}>
-                    {statusMeta("finding", st).label}
+                    {statusLabel("finding", st, locale)}
                   </SelectItem>
                 ))}
               </SelectGroup>
@@ -108,7 +113,7 @@ function Row({
           <StatusBadge domain="finding" value={f.status} dot />
         )}
         <span className="hidden shrink-0 text-xs text-muted-foreground md:block">
-          {new Date(f.ts).toLocaleString("zh-CN")}
+          {new Date(f.ts).toLocaleString(locale)}
         </span>
         {f.finding_id && (
           <Link
@@ -118,16 +123,16 @@ function Row({
                 : `/function/findings/detail?id=${f.finding_id}`
             }
             className="text-muted-foreground hover:text-primary inline-flex shrink-0 items-center gap-0.5 text-xs"
-            title="View vulnerability details"
+            title={tr("查看漏洞详情", "View finding details")}
           >
-            Details
+            {tr("详情", "Details")}
             <ArrowUpRightIcon className="size-3" />
           </Link>
         )}
       </div>
       {open && (
         <div className="bg-muted/30 px-4 pb-4 pl-11">
-          <div className="mb-1 text-xs font-medium text-muted-foreground">Evidence / PoC</div>
+          <div className="mb-1 text-xs font-medium text-muted-foreground">{tr("证据 / PoC", "Evidence / PoC")}</div>
           <pre className="overflow-auto rounded-md border bg-background p-3 font-mono text-xs whitespace-pre-wrap">
             {f.evidence}
           </pre>
@@ -138,6 +143,8 @@ function Row({
 }
 
 export function FindingsTab({ taskId }: { taskId: string }) {
+  const locale = useUiLocale();
+  const tr = (zh: string, en: string) => uiText(locale, zh, en);
   const [findings, setFindings] = React.useState<Finding[]>([]);
   const [sortPreference, setSortPreference] = useStoredSortPreference(
     FINDING_SORT_PREFERENCE_KEY,
@@ -172,12 +179,12 @@ export function FindingsTab({ taskId }: { taskId: string }) {
     setFindings((cur) => cur.map((x) => (x.id === f.id ? { ...x, status: next } : x)));
     try {
       await api.setFindingStatus(f.finding_id, next);
-      toast.success(`Marked as "${statusMeta("finding", next).label}"`);
+      toast.success(uiText(locale, `已标记为「${statusLabel("finding", next, locale)}」`, `Marked ${statusLabel("finding", next, locale)}`));
     } catch (e) {
       setFindings((cur) => cur.map((x) => (x.id === f.id ? { ...x, status: prev } : x)));
-      toast.error("Update failed: " + (e as Error).message);
+      toast.error(uiText(locale, "更新失败：", "Update failed: ") + (e as Error).message);
     }
-  }, []);
+  }, [locale]);
 
   const items = findings
     .filter((f) => f.task_id === taskId || f.inherited)
@@ -191,11 +198,11 @@ export function FindingsTab({ taskId }: { taskId: string }) {
     <Card className="overflow-hidden py-0">
       <CardContent className="px-0">
         <div className="flex items-center border-b px-4 py-2 text-xs text-muted-foreground">
-          <span className="min-w-0 flex-1">Vulnerabilities</span>
+          <span className="min-w-0 flex-1">{tr("漏洞", "Finding")}</span>
           <button
             type="button"
             className="inline-flex items-center gap-1 outline-none focus-visible:underline"
-            aria-label={`Discovery time currently ${sortPreference.direction === "asc" ? "ascending" : "descending"}, click to toggle sort direction`}
+            aria-label={tr(`发现时间当前${sortPreference.direction === "asc" ? "升序" : "降序"}，点击切换排序`, `Discovery time ${sortPreference.direction === "asc" ? "ascending" : "descending"}; click to toggle`)}
             onClick={() =>
               setSortPreference((current) => ({
                 field: "time",
@@ -203,7 +210,7 @@ export function FindingsTab({ taskId }: { taskId: string }) {
               }))
             }
           >
-            <span>Discovery time</span>
+            <span>{tr("发现时间", "Discovered at")}</span>
             {sortPreference.direction === "asc" ? (
               <ArrowUpIcon className="size-3.5" />
             ) : (
@@ -215,7 +222,7 @@ export function FindingsTab({ taskId }: { taskId: string }) {
           <Row key={f.id} f={f} contextTaskId={taskId} onStatus={onStatus} />
         ))}
         {items.length === 0 && (
-          <p className="px-4 py-8 text-center text-sm text-muted-foreground">No confirmed findings yet for this task or its directly linked tasks.</p>
+          <p className="px-4 py-8 text-center text-sm text-muted-foreground">{tr("当前任务及其直接关联任务暂无已确认发现。", "No confirmed findings for this task or directly linked tasks.")}</p>
         )}
       </CardContent>
     </Card>

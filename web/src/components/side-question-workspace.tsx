@@ -1,5 +1,8 @@
 "use client";
 
+import { useUiLocale } from "@/lib/ui-locale.client";
+import { uiText } from "@/lib/ui-locale";
+
 import { type ReactNode, useEffect, useRef, useState } from "react";
 
 import { ArrowUpIcon, MessageCircleQuestionIcon, SquareIcon, Trash2Icon, XIcon } from "lucide-react";
@@ -38,11 +41,13 @@ const preparationLabels = {
 };
 
 export function SideQuestionButton({ side }: { side: SideQuestions }) {
+  const locale = useUiLocale();
+  const tr = (zh: string, en: string) => uiText(locale, zh, en);
   if (!side.enabled) return null;
   return (
-    <Button variant="outline" size="sm" onClick={() => side.setOpen(true)} title="/btw side question">
+    <Button variant="outline" size="sm" onClick={() => side.setOpen(true)} title={tr("/btw 旁支问答", "/btw side question")}>
       <MessageCircleQuestionIcon data-icon="inline-start" />
-      Side question
+      {tr("旁支问答", "Side question")}
     </Button>
   );
 }
@@ -56,6 +61,8 @@ function SidePanel({
   label: string;
   composerLayout: ComposerLayout;
 }) {
+  const locale = useUiLocale();
+  const tr = (zh: string, en: string) => uiText(locale, zh, en);
   const inlineComposer = composerLayout === "inline";
   const [confirm, setConfirm] = useState(false);
   const viewport = useRef<HTMLDivElement>(null);
@@ -65,13 +72,13 @@ function SidePanel({
   useEffect(() => {
     if (pinned.current && viewport.current) viewport.current.scrollTop = viewport.current.scrollHeight;
   }, [tail?.answer, tail?.id]);
-  const status = { running: "Answering", completed: "Completed", failed: "Failed", cancelled: "Stopped", interrupted: "Interrupted" };
+  const status = { running: tr("回答中", "Answering"), completed: tr("已完成", "Completed"), failed: tr("失败", "Failed"), cancelled: tr("已停止", "Stopped"), interrupted: tr("已中断", "Interrupted") };
   return (
-    <section className="flex h-full min-h-0 flex-col bg-background" aria-label="Side question panel">
+    <section className="flex h-full min-h-0 flex-col bg-background" aria-label={tr("旁支问答面板", "Side question panel")}>
       <div className="flex items-center gap-2 border-b p-3">
         <div className="min-w-0 flex-1">
           <p className="font-medium">
-            Side question <span className="text-muted-foreground">/btw</span>
+            {tr("旁支问答", "Side question")} <span className="text-muted-foreground">/btw</span>
           </p>
           <p className="truncate text-muted-foreground text-xs">{label}</p>
         </div>
@@ -80,11 +87,11 @@ function SidePanel({
           size="icon-sm"
           onClick={() => setConfirm(true)}
           disabled={!side.items.length || side.busy}
-          aria-label="Clear side-question history"
+          aria-label={tr("清空旁支历史", "Clear side-question history")}
         >
           <Trash2Icon />
         </Button>
-        <Button variant="ghost" size="icon-sm" onClick={() => side.setOpen(false)} aria-label="Close side-question panel">
+        <Button variant="ghost" size="icon-sm" onClick={() => side.setOpen(false)} aria-label={tr("关闭旁支问答", "Close side-question panel")}>
           <XIcon />
         </Button>
       </div>
@@ -92,10 +99,10 @@ function SidePanel({
         {side.snapshot ? (
           <>
             <p>{side.snapshot.model.model}</p>
-            <p>Context updated {new Date(side.snapshot.captured_at).toLocaleString()}</p>
+            <p>{tr("上下文更新于", "Context updated")} {new Date(side.snapshot.captured_at).toLocaleString(locale)}</p>
           </>
         ) : (
-          "Ask anytime after the main agent's first run"
+          tr("主智能体首次运行后即可随时提问", "Ask anytime after the main agent's first run")
         )}
       </div>
       <div
@@ -108,15 +115,15 @@ function SidePanel({
       >
         {side.nextCursor > 0 && (
           <Button variant="ghost" size="sm" onClick={() => void side.load(side.nextCursor)}>
-            Load earlier side Q&A
+            {tr("加载更早的旁支问答", "Load earlier side Q&A")}
           </Button>
         )}
         {side.loading && <Skeleton className="h-16 w-full" />}
         {!side.loading && side.items.length === 0 && (
           <Empty>
             <EmptyHeader>
-              <EmptyTitle>Ask a question anytime</EmptyTitle>
-              <EmptyDescription>Answered from the current agent's context while the main task keeps running.</EmptyDescription>
+              <EmptyTitle>{tr("随时提出问题", "Ask a question anytime")}</EmptyTitle>
+              <EmptyDescription>{tr("基于当前智能体上下文回答，主任务继续运行。", "Answered from the current agent's context while the main task keeps running.")}</EmptyDescription>
             </EmptyHeader>
           </Empty>
         )}
@@ -127,21 +134,21 @@ function SidePanel({
               <div className="flex flex-wrap items-center gap-2 text-muted-foreground text-xs">
                 <Badge variant="secondary">{status[item.status]}</Badge>
                 <span className="truncate">{item.model.model}</span>
-                <time dateTime={item.snapshot_at} title={new Date(item.snapshot_at).toLocaleString()}>
-                  Context {new Date(item.snapshot_at).toLocaleTimeString()}
+                <time dateTime={item.snapshot_at} title={new Date(item.snapshot_at).toLocaleString(locale)}>
+                  {tr("上下文", "Context")} {new Date(item.snapshot_at).toLocaleTimeString(locale)}
                 </time>
               </div>
               {item.context?.estimated_input_tokens != null && (
                 <p className="text-muted-foreground text-xs">
-                  Last {item.context.recent_exchanges} Q&A exchanges verbatim
-                  {item.context.history_summarized && " · earlier Q&A summarized"}
-                  {item.context.snapshot_summarized && " · uses the main-context digest"}
+                  {tr(`最近 ${item.context.recent_exchanges} 轮问答保留原文`, `Last ${item.context.recent_exchanges} Q&A exchanges verbatim`)}
+                  {item.context.history_summarized && tr(" · 更早问答已摘要", " · earlier Q&A summarized")}
+                  {item.context.snapshot_summarized && tr(" · 使用主上下文摘要", " · uses the main-context digest")}
                 </p>
               )}
               {item.answer && <Markdown text={item.answer} />}
               {!item.answer && item.status === "running" && (
                 <p role="status" className="text-muted-foreground text-sm">
-                  {preparationLabels[item.context?.phase ?? "answering"]}
+                  {(locale === "en" ? preparationLabels : { preparing: "正在准备上下文…", summarizing_history: "正在摘要早期旁支问答…", compressing_snapshot: "正在压缩旁支上下文副本…", retrying: "超出模型上下文，正在缩减并重试…", answering: "正在回答…" })[item.context?.phase ?? "answering"]}
                 </p>
               )}
               {item.error && (
@@ -163,8 +170,8 @@ function SidePanel({
           <InputGroupTextarea
             rows={1}
             className={cn("overflow-y-auto", inlineComposer ? "max-h-40 min-h-0" : "max-h-36 min-h-9")}
-            aria-label="Side question"
-            placeholder="Ask about the current context…"
+            aria-label={tr("旁支问答", "Side question")}
+            placeholder={tr("询问当前上下文…", "Ask about the current context…")}
             value={side.draft}
             maxLength={4000}
             disabled={side.busy}
@@ -177,14 +184,14 @@ function SidePanel({
             }}
           />
           <InputGroupAddon align={inlineComposer ? "inline-end" : "block-end"}>
-            {!inlineComposer && <span className="text-muted-foreground text-xs">Standalone Q&A · No tool execution</span>}
+            {!inlineComposer && <span className="text-muted-foreground text-xs">{tr("独立问答 · 不执行工具", "Standalone Q&A · No tool execution")}</span>}
             {side.running ? (
               <InputGroupButton
                 className="ml-auto"
                 variant="destructive"
                 size="icon-xs"
                 onClick={() => void side.stop()}
-                aria-label="Stop the side answer"
+                aria-label={tr("停止旁支回答", "Stop the side answer")}
               >
                 <SquareIcon />
               </InputGroupButton>
@@ -195,7 +202,7 @@ function SidePanel({
                 size="icon-xs"
                 onClick={() => void side.ask(side.draft)}
                 disabled={side.busy || !side.draft.trim() || !side.snapshot?.available}
-                aria-label="Send side question"
+                aria-label={tr("发送旁支问题", "Send side question")}
               >
                 <ArrowUpIcon />
               </InputGroupButton>
@@ -204,19 +211,19 @@ function SidePanel({
         </InputGroup>
       </div>
       {inlineComposer && (
-        <div className="shrink-0 truncate px-3 pt-0.5 pb-1 text-muted-foreground text-xs">Standalone Q&A · No tool execution</div>
+        <div className="shrink-0 truncate px-3 pt-0.5 pb-1 text-muted-foreground text-xs">{tr("独立问答 · 不执行工具", "Standalone Q&A · No tool execution")}</div>
       )}
       <AlertDialog open={confirm} onOpenChange={setConfirm}>
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle>Clear side-question history?</AlertDialogTitle>
+            <AlertDialogTitle>{tr("清空旁支问答历史？", "Clear side-question history?")}</AlertDialogTitle>
             <AlertDialogDescription>
-              Deletes this agent's side Q&A and stops any answer still being generated. The main session and context snapshot are kept.
+              {tr("删除该智能体的旁支问答并停止正在生成的回答。主会话与上下文快照保留。", "Deletes this agent's side Q&A and stops any answer still being generated. The main session and context snapshot are kept.")}
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel>Cancel</AlertDialogCancel>
-            <AlertDialogAction onClick={() => void side.clear()}>Clear history</AlertDialogAction>
+            <AlertDialogCancel>{tr("取消", "Cancel")}</AlertDialogCancel>
+            <AlertDialogAction onClick={() => void side.clear()}>{tr("清空历史", "Clear history")}</AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
       </AlertDialog>
@@ -235,6 +242,8 @@ export function SideQuestionWorkspace({
   children: ReactNode;
   composerLayout?: ComposerLayout;
 }) {
+  const locale = useUiLocale();
+  const tr = (zh: string, en: string) => uiText(locale, zh, en);
   const mobile = useIsMobile();
   return (
     <>
@@ -254,8 +263,8 @@ export function SideQuestionWorkspace({
       <Drawer open={mobile && side.open && side.enabled} onOpenChange={side.setOpen}>
         <DrawerContent className="h-[85svh]">
           <DrawerHeader className="sr-only">
-            <DrawerTitle>Side question</DrawerTitle>
-            <DrawerDescription>Standalone Q&A for {label}</DrawerDescription>
+            <DrawerTitle>{tr("旁支问答", "Side question")}</DrawerTitle>
+            <DrawerDescription>{tr("独立问答：", "Standalone Q&A for ")}{label}</DrawerDescription>
           </DrawerHeader>
           <SidePanel side={side} label={label} composerLayout={composerLayout} />
         </DrawerContent>

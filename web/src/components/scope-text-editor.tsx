@@ -1,5 +1,8 @@
 "use client";
 
+import { useUiLocale } from "@/lib/ui-locale.client";
+import { uiText } from "@/lib/ui-locale";
+
 import * as React from "react";
 
 import { Badge } from "@/components/ui/badge";
@@ -21,8 +24,8 @@ export function ScopeTextEditor({
   value,
   onValueChange,
   parsed,
-  label = "Asset scope",
-  description = "One per line; domains, IPs, CIDRs, ICP filings, and company keywords are recognized automatically.",
+  label,
+  description,
 }: {
   id: string;
   value: string;
@@ -31,6 +34,8 @@ export function ScopeTextEditor({
   label?: string;
   description?: string;
 }) {
+  const locale = useUiLocale();
+  const tr = (zh: string, en: string) => uiText(locale, zh, en);
   const counts = React.useMemo(() => {
     const result = new Map<CompanyScopeKind, number>();
     for (const rule of parsed.rules) result.set(rule.kind, (result.get(rule.kind) ?? 0) + 1);
@@ -39,8 +44,8 @@ export function ScopeTextEditor({
 
   return (
     <Field data-invalid={parsed.errors.length > 0}>
-      <FieldLabel htmlFor={id}>{label}</FieldLabel>
-      <FieldDescription>{description}</FieldDescription>
+      <FieldLabel htmlFor={id}>{label ?? tr("资产范围", "Asset scope")}</FieldLabel>
+      <FieldDescription>{description ?? tr("每行一项，自动识别域名、IP、CIDR、ICP备案和企业关键词。", "One per line; domains, IPs, CIDRs, ICP filings, and company keywords are recognized automatically.")}</FieldDescription>
       <Textarea
         id={id}
         rows={8}
@@ -52,12 +57,12 @@ export function ScopeTextEditor({
       />
       {parsed.rules.length > 0 && (
         <div className="flex flex-wrap items-center gap-1.5 text-muted-foreground text-xs">
-          <span>{parsed.rules.length} recognized</span>
+          <span>{tr(`已识别 ${parsed.rules.length} 项`, `${parsed.rules.length} recognized`)}</span>
           {Object.entries(SCOPE_KIND_LABELS).map(([kind, kindLabel]) => {
             const count = counts.get(kind as CompanyScopeKind) ?? 0;
             return count > 0 ? (
               <Badge key={kind} variant="secondary" className="font-mono tabular-nums">
-                {kindLabel} {count}
+                {locale === "en" ? kindLabel : ({ domain: "域名", ip: "IP", cidr: "CIDR", icp: "ICP备案", keyword: "关键词" } as Record<string, string>)[kind]} {count}
               </Badge>
             ) : null;
           })}
@@ -67,10 +72,10 @@ export function ScopeTextEditor({
         <FieldError>
           {parsed.errors.slice(0, 5).map((item) => (
             <span key={`${item.line}-${item.error}`} className="block">
-              Line {item.line}: {item.error}
+              {tr(`第 ${item.line} 行：`, `Line ${item.line}: `)}{item.error}
             </span>
           ))}
-          {parsed.errors.length > 5 && <span className="block">{parsed.errors.length - 5} more errors</span>}
+          {parsed.errors.length > 5 && <span className="block">{tr(`另有 ${parsed.errors.length - 5} 项错误`, `${parsed.errors.length - 5} more errors`)}</span>}
         </FieldError>
       )}
     </Field>

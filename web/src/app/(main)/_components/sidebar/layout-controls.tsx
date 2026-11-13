@@ -1,5 +1,7 @@
 "use client";
 
+import { useUiLocale, setUiLocale } from "@/lib/ui-locale.client";
+import { uiText, parseUiLocale } from "@/lib/ui-locale";
 import { Settings } from "lucide-react";
 
 import { Button } from "@/components/ui/button";
@@ -23,6 +25,8 @@ import { applyThemePreset } from "@/lib/preferences/theme-utils";
 import { usePreferencesStore } from "@/stores/preferences/preferences-provider";
 
 export function LayoutControls() {
+  const locale = useUiLocale();
+  const t = (zh: string, en: string) => uiText(locale, zh, en);
   const themeMode = usePreferencesStore((s) => s.themeMode);
   const resolvedThemeMode = usePreferencesStore((s) => s.resolvedThemeMode);
   const setThemeMode = usePreferencesStore((s) => s.setThemeMode);
@@ -106,15 +110,23 @@ export function LayoutControls() {
       <PopoverContent align="end">
         <div className="flex flex-col gap-5">
           <div className="space-y-1.5">
-            <h4 className="font-medium text-sm leading-none">Preferences</h4>
-            <p className="text-muted-foreground text-xs">Customize your dashboard layout preferences.</p>
+            <h4 className="font-medium text-sm leading-none">{t("偏好设置", "Preferences")}</h4>
+            <p className="text-muted-foreground text-xs">{t("自定义工作台的布局与界面偏好。", "Customize your dashboard layout preferences.")}</p>
+          </div>
+          <div className="space-y-1">
+            <Label className="font-medium text-xs">{t("界面语言（已适配页面）", "Interface language (supported pages)")}</Label>
+            <Select value={locale} onValueChange={value => setUiLocale(parseUiLocale(value))}>
+              <SelectTrigger size="sm" className="w-full text-xs" aria-label={t("界面语言", "Interface language")}><SelectValue /></SelectTrigger>
+              <SelectContent><SelectItem value="zh-CN">简体中文</SelectItem><SelectItem value="en">English</SelectItem></SelectContent>
+            </Select>
+            <p className="text-muted-foreground text-xs">{t("已适配导航、登录、布局、系统设置、工作区及知识库；其他页面仍在迁移。", "Applies to navigation, sign-in, layout, system settings, workspace and knowledge base; other pages are being migrated.")}</p>
           </div>
           <div className="space-y-3 **:data-[slot=toggle-group]:w-full **:data-[slot=toggle-group-item]:flex-1 **:data-[slot=toggle-group-item]:text-xs">
             <div className="space-y-1">
-              <Label className="font-medium text-xs">Theme Preset</Label>
+              <Label className="font-medium text-xs">{t("主题预设", "Theme Preset")}</Label>
               <Select value={themePreset} onValueChange={onThemePresetChange}>
                 <SelectTrigger size="sm" className="w-full text-xs">
-                  <SelectValue placeholder="Preset" />
+                  <SelectValue placeholder={t("选择预设", "Preset")} />
                 </SelectTrigger>
                 <SelectContent>
                   <SelectGroup>
@@ -136,10 +148,10 @@ export function LayoutControls() {
             </div>
 
             <div className="space-y-1">
-              <Label className="font-medium text-xs">Fonts</Label>
+              <Label className="font-medium text-xs">{t("字体", "Fonts")}</Label>
               <Select value={font} onValueChange={onFontChange}>
                 <SelectTrigger size="sm" className="w-full text-xs">
-                  <SelectValue placeholder="Select font" />
+                  <SelectValue placeholder={t("选择字体", "Select font")} />
                 </SelectTrigger>
                 <SelectContent>
                   <SelectGroup>
@@ -154,7 +166,7 @@ export function LayoutControls() {
             </div>
 
             <div className="space-y-1">
-              <Label className="font-medium text-xs">Theme Mode</Label>
+              <Label className="font-medium text-xs">{t("主题模式", "Theme Mode")}</Label>
               <ToggleGroup
                 size="sm"
                 spacing={0}
@@ -164,19 +176,19 @@ export function LayoutControls() {
                 onValueChange={onThemeModeChange}
               >
                 <ToggleGroupItem value="light" aria-label="Toggle light">
-                  Light
+                  {t("浅色", "Light")}
                 </ToggleGroupItem>
                 <ToggleGroupItem value="dark" aria-label="Toggle dark">
-                  Dark
+                  {t("深色", "Dark")}
                 </ToggleGroupItem>
                 <ToggleGroupItem value="system" aria-label="Toggle system">
-                  System
+                  {t("跟随系统", "System")}
                 </ToggleGroupItem>
               </ToggleGroup>
             </div>
 
             <div className="space-y-1">
-              <Label className="font-medium text-xs">Page Layout</Label>
+              <Label className="font-medium text-xs">{t("页面布局", "Page Layout")}</Label>
               <ToggleGroup
                 size="sm"
                 spacing={0}
@@ -186,16 +198,16 @@ export function LayoutControls() {
                 onValueChange={onContentLayoutChange}
               >
                 <ToggleGroupItem value="centered" aria-label="Toggle centered">
-                  Centered
+                  {t("居中", "Centered")}
                 </ToggleGroupItem>
                 <ToggleGroupItem value="full-width" aria-label="Toggle full-width">
-                  Full Width
+                  {t("全宽", "Full Width")}
                 </ToggleGroupItem>
               </ToggleGroup>
             </div>
 
             <div className="space-y-1">
-              <Label className="font-medium text-xs">Navbar Behavior</Label>
+              <Label className="font-medium text-xs">{t("导航栏行为", "Navbar Behavior")}</Label>
               <ToggleGroup
                 size="sm"
                 spacing={0}
@@ -205,16 +217,16 @@ export function LayoutControls() {
                 onValueChange={onNavbarStyleChange}
               >
                 <ToggleGroupItem value="sticky" aria-label="Toggle sticky">
-                  Sticky
+                  {t("固定", "Sticky")}
                 </ToggleGroupItem>
                 <ToggleGroupItem value="scroll" aria-label="Toggle scroll">
-                  Scroll
+                  {t("随页面滚动", "Scroll")}
                 </ToggleGroupItem>
               </ToggleGroup>
             </div>
 
             <div className="space-y-1">
-              <Label className="font-medium text-xs">Sidebar Style</Label>
+              <Label className="font-medium text-xs">{t("侧栏样式", "Sidebar Style")}</Label>
               <ToggleGroup
                 size="sm"
                 spacing={0}
@@ -224,19 +236,19 @@ export function LayoutControls() {
                 onValueChange={onSidebarStyleChange}
               >
                 <ToggleGroupItem value="inset" aria-label="Toggle inset">
-                  Inset
+                  {t("内嵌", "Inset")}
                 </ToggleGroupItem>
                 <ToggleGroupItem value="sidebar" aria-label="Toggle sidebar">
-                  Sidebar
+                  {t("侧边栏", "Sidebar")}
                 </ToggleGroupItem>
                 <ToggleGroupItem value="floating" aria-label="Toggle floating">
-                  Floating
+                  {t("悬浮", "Floating")}
                 </ToggleGroupItem>
               </ToggleGroup>
             </div>
 
             <div className="space-y-1">
-              <Label className="font-medium text-xs">Sidebar Collapse Mode</Label>
+              <Label className="font-medium text-xs">{t("侧栏折叠模式", "Sidebar Collapse Mode")}</Label>
               <ToggleGroup
                 size="sm"
                 spacing={0}
@@ -246,16 +258,16 @@ export function LayoutControls() {
                 onValueChange={onSidebarCollapseModeChange}
               >
                 <ToggleGroupItem value="icon" aria-label="Toggle icon">
-                  Icon
+                  {t("图标", "Icon")}
                 </ToggleGroupItem>
                 <ToggleGroupItem value="offcanvas" aria-label="Toggle offcanvas">
-                  OffCanvas
+                  {t("收起", "OffCanvas")}
                 </ToggleGroupItem>
               </ToggleGroup>
             </div>
 
             <Button type="button" size="sm" variant="outline" className="w-full text-xs" onClick={handleRestore}>
-              Restore Defaults
+              {t("恢复默认值", "Restore Defaults")}
             </Button>
           </div>
         </div>

@@ -1,5 +1,8 @@
 "use client";
 
+import { useUiLocale } from "@/lib/ui-locale.client";
+import { uiText } from "@/lib/ui-locale";
+
 import * as React from "react";
 
 import { CopyIcon, EyeIcon, EyeOffIcon, PlusIcon, TrashIcon } from "lucide-react";
@@ -17,6 +20,8 @@ import type { TaskCredential } from "@/lib/types";
 // accounts) and agent-recorded (accounts the workers registered themselves).
 // Passwords render masked; reveal and copy are explicit.
 export function CredentialsTab({ taskId }: { taskId: string }) {
+  const locale = useUiLocale();
+  const tr = (zh: string, en: string) => uiText(locale, zh, en);
   const [items, setItems] = React.useState<TaskCredential[] | null>(null);
   const [error, setError] = React.useState("");
   const [revealed, setRevealed] = React.useState<Set<number>>(new Set());
@@ -86,9 +91,9 @@ export function CredentialsTab({ taskId }: { taskId: string }) {
   return (
     <Card>
       <CardHeader>
-        <CardTitle>Test accounts</CardTitle>
+        <CardTitle>{tr("测试账号", "Test accounts")}</CardTitle>
         <CardDescription>
-          Test accounts for this task. Entries with an empty password mean the agent registers that account and records it. Agent-recorded accounts appear here automatically.
+          {tr("当前任务的测试账号。密码留空时由智能体注册并记录账号；智能体登记的账号会自动显示在此。", "Test accounts for this task. Leaving the password empty lets the agent register and record it; agent-recorded accounts appear here.")}
         </CardDescription>
       </CardHeader>
       <CardContent className="flex flex-col gap-4">
@@ -98,9 +103,9 @@ export function CredentialsTab({ taskId }: { taskId: string }) {
         ) : items.length === 0 ? (
           <Empty>
             <EmptyHeader>
-              <EmptyTitle>No test accounts</EmptyTitle>
+              <EmptyTitle>{tr("暂无测试账号", "No test accounts")}</EmptyTitle>
               <EmptyDescription>
-                Add one below, or declare them when creating the task — the agent reuses them for authenticated testing.
+                {tr("可在下方添加，或在创建任务时声明，智能体将复用账号进行认证测试。", "Add accounts below or declare them at task creation for authenticated testing.")}
               </EmptyDescription>
             </EmptyHeader>
           </Empty>
@@ -111,29 +116,29 @@ export function CredentialsTab({ taskId }: { taskId: string }) {
                 <code className="text-sm font-medium">{c.domain}</code>
                 <span className="text-muted-foreground text-sm">{c.username}</span>
                 <Badge variant={c.source === "agent" ? "secondary" : "outline"}>
-                  {c.source === "agent" ? "agent-recorded" : "declared"}
+                  {c.source === "agent" ? tr("智能体登记", "agent-recorded") : tr("手动声明", "declared")}
                 </Badge>
                 <div className="ml-auto flex items-center gap-1">
                   <code className="max-w-40 truncate rounded bg-muted px-2 py-0.5 text-sm">
-                    {c.password === "" ? "— agent generates —" : revealed.has(c.id) ? c.password : "•".repeat(Math.min(c.password.length, 12))}
+                    {c.password === "" ? tr("— 智能体生成 —", "— agent generates —") : revealed.has(c.id) ? c.password : "•".repeat(Math.min(c.password.length, 12))}
                   </code>
                   {c.password !== "" ? (
                     <>
-                      <Button size="icon" variant="ghost" className="size-7" aria-label={revealed.has(c.id) ? "Hide password" : "Reveal password"} onClick={() => toggle(c.id)}>
+                      <Button size="icon" variant="ghost" className="size-7" aria-label={revealed.has(c.id) ? tr("隐藏密码", "Hide password") : tr("显示密码", "Show password")} onClick={() => toggle(c.id)}>
                         {revealed.has(c.id) ? <EyeOffIcon /> : <EyeIcon />}
                       </Button>
                       <Button
                         size="icon"
                         variant="ghost"
                         className="size-7"
-                        aria-label="Copy password"
+                        aria-label={tr("复制密码", "Copy password")}
                         onClick={() => navigator.clipboard?.writeText(c.password).catch(() => {})}
                       >
                         <CopyIcon />
                       </Button>
                     </>
                   ) : null}
-                  <Button size="icon" variant="ghost" className="size-7" aria-label="Delete credential" onClick={() => remove(c.id)}>
+                  <Button size="icon" variant="ghost" className="size-7" aria-label={tr("删除凭据", "Delete credential")} onClick={() => remove(c.id)}>
                     <TrashIcon />
                   </Button>
                 </div>
@@ -143,18 +148,18 @@ export function CredentialsTab({ taskId }: { taskId: string }) {
           </div>
         )}
         <div className="grid gap-2 sm:grid-cols-[1fr_1fr_1fr_auto]">
-          <Input placeholder="domain (e.g. target.example.com)" value={domain} onChange={(e) => setDomain(e.target.value)} />
-          <Input placeholder="email or username" value={username} onChange={(e) => setUsername(e.target.value)} />
+          <Input placeholder={tr("域名（例如 target.example.com）", "Domain (e.g. target.example.com)")} value={domain} onChange={(e) => setDomain(e.target.value)} />
+          <Input placeholder={tr("邮箱或用户名", "Email or username")} value={username} onChange={(e) => setUsername(e.target.value)} />
           <Input
-            placeholder="password (empty = agent generates)"
+            placeholder={tr("密码（留空由智能体生成）", "Password (empty = agent generates)")}
             type="text"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
           />
           <Button variant="outline" disabled={adding || !domain.trim() || !username.trim()} onClick={add}>
-            <PlusIcon /> Add
+            <PlusIcon /> {tr("添加", "Add")}
           </Button>
-          <Input className="sm:col-span-4" placeholder="note (optional, e.g. program alias account)" value={note} onChange={(e) => setNote(e.target.value)} />
+          <Input className="sm:col-span-4" placeholder={tr("备注（可选，例如项目别名账号）", "Note (optional, e.g. program alias account)")} value={note} onChange={(e) => setNote(e.target.value)} />
         </div>
       </CardContent>
     </Card>

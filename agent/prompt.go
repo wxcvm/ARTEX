@@ -2,6 +2,7 @@ package agent
 
 import (
 	"bytes"
+	"strings"
 	"text/template"
 	"time"
 )
@@ -26,6 +27,24 @@ type GoalsVars struct{ EngagementDescription, DataDir, Now string }
 // elapsed time (e.g. a timed benchmark's "last N hours" window).
 func nowStr() string { return time.Now().Format("2006-01-02 15:04:05 MST") }
 
+// localizedDefaultTemplate upgrades only exact, unedited stock templates at render
+// time. Existing user-authored templates and stored prompt versions are not changed.
+func localizedDefaultTemplate(agentKey, tmpl string) string {
+	if tmpl == legacyAssistantPrompt {
+		return DefaultAssistantPrompt
+	}
+	if agentKey == "retester" && tmpl == strings.Replace(RetesterDefaultPrompt, retesterLanguage, legacyRetesterLanguage, 1) {
+		return RetesterDefaultPrompt
+	}
+	if agentKey == "reporter" && tmpl == strings.Replace(ReporterDefaultPrompt, reporterLanguage, legacyReporterLanguage, 1) {
+		return ReporterDefaultPrompt
+	}
+	if stock, ok := BuiltinPromptSeeds()[agentKey]; ok && tmpl + humanOutputLanguage == stock {
+		return stock
+	}
+	return tmpl
+}
+
 // renderSystem returns the rendered system-prompt BODY (section [A]) for agentKey.
 // Precedence: the DB-stored template (if any) over the built-in default template
 // (def). BOTH are Go templates now — the built-in default is seeded into the DB
@@ -43,10 +62,12 @@ func renderSystem(agentKey, def string, vars any) string {
 			tmpl = t
 		}
 	}
+	tmpl = localizedDefaultTemplate(agentKey, tmpl)
 	if out, err := renderTmpl(tmpl, vars); err == nil {
 		return out
 	}
 	// DB template broke (e.g. references an out-of-catalog var) → code default.
+	def = localizedDefaultTemplate(agentKey, def)
 	if out, err := renderTmpl(def, vars); err == nil {
 		return out
 	}

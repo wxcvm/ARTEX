@@ -1,5 +1,8 @@
 "use client";
 
+import { useUiLocale } from "@/lib/ui-locale.client";
+import { uiText } from "@/lib/ui-locale";
+
 import * as React from "react";
 import { DownloadIcon, Loader2Icon } from "lucide-react";
 import { toast } from "sonner";
@@ -8,6 +11,8 @@ import { api } from "@/lib/api";
 import { buildFindingReportMarkdown, collectFindingReport, findingReportFilename } from "@/lib/finding-report-export";
 
 export function FindingReportExportButton({ findingId, contextTask }: { findingId: string; contextTask?: string }) {
+  const locale = useUiLocale();
+  const tr = (zh: string, en: string) => uiText(locale, zh, en);
   const [loading, setLoading] = React.useState(false);
   const busy = React.useRef(false);
 
@@ -17,7 +22,7 @@ export function FindingReportExportButton({ findingId, contextTask }: { findingI
     setLoading(true);
     try {
       const data = await collectFindingReport(api, findingId, contextTask);
-      const markdown = buildFindingReportMarkdown(data);
+      const markdown = buildFindingReportMarkdown(data, locale);
       const url = URL.createObjectURL(new Blob([markdown], { type: "text/markdown;charset=utf-8" }));
       const link = document.createElement("a");
       link.href = url;
@@ -28,12 +33,12 @@ export function FindingReportExportButton({ findingId, contextTask }: { findingI
       window.setTimeout(() => URL.revokeObjectURL(url), 1000);
       if (data.packets.some((p) => p.request.binary || p.response.binary ||
         p.request.truncated || p.response.truncated)) {
-        toast.warning("报告已导出；二进制或截断正文已注明");
+        toast.warning(tr("报告已导出；二进制或截断正文已注明", "Report exported; binary or truncated bodies are marked"));
       } else {
-        toast.success("已导出漏洞 Markdown 报告");
+        toast.success(tr("已导出漏洞 Markdown 报告", "Finding Markdown report exported"));
       }
     } catch (error) {
-      toast.error("导出失败：" + (error instanceof Error ? error.message : "请重试"));
+      toast.error(tr("导出失败：", "Export failed: ") + (error instanceof Error ? error.message : tr("请重试", "Please retry")));
     } finally {
       busy.current = false;
       setLoading(false);
@@ -43,7 +48,7 @@ export function FindingReportExportButton({ findingId, contextTask }: { findingI
   return (
     <Button variant="outline" size="sm" onClick={() => void exportMarkdown()} disabled={loading}>
       {loading ? <Loader2Icon className="animate-spin" /> : <DownloadIcon />}
-      导出 Markdown
+      {tr("导出 Markdown", "Export Markdown")}
     </Button>
   );
 }

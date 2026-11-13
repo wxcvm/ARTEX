@@ -9,6 +9,8 @@ import { CircleHelpIcon } from "lucide-react";
 import { Separator } from "@/components/ui/separator";
 import { SidebarTrigger } from "@/components/ui/sidebar";
 import { useCurrentUser } from "@/hooks/use-current-user";
+import { useUiLocale } from "@/lib/ui-locale.client";
+import { uiText } from "@/lib/ui-locale";
 import { api } from "@/lib/api";
 import { guideHref } from "@/lib/user-guide";
 import { cn } from "@/lib/utils";
@@ -35,6 +37,7 @@ function isFullBleed(pathname: string) {
 
 export function MainContent({ children }: { children: ReactNode }) {
   const currentUser = useCurrentUser();
+  const locale = useUiLocale();
   const pathname = usePathname();
   const [version, setVersion] = useState("");
 
@@ -68,14 +71,14 @@ export function MainContent({ children }: { children: ReactNode }) {
           </div>
           <div className="flex shrink-0 items-center gap-1 sm:gap-2">
             {!pathname.startsWith("/help") && (
-              <Link href={guideHref(pathname)} aria-label="查看当前页面操作指南" title="查看当前页面操作指南"
+              <Link href={guideHref(pathname)} aria-label={uiText(locale, "查看当前页面操作指南", "View page guide")} title={uiText(locale, "查看当前页面操作指南", "View page guide")}
                 className="inline-flex h-8 items-center gap-1 rounded-md px-2 text-sm text-muted-foreground hover:bg-accent hover:text-foreground">
                 <CircleHelpIcon className="size-4" />
-                <span className="hidden md:inline">操作指南</span>
+                <span className="hidden md:inline">{uiText(locale, "操作指南", "Guide")}</span>
               </Link>
             )}
             {version && (
-              <span className="hidden font-medium text-muted-foreground text-xs tabular-nums xl:inline">Version · {version}</span>
+              <span className="hidden font-medium text-muted-foreground text-xs tabular-nums xl:inline">{uiText(locale, "版本", "Version")} · {version}</span>
             )}
             <LayoutControls />
             <ThemeSwitcher />

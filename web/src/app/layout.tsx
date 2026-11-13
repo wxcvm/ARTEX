@@ -2,6 +2,7 @@ import type { ReactNode } from "react";
 
 import type { Metadata } from "next";
 
+import { UiLocaleDocument } from "@/lib/ui-locale.client";
 import { Toaster } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { APP_CONFIG } from "@/config/app-config";
@@ -22,7 +23,7 @@ export default function RootLayout({ children }: Readonly<{ children: ReactNode 
     PREFERENCE_DEFAULTS;
   return (
     <html
-      lang="en"
+      lang="zh-CN"
       data-theme-mode={theme_mode}
       data-theme-preset={theme_preset}
       data-content-layout={content_layout}
@@ -45,6 +46,7 @@ export default function RootLayout({ children }: Readonly<{ children: ReactNode 
             navbarStyle={navbar_style}
             font={font}
           >
+            <UiLocaleDocument />
             {children}
             <Toaster />
           </PreferencesStoreProvider>

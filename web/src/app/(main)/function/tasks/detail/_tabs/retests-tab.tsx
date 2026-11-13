@@ -1,6 +1,8 @@
 "use client";
 
 import * as React from "react";
+import { useUiLocale } from "@/lib/ui-locale.client";
+import { uiText, type UiLocale } from "@/lib/ui-locale";
 
 import Link from "next/link";
 
@@ -24,6 +26,8 @@ function findingLabel(finding: Finding) {
 }
 
 export function RetestsTab({ taskId }: { taskId: string }) {
+  const locale = useUiLocale();
+  const tr = (zh: string, en: string) => uiText(locale, zh, en);
   const [page, setPage] = React.useState(1);
   const [data, setData] = React.useState<FindingsPage | null>(null);
   const [selectedId, setSelectedId] = React.useState("");
@@ -73,9 +77,9 @@ export function RetestsTab({ taskId }: { taskId: string }) {
       {error ? (
         <Alert variant="destructive">
           <AlertDescription>
-            Failed to load task vulnerabilities: {error}
+            {tr("加载任务漏洞失败：", "Failed to load findings: ")}{error}
             <Button variant="outline" size="sm" onClick={refresh}>
-              Retry
+              {tr("重试", "Retry")}
             </Button>
           </AlertDescription>
         </Alert>
@@ -83,8 +87,8 @@ export function RetestsTab({ taskId }: { taskId: string }) {
       <div className="grid items-start gap-4 lg:grid-cols-[minmax(16rem,22rem)_minmax(0,1fr)]">
         <Card className="min-w-0">
           <CardHeader>
-            <CardTitle>Select a vulnerability{data ? ` · ${data.total}` : ""}</CardTitle>
-            <CardDescription>View retest history for this task's vulnerabilities, or start a new retest.</CardDescription>
+            <CardTitle>{tr("选择漏洞", "Select finding")}{data ? ` · ${data.total}` : ""}</CardTitle>
+            <CardDescription>{tr("查看当前任务漏洞的复测历史，或启动新的复测。", "View retest history for this task or start a new retest.")}</CardDescription>
           </CardHeader>
           <CardContent className="flex max-h-[32rem] flex-col overflow-y-auto">
             {!loaded && !error ? <Skeleton className="h-24 w-full" /> : null}
@@ -94,7 +98,7 @@ export function RetestsTab({ taskId }: { taskId: string }) {
                 <Button
                   variant={finding.id === selectedId ? "secondary" : "ghost"}
                   className="h-auto w-full shrink-0 flex-col items-start gap-2 whitespace-normal py-3 text-left"
-                  aria-label={`Select vulnerability: ${findingLabel(finding)}`}
+                  aria-label={tr(`选择漏洞：${findingLabel(finding)}`, `Select finding: ${findingLabel(finding)}`)}
                   aria-pressed={finding.id === selectedId}
                   onClick={() => setSelectedId(finding.id)}
                 >
@@ -109,8 +113,8 @@ export function RetestsTab({ taskId }: { taskId: string }) {
             {loaded && findings.length === 0 ? (
               <Empty>
                 <EmptyHeader>
-                  <EmptyTitle>No vulnerabilities to retest</EmptyTitle>
-                  <EmptyDescription>Once this task discovers vulnerabilities, you can manually start a retest here.</EmptyDescription>
+                  <EmptyTitle>{tr("暂无可复测漏洞", "No findings to retest")}</EmptyTitle>
+                  <EmptyDescription>{tr("任务发现漏洞后，可在此手动启动复测。", "Start a manual retest here after findings are recorded.")}</EmptyDescription>
                 </EmptyHeader>
               </Empty>
             ) : null}
@@ -120,7 +124,7 @@ export function RetestsTab({ taskId }: { taskId: string }) {
               <Button
                 variant="outline"
                 size="icon-sm"
-                aria-label="Previous page of vulnerabilities"
+                aria-label={tr("上一页漏洞", "Previous page of findings")}
                 disabled={page === 1}
                 onClick={() => setPage(page - 1)}
               >
@@ -132,7 +136,7 @@ export function RetestsTab({ taskId }: { taskId: string }) {
               <Button
                 variant="outline"
                 size="icon-sm"
-                aria-label="Next page of vulnerabilities"
+                aria-label={tr("下一页漏洞", "Next page of findings")}
                 disabled={page * PAGE_SIZE >= data.total}
                 onClick={() => setPage(page + 1)}
               >
@@ -148,7 +152,7 @@ export function RetestsTab({ taskId }: { taskId: string }) {
                 <h2 className="min-w-0 flex-1 break-words font-medium">{findingLabel(selected)}</h2>
                 <Button asChild variant="ghost" size="sm">
                   <Link href={`/function/findings/detail?id=${selected.finding_id || selected.id}`}>
-                    Vulnerability details <ArrowUpRightIcon data-icon="inline-end" />
+                    {tr("漏洞详情", "Finding details")} <ArrowUpRightIcon data-icon="inline-end" />
                   </Link>
                 </Button>
               </div>

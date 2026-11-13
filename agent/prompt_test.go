@@ -81,3 +81,52 @@ func TestRenderSystemOverrideAndFallback(t *testing.T) {
 		t.Fatalf("worker without proxy must NOT inject trafficTool: %q", noProxy)
 	}
 }
+
+// Stock templates from an existing installation get the same language default
+// as a fresh install without overwriting the persisted prompt or custom edits.
+func TestLocalizedStockPromptLanguage(t *testing.T) {
+	prev := PromptOverride
+	t.Cleanup(func() { PromptOverride = prev })
+	for key, stock := range BuiltinPromptSeeds() {
+		legacy := strings.TrimSuffix(stock, humanOutputLanguage)
+		if got := localizedDefaultTemplate(key, legacy); got != stock {
+			t.Fatalf("%s legacy template not localized", key)
+		}
+		if got := localizedDefaultTemplate(key, stock); got != stock {
+			t.Fatalf("%s stock template was changed twice", key)
+		}
+		if got := localizedDefaultTemplate(key, legacy+"\nUser custom text"); got != legacy+"\nUser custom text" {
+			t.Fatalf("%s custom template was modified", key)
+		}
+	}
+	legacyReporter := strings.Replace(ReporterDefaultPrompt, reporterLanguage, legacyReporterLanguage, 1)
+	if got := localizedDefaultTemplate("reporter", legacyReporter); got != ReporterDefaultPrompt {
+		t.Fatal("legacy reporter template not localized")
+	}
+	if got := localizedDefaultTemplate("reporter", legacyReporter+"\nCustom instruction"); got != legacyReporter+"\nCustom instruction" {
+		t.Fatal("custom reporter template was modified")
+	}
+	PromptOverride = func(string) (string, bool) { return legacyAssistantPrompt, true }
+	if got := renderSystem("custom", DefaultAssistantPrompt, chatVars{}); got != DefaultAssistantPrompt {
+		t.Fatal("legacy assistant prompt did not render the Chinese default")
+	}
+	PromptOverride = func(string) (string, bool) { return "Use English for this custom assistant.", true }
+	if got := renderSystem("custom", DefaultAssistantPrompt, chatVars{}); got != "Use English for this custom assistant." {
+		t.Fatal("custom language preference was overridden")
+	}
+}
+
+func TestLocalizedRetesterPrompt(t *testing.T) {
+	prev := PromptOverride
+	t.Cleanup(func() { PromptOverride = prev })
+	legacy := strings.Replace(RetesterDefaultPrompt, retesterLanguage, legacyRetesterLanguage, 1)
+	PromptOverride = func(string) (string, bool) { return legacy, true }
+	if got := chatSystem("retester", "/data", "/work"); !strings.Contains(got, retesterLanguage) || strings.Contains(got, legacyRetesterLanguage) {
+		t.Fatal("the runtime retester prompt did not pick up the Chinese default")
+	}
+	custom := legacy + "\nCustom language choice."
+	PromptOverride = func(string) (string, bool) { return custom, true }
+	if got := chatSystem("retester", "/data", "/work"); !strings.HasPrefix(got, custom) {
+		t.Fatal("custom retester prompt was modified")
+	}
+}

@@ -1,5 +1,8 @@
 "use client";
 
+import { useUiLocale } from "@/lib/ui-locale.client";
+import { uiText } from "@/lib/ui-locale";
+
 import * as React from "react";
 
 import { BarChart3Icon, ChevronLeftIcon, ChevronRightIcon, Loader2Icon, SearchIcon, TerminalIcon } from "lucide-react";
@@ -50,6 +53,8 @@ const PAGE_SIZES = [25, 50, 100];
 const CMD_MAX_LEN = 80;
 
 export default function CommandsPage() {
+  const locale = useUiLocale();
+  const tr = (zh: string, en: string) => uiText(locale, zh, en);
   const [page, setPage] = React.useState(0);
   const [size, setSize] = React.useState(50);
   const [query, setQuery] = React.useState("");
@@ -130,7 +135,7 @@ export default function CommandsPage() {
       <div className="flex items-center justify-between gap-4">
         <div className="flex items-center gap-2">
           <TerminalIcon className="h-5 w-5 text-muted-foreground" />
-          <h1 className="text-xl font-semibold tracking-tight">Tool executions</h1>
+          <h1 className="text-xl font-semibold tracking-tight">{tr("工具执行记录", "Tool execution records")}</h1>
           <Badge variant="secondary">{total}</Badge>
         </div>
       </div>
@@ -140,14 +145,14 @@ export default function CommandsPage() {
         <div className="relative max-w-sm flex-1">
           <SearchIcon className="absolute top-1/2 left-2.5 size-4 -translate-y-1/2 text-muted-foreground" />
           <Input
-            placeholder="Search tools / arguments..."
+            placeholder={tr("搜索工具或参数…", "Search tools or arguments…")}
             value={query}
             onChange={(e) => setQuery(e.target.value)}
             className="h-8 pl-8"
           />
         </div>
         <Input
-          placeholder="Task ID"
+          placeholder={tr("任务 ID", "Task ID")}
           className="h-8 w-28"
           value={taskFilter}
           onChange={(e) => setTaskFilter(e.target.value.replace(/\D/g, ""))}
@@ -167,7 +172,7 @@ export default function CommandsPage() {
 
         <Button variant="outline" size="sm" className="h-8" onClick={() => setStatsOpen(true)}>
           <BarChart3Icon className="size-4" />
-          Stats
+          {tr("统计", "Statistics")}
         </Button>
 
         <div className="ml-auto flex items-center gap-2 text-xs text-muted-foreground">
@@ -205,12 +210,12 @@ export default function CommandsPage() {
             <Table>
               <TableHeader className="sticky top-0 z-10 bg-card">
                 <TableRow>
-                  <TableHead className="w-[130px]">Time</TableHead>
-                  <TableHead className="w-[60px]">Task</TableHead>
-                  <TableHead className="w-[90px]">Worker</TableHead>
-                  <TableHead className="w-[110px]">Tool</TableHead>
-                  <TableHead>Input</TableHead>
-                  <TableHead className="w-[60px]">Status</TableHead>
+                  <TableHead className="w-[130px]">{tr("时间", "Time")}</TableHead>
+                  <TableHead className="w-[60px]">{tr("任务", "Task")}</TableHead>
+                  <TableHead className="w-[90px]">{tr("执行智能体", "Worker")}</TableHead>
+                  <TableHead className="w-[110px]">{tr("工具", "Tool")}</TableHead>
+                  <TableHead>{tr("输入", "Input")}</TableHead>
+                  <TableHead className="w-[60px]">{tr("状态", "Status")}</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
@@ -223,7 +228,7 @@ export default function CommandsPage() {
                 ) : commands.length === 0 ? (
                   <TableRow>
                     <TableCell colSpan={6} className="py-12 text-center text-sm text-muted-foreground">
-                      No tool execution records yet
+                      {tr("暂无工具执行记录", "No tool execution records")}
                     </TableCell>
                   </TableRow>
                 ) : (
@@ -255,11 +260,11 @@ export default function CommandsPage() {
                       <TableCell>
                         {cmd.is_error ? (
                           <Badge variant="destructive" className="text-xs">
-                            Failed
+                            {tr("失败", "Failed")}
                           </Badge>
                         ) : (
                           <Badge variant="secondary" className="text-xs text-emerald-600">
-                            Success
+                            {tr("成功", "Succeeded")}
                           </Badge>
                         )}
                       </TableCell>
@@ -272,13 +277,13 @@ export default function CommandsPage() {
         </Card>
       </div>
 
-      {/* Tool call stats: the same set of records as the table (same filters, no pagination) */}
+      {/* 工具调用统计: the same set of records as the table (same filters, no pagination) */}
       <Dialog open={statsOpen} onOpenChange={setStatsOpen}>
         <DialogContent className="sm:max-w-lg">
           <DialogHeader>
-            <DialogTitle>Tool call stats</DialogTitle>
+            <DialogTitle>{tr("工具调用统计", "Tool call statistics")}</DialogTitle>
             <DialogDescription>
-              {taskFilter || queryQ ? "All records under the current filters" : "All tool execution records"}
+              {taskFilter || queryQ ? tr("当前筛选条件下的所有记录", "All matching records") : tr("全部工具执行记录", "All tool execution records")}
               {stats.length > 0 && (
                 <>
                   {" · "}
@@ -300,7 +305,7 @@ export default function CommandsPage() {
               <Loader2Icon className="mx-auto h-5 w-5 animate-spin text-muted-foreground" />
             </div>
           ) : stats.length === 0 ? (
-            <div className="py-10 text-center text-sm text-muted-foreground">No stats data</div>
+            <div className="py-10 text-center text-sm text-muted-foreground">{tr("暂无统计数据", "No statistics")}</div>
           ) : (
             <div className="-mr-2 max-h-[55vh] space-y-1 overflow-auto pr-2">
               {stats.map((s) => (
@@ -337,7 +342,7 @@ export default function CommandsPage() {
           {selected && (
             <>
               <SheetHeader className="border-b px-5 py-4">
-                <SheetTitle className="pr-8">Tool execution details</SheetTitle>
+                <SheetTitle className="pr-8">{tr("工具执行详情", "Tool execution details")}</SheetTitle>
                 <SheetDescription>{fmtTime(selected.created_at)}</SheetDescription>
                 <div className="flex flex-wrap items-center gap-2 pt-2">
                   <Badge variant="outline" className="text-xs font-mono">
@@ -351,18 +356,18 @@ export default function CommandsPage() {
                   </Badge>
                   {selected.is_error ? (
                     <Badge variant="destructive" className="text-xs">
-                      Failed
+                      {tr("失败", "Failed")}
                     </Badge>
                   ) : (
                     <Badge variant="secondary" className="text-xs text-emerald-600">
-                      Success
+                      {tr("成功", "Succeeded")}
                     </Badge>
                   )}
                 </div>
               </SheetHeader>
               <div className="grid min-h-0 flex-1 grid-rows-2 divide-y">
                 <div className="flex min-h-0 min-w-0 flex-col">
-                  <div className="border-b px-5 py-2 text-xs font-medium text-muted-foreground">Input</div>
+                  <div className="border-b px-5 py-2 text-xs font-medium text-muted-foreground">{tr("输入", "Input")}</div>
                   <div className="min-h-0 flex-1 overflow-auto">
                     <pre className="p-5 font-mono text-xs break-all whitespace-pre-wrap">
                       {toolInput(selected.command)}
@@ -370,7 +375,7 @@ export default function CommandsPage() {
                   </div>
                 </div>
                 <div className="flex min-h-0 min-w-0 flex-col">
-                  <div className="border-b px-5 py-2 text-xs font-medium text-muted-foreground">Output</div>
+                  <div className="border-b px-5 py-2 text-xs font-medium text-muted-foreground">{tr("输出", "Output")}</div>
                   <div className="min-h-0 flex-1 overflow-auto">
                     <pre
                       className={cn(

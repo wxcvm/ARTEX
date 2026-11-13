@@ -1,5 +1,8 @@
 "use client";
 
+import { useUiLocale } from "@/lib/ui-locale.client";
+import { uiText } from "@/lib/ui-locale";
+
 import * as React from "react";
 import { ArrowUpRightIcon, DownloadIcon, RefreshCwIcon } from "lucide-react";
 import { toast } from "sonner";
@@ -25,6 +28,8 @@ function ToolItem({
   host: string;
   onRefresh: () => Promise<void>;
 }) {
+  const locale = useUiLocale();
+  const tr = (zh: string, en: string) => uiText(locale, zh, en);
   const [release, setRelease] = React.useState<ExternalToolRelease | null>(null);
   const [checking, setChecking] = React.useState(false);
   const [installing, setInstalling] = React.useState(false);
@@ -49,14 +54,13 @@ function ToolItem({
     if (!release) return;
     const sizeMiB = (release.size_bytes / 1048576).toFixed(1);
     if (!window.confirm(
-      "从官方 GitHub 下载 " + tool.name + " " + release.version + "（" + sizeMiB + " MiB）？\n" +
-      "下载后校验 SHA-256，再安装到 ARTEX 用户工具目录；不会覆盖自定义目录、修改 PATH 或绑定 Agent。"
+      tr(`从官方 GitHub 下载 ${tool.name} ${release.version}（${sizeMiB} MiB）？\n下载后校验 SHA-256，再安装到 ARTEX 用户工具目录；不会覆盖自定义目录、修改 PATH 或绑定 Agent。`, `Download ${tool.name} ${release.version} (${sizeMiB} MiB) from official GitHub?\nVerify SHA-256, then install in the ARTEX user tools directory; custom directories, PATH and agent bindings are unchanged.`)
     )) return;
     setInstalling(true);
     setError("");
     try {
       await api.installExternalTool(tool.id, release.version, release.sha256);
-      toast.success(tool.name + " " + release.version + " 已安装并通过下载摘要校验");
+      toast.success(tr(`${tool.name} ${release.version} 已安装并通过下载摘要校验`, `${tool.name} ${release.version} installed and download digest verified`));
       await onRefresh();
     } catch (e) {
       setError((e as Error).message);
@@ -68,14 +72,13 @@ function ToolItem({
   async function rollback() {
     if (!tool.previous_version || !tool.managed_version) return;
     if (!window.confirm(
-      "将 " + tool.name + " 从 " + tool.managed_version + " 恢复到 " + tool.previous_version +
-      "？当前版本会保留为上一版；正在运行此程序时请先结束运行。"
+      tr(`将 ${tool.name} 从 ${tool.managed_version} 恢复到 ${tool.previous_version}？当前版本会保留为上一版；正在运行此程序时请先结束运行。`, `Restore ${tool.name} from ${tool.managed_version} to ${tool.previous_version}? The current version becomes the previous version; stop the running program first.`)
     )) return;
     setManaging(true);
     setError("");
     try {
       const result = await api.rollbackExternalTool(tool.id);
-      toast.success(tool.name + " 已恢复到 " + result.version);
+      toast.success(tr(`${tool.name} 已恢复到 ${result.version}`, `${tool.name} restored to ${result.version}`));
       await onRefresh();
     } catch (e) {
       setError((e as Error).message);
@@ -87,14 +90,13 @@ function ToolItem({
   async function uninstall() {
     if (!tool.managed_version) return;
     if (!window.confirm(
-      "卸载 ARTEX 管理的 " + tool.name + " " + tool.managed_version +
-      " 和保留的上一版？\n自定义目录及 PATH 中的工具不会被删除。"
+      tr(`卸载 ARTEX 管理的 ${tool.name} ${tool.managed_version} 和保留的上一版？\n自定义目录及 PATH 中的工具不会被删除。`, `Uninstall ARTEX-managed ${tool.name} ${tool.managed_version} and its retained previous version?\nTools in custom directories and PATH are not deleted.`)
     )) return;
     setManaging(true);
     setError("");
     try {
       await api.uninstallExternalTool(tool.id);
-      toast.success("已卸载 ARTEX 管理的 " + tool.name);
+      toast.success(tr(`已卸载 ARTEX 管理的 ${tool.name}`, `Uninstalled ARTEX-managed ${tool.name}`));
       setRelease(null);
       await onRefresh();
     } catch (e) {
@@ -109,15 +111,15 @@ function ToolItem({
       <div className="flex flex-wrap items-center gap-2">
         <span className="font-mono text-sm font-semibold">{tool.name}</span>
         {tool.status === "installed" ? (
-          <Badge variant="secondary">版本检查通过</Badge>
+          <Badge variant="secondary">{tr("版本检查通过", "Version check passed")}</Badge>
         ) : tool.status === "unverified" ? (
-          <Badge variant="outline">已发现 · 检查失败</Badge>
+          <Badge variant="outline">{tr("已发现 · 检查失败", "Found · check failed")}</Badge>
         ) : (
-          <Badge variant="outline">未发现</Badge>
+          <Badge variant="outline">{tr("未发现", "Not found")}</Badge>
         )}
         {tool.origin && (
           <span className="text-muted-foreground ml-auto text-xs">
-            {originName[tool.origin] ?? tool.origin}
+            {locale === "en" ? ({ custom: "Custom directory", managed: "ARTEX tool directory", bundled: "Bundled", path: "System PATH" } as Record<string, string>)[tool.origin] ?? tool.origin : originName[tool.origin] ?? tool.origin}
           </span>
         )}
       </div>
@@ -126,10 +128,10 @@ function ToolItem({
       {tool.managed_version && (
         <div className="space-y-2">
           <div className="text-xs">
-            ARTEX 管理版本：<span className="font-mono">{tool.managed_version}</span>
+            {tr("ARTEX 管理版本：", "ARTEX managed version: ")}<span className="font-mono">{tool.managed_version}</span>
             {tool.previous_version && (
               <span className="text-muted-foreground ml-2">
-                上一版 <span className="font-mono">{tool.previous_version}</span>
+                {tr("上一版", "Previous version")} <span className="font-mono">{tool.previous_version}</span>
               </span>
             )}
           </div>
@@ -137,11 +139,11 @@ function ToolItem({
             <div className="flex flex-wrap gap-2">
               {tool.previous_version && (
                 <Button variant="outline" size="sm" disabled={managing || installing}
-                  onClick={() => void rollback()}>恢复上一版</Button>
+                  onClick={() => void rollback()}>{tr("恢复上一版", "Restore previous version")}</Button>
               )}
               <Button variant="outline" size="sm" disabled={managing || installing}
                 onClick={() => void uninstall()}>
-                {managing ? "处理中…" : "卸载管理版本"}
+                {managing ? tr("处理中…", "Working…") : tr("卸载管理版本", "Uninstall managed version")}
               </Button>
             </div>
           )}
@@ -154,22 +156,22 @@ function ToolItem({
       )}
       {tool.detail && <p className="text-muted-foreground text-xs">{tool.detail}</p>}
       {tool.managed_version && tool.origin === "custom" && (
-        <p className="text-muted-foreground text-xs">自定义目录优先于 ARTEX 管理目录，界面显示的是实际优先匹配的版本。</p>
+        <p className="text-muted-foreground text-xs">{tr("自定义目录优先于 ARTEX 管理目录，界面显示的是实际优先匹配的版本。", "Custom directories take precedence over ARTEX-managed directories; the display shows the version actually selected.")}</p>
       )}
       <div className="mt-auto space-y-2 pt-2">
         {supported ? (
           <>
             <Button size="sm" variant="outline" disabled={checking || installing || managing} onClick={() => void checkRelease()}>
               <RefreshCwIcon className={checking ? "animate-spin" : ""} />
-              {checking ? "查询官方发布…" : "查看官方最新版"}
+              {checking ? tr("查询官方发布…", "Checking official releases…") : tr("查看官方最新版", "Check latest official release")}
             </Button>
             {release && (
               <div className="space-y-2 rounded-md bg-muted/50 p-2 text-xs">
                 <div className="flex flex-wrap items-center justify-between gap-2">
-                  <span>官方 {release.version} · {(release.size_bytes / 1048576).toFixed(1)} MiB</span>
+                  <span>{tr("官方", "Official")} {release.version} · {(release.size_bytes / 1048576).toFixed(1)} MiB</span>
                   <Button size="sm" disabled={installing || managing || alreadyManaged} onClick={() => void install()}>
                     <DownloadIcon className={installing ? "animate-pulse" : ""} />
-                    {alreadyManaged ? "已安装本版本" : installing ? "下载并校验中…" : tool.managed_version ? "更新到此版本" : "下载并安装"}
+                    {alreadyManaged ? tr("已安装本版本", "Version already installed") : installing ? tr("下载并校验中…", "Downloading and verifying…") : tool.managed_version ? tr("更新到此版本", "Update to this version") : tr("下载并安装", "Download and install")}
                   </Button>
                 </div>
                 <p className="text-muted-foreground break-all font-mono" title={release.sha256}>
@@ -180,7 +182,7 @@ function ToolItem({
           </>
         ) : (
           <p className="text-muted-foreground text-xs">
-            当前仅 Windows x64 后端提供自动安装；本机检测与手动配置仍可使用。
+            {tr("当前仅 Windows x64 后端提供自动安装；本机检测与手动配置仍可使用。", "Automatic installation is currently available only on Windows x64 backends; local detection and manual setup remain available.")}
           </p>
         )}
         {error && <p role="alert" className="text-destructive text-xs">{error}</p>}
@@ -192,11 +194,11 @@ function ToolItem({
           rel="noopener noreferrer"
           className="text-primary inline-flex items-center gap-1 text-xs hover:underline"
         >
-          官方项目 <ArrowUpRightIcon className="size-3" />
+          {tr("官方项目", "Official project")} <ArrowUpRightIcon className="size-3" />
         </a>
         {tool.docker_reference_version && (
           <span className="text-muted-foreground text-[11px]">
-            Docker 参考版本 {tool.docker_reference_version}
+            {tr("Docker 参考版本", "Docker reference version")} {tool.docker_reference_version}
           </span>
         )}
       </div>
@@ -205,6 +207,8 @@ function ToolItem({
 }
 
 export function ExternalToolsPanel({ onOpenCustom }: { onOpenCustom: () => void }) {
+  const locale = useUiLocale();
+  const tr = (zh: string, en: string) => uiText(locale, zh, en);
   const [inventory, setInventory] = React.useState<ExternalToolInventory | null>(null);
   const [loading, setLoading] = React.useState(false);
   const [error, setError] = React.useState("");
@@ -234,18 +238,18 @@ export function ExternalToolsPanel({ onOpenCustom }: { onOpenCustom: () => void 
         <div className="space-y-1.5">
           <CardTitle>外部工具检测</CardTitle>
           <CardDescription>
-            检测 ARTEX 后端所在主机的已安装程序，不是当前浏览器或手机的工具。
-            {inventory && (" " + inventory.host + " · 版本检查成功 " + recognized + "/" + items.length)}
+            {tr("检测 ARTEX 后端所在主机的已安装程序，不是当前浏览器或手机的工具。", "Detect programs on the ARTEX backend host, not tools on the current browser or phone.")}
+            {inventory && (" " + inventory.host + tr(" · 版本检查成功 ", " · Version checks passed ") + recognized + "/" + items.length)}
           </CardDescription>
         </div>
         <Button size="sm" variant="outline" onClick={() => void refresh()} disabled={loading}>
           <RefreshCwIcon className={loading ? "animate-spin" : ""} />
-          重新检测
+          {tr("重新检测", "Detect again")}
         </Button>
       </CardHeader>
       <CardContent className="space-y-4">
-        {error && <p role="alert" className="text-destructive text-sm">检测失败：{error}</p>}
-        {loading && !inventory && <p className="text-muted-foreground text-sm">正在检测本机外部工具…</p>}
+        {error && <p role="alert" className="text-destructive text-sm">{tr("检测失败：", "Detection failed: ")}{error}</p>}
+        {loading && !inventory && <p className="text-muted-foreground text-sm">{tr("正在检测本机外部工具…", "Detecting local external tools…")}</p>}
         <OfflineToolsPanel host={inventory?.host ?? ""} managedCount={items.filter((tool) => tool.managed_version).length} onRefresh={refresh} />
         {items.length > 0 && (
           <div className="grid gap-3 sm:grid-cols-2 xl:grid-cols-3">
@@ -254,17 +258,13 @@ export function ExternalToolsPanel({ onOpenCustom }: { onOpenCustom: () => void 
         )}
         <div className="text-muted-foreground space-y-2 border-t pt-4 text-xs leading-relaxed">
           <p>
-            搜索顺序：ARTEX_TOOL_DIRS 自定义路径 → ARTEX 本机工具目录 →
-            安装目录内的 tools/ 与 data/tools/ → 系统 PATH。Windows 可用分号分隔多个自定义路径。
+            {tr("搜索顺序：ARTEX_TOOL_DIRS 自定义路径 → ARTEX 本机工具目录 → 安装目录内的 tools/ 与 data/tools/ → 系统 PATH。Windows 可用分号分隔多个自定义路径。", "Search order: ARTEX_TOOL_DIRS custom paths → local ARTEX tools → tools/ and data/tools/ in the installation → system PATH. Separate multiple Windows custom paths with semicolons.")}
           </p>
           <p>
-            “版本检查通过”仅说明命令能够返回版本；手动安装的文件不代表来源已验证。
-            官方按需安装会使用 GitHub Release 提供的 SHA-256 校验下载内容，但<strong>不等于发布者代码签名</strong>。
-            更新只替换 ARTEX 管理目录中的版本并保留上一版；可恢复旧版或卸载受管理的程序，不会删除你自定义目录中的文件，也不会自动执行扫描。若要让 Agent 调用某个程序，
-            可在现有自定义工具中明确配置，避免自动创建重复的 Agent 工具。
+            {tr("“版本检查通过”仅说明命令能够返回版本；手动安装的文件不代表来源已验证。官方按需安装使用 GitHub Release 的 SHA-256 校验下载内容，但不等于发布者代码签名。更新仅替换 ARTEX 管理版本并保留上一版，可恢复或卸载；不会删除自定义目录文件或自动执行扫描。可在自定义工具中明确配置 Agent 调用，避免重复创建。", "Version check passed only means the command returned a version; manually installed files are not source-verified. Official on-demand installs verify the GitHub Release SHA-256, not publisher signatures. Updates replace only ARTEX-managed versions and retain the previous version for restore or uninstall. Custom files are not deleted and scans are not run automatically. Configure agent invocation explicitly in custom tools to avoid duplicate entries.")}
           </p>
           <Button size="sm" variant="outline" onClick={onOpenCustom}>
-            前往自定义工具
+            {tr("前往自定义工具", "Open custom tools")}
           </Button>
         </div>
       </CardContent>

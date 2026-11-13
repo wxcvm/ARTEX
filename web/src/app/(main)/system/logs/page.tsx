@@ -1,5 +1,8 @@
 "use client";
 
+import { useUiLocale } from "@/lib/ui-locale.client";
+import { uiText } from "@/lib/ui-locale";
+
 import * as React from "react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -37,6 +40,8 @@ function fmtTime(ts: string) {
 }
 
 export default function LogsPage() {
+  const locale = useUiLocale();
+  const tr = (zh: string, en: string) => uiText(locale, zh, en);
   const [lines, setLines] = React.useState<LogLine[]>([]);
   const [q, setQ] = React.useState("");
   const [level, setLevel] = React.useState<"all" | LogLine["level"]>("all");
@@ -169,19 +174,19 @@ export default function LogsPage() {
     <div className="flex min-w-0 flex-1 flex-col gap-4 pb-5">
       <header className="flex flex-wrap items-center justify-between gap-4 rounded-2xl border border-border/70 bg-gradient-to-br from-card to-primary/5 px-5 py-5 shadow-sm sm:px-7">
         <div>
-          <p className="mb-1 text-[11px] font-semibold tracking-[0.16em] text-primary">ARTEX / LOGS</p>
-          <h1 className="text-2xl font-semibold tracking-tight">系统日志</h1>
-          <p className="mt-1 text-sm leading-relaxed text-muted-foreground">实时查看后端、任务规划与工作进程的运行记录。</p>
+          <p className="mb-1 text-[11px] font-semibold tracking-[0.16em] text-primary">{tr("ARTEX / 日志", "ARTEX / LOGS")}</p>
+          <h1 className="text-2xl font-semibold tracking-tight">{tr("系统日志", "System logs")}</h1>
+          <p className="mt-1 text-sm leading-relaxed text-muted-foreground">{tr("实时查看后端、任务规划与工作进程的运行记录。", "View live backend, planner and worker logs.")}</p>
         </div>
         <span role="status" className="inline-flex items-center gap-2 rounded-lg border border-border/70 bg-background/60 px-3 py-2 text-xs text-muted-foreground">
           <span className={cn("size-2 rounded-full", MOCK ? "bg-sky-400" : connection === "connected" ? "bg-emerald-400" : connection === "connecting" ? "bg-amber-400" : "bg-rose-400")} />
-          {MOCK ? "演示数据" : connection === "connected" ? "实时连接" : connection === "connecting" ? "正在连接" : "连接中断 · 自动重试"}
+          {MOCK ? tr("演示数据", "Demo data") : connection === "connected" ? tr("实时连接", "Live connection") : connection === "connecting" ? tr("正在连接", "Connecting") : tr("连接中断 · 自动重试", "Disconnected · retrying")}
         </span>
       </header>
       <div className="flex min-w-0 flex-1 flex-col overflow-hidden rounded-xl border border-border/70 bg-card/90 shadow-sm">
         <div className="flex flex-wrap items-center gap-2 border-b border-border/60 px-4 py-4 sm:px-5">
           <Input
-            placeholder="筛选日志内容或标签…"
+            placeholder={tr("筛选日志内容或标签…", "Filter log content or tags…")}
             value={q}
             onChange={(e) => setQ(e.target.value)}
             className="h-9 min-w-[180px] flex-1 sm:max-w-sm"
@@ -195,7 +200,7 @@ export default function LogsPage() {
                 className="h-8"
                 onClick={() => setLevel(lv)}
               >
-                {lv === "all" ? "全部" : lv === "info" ? "信息" : lv === "warn" ? "警告" : "错误"}
+                {lv === "all" ? tr("全部", "All") : lv === "info" ? tr("信息", "Info") : lv === "warn" ? tr("警告", "Warning") : tr("错误", "Error")}
               </Button>
             ))}
           </div>
@@ -205,15 +210,15 @@ export default function LogsPage() {
             className="h-8"
             onClick={() => setPaused((p) => !p)}
           >
-            {paused ? "继续显示" : "暂停显示"}
+            {paused ? tr("继续显示", "Resume display") : tr("暂停显示", "Pause display")}
           </Button>
           <Button size="sm" variant="outline" className="h-9" onClick={() => { pendingWhilePaused.current = []; setLines([]); }}>
-            清空显示
+            {tr("清空显示", "Clear display")}
           </Button>
           <span className="ml-auto text-xs text-muted-foreground">
-            共 {counts.total} 条 ·{" "}
-            <span className="text-amber-600 dark:text-amber-400">{counts.warn} 警告</span> ·{" "}
-            <span className="text-red-600 dark:text-red-400">{counts.error} 错误</span>
+            {tr(`共 ${counts.total} 条`, `${counts.total} total`)} ·{" "}
+            <span className="text-amber-600 dark:text-amber-400">{tr(`${counts.warn} 警告`, `${counts.warn} warnings`)}</span> ·{" "}
+            <span className="text-red-600 dark:text-red-400">{tr(`${counts.error} 错误`, `${counts.error} errors`)}</span>
           </span>
         </div>
 
@@ -233,13 +238,13 @@ export default function LogsPage() {
                 disabled={loadingHistory}
                 onClick={loadOlderHistory}
               >
-                {loadingHistory ? "加载中…" : "加载更早的日志"}
+                {loadingHistory ? tr("加载中…", "Loading…") : tr("加载更早的日志", "Load earlier logs")}
               </Button>
             </div>
           )}
           {filtered.length === 0 ? (
             <p className="px-4 py-16 text-center text-sm text-muted-foreground">
-              {q || level !== "all" ? "没有符合筛选条件的日志。" : "暂无日志记录，连接后会自动显示新内容。"}
+              {q || level !== "all" ? tr("没有符合筛选条件的日志。", "No logs match the filters.") : tr("暂无日志记录，连接后会自动显示新内容。", "No logs yet; new entries appear once connected.")}
             </p>
           ) : (
             filtered.map((l) => {

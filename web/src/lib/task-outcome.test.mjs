@@ -72,3 +72,20 @@ test("reports distinguish incomplete empty results and explicit request errors",
   assert.throws(() => taskOutcomeScenarioReport("9109"), /503/);
   assert.equal(taskOutcomeScenarioReport("ordinary-task"), null);
 });
+
+
+test("localized outcome presentation preserves every lifecycle classification and source snapshot", () => {
+  for (const [id, expected] of Object.entries(states)) {
+    const { task, outcome, outcomeError } = taskOutcomeScenario(id);
+    const original = JSON.stringify(outcome);
+    const zh = taskOutcomePresentation(task, outcome, outcomeError, "zh-CN");
+    const en = taskOutcomePresentation(task, outcome, outcomeError, "en");
+    assert.equal(zh.state, expected);
+    assert.equal(en.state, expected);
+    assert.match(zh.title, /[\u3400-\u9fff]/u);
+    assert.notEqual(zh.title, en.title);
+    assert.equal(JSON.stringify(outcome), original);
+  }
+  const { task, outcome } = taskOutcomeScenario("9105");
+  assert.match(taskOutcomePresentation(task, outcome, "", "zh-CN").detail, /不能证明/);
+});
