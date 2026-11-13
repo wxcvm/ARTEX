@@ -15,7 +15,9 @@ import {
 } from "@/components/ui/sidebar";
 import { APP_CONFIG } from "@/config/app-config";
 import { useCurrentUser } from "@/hooks/use-current-user";
-import { sidebarItems } from "@/navigation/sidebar/sidebar-items";
+import { useUiLocale } from "@/lib/ui-locale.client";
+import { uiText } from "@/lib/ui-locale";
+import { localizedSidebarItems } from "@/navigation/sidebar/sidebar-items";
 import { usePreferencesStore } from "@/stores/preferences/preferences-provider";
 
 import { NavMain } from "./nav-main";
@@ -25,6 +27,7 @@ import { SidebarSupportCard } from "./sidebar-support-card";
 
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   const currentUser = useCurrentUser();
+  const locale = useUiLocale();
   const { sidebarVariant, sidebarCollapsible, isSynced } = usePreferencesStore(
     useShallow((s) => ({
       sidebarVariant: s.sidebarVariant,
@@ -47,7 +50,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
                 <img src="/logo.jpg" alt="ARTEX" width={34} height={34} className="size-[34px] shrink-0 rounded-lg object-cover shadow-sm" />
                 <span className="flex min-w-0 flex-col leading-tight">
                   <strong className="text-sm font-semibold tracking-wide">{APP_CONFIG.name}</strong>
-                  <span className="text-[10px] font-normal text-sidebar-foreground/60">智能工作台</span>
+                  <span className="text-[10px] font-normal text-sidebar-foreground/60">{uiText(locale, "智能工作台", "Intelligent workspace")}</span>
                 </span>
               </Link>
             </SidebarMenuButton>
@@ -55,7 +58,7 @@ export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
         </SidebarMenu>
       </SidebarHeader>
       <SidebarContent className="py-2">
-        <NavMain items={sidebarItems} />
+        <NavMain items={localizedSidebarItems(locale)} />
         {/* <NavDocuments items={data.documents} /> */}
         {/* <NavSecondary items={data.navSecondary} className="mt-auto" /> */}
       </SidebarContent>

@@ -12,10 +12,14 @@ import { Dialog, DialogClose, DialogContent, DialogFooter, DialogHeader, DialogT
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { api } from "@/lib/api";
+import { useUiLocale, setUiLocale } from "@/lib/ui-locale.client";
+import { uiText } from "@/lib/ui-locale";
 import { auth } from "@/lib/auth";
 
 export default function LoginPage() {
   const router = useRouter();
+  const locale = useUiLocale();
+  const t = (zh: string, en: string) => uiText(locale, zh, en);
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
   const [loading, setLoading] = useState(false);
@@ -81,7 +85,7 @@ export default function LoginPage() {
   if (checking) {
     return (
       <div role="status" className="flex min-h-dvh items-center justify-center text-muted-foreground">
-        Checking login state…
+        {t("正在检查登录状态…", "Checking login state…")}
       </div>
     );
   }
@@ -102,23 +106,24 @@ export default function LoginPage() {
       {/* Right panel */}
       <div className="flex w-full items-center justify-center bg-background p-8 lg:w-2/3">
         <div className="w-full max-w-md space-y-10 py-24 lg:py-32">
+          <div className="flex justify-end"><Button type="button" variant="ghost" onClick={() => setUiLocale(locale === "en" ? "zh-CN" : "en")}>{locale === "en" ? "简体中文" : "English"}</Button></div>
           <div className="space-y-4 text-center">
-            <h2 className="text-2xl font-medium tracking-tight">Sign in</h2>
-            <p className="mx-auto max-w-xl text-muted-foreground">Welcome back — enter your password to continue using ARTEX</p>
+            <h2 className="text-2xl font-medium tracking-tight">{t("登录", "Sign in")}</h2>
+            <p className="mx-auto max-w-xl text-muted-foreground">{t("欢迎回来，输入密码继续使用 ARTEX", "Welcome back — enter your password to continue using ARTEX")}</p>
           </div>
           <form onSubmit={handleSubmit} className="flex flex-col gap-4">
             <div className="space-y-1.5">
-              <Label htmlFor="username">Username</Label>
+              <Label htmlFor="username">{t("用户名", "Username")}</Label>
               <Input id="username" value="ARTEX" readOnly className="bg-muted text-muted-foreground" />
             </div>
             <div className="space-y-1.5">
-              <Label htmlFor="password">Password</Label>
+              <Label htmlFor="password">{t("密码", "Password")}</Label>
               <Input
                 id="password"
                 type="password"
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
-                placeholder="Enter your password"
+                placeholder={t("请输入密码", "Enter your password")}
                 autoFocus
                 autoComplete="current-password"
               />
@@ -131,19 +136,19 @@ export default function LoginPage() {
                 className="mt-0.5"
               />
               <Label htmlFor="agree-terms" className="text-sm font-normal leading-relaxed text-muted-foreground">
-                I have read and agree to
+                {t("我已阅读并同意", "I have read and agree to")}
                 <button
                   type="button"
                   onClick={() => setTermsOpen(true)}
                   className="mx-0.5 font-medium text-primary underline-offset-4 hover:underline"
                 >
-                  Terms of Use
+                  {t("使用条款", "Terms of Use")}
                 </button>
               </Label>
             </div>
-            {error && <p className="text-sm text-destructive">{error}</p>}
+            {error && <p className="text-sm text-destructive">{locale === "en" ? error : ({ "Unable to connect to the backend service": "无法连接后端服务", "Please read and agree to the Terms of Use first": "请先阅读并同意使用条款", "Incorrect username or password": "用户名或密码错误" } as Record<string, string>)[error] ?? error}</p>}
             <Button type="submit" className="w-full" disabled={loading || !password || !agreed}>
-              {loading ? "Signing in..." : "Sign in"}
+              {loading ? t("正在登录…", "Signing in...") : t("登录", "Sign in")}
             </Button>
           </form>
         </div>
@@ -156,9 +161,9 @@ export default function LoginPage() {
               <ShieldCheck className="size-5" />
             </div>
             <div className="space-y-0.5">
-              <DialogTitle className="text-base">ARTEX Terms of Use and Disclaimer</DialogTitle>
+              <DialogTitle className="text-base">{t("ARTEX 使用条款及免责声明", "ARTEX Terms of Use and Disclaimer")}</DialogTitle>
               <p className="text-xs text-muted-foreground">
-                Version v1.1 · Effective 2026-10-11 · Please read all the following terms in full before signing in
+                {t("版本 v1.1 · 2026-10-11 生效 · 登录前请完整阅读以下英文原文", "Version v1.1 · Effective 2026-10-11 · Please read all the following terms in full before signing in")}
               </p>
             </div>
           </DialogHeader>
@@ -290,7 +295,7 @@ export default function LoginPage() {
 
           <DialogFooter className="mx-0 mb-0 flex-col items-stretch gap-2 rounded-b-xl px-6 sm:flex-row sm:items-center sm:justify-between">
             <p className="text-xs text-muted-foreground">
-              {readToEnd ? "You have read all the terms" : "Scroll the terms to the bottom to confirm"}
+              {readToEnd ? t("已阅读全部条款", "You have read all the terms") : t("滚动至条款底部以确认", "Scroll the terms to the bottom to confirm")}
             </p>
             <DialogClose asChild>
               <Button
@@ -301,7 +306,7 @@ export default function LoginPage() {
                   setError("");
                 }}
               >
-                I have read and agree to all the terms
+                {t("我已阅读并同意全部条款", "I have read and agree to all the terms")}
               </Button>
             </DialogClose>
           </DialogFooter>
