@@ -49,6 +49,20 @@ const TRAFFIC_TOOL_KEYS = new Set(["traffic_search", "traffic_get"]);
 // name/type/required are read-only (welded to the Go handler); description/default
 // are editable. Non-scalar params (array/object) can't carry an editable default.
 // parentKey is set for rows that live inside an array param's items.properties.
+// Display-only glossary for common system-tool parameter identifiers.
+// The original schema description remains authoritative and editable.
+const parameterLabels: Record<string, string> = {
+  task_id: "任务编号", node_id: "节点编号", finding_id: "发现编号",
+  goal_id: "目标编号", worker_id: "执行单元编号", intent_id: "意图编号",
+  asset_id: "资产编号", company_id: "组织编号", entry_id: "条目编号",
+  query: "查询条件", limit: "数量上限", offset: "起始偏移",
+  title: "标题", name: "名称", description: "说明", summary: "摘要",
+  evidence: "证据", severity: "严重程度", status: "状态",
+  category: "分类", kind: "类型", host: "主机", port: "端口",
+  url: "URL 地址", path: "路径", content: "内容", hint: "提示",
+  reason: "原因", timeout: "超时设置", tags: "标签"
+};
+
 type ParamRow = {
   name: string;
   type: string;
@@ -269,6 +283,7 @@ function ToolEditor({
               <div className="flex flex-wrap items-center gap-2">
                 {r.parentKey && <span className="text-muted-foreground font-mono text-[10px]">↳</span>}
                 <span className="font-mono text-sm">{r.name}</span>
+                {locale !== "en" && tool.system && Object.hasOwn(parameterLabels, r.name) && <span className="text-xs text-muted-foreground">{parameterLabels[r.name]}</span>}
                 <Badge variant="secondary" className="px-1.5 py-0 text-[10px]">
                   {r.type || "?"}
                 </Badge>
@@ -410,6 +425,7 @@ export default function ToolsPage() {
     return (
       t.key.toLowerCase().includes(q) ||
       toolLabel(t.key, t.system).toLowerCase().includes(q) ||
+      (toolSummary(t.key, t.system)?.toLowerCase().includes(q) ?? false) ||
       t.description.toLowerCase().includes(q) ||
       t.agents.some((a) => a.toLowerCase().includes(q))
     );
