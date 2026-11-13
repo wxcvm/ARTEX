@@ -271,7 +271,7 @@ function ToolEditor({
                 </Badge>
                 {r.required && (
                   <Badge variant="outline" className="px-1.5 py-0 text-[10px]">
-                    Required
+                    {tr("必填", "Required")}
                   </Badge>
                 )}
                 {r.parentKey && (
@@ -281,6 +281,12 @@ function ToolEditor({
               <div className="grid gap-2">
                 <div className="grid gap-1">
                   <Label className="text-muted-foreground text-[11px]">{tr("说明", "Description")}</Label>
+                  {locale !== "en" && (
+                    <p className="text-[11px] text-muted-foreground">
+                      {r.required ? "调用时必须提供此参数。" : "此参数可选。"}
+                      {r.type === "string" ? "值为文本字符串。" : r.type === "integer" ? "值为整数。" : r.type === "number" ? "值为数字。" : r.type === "boolean" ? "值为 true 或 false。" : r.type === "array" ? "值为数组，元素结构以原始 Schema 为准。" : r.type === "object" ? "值为对象，字段结构以原始 Schema 为准。" : "值的格式以原始 Schema 为准。"}
+                    </p>
+                  )}
                   <Input
                     className="text-xs"
                     value={r.description}
