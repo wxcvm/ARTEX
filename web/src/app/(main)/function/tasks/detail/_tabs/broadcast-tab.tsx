@@ -172,13 +172,13 @@ function prettyPayload(raw?: string): string {
   }
 }
 
-function relTime(ts: number, now: number): string {
+function relTime(ts: number, now: number, locale: UiLocale): string {
   if (!now || !ts) return "";
   const sec = Math.max(0, (now - ts) / 1000);
-  if (sec < 60) return "just now";
-  if (sec < 3600) return `${Math.floor(sec / 60)} minutes ago`;
-  if (sec < 86400) return `${Math.floor(sec / 3600)} hours ago`;
-  return `${Math.floor(sec / 86400)} days ago`;
+  if (sec < 60) return uiText(locale, "刚刚", "just now");
+  if (sec < 3600) return uiText(locale, `${Math.floor(sec / 60)} 分钟前`, `${Math.floor(sec / 60)} minutes ago`);
+  if (sec < 86400) return uiText(locale, `${Math.floor(sec / 3600)} 小时前`, `${Math.floor(sec / 3600)} hours ago`);
+  return uiText(locale, `${Math.floor(sec / 86400)} 天前`, `${Math.floor(sec / 86400)} days ago`);
 }
 
 const clockFmt = new Intl.DateTimeFormat("zh-CN", {
@@ -366,7 +366,7 @@ function BroadcastRow({
       {/* Time column */}
       <div className="py-3 text-right text-xs text-muted-foreground tabular-nums">
         <div>{Number.isNaN(ts) ? "--:--:--" : clockFmt.format(ts)}</div>
-        <div className="text-[11px] opacity-70">{relTime(ts, now)}</div>
+        <div className="text-[11px] opacity-70">{relTime(ts, now, locale)}</div>
       </div>
 
       {/* Timeline: vertical line + type dot */}
@@ -611,7 +611,7 @@ export function BroadcastTab({ taskId }: { taskId: string }) {
                   active ? meta.chip : "border-transparent text-muted-foreground hover:bg-accent",
                 )}
               >
-                {meta.label}
+                {locale === "en" ? englishKind[kind] ?? meta.label : meta.label}
               </button>
             );
           })}

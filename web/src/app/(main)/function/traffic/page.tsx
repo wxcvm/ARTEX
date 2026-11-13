@@ -417,7 +417,7 @@ export default function TrafficPage() {
                     className="h-6 px-2 text-xs"
                     onClick={() => setSelectedHosts(allSelected ? [] : hosts.map((h) => h.host))}
                   >
-                    {allSelected ? "清除选择" : tr("全选", "Select all")}
+                    {allSelected ? tr("清除选择", "Clear selection") : tr("全选", "Select all")}
                   </Button>
                 )}
               </div>
@@ -822,8 +822,7 @@ export default function TrafficPage() {
             <AlertDialogDescription>
               {deleteMode === "all" && (
                 <>
-                  此操作将永久删除全部 <span className="font-semibold tabular-nums">{traffic?.count ?? 0}</span>{" "}
-                   条流量记录（含原始请求和响应），不受当前筛选条件限制。此操作无法撤销。已关联至发现结果的流量证据存储在独立证据库中，不受影响。
+                  {tr(`此操作将永久删除全部 ${traffic?.count ?? 0} 条流量记录（含原始请求和响应），不受当前筛选条件限制。此操作无法撤销。已关联至发现结果的流量证据存储在独立证据库中，不受影响。`, `This permanently deletes all ${traffic?.count ?? 0} traffic records (including raw requests and responses), regardless of filters. This cannot be undone. Evidence linked to findings is stored separately and remains unaffected.`)}
                   <br />
                   <span className="text-muted-foreground">
                     {tr("清理还会压缩存储，将索引占用的磁盘空间归还系统；期间流量记录会短暂停止。", "Cleanup compacts storage and returns index space to the system; recording briefly pauses.")}
@@ -843,7 +842,7 @@ export default function TrafficPage() {
               {deleteMode === "filter" && (
                 <>
                   {tr("此操作将永久删除主机名包含", "This permanently deletes traffic for hosts containing")} <span className="font-mono font-semibold">{hostQ}</span>{" "}
-                   的全部流量记录（含原始请求和响应）。此操作无法撤销。
+                   {tr("的全部流量记录（含原始请求和响应）。此操作无法撤销。", " including raw requests and responses. This cannot be undone.")}
                 </>
               )}
             </AlertDialogDescription>

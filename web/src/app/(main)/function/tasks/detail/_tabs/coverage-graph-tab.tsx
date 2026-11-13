@@ -518,7 +518,7 @@ function GraphInner({ taskId, coverageEnabled = true }: { taskId: string; covera
   const sig = React.useMemo(
     () =>
       `${locale}|${renderNodes.map((n) => `${n.key}:${n.fold ? "f" : n.node.tested ? "t" : "u"}`).sort().join(",")}|${renderEdges.length}`,
-    [renderNodes, renderEdges],
+    [renderNodes, renderEdges, locale],
   );
 
   // Maintain gDataRef + renderMapRef (read by events and graph data application).
@@ -659,7 +659,7 @@ function GraphInner({ taskId, coverageEnabled = true }: { taskId: string; covera
               {coverageEnabled && (
                 <>
                   {" "}
-                  · Tested{" "}
+                  · {tr("已测试", "Tested")}{" "}
                   <span className="font-semibold tabular-nums text-emerald-600 dark:text-emerald-400">{tested}</span>
                 </>
               )}
@@ -680,7 +680,7 @@ function GraphInner({ taskId, coverageEnabled = true }: { taskId: string; covera
                 <span className={cn("flex size-4 items-center justify-center rounded", m.iconBg)}>
                   <Icon className="size-2.5 text-white" />
                 </span>
-                {kindLabel(k as Kind, locale)}
+                {kindLabel(k, locale)}
               </span>
             );
           })}
