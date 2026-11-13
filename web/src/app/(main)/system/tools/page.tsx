@@ -37,7 +37,7 @@ import {
 import { useUiLocale } from "@/lib/ui-locale.client";
 import { uiText } from "@/lib/ui-locale";
 import { api } from "@/lib/api";
-import { toolLabel } from "@/lib/resource-labels";
+import { toolLabel, toolSummary } from "@/lib/resource-labels";
 import { ExternalToolsPanel } from "@/components/external-tools-panel";
 import type { Agent, Tool } from "@/lib/types";
 
@@ -239,6 +239,9 @@ function ToolEditor({
 
         {/* description */}
         <div className="grid gap-1.5">
+          {locale !== "en" && toolSummary(tool.key, tool.system) && (
+            <p className="text-sm text-muted-foreground">{toolSummary(tool.key, tool.system)}</p>
+          )}
           <Label className="text-muted-foreground text-xs">{tr("原始工具说明（发送给模型）", "Original tool description (sent to the model)")}</Label>
           <p className="text-xs text-muted-foreground">{tr("中文名称仅用于界面展示。这里保留模型实际使用的说明，可按需编辑。", "Localized names are for display only. The actual model-facing description is preserved and editable.")}</p>
           <Textarea
@@ -346,7 +349,7 @@ function ToolGridCard({ tool, onClick }: { tool: Tool; onClick: () => void }) {
         )}
         {tool.deferred && (
           <Badge variant="outline" className="px-1.5 py-0 text-[10px]">
-            deferred
+            {tr("延迟加载", "deferred")}
           </Badge>
         )}
         {!tool.enabled && (
@@ -359,11 +362,11 @@ function ToolGridCard({ tool, onClick }: { tool: Tool; onClick: () => void }) {
           className="ml-auto px-1.5 py-0 text-[10px] tabular-nums"
           title={tr(`共调用 ${tool.calls ?? 0} 次`, `${tool.calls ?? 0} calls`)}
         >
-          {tool.calls ?? 0} calls
+          {tr(`${tool.calls ?? 0} 次`, `${tool.calls ?? 0} calls`)}
         </Badge>
       </div>
       <p className="text-muted-foreground line-clamp-1 h-4 text-xs">
-        {tool.description || tr("（暂无说明）", "(No description)")}
+        {(locale !== "en" ? toolSummary(tool.key, tool.system) : undefined) || tool.description || tr("（暂无说明）", "(No description)")}
       </p>
       <div className="mt-auto flex flex-wrap gap-1 pt-1">
         {tool.agents.length === 0 && (
