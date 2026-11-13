@@ -739,7 +739,7 @@ function CustomToolDialog({
 
           {kind === "command" && (
             <div className="grid gap-1.5">
-              <Label className="text-xs">命令模板（占位符 {"{param}"}, e.g. nmap -p {"{ports}"} {"{target}"})</Label>
+              <Label className="text-xs">{tr("命令模板（占位符 {param}, e.g. nmap -p {ports} {target})", "Command template (placeholder {param}, e.g. nmap -p {ports} {target})")}</Label>
               <Textarea className="font-mono text-xs" rows={2} value={ex.command}
                 onChange={(e) => setEx({ ...ex, command: e.target.value })} />
             </div>
@@ -760,17 +760,17 @@ function CustomToolDialog({
                   <Input className="w-24" value={ex.method} onChange={(e) => setEx({ ...ex, method: e.target.value })} />
                 </div>
                 <div className="grid flex-1 gap-1.5">
-                  <Label className="text-xs">URL（可包含 {"{param}"})</Label>
+                  <Label className="text-xs">{tr("URL（可包含 {param})", "URL (may contain {param})")}</Label>
                   <Input className="font-mono text-xs" value={ex.url} onChange={(e) => setEx({ ...ex, url: e.target.value })} />
                 </div>
               </div>
               <div className="grid gap-1.5">
-                <Label className="text-xs">请求头（JSON，可包含 {"{param}"})</Label>
+                <Label className="text-xs">{tr("请求头（JSON，可包含 {param})", "Headers (JSON, may contain {param})")}</Label>
                 <Textarea className="font-mono text-xs" rows={2} value={ex.headers}
                   placeholder={'{"Authorization": "Bearer {token}"}'} onChange={(e) => setEx({ ...ex, headers: e.target.value })} />
               </div>
               <div className="grid gap-1.5">
-                <Label className="text-xs">请求正文（可包含 {"{param}"})</Label>
+                <Label className="text-xs">{tr("请求正文（可包含 {param})", "Request body (may contain {param})")}</Label>
                 <Textarea className="font-mono text-xs" rows={2} value={ex.body} onChange={(e) => setEx({ ...ex, body: e.target.value })} />
               </div>
               <div className="flex items-center gap-4">
