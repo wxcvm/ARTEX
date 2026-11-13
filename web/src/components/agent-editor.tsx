@@ -115,9 +115,9 @@ export function AgentEditor({ agentKey, onSaved }: { agentKey: string; onSaved?:
   async function doPreview() {
     try {
       const r = await api.previewAgentPrompt(agentKey, prompt);
-      setPreview(r.error ? "Render error: " + r.error : r.rendered);
+      setPreview(r.error ? "渲染错误：" + r.error : r.rendered);
     } catch (e) {
-      setPreview("Preview failed: " + (e as Error).message);
+      setPreview("预览失败：" + (e as Error).message);
     }
   }
   async function savePrompt() {
@@ -252,7 +252,7 @@ export function AgentEditor({ agentKey, onSaved }: { agentKey: string; onSaved?:
   }
 
   if (loaded && !detail) {
-    return <div className="text-muted-foreground p-6 text-center text-sm">Agent not found: {agentKey}</div>;
+    return <div className="text-muted-foreground p-6 text-center text-sm">未找到智能体：{agentKey}</div>;
   }
   // config is meaningless for the conversational main agent and the fixed-budget
   // goals decomposer; every other agent (workers, custom assistants) honors it.
@@ -292,7 +292,7 @@ export function AgentEditor({ agentKey, onSaved }: { agentKey: string; onSaved?:
                         <SelectValue />
                       </SelectTrigger>
                       <SelectContent>
-                        <SelectItem value="__follow__">Follow task / globally active profile</SelectItem>
+                        <SelectItem value="__follow__">跟随任务或全局启用模型</SelectItem>
                         {llmProfiles.map((p) => (
                           <SelectItem key={p.id} value={String(p.id)}>
                             {p.name} ({p.model}){p.is_default ? " · default" : ""}
@@ -337,8 +337,8 @@ export function AgentEditor({ agentKey, onSaved }: { agentKey: string; onSaved?:
                     <Label htmlFor="web-search" className="text-sm">网页搜索</Label>
                     <span className="text-muted-foreground text-xs">
                       {webSearchGlobalOn
-                        ? "Once enabled for this Agent (click Save above to apply), web_search can search the internet"
-                        : "Enable web search in System settings and configure a backend before enabling it here"}
+                        ? "为此智能体启用并保存后，web_search 可搜索互联网"
+                        : "请先在系统设置中启用网页搜索并配置后端"}
                     </span>
                   </div>
                 </div>
@@ -419,7 +419,7 @@ export function AgentEditor({ agentKey, onSaved }: { agentKey: string; onSaved?:
               {versions.map((ver, i) => (
                 <li key={ver.version} className="flex items-center gap-2 rounded-md px-1 py-0.5 text-xs hover:bg-muted/50">
                   <span className="font-mono shrink-0">v{ver.version}</span>
-                  {i === 0 && <Badge variant="secondary" className="px-1.5 py-0 shrink-0">Current</Badge>}
+                  {i === 0 && <Badge variant="secondary" className="px-1.5 py-0 shrink-0">当前</Badge>}
                   <span className="text-muted-foreground truncate flex-1">{ver.note}</span>
                   {ver.ts && (
                     <span className="text-muted-foreground/60 shrink-0 tabular-nums">
@@ -437,7 +437,7 @@ export function AgentEditor({ agentKey, onSaved }: { agentKey: string; onSaved?:
                 </li>
               ))}
               {versions.length === 0 && (
-                <li className="text-muted-foreground text-xs">(no saved versions; using the built-in default)</li>
+                <li className="text-muted-foreground text-xs">（暂无保存版本，正在使用内置默认配置）</li>
               )}
             </ul>
           </div>
@@ -449,7 +449,7 @@ export function AgentEditor({ agentKey, onSaved }: { agentKey: string; onSaved?:
                 <DialogTitle>
                   v{viewVer?.version}
                   {viewVer?.version === versions[0]?.version && (
-                    <Badge variant="secondary" className="ml-2 px-1.5 py-0 align-middle">Current</Badge>
+                    <Badge variant="secondary" className="ml-2 px-1.5 py-0 align-middle">当前</Badge>
                   )}
                 </DialogTitle>
                 <DialogDescription>
@@ -469,7 +469,7 @@ export function AgentEditor({ agentKey, onSaved }: { agentKey: string; onSaved?:
                   <Button variant="outline" size="sm" onClick={() => {
                     if (viewVer) { setDiffVer(viewVer); setViewVer(null); }
                   }}>
-                    <GitCompareIcon className="mr-1 size-3.5" /> Compare with current
+                    <GitCompareIcon className="mr-1 size-3.5" /> 与当前版本比较
                   </Button>
                 )}
                 <Button size="sm" onClick={() => {
@@ -503,15 +503,15 @@ export function AgentEditor({ agentKey, onSaved }: { agentKey: string; onSaved?:
       <TabsContent value="wrapup" className="min-h-0 flex-1 overflow-y-auto px-4 pb-4">
         <div className="grid gap-3">
           <p className="text-muted-foreground text-xs leading-relaxed">
-            When this Agent is terminated due to <b>timeout</b> or <b>exhausted turns</b>, the system injects this "wrap-up prompt" for one wrap-up round:
-            It first writes back anything identified but not yet stored, then outputs a one-line summary (to avoid an abrupt ending). Leave empty to use the built-in default.
+            当智能体因<b>超时</b>或<b>轮数耗尽</b>而终止时，系统将注入此收尾提示词执行一轮收尾：
+            先回写已识别但尚未保存的内容，再输出一句总结，避免突然结束。留空使用内置默认配置。
           </p>
           <div className="flex items-center gap-2">
             <Label className="text-xs">收尾提示词正文</Label>
             {wrapup.trim() ? (
-              <Badge variant="secondary" className="px-1.5 py-0">Custom</Badge>
+              <Badge variant="secondary" className="px-1.5 py-0">自定义</Badge>
             ) : (
-              <Badge variant="outline" className="px-1.5 py-0">Using built-in default</Badge>
+              <Badge variant="outline" className="px-1.5 py-0">使用内置默认配置</Badge>
             )}
           </div>
           <Textarea
@@ -548,15 +548,15 @@ export function AgentEditor({ agentKey, onSaved }: { agentKey: string; onSaved?:
             <>
               <Separator className="my-2" />
               <p className="text-muted-foreground text-xs leading-relaxed">
-                <b>Task timeout wrap-up</b> (<b>separate</b> from the per-run wrap-up above): injected when the <b>entire task</b> hits its timeout cap and is about to end.
-                Its semantics are often the opposite of per-run (e.g. planner: per-run says "don't stop, keep planning", task timeout says "time's up, stop and make the final call"). Leave empty to use the built-in default.
+                <b>任务超时收尾</b>（与单次运行收尾<b>独立</b>）：当<b>整个任务</b>达到超时上限即将结束时注入。
+                其含义通常与单次运行收尾不同，例如规划器的单次运行要求继续规划，而任务超时要求停止并作出最终判断。留空使用内置默认配置。
               </p>
               <div className="flex items-center gap-2">
                 <Label className="text-xs">任务超时收尾提示词正文</Label>
                 {ttWrapup.trim() ? (
-                  <Badge variant="secondary" className="px-1.5 py-0">Custom</Badge>
+                  <Badge variant="secondary" className="px-1.5 py-0">自定义</Badge>
                 ) : (
-                  <Badge variant="outline" className="px-1.5 py-0">Using built-in default</Badge>
+                  <Badge variant="outline" className="px-1.5 py-0">使用内置默认配置</Badge>
                 )}
               </div>
               <Textarea
@@ -642,10 +642,10 @@ export function AgentEditor({ agentKey, onSaved }: { agentKey: string; onSaved?:
                 />
                 <span className="font-mono text-xs">{t.key}</span>
                 {isTraffic && (
-                  <Badge variant="secondary" className="px-1 py-0 text-[9px]">Traffic</Badge>
+                  <Badge variant="secondary" className="px-1 py-0 text-[9px]">流量</Badge>
                 )}
                 {!t.enabled && (
-                  <Badge variant="outline" className="text-destructive px-1 py-0 text-[9px]">Disabled</Badge>
+                  <Badge variant="outline" className="text-destructive px-1 py-0 text-[9px]">已停用</Badge>
                 )}
                 {gated ? (
                   <span className="text-muted-foreground ml-auto text-xs">需要流量采集</span>
@@ -903,12 +903,12 @@ function AgentTriggersTab({ agentKey, agent }: { agentKey: string; agent?: Agent
 
   function condLabel(t: AgentTrigger): string {
     const parts: string[] = [];
-    if (t.interval_sec > 0) parts.push(`every ${t.interval_sec}s`);
-    if (t.on_finding) parts.push("finding found");
-    if (t.on_goal_met) parts.push("goal met");
-    if (t.on_task_timeout) parts.push("task timeout");
-    if (t.on_tool_call) parts.push(`tool call (${t.tool_names.length})`);
-    if (t.on_task_create) parts.push("task created");
+    if (t.interval_sec > 0) parts.push(`每 ${t.interval_sec} 秒`);
+    if (t.on_finding) parts.push("发现结果");
+    if (t.on_goal_met) parts.push("目标达成");
+    if (t.on_task_timeout) parts.push("任务超时");
+    if (t.on_tool_call) parts.push(`工具调用（${t.tool_names.length}）`);
+    if (t.on_task_create) parts.push("任务创建");
     return parts.join(" · ") || "(no conditions)";
   }
 
@@ -937,8 +937,8 @@ function AgentTriggersTab({ agentKey, agent }: { agentKey: string; agent?: Agent
                 <SelectValue />
               </SelectTrigger>
               <SelectContent position="popper">
-                <SelectItem value="serial">Serial (queued, one at a time)</SelectItem>
-                <SelectItem value="parallel">Parallel (independent concurrent sessions)</SelectItem>
+                <SelectItem value="serial">串行（排队，逐个执行）</SelectItem>
+                <SelectItem value="parallel">并行（独立并发会话）</SelectItem>
               </SelectContent>
             </Select>
           </div>
@@ -958,9 +958,9 @@ function AgentTriggersTab({ agentKey, agent }: { agentKey: string; agent?: Agent
                 <SelectValue />
               </SelectTrigger>
               <SelectContent position="popper">
-                <SelectItem value="by_task">Merge by task</SelectItem>
-                <SelectItem value="all">Merge all into one</SelectItem>
-                <SelectItem value="none">No merge</SelectItem>
+                <SelectItem value="by_task">按任务合并</SelectItem>
+                <SelectItem value="all">全部合并为一个</SelectItem>
+                <SelectItem value="none">不合并</SelectItem>
               </SelectContent>
             </Select>
           </div>
@@ -1017,7 +1017,7 @@ function AgentTriggersTab({ agentKey, agent }: { agentKey: string; agent?: Agent
                 <span className="text-muted-foreground text-xs">秒</span>
               </div>
               <Textarea className="text-xs" rows={2} value={intervalMsg}
-                placeholder="Message sent to the agent when the schedule fires, e.g. inspect all tasks" onChange={(e) => setIntervalMsg(e.target.value)} />
+                placeholder="定时触发时发送给智能体的消息，例如检查所有任务" onChange={(e) => setIntervalMsg(e.target.value)} />
             </div>
           )}
         </div>
@@ -1029,7 +1029,7 @@ function AgentTriggersTab({ agentKey, agent }: { agentKey: string; agent?: Agent
           </label>
           {onFinding && (
             <Textarea className="text-xs" rows={2} value={findingMsg}
-              placeholder="Message sent to the agent when a finding is found (the system attaches task and finding details)" onChange={(e) => setFindingMsg(e.target.value)} />
+              placeholder="发现结果时发送给智能体的消息（系统附加任务和发现详情）" onChange={(e) => setFindingMsg(e.target.value)} />
           )}
         </div>
 
@@ -1040,7 +1040,7 @@ function AgentTriggersTab({ agentKey, agent }: { agentKey: string; agent?: Agent
           </label>
           {onGoalMet && (
             <Textarea className="text-xs" rows={2} value={goalMsg}
-              placeholder="Message sent to the agent when a goal is met (the system attaches the task and the met goal)" onChange={(e) => setGoalMsg(e.target.value)} />
+              placeholder="目标达成时发送给智能体的消息（系统附加任务和已达成目标）" onChange={(e) => setGoalMsg(e.target.value)} />
           )}
         </div>
 
@@ -1051,7 +1051,7 @@ function AgentTriggersTab({ agentKey, agent }: { agentKey: string; agent?: Agent
           </label>
           {onTaskTimeout && (
             <Textarea className="text-xs" rows={2} value={taskTimeoutMsg}
-              placeholder="Message sent to the agent on task timeout (the system attaches the task id and goals)" onChange={(e) => setTaskTimeoutMsg(e.target.value)} />
+              placeholder="任务超时时发送给智能体的消息（系统附加任务 ID 和目标）" onChange={(e) => setTaskTimeoutMsg(e.target.value)} />
           )}
         </div>
 
@@ -1081,7 +1081,7 @@ function AgentTriggersTab({ agentKey, agent }: { agentKey: string; agent?: Agent
                 </div>
               </div>
               <Textarea className="text-xs" rows={2} value={toolCallMsg}
-                placeholder="Message sent to the agent when a tool is called (the system attaches task info, tool input and output)" onChange={(e) => setToolCallMsg(e.target.value)} />
+                placeholder="工具调用时发送给智能体的消息（系统附加任务信息、工具输入和输出）" onChange={(e) => setToolCallMsg(e.target.value)} />
             </div>
           )}
         </div>
@@ -1093,13 +1093,13 @@ function AgentTriggersTab({ agentKey, agent }: { agentKey: string; agent?: Agent
           </label>
           {onTaskCreate && (
             <Textarea className="text-xs" rows={2} value={taskCreateMsg}
-              placeholder="Message sent to the agent when a task is created (the system attaches the task id and goals)" onChange={(e) => setTaskCreateMsg(e.target.value)} />
+              placeholder="创建任务时发送给智能体的消息（系统附加任务 ID 和目标）" onChange={(e) => setTaskCreateMsg(e.target.value)} />
           )}
         </div>
 
         <div className="flex items-center gap-2">
           <Button size="sm" onClick={submit} disabled={saving}>
-            <SaveIcon /> {editingId != null ? "Save changes" : "Add trigger"}
+            <SaveIcon /> {editingId != null ? "保存修改" : "添加触发器"}
           </Button>
           {editingId != null && (
             <Button size="sm" variant="ghost" onClick={resetForm} disabled={saving}>
@@ -1126,7 +1126,7 @@ function AgentTriggersTab({ agentKey, agent }: { agentKey: string; agent?: Agent
               <div className="flex flex-wrap items-center gap-1.5">
                 <span className="font-medium">{condLabel(t)}</span>
                 {!t.enabled && (
-                  <Badge variant="outline" className="text-destructive px-1 py-0 text-[9px]">Disabled</Badge>
+                  <Badge variant="outline" className="text-destructive px-1 py-0 text-[9px]">已停用</Badge>
                 )}
               </div>
               <div className="text-muted-foreground grid gap-0.5 text-xs">

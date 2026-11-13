@@ -227,7 +227,7 @@ function ToolEditor({
           <div className="flex items-center gap-2">
             <Switch checked={enabled} onCheckedChange={setEnabled} id={`en-${tool.key}`} />
             <Label htmlFor={`en-${tool.key}`} className="text-sm">
-              Enable
+              启用
             </Label>
           </div>
         </div>
@@ -246,7 +246,7 @@ function ToolEditor({
         {/* params */}
         <div className="grid gap-2">
           <Label className="text-muted-foreground text-xs">
-            Parameters (name / type / required are read-only; description and default are editable)
+            参数（名称、类型、是否必填为只读；说明和默认值可编辑）
           </Label>
           {rows.length === 0 && <span className="text-muted-foreground text-xs">（暂无参数）</span>}
           {rows.map((r, i) => (
@@ -322,11 +322,11 @@ function ToolGridCard({ tool, onClick }: { tool: Tool; onClick: () => void }) {
         <span className="font-mono text-sm font-medium">{tool.key}</span>
         {tool.system ? (
           <Badge variant="secondary" className="px-1.5 py-0 text-[10px]">
-            System
+            系统
           </Badge>
         ) : (
           <Badge variant="outline" className="px-1.5 py-0 text-[10px]">
-            Custom · {tool.kind}
+            自定义 · {tool.kind}
           </Badge>
         )}
         {tool.deferred && (
@@ -336,7 +336,7 @@ function ToolGridCard({ tool, onClick }: { tool: Tool; onClick: () => void }) {
         )}
         {!tool.enabled && (
           <Badge variant="outline" className="text-destructive px-1.5 py-0 text-[10px]">
-            Disabled
+            已停用
           </Badge>
         )}
         <Badge
@@ -438,7 +438,7 @@ export default function ToolsPage() {
             <CardContent>
               {systemTools.length === 0 ? (
                 <p className="text-muted-foreground py-6 text-center text-sm">
-                  {query.trim() ? "No matching system tools" : "(no system tools yet, waiting for the backend seed)"}
+                  {query.trim() ? "没有匹配的系统工具" : "（暂无系统工具，等待后端初始化）"}
                 </p>
               ) : (
                 <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
@@ -463,8 +463,8 @@ export default function ToolsPage() {
                   <CardTitle>自定义工具</CardTitle>
                   <CardDescription>
                     {query.trim()
-                      ? `shell/command/script/http, ${customTools.length} / ${allCustomCount} matching; click a card to edit`
-                      : `shell (bash declaration) / command (command template) / script (Python) / http (API), ${allCustomCount} total; click a card to edit`}
+                      ? `shell/command/script/http，匹配 ${customTools.length} / ${allCustomCount} 项；点击卡片编辑`
+                      : `shell（Bash 声明）/ command（命令模板）/ script（Python）/ http（API），共 ${allCustomCount} 项；点击卡片编辑`}
                   </CardDescription>
                 </div>
                 <Button size="sm" onClick={() => setCustomEdit("new")}>
@@ -475,7 +475,7 @@ export default function ToolsPage() {
             <CardContent>
               {customTools.length === 0 ? (
                 <p className="text-muted-foreground py-6 text-center text-sm">
-                  {query.trim() ? "No matching custom tools" : "(no custom tools yet; click 'Create custom tool' in the top right)"}
+                  {query.trim() ? "没有匹配的自定义工具" : "（暂无自定义工具，点击右上角「创建自定义工具」）"}
                 </p>
               ) : (
                 <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
@@ -685,7 +685,7 @@ function CustomToolDialog({
         className="flex flex-col gap-0 p-0 data-[side=right]:w-[45vw] data-[side=right]:sm:max-w-[45vw] data-[side=right]:min-w-[480px]"
       >
         <SheetHeader className="px-4">
-          <SheetTitle>{isNew ? "Create custom tool" : `Edit ${tool?.key}`}</SheetTitle>
+          <SheetTitle>{isNew ? "创建自定义工具" : `编辑 ${tool?.key}`}</SheetTitle>
           <SheetDescription>shell 为 Bash 环境声明（仅名称和说明，告知模型可在 Bash 中调用）；command、script、http 需要执行配置。</SheetDescription>
         </SheetHeader>
 
@@ -816,7 +816,7 @@ function CustomToolDialog({
                 onChange={(e) => setParamsText(e.target.value)} />
               <div>
                 <Button size="sm" variant="outline" onClick={runTest} disabled={testing}>
-                  <PlayIcon /> {testing ? "Running…" : "Test run"}
+                  <PlayIcon /> {testing ? "正在运行…" : "测试运行"}
                 </Button>
               </div>
               {testResult && (

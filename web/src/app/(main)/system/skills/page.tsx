@@ -47,7 +47,7 @@ import { api } from "@/lib/api";
 import type { Agent, SkillItem, MCPServer, SkillCall, MissingSkill } from "@/lib/types";
 
 function fmtTime(ts?: string) {
-  if (!ts) return "Never called";
+  if (!ts) return "从未调用";
   return new Date(ts).toLocaleString("zh-CN", {
     month: "2-digit",
     day: "2-digit",
@@ -806,7 +806,7 @@ export default function SkillsPage() {
               title="上传包含 SKILL.md 的 ZIP 压缩包"
             >
               <UploadIcon className="size-3.5" />
-              {uploading ? "Uploading…" : "Upload archive"}
+              {uploading ? "正在上传…" : "上传压缩包"}
             </Button>
           </div>
           {/* Radix viewport wraps children in a display:table div that grows with
@@ -903,7 +903,7 @@ export default function SkillsPage() {
                 )}
                 <div className="mt-2 flex flex-wrap gap-2">
                   {selectedSkill.license && (
-                    <Badge variant="outline" className="text-xs font-normal">License: {selectedSkill.license}</Badge>
+                    <Badge variant="outline" className="text-xs font-normal">许可证：{selectedSkill.license}</Badge>
                   )}
                   {selectedSkill.compatibility && (
                     <Badge variant="secondary" className="text-xs font-normal">{selectedSkill.compatibility}</Badge>
@@ -946,14 +946,14 @@ export default function SkillsPage() {
                     <p className="text-xs text-muted-foreground">正在加载调用详情…</p>
                   ) : usageCalls.length > 0 ? (
                     <div className="rounded-md border">
-                      <div className="border-b px-2 py-1 text-xs text-muted-foreground">Last {usageCalls.length} calls</div>
+                      <div className="border-b px-2 py-1 text-xs text-muted-foreground">最近 {usageCalls.length} 次调用</div>
                       <div className="max-h-56 overflow-y-auto">
                         {usageCalls.map((c, i) => (
                           <div key={`${c.ts}-${i}`} className="flex items-center gap-2 border-b px-2 py-1 text-xs last:border-b-0">
                             <span className="tabular-nums text-muted-foreground">{fmtTime(c.ts)}</span>
                             <Badge variant="outline" className="font-normal">{c.agent_key || "—"}</Badge>
                             <span className="ml-auto text-muted-foreground">
-                              {c.task_id > 0 ? `Task #${c.task_id}` : c.session_id ? "Chat session" : "—"}
+                              {c.task_id > 0 ? `任务 #${c.task_id}` : c.session_id ? "对话会话" : "—"}
                             </span>
                           </div>
                         ))}
@@ -1017,7 +1017,7 @@ export default function SkillsPage() {
                 <span>/</span>
                 <span className="font-mono">{selected.path}</span>
                 <Button size="sm" className="ml-auto" onClick={saveFile} disabled={!dirty || saving}>
-                  {saving ? "Saving…" : "Save"}
+                  {saving ? "正在保存…" : "保存"}
                 </Button>
               </div>
               {fileLoading ? (
@@ -1039,16 +1039,16 @@ export default function SkillsPage() {
         <AlertDialogContent>
           <AlertDialogHeader>
             <AlertDialogTitle>
-              {pendingDelete?.kind === "skill" && `Delete skill "${pendingDelete.skill}"?`}
-              {pendingDelete?.kind === "dir" && `Delete folder "${pendingDelete.path}"?`}
-              {pendingDelete?.kind === "file" && `Delete file "${pendingDelete.path}"?`}
+              {pendingDelete?.kind === "skill" && `删除技能「${pendingDelete.skill}」？`}
+              {pendingDelete?.kind === "dir" && `删除文件夹「${pendingDelete.path}」？`}
+              {pendingDelete?.kind === "file" && `删除文件「${pendingDelete.path}」？`}
             </AlertDialogTitle>
             <AlertDialogDescription>
               {pendingDelete?.kind === "skill"
-                ? "This deletes all of the skill's files, MCP links and visibility config. This action cannot be undone."
+                ? "此操作将删除该技能的全部文件、MCP 关联和可见权限配置，且无法撤销。"
                 : pendingDelete?.kind === "dir"
-                  ? "This also deletes all files under the folder. This action cannot be undone."
-                  : "This action cannot be undone."}
+                  ? "此操作也会删除文件夹下的全部文件，且无法撤销。"
+                  : "此操作无法撤销。"}
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
@@ -1057,7 +1057,7 @@ export default function SkillsPage() {
               disabled={deleting}
               onClick={(e) => { e.preventDefault(); void runPendingDelete(); }}
             >
-              {deleting ? "Deleting…" : "Delete"}
+              {deleting ? "正在删除…" : "删除"}
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
@@ -1106,7 +1106,7 @@ export default function SkillsPage() {
               <div className="grid grid-cols-2 gap-3">
                 <div className="grid gap-1.5">
                   <Label className="text-muted-foreground text-xs">许可证</Label>
-                  <Input placeholder="MIT / Proprietary" value={newLicense} onChange={(e) => setNewLicense(e.target.value)} />
+                  <Input placeholder="MIT / 专有许可" value={newLicense} onChange={(e) => setNewLicense(e.target.value)} />
                 </div>
                 <div className="grid gap-1.5">
                   <Label className="text-muted-foreground text-xs">兼容性</Label>
