@@ -26,7 +26,7 @@ import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip
 import { Markdown } from "@/components/markdown";
 import { api } from "@/lib/api";
 import { cn } from "@/lib/utils";
-import { skillLabel, toolLabel } from "@/lib/resource-labels";
+import { skillLabel, skillSummary, toolLabel } from "@/lib/resource-labels";
 import type { Agent, AgentDetail, AgentTrigger, MCPServer, PromptVar, PromptVersion, Settings, SkillItem, Tool } from "@/lib/types";
 
 // Traffic tools are host tools gated by the global traffic capture switch: bindable, but
@@ -614,7 +614,7 @@ export function AgentEditor({ agentKey, onSaved }: { agentKey: string; onSaved?:
             <label key={s.name} className="flex items-center gap-2 rounded-md border p-2 text-sm">
               <Checkbox checked={skillVisible.includes(s.name)} onCheckedChange={() => toggleSkill(s.name)} />
               <span className="text-xs" title={s.name}>{skillLabel(s.name)}</span>
-              {s.description && <span className="text-muted-foreground ml-auto truncate text-xs">{s.description}</span>}
+              {(skillSummary(s.name) || s.description) && <span className="text-muted-foreground ml-auto truncate text-xs" title={s.description}>{skillSummary(s.name) || s.description}</span>}
             </label>
           ))}
           {skills.length === 0 && <span className="text-muted-foreground text-xs">（暂无技能）</span>}

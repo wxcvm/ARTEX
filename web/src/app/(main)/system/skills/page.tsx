@@ -44,7 +44,7 @@ import {
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { cn } from "@/lib/utils";
 import { api } from "@/lib/api";
-import { skillLabel } from "@/lib/resource-labels";
+import { skillLabel, skillSummary } from "@/lib/resource-labels";
 import type { Agent, SkillItem, MCPServer, SkillCall, MissingSkill } from "@/lib/types";
 
 function fmtTime(ts?: string) {
@@ -900,8 +900,12 @@ export default function SkillsPage() {
               <div>
                 <h2 className="text-base font-semibold">{skillLabel(selectedSkill.name)}</h2>
                 {skillLabel(selectedSkill.name) !== selectedSkill.name && <p className="text-xs font-mono text-muted-foreground">技能标识：{selectedSkill.name}</p>}
+                {skillSummary(selectedSkill.name) && <p className="mt-1 text-sm">{skillSummary(selectedSkill.name)}</p>}
                 {selectedSkill.description && (
-                  <p className="mt-1 text-sm text-muted-foreground"><span className="font-medium">原始说明：</span>{selectedSkill.description}</p>
+                  <details className="mt-2 text-sm text-muted-foreground" open={!skillSummary(selectedSkill.name)}>
+                    <summary className="cursor-pointer">原始说明</summary>
+                    <p className="mt-1 whitespace-pre-wrap break-words">{selectedSkill.description}</p>
+                  </details>
                 )}
                 <div className="mt-2 flex flex-wrap gap-2">
                   {selectedSkill.license && (

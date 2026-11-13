@@ -57,6 +57,22 @@ const skillLabels: Record<string, string> = {
   "webshell-toolkit": "WebShell 安全资料"
 };
 
+// Brief Chinese catalog introductions for shipped skills whose metadata is English.
+// These are presentation summaries, not replacements for SKILL.md.
+const skillSummaries: Record<string, string> = {
+  "api-recon": "用于梳理网站的 API 接口，帮助了解前端调用的接口结构。",
+  "api-security": "用于授权范围内的 REST、GraphQL、WebSocket 与 SOAP API 安全评估，涵盖认证、授权、输入校验、业务逻辑及数据暴露等问题。",
+  "bbot-recon": "用于授权资产的信息收集与整理，可结合 BBOT 的事件图谱开展资产分析，并按项目规定选择适用的扫描模式。",
+  "codeaudit": "用于对用户提供的插件、应用或仓库进行白盒源码审计，分析输入处理和敏感操作，验证安全问题并记录证据及影响。",
+  "edr-bypass-re": "用于授权隔离实验环境中的终端防护研究，了解 EDR/AV 的监控覆盖、遥测和防护能力。",
+  "finding-triage": "用于整理、复核、去重和复测安全发现，区分事实与假设，保留原始证据并准备交付材料。",
+  "patch-diff": "用于比较厂商安全补丁与旧版本的差异，分析修复所针对的问题，并验证修复效果。",
+  "php2shell": "用于评估 PHP 文件包含相关风险和受影响的会话配置，记录验证依据与修复状态。",
+  "playwright-cli": "使用 Playwright CLI 自动化浏览器操作、测试网页并管理 Playwright 测试。",
+  "rea": "通过本机 REA MCP 分析二进制文件、应用安装包、原生库和 JavaScript 打包产物，帮助理解程序结构。",
+  "scopesentry": "通过 ScopeSentry MCP 管理扫描项目、任务、模板、资产与节点，查看任务结果和资产记录。"
+};
+
 const toolLabels: Record<string, string> = {
   "graph_overview": "任务图谱总览",
   "list_findings": "查看发现结果",
@@ -151,6 +167,7 @@ function labelFor(labels: Record<string, string>, key: string): string {
 }
 
 export function skillLabel(key: string): string { return labelFor(skillLabels, key); }
+export function skillSummary(key: string): string | undefined { return Object.hasOwn(skillSummaries, key) ? skillSummaries[key] : undefined; }
 export function toolLabel(key: string, system = true): string { return system ? labelFor(toolLabels, key) : key; }
 export function knowledgeCategory(key: string): string { return labelFor(categoryLabels, key); }
 export function knowledgeKind(key: string): string { return labelFor(kindLabels, key); }
