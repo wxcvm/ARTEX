@@ -44,6 +44,7 @@ import {
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { cn } from "@/lib/utils";
 import { api } from "@/lib/api";
+import { skillLabel } from "@/lib/resource-labels";
 import type { Agent, SkillItem, MCPServer, SkillCall, MissingSkill } from "@/lib/types";
 
 function fmtTime(ts?: string) {
@@ -224,7 +225,7 @@ function SkillsOverview({
                 onClick={() => onSelect(s.name)}
                 className="group flex w-full items-center gap-3 rounded-md px-2 py-1.5 text-left hover:bg-muted"
               >
-                <span className="w-40 shrink-0 truncate font-mono text-xs" title={s.name}>{s.name}</span>
+                <span className="w-40 shrink-0 truncate font-mono text-xs" title={s.name}>{skillLabel(s.name)}</span>
                 <span className="relative h-2 flex-1 overflow-hidden rounded-full bg-muted">
                   <span
                     className="absolute inset-y-0 left-0 rounded-full bg-primary/70"
@@ -255,7 +256,7 @@ function SkillsOverview({
                   onClick={() => onSelect(s.name)}
                   className="flex w-full items-center gap-2 rounded px-1.5 py-1 text-left hover:bg-muted"
                 >
-                  <span className="min-w-0 flex-1 truncate font-mono text-xs" title={s.name}>{s.name}</span>
+                  <span className="min-w-0 flex-1 truncate font-mono text-xs" title={s.name}>{skillLabel(s.name)}</span>
                   <span className="shrink-0 text-[11px] tabular-nums text-muted-foreground">{fmtTime(s.last_used)}</span>
                 </button>
               ))}
@@ -281,7 +282,7 @@ function SkillsOverview({
                   title={s.name}
                 >
                   <Badge variant="outline" className="max-w-[12rem] cursor-pointer truncate font-mono text-xs font-normal hover:bg-muted">
-                    {s.name}
+                    {skillLabel(s.name)}
                   </Badge>
                 </button>
               ))}
@@ -836,7 +837,7 @@ export default function SkillsPage() {
                         ? <FolderOpenIcon className="size-3.5 shrink-0 text-blue-500" />
                         : <FolderIcon className="size-3.5 shrink-0 text-blue-500" />
                       }
-                      <span className="min-w-0 flex-1 truncate font-semibold" title={s.name}>{s.name}</span>
+                      <span className="min-w-0 flex-1 truncate font-semibold" title={s.name}>{skillLabel(s.name)}</span>
                       {s.calls > 0 && (
                         <span
                           className="shrink-0 rounded bg-muted px-1 text-[10px] tabular-nums text-muted-foreground"
@@ -897,9 +898,10 @@ export default function SkillsPage() {
           {selected && selected.path === null && selectedSkill && (
             <div className="max-w-5xl space-y-5">
               <div>
-                <h2 className="font-mono text-base font-semibold">{selectedSkill.name}</h2>
+                <h2 className="text-base font-semibold">{skillLabel(selectedSkill.name)}</h2>
+                {skillLabel(selectedSkill.name) !== selectedSkill.name && <p className="text-xs font-mono text-muted-foreground">技能标识：{selectedSkill.name}</p>}
                 {selectedSkill.description && (
-                  <p className="mt-1 text-sm text-muted-foreground">{selectedSkill.description}</p>
+                  <p className="mt-1 text-sm text-muted-foreground"><span className="font-medium">原始说明：</span>{selectedSkill.description}</p>
                 )}
                 <div className="mt-2 flex flex-wrap gap-2">
                   {selectedSkill.license && (

@@ -35,6 +35,7 @@ import {
   SheetTitle,
 } from "@/components/ui/sheet";
 import { api } from "@/lib/api";
+import { toolLabel } from "@/lib/resource-labels";
 import { ExternalToolsPanel } from "@/components/external-tools-panel";
 import type { Agent, Tool } from "@/lib/types";
 
@@ -234,7 +235,8 @@ function ToolEditor({
 
         {/* description */}
         <div className="grid gap-1.5">
-          <Label className="text-muted-foreground text-xs">工具说明（发送给模型）</Label>
+          <Label className="text-muted-foreground text-xs">原始工具说明（发送给模型）</Label>
+          <p className="text-xs text-muted-foreground">中文名称仅用于界面展示。这里保留模型实际使用的说明，可按需编辑。</p>
           <Textarea
             className="font-mono text-xs"
             rows={6}
@@ -319,7 +321,8 @@ function ToolGridCard({ tool, onClick }: { tool: Tool; onClick: () => void }) {
       className="hover:border-primary/50 hover:bg-muted/40 focus-visible:ring-ring flex flex-col gap-2 rounded-lg border p-4 text-left transition-colors focus-visible:ring-2 focus-visible:outline-none"
     >
       <div className="flex flex-wrap items-center gap-2">
-        <span className="font-mono text-sm font-medium">{tool.key}</span>
+        <span className="text-sm font-medium">{toolLabel(tool.key, tool.system)}</span>
+        {toolLabel(tool.key, tool.system) !== tool.key && <span className="font-mono text-[10px] text-muted-foreground">{tool.key}</span>}
         {tool.system ? (
           <Badge variant="secondary" className="px-1.5 py-0 text-[10px]">
             系统
@@ -348,7 +351,7 @@ function ToolGridCard({ tool, onClick }: { tool: Tool; onClick: () => void }) {
         </Badge>
       </div>
       <p className="text-muted-foreground line-clamp-1 h-4 text-xs">
-        {tool.description || "(no description)"}
+        {tool.description || "（暂无说明）"}
       </p>
       <div className="mt-auto flex flex-wrap gap-1 pt-1">
         {tool.agents.length === 0 && (
@@ -389,6 +392,7 @@ export default function ToolsPage() {
     if (!q) return true;
     return (
       t.key.toLowerCase().includes(q) ||
+      toolLabel(t.key, t.system).toLowerCase().includes(q) ||
       t.description.toLowerCase().includes(q) ||
       t.agents.some((a) => a.toLowerCase().includes(q))
     );
@@ -497,7 +501,8 @@ export default function ToolsPage() {
           {selected && (
             <>
               <SheetHeader className="px-4">
-                <SheetTitle className="font-mono">{selected.key}</SheetTitle>
+                <SheetTitle>{toolLabel(selected.key, selected.system)}</SheetTitle>
+                {toolLabel(selected.key, selected.system) !== selected.key && <p className="text-xs font-mono text-muted-foreground">工具标识：{selected.key}</p>}
                 <SheetDescription>编辑说明、参数默认值和智能体绑定</SheetDescription>
               </SheetHeader>
               <ToolEditor

@@ -26,6 +26,7 @@ import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip
 import { Markdown } from "@/components/markdown";
 import { api } from "@/lib/api";
 import { cn } from "@/lib/utils";
+import { skillLabel, toolLabel } from "@/lib/resource-labels";
 import type { Agent, AgentDetail, AgentTrigger, MCPServer, PromptVar, PromptVersion, Settings, SkillItem, Tool } from "@/lib/types";
 
 // Traffic tools are host tools gated by the global traffic capture switch: bindable, but
@@ -612,7 +613,7 @@ export function AgentEditor({ agentKey, onSaved }: { agentKey: string; onSaved?:
           {skills.map((s) => (
             <label key={s.name} className="flex items-center gap-2 rounded-md border p-2 text-sm">
               <Checkbox checked={skillVisible.includes(s.name)} onCheckedChange={() => toggleSkill(s.name)} />
-              <span className="font-mono text-xs">{s.name}</span>
+              <span className="text-xs" title={s.name}>{skillLabel(s.name)}</span>
               {s.description && <span className="text-muted-foreground ml-auto truncate text-xs">{s.description}</span>}
             </label>
           ))}
@@ -640,7 +641,7 @@ export function AgentEditor({ agentKey, onSaved }: { agentKey: string; onSaved?:
                   disabled={gated}
                   onCheckedChange={() => toggleTool(t)}
                 />
-                <span className="font-mono text-xs">{t.key}</span>
+                <span className="text-xs" title={t.key}>{toolLabel(t.key, t.system)}</span>
                 {isTraffic && (
                   <Badge variant="secondary" className="px-1 py-0 text-[9px]">流量</Badge>
                 )}
@@ -1073,7 +1074,7 @@ function AgentTriggersTab({ agentKey, agent }: { agentKey: string; agent?: Agent
                       <Checkbox className="mt-0.5" checked={toolNames.includes(tool.key)}
                         onCheckedChange={() => toggleTool(tool.key)} />
                       <span className="min-w-0">
-                        <span className="font-medium">{tool.key}</span>
+                        <span className="font-medium" title={tool.key}>{toolLabel(tool.key, tool.system)}</span>
                         {tool.description && <span className="text-muted-foreground line-clamp-1"> {tool.description}</span>}
                       </span>
                     </label>
