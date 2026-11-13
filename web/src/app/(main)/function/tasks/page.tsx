@@ -857,7 +857,7 @@ export default function TasksPage() {
                 <>
                   <span className="text-xs tabular-nums">{selectedIds.size} selected</span>
                   <Button size="sm" variant="ghost" onClick={() => setSelectedIds(new Set())}>
-                    Clear selection
+                    清除选择
                   </Button>
                   {pausableTaskIDs.length > 0 && (
                     <Button

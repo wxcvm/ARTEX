@@ -495,7 +495,7 @@ export default function LLMRecordsPage() {
                 title={hasRaw ? "查看与模型提供方实际交换的原始 HTTP" : "此记录早于原始数据记录功能上线，暂无原始数据"}
                 onClick={() => setRawView((v) => !v)}
               >
-                Raw
+                原始数据
               </Button>
               <Button
                 variant="ghost"

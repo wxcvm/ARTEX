@@ -485,7 +485,7 @@ export default function MCPPage() {
                 {renderForm()}
                 <div className="flex gap-2 pt-2 pb-6">
                   <Button onClick={saveForm} disabled={saving}>
-                    Save
+                    保存
                   </Button>
                 </div>
               </TabsContent>

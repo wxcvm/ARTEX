@@ -137,7 +137,7 @@ function LiveBadge() {
   return (
     <span className="inline-flex items-center gap-1 rounded bg-blue-500/15 px-1.5 py-0.5 text-[10px] font-medium text-blue-600 dark:text-blue-400">
       <span className="size-1 animate-pulse rounded-full bg-blue-500" />
-      Live
+      实时
     </span>
   );
 }
@@ -309,7 +309,7 @@ function LLMProfileRow({
             disabled={disabled}
             className="flex shrink-0 items-center gap-0.5 text-primary text-xs hover:underline disabled:pointer-events-none disabled:opacity-40"
           >
-            Change
+            更换
             <ChevronDownIcon className="size-3" />
           </button>
         </PopoverTrigger>
@@ -432,7 +432,7 @@ function DraftChat({
                 {a.name}
                 {!a.builtin && (
                   <Badge variant="outline" className="px-1 py-0 text-[9px]">
-                    Custom
+                    自定义
                   </Badge>
                 )}
               </span>
@@ -768,7 +768,7 @@ function ChatView({
         <span className="text-muted-foreground hidden shrink-0 font-mono text-xs sm:inline">{conv.agent_key}</span>
         {agent && !agent.builtin && (
           <Badge variant="outline" className="shrink-0 px-1.5 py-0 text-[10px]">
-            Custom
+            自定义
           </Badge>
         )}
         {agent?.description && (
@@ -933,7 +933,7 @@ const ConversationItem = React.memo(function ConversationItem({
             {conv.running ? (
               <Badge variant="secondary" className="shrink-0 gap-1" title="智能体正在运行">
                 <Spinner className="size-3" aria-hidden="true" />
-                Running
+                运行中
               </Badge>
             ) : null}
           </div>
@@ -1397,11 +1397,11 @@ export default function ChatPage() {
                       onClick={() => setBulkDeleteOpen(true)}
                     >
                       <Trash2Icon data-icon="inline-start" />
-                      Delete
+                      删除
                     </Button>
                   )}
                   <Button size="sm" variant="ghost" onClick={exitSelectionMode}>
-                    Done
+                    完成
                   </Button>
                 </div>
               ) : (
@@ -1417,7 +1417,7 @@ export default function ChatPage() {
                     disabled={filteredConversations.length === 0}
                   >
                     <ListChecksIcon data-icon="inline-start" />
-                    Select
+                    选择
                   </Button>
                 </div>
               ))}
@@ -1546,7 +1546,7 @@ export default function ChatPage() {
         <AlertDialogContent>
           <AlertDialogHeader>
             <AlertDialogTitle>删除选中的 {selectedConversationCount} 个对话？</AlertDialogTitle>
-            <AlertDialogDescription>Conversation messages and execution records will be deleted with them. 此操作无法撤销。</AlertDialogDescription>
+            <AlertDialogDescription>对话消息及执行记录将一并删除，此操作无法撤销。</AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
             <AlertDialogCancel disabled={bulkDeleting}>取消</AlertDialogCancel>
