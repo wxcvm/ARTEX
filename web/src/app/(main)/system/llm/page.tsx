@@ -42,13 +42,13 @@ const NONE = "none";
 const fromStore = (v?: string) => (v ? v : NONE);
 const toStore = (v: string) => (v === NONE ? "" : v);
 const THINKING_TYPES: { value: string; label: string }[] = [
-  { value: NONE, label: "Not sent (default)" },
-  { value: "disabled", label: "Disabled" },
-  { value: "enabled", label: "Enabled" },
+  { value: NONE, label: "不发送（默认）" },
+  { value: "disabled", label: "关闭" },
+  { value: "enabled", label: "开启" },
 ];
 // Which request field name carries the output cap (only meaningful for the openai format). NONE ↔ "" shares the same sentinel conversion.
 const MAX_TOKENS_FIELDS: { value: string; label: string }[] = [
-  { value: NONE, label: "max_tokens (default)" },
+  { value: NONE, label: "max_tokens（默认）" },
   { value: "max_completion_tokens", label: "max_completion_tokens" },
 ];
 // The other formats hard-code their field names, so the option is meaningless for them; the hint texts spell this out.
@@ -64,12 +64,12 @@ const MAX_TOKENS_FIELD_HINTS: Record<string, string> = {
 type ProfileFormat = "anthropic" | "openai" | "openai-responses" | "ollama";
 const OLLAMA_DEFAULT_BASE_URL = "http://127.0.0.1:11434/v1";
 const EFFORT_LEVELS: { value: string; label: string }[] = [
-  { value: NONE, label: "Not sent (default)" },
-  { value: "low", label: "low" },
-  { value: "medium", label: "medium" },
-  { value: "high", label: "high" },
-  { value: "xhigh", label: "xhigh" },
-  { value: "max", label: "max" },
+  { value: NONE, label: "不发送（默认）" },
+  { value: "low", label: "低" },
+  { value: "medium", label: "中" },
+  { value: "high", label: "高" },
+  { value: "xhigh", label: "极高" },
+  { value: "max", label: "最大" },
 ];
 
 function modelTestAdvice(message: string): string {
@@ -101,26 +101,26 @@ type Health = { label: string; cls: string; hint?: string };
 function healthOf(p: LLMProfile, m?: LLMPoolMember): Health {
   if (!p.api_key_hint && p.format !== "ollama") {
     return {
-      label: "No Key configured",
+      label: "未配置密钥",
       cls: "border-muted-foreground/40 text-muted-foreground",
-      hint: "No API Key set; cannot be called",
+      hint: "未设置 API Key，无法调用",
     };
   }
   if (m?.state === "tripped") {
     return {
-      label: m.cooldown_secs > 0 ? `Tripped · ${cooldownText(m.cooldown_secs)}` : "Tripped",
+      label: m.cooldown_secs > 0 ? `已熔断 · ${cooldownText(m.cooldown_secs)}` : "已熔断",
       cls: "border-destructive/50 text-destructive",
       hint: m.last_error,
     };
   }
   if (m?.state === "degraded") {
     return {
-      label: `Degraded · failed ${m.fails} times`,
+      label: `已降级 · 失败 ${m.fails} 次`,
       cls: "border-amber-500/50 text-amber-600 dark:text-amber-400",
       hint: m.last_error,
     };
   }
-  return { label: "Healthy", cls: "border-emerald-500/50 text-emerald-600 dark:text-emerald-400" };
+  return { label: "正常", cls: "border-emerald-500/50 text-emerald-600 dark:text-emerald-400" };
 }
 
 // ─────────────────────────────────────────────────────────────────────────────
@@ -154,12 +154,12 @@ function PoolSheet({
       await api.setSettings(patch);
       await onReload();
       if (patch.llm_pool_enabled !== undefined) {
-        toast.success(patch.llm_pool_enabled ? "LLM pool enabled" : "LLM pool disabled");
+        toast.success(patch.llm_pool_enabled ? "已启用模型池" : "已关闭模型池");
       } else {
-        toast.success("Fallback settings updated");
+        toast.success("故障切换设置已更新");
       }
     } catch (e) {
-      toast.error(`Failed to apply settings: ${(e as Error).message}`);
+      toast.error(`应用设置失败：${(e as Error).message}`);
     } finally {
       setBusy(false);
     }
@@ -169,9 +169,9 @@ function PoolSheet({
     try {
       await api.resetLLMPool(id);
       await onReload();
-      toast.success(id ? "Profile recovered" : "All profiles recovered");
+      toast.success(id ? "配置已恢复" : "全部配置已恢复");
     } catch (e) {
-      toast.error(`Recovery failed: ${(e as Error).message}`);
+      toast.error(`恢复失败：${(e as Error).message}`);
     }
   }
 
@@ -197,14 +197,14 @@ function PoolSheet({
         <div className="flex min-h-0 flex-1 flex-col gap-4 overflow-y-auto px-4 pb-6">
           <div className="flex items-center justify-between gap-4 rounded-lg border p-3">
             <div className="grid gap-0.5">
-              <Label className="text-sm">Enable pool</Label>
-              <p className="text-muted-foreground text-xs">Off by default. When off, only the active profile is ever used and a failure stays a failure.</p>
+              <Label className="text-sm">启用模型池</Label>
+              <p className="text-muted-foreground text-xs">默认关闭。关闭时仅使用当前启用的配置，失败不会切换。</p>
             </div>
             <Switch
               checked={enabled}
               disabled={busy}
               onCheckedChange={(v) => void toggle({ llm_pool_enabled: v })}
-              aria-label="LLM pool toggle"
+              aria-label="模型池开关"
             />
           </div>
 
@@ -212,17 +212,17 @@ function PoolSheet({
             <>
               <div className="flex items-center justify-between gap-4 rounded-lg border p-3">
                 <div className="grid gap-0.5">
-                  <Label className="text-sm">Also fall back when a pinned config fails</Label>
+                  <Label className="text-sm">固定配置失败时也允许切换</Label>
                   <p className="text-muted-foreground text-xs">
-                    Off by default: when an Agent or task pins a config, only that config is used and a failure stays a failure (no silent switch to another model).
-                    When enabled, a failing pinned config also falls back to the pool chain below.
+                    默认关闭：智能体或任务指定配置后，仅使用该配置，失败时不会自动切换其他模型。
+                    开启后，指定配置失败时也会按下方模型池顺序切换。
                   </p>
                 </div>
                 <Switch
                   checked={pool?.bind_fallback ?? false}
                   disabled={busy}
                   onCheckedChange={(v) => void toggle({ llm_pool_bind_fallback: v })}
-                  aria-label="Bound-config failure fallback toggle"
+                  aria-label="固定配置失败切换开关"
                 />
               </div>
 
@@ -230,7 +230,7 @@ function PoolSheet({
 
               <div className="grid gap-2">
                 <div className="flex items-center justify-between">
-                  <Label className="text-sm">Pool order</Label>
+                  <Label className="text-sm">模型池顺序</Label>
                   {tripped.length > 0 && (
                     <Button size="sm" variant="ghost" onClick={() => void recover()}>
                       <RotateCcwIcon /> Recover all
@@ -262,10 +262,10 @@ function PoolSheet({
                         <span className="font-medium">{m.name}</span>
                         {m.active && (
                           <Badge variant="outline" className="border-amber-400/50 text-amber-500">
-                            Active
+                            已启用
                           </Badge>
                         )}
-                        {excluded && <Badge variant="outline">Excluded from pool</Badge>}
+                        {excluded && <Badge variant="outline">排除出模型池</Badge>}
                         <div className="ml-auto flex items-center gap-2">
                           {m.state === "tripped" && m.cooldown_secs > 0 && (
                             <span className="text-muted-foreground text-xs">Cooldown {cooldownText(m.cooldown_secs)}</span>
@@ -278,8 +278,8 @@ function PoolSheet({
                               size="icon"
                               variant="ghost"
                               className="size-7"
-                              aria-label="Recover now"
-                              title="Recover now: clears the breaker so the next call retries this profile"
+                              aria-label="立即恢复"
+                              title="立即恢复：清除熔断状态，下次调用重新尝试此配置"
                               onClick={() => void recover(m.profile_id)}
                             >
                               <RotateCcwIcon className="size-3.5" />
@@ -301,7 +301,7 @@ function PoolSheet({
                 })}
                 {chain.length === 0 && (
                   <div className="rounded-lg border border-dashed p-4 text-center text-muted-foreground text-sm">
-                    No profiles yet
+                    暂无模型配置
                   </div>
                 )}
               </div>
@@ -500,7 +500,7 @@ function ProfileSheet({
 
   async function save() {
     if (!name.trim() || !model.trim()) {
-      toast.error("Please fill in a name and a model");
+      toast.error("请填写配置名称和模型");
       return;
     }
     if (saving) return;
@@ -530,12 +530,12 @@ function ProfileSheet({
         user_agent: userAgent.trim(),
         retry,
       });
-      if (isNew) toast.success(`Created: ${name.trim()} (use "Set as active" on its card to enable it)`);
-      else toast.success(profile?.is_default ? "Saved; the active profile takes effect immediately, no restart needed" : "Saved");
+      if (isNew) toast.success(`已创建：${name.trim()}（在卡片中设为启用即可使用）`);
+      else toast.success(profile?.is_default ? "已保存；当前启用配置立即生效，无需重启" : "已保存");
       onSaved(String(id));
       onOpenChange(false);
     } catch (e) {
-      toast.error(`Save failed: ${(e as Error).message}`);
+      toast.error(`保存失败：${(e as Error).message}`);
     } finally {
       setSaving(false);
     }
@@ -545,7 +545,7 @@ function ProfileSheet({
   if (format === "ollama") {
     keyPlaceholder = "optional — a local Ollama server runs keyless";
   } else if (keyHint) {
-    keyPlaceholder = `Set (${keyHint}); leave empty to keep it`;
+    keyPlaceholder = `已设置（${keyHint}），留空保留`;
   }
 
   return (
@@ -559,7 +559,7 @@ function ProfileSheet({
             {isNew ? "添加模型连接" : `编辑模型：${profile?.name}`}
             {profile?.is_default && (
               <Badge variant="outline" className="border-amber-400/50 text-amber-500">
-                Active
+                已启用
               </Badge>
             )}
           </SheetTitle>
@@ -692,7 +692,7 @@ function ProfileSheet({
             </button>
             <div id="model-advanced-settings" className={advancedOpen ? "grid min-w-0 gap-4 border-t border-border/70 px-4 py-4" : "hidden"}>
           <div className="grid gap-2">
-            <Label htmlFor="p-proxy">Proxy (optional)</Label>
+            <Label htmlFor="p-proxy">代理（可选）</Label>
             <Input
               id="p-proxy"
               className="font-mono"
@@ -707,11 +707,11 @@ function ProfileSheet({
           </div>
 
           <div className="grid gap-2">
-            <Label htmlFor="p-session-header">Custom session header (optional)</Label>
+            <Label htmlFor="p-session-header">自定义会话请求头（可选）</Label>
             <Input
               id="p-session-header"
               className="font-mono"
-              placeholder="e.g. x-session-id (empty = not sent)"
+              placeholder="例如 x-session-id（留空不发送）"
               value={sessionHeaderKey}
               onChange={(e) => setSessionHeaderKey(e.target.value)}
             />
@@ -723,11 +723,11 @@ function ProfileSheet({
           </div>
 
           <div className="grid gap-2">
-            <Label htmlFor="p-user-agent">Custom User-Agent (optional)</Label>
+            <Label htmlFor="p-user-agent">自定义 User-Agent（可选）</Label>
             <Input
               id="p-user-agent"
               className="font-mono"
-              placeholder="e.g. my-app/1.0 (empty = default UA)"
+              placeholder="例如 my-app/1.0（留空使用默认 UA）"
               value={userAgent}
               onChange={(e) => setUserAgent(e.target.value)}
             />
@@ -739,15 +739,15 @@ function ProfileSheet({
 
           <div className="grid gap-4 sm:grid-cols-3">
             <div className="grid gap-2">
-              <Label htmlFor="p-rps">Rate limit per second</Label>
+              <Label htmlFor="p-rps">每秒速率限制</Label>
               <Input id="p-rps" type="number" min={0} value={rps} onChange={(e) => setRps(e.target.value)} />
             </div>
             <div className="grid gap-2">
-              <Label htmlFor="p-rpm">Rate limit per minute</Label>
+              <Label htmlFor="p-rpm">每分钟速率限制</Label>
               <Input id="p-rpm" type="number" min={0} value={rpm} onChange={(e) => setRpm(e.target.value)} />
             </div>
             <div className="grid gap-2">
-              <Label htmlFor="p-cw">Context window (K)</Label>
+              <Label htmlFor="p-cw">上下文窗口（K）</Label>
               <Input
                 id="p-cw"
                 type="number"
@@ -784,24 +784,24 @@ function ProfileSheet({
             </div>
             <div className="flex flex-col items-start gap-3 border-t pt-3 sm:flex-row sm:items-center sm:justify-between">
               <div className="grid gap-0.5">
-                <Label className="text-sm">Excluded from pool</Label>
+                <Label className="text-sm">排除出模型池</Label>
                 <p className="text-muted-foreground text-xs">
                   When enabled, this profile is never used as a failover target (Agents / tasks can still pin it explicitly). Suited to expensive profiles reserved for one specific Agent
                   that should not be burned through by other agents' failures.
                 </p>
               </div>
-              <Switch checked={poolExclude} onCheckedChange={setPoolExclude} aria-label="Excluded from pool" />
+              <Switch checked={poolExclude} onCheckedChange={setPoolExclude} aria-label="排除出模型池" />
             </div>
             <div className="flex flex-col items-start gap-3 border-t pt-3 sm:flex-row sm:items-center sm:justify-between">
               <div className="grid gap-0.5">
-                <Label className="text-sm">Streaming output</Label>
+                <Label className="text-sm">流式输出</Label>
                 <p className="text-muted-foreground text-xs">
                   On (default) streams over SSE, with live in-flight progress and real-time token counting. Off uses true non-streaming (stream:false,
                   returning the full response in one shot) — a way around gateways with broken SSE implementations (empty frames / dropped thinking-field frames),
                   at the cost of losing live in-flight progress.
                 </p>
               </div>
-              <Switch checked={streaming} onCheckedChange={setStreaming} aria-label="Streaming output" />
+              <Switch checked={streaming} onCheckedChange={setStreaming} aria-label="流式输出" />
             </div>
           </div>
 
@@ -809,7 +809,7 @@ function ProfileSheet({
             <div className="flex flex-col items-start gap-3 sm:flex-row sm:items-center sm:justify-between">
               <div className="grid gap-0.5">
                 <Label htmlFor="p-max-tokens" className="text-sm">
-                  Output cap · max tokens
+                  输出上限 · max tokens
                 </Label>
                 <p className="text-muted-foreground text-xs">
                   How many tokens a single reply may generate at most; sent with every request. 0 (default) = the field is not sent, leaving it to the server default.
@@ -829,7 +829,7 @@ function ProfileSheet({
             </div>
             <div className="flex flex-col items-start gap-3 border-t pt-3 sm:flex-row sm:items-center sm:justify-between">
               <div className="grid gap-0.5">
-                <Label className="text-sm">Cap field name</Label>
+                <Label className="text-sm">上限字段名称</Label>
                 <p className="text-muted-foreground text-xs">{MAX_TOKENS_FIELD_HINTS[format]}</p>
               </div>
               <Select
@@ -854,7 +854,7 @@ function ProfileSheet({
           <div className="grid gap-3 rounded-lg border p-3">
             <div className="flex flex-col items-start gap-3 sm:flex-row sm:items-center sm:justify-between">
               <div className="grid gap-0.5">
-                <Label className="text-sm">Thinking switch · thinking.type</Label>
+                <Label className="text-sm">思考开关 · thinking.type</Label>
                 <p className="text-muted-foreground text-xs">
                   Controls whether the thinking field is sent. Not sent = the field is omitted (compatible with models like MiniMax that lack support); Disabled = send
                   disabled; Enabled = send enabled. Independent of the effort below.
@@ -875,7 +875,7 @@ function ProfileSheet({
             </div>
             <div className="flex flex-col items-start gap-3 border-t pt-3 sm:flex-row sm:items-center sm:justify-between">
               <div className="grid gap-0.5">
-                <Label className="text-sm">Thinking effort · reasoning_effort</Label>
+                <Label className="text-sm">思考强度 · reasoning_effort</Label>
                 <p className="text-muted-foreground text-xs">
                   A separate effort knob (OpenAI reasoning_effort / Anthropic output_config.effort). Some APIs have no thinking
                   field and activate thinking via effort alone, so it can be set on its own without sending the thinking switch.
@@ -991,24 +991,24 @@ export default function LLMPage() {
   async function activate(id: string, name: string) {
     try {
       await api.activateLLMProfile(id);
-      toast.success(`Activated: ${name}`);
+      toast.success(`已启用：${name}`);
       await load();
     } catch (e) {
-      toast.error(`Activation failed: ${(e as Error).message}`);
+      toast.error(`启用失败：${(e as Error).message}`);
     }
   }
 
   async function remove(p: LLMProfile) {
     if (p.is_default) {
-      toast.error("Cannot delete the active profile");
+      toast.error("无法删除当前启用的配置");
       return;
     }
     try {
       await api.deleteLLMProfile(p.id);
-      toast.success(`Deleted: ${p.name}`);
+      toast.success(`已删除：${p.name}`);
       await load();
     } catch (e) {
-      toast.error(`Delete failed: ${(e as Error).message}`);
+      toast.error(`删除失败：${(e as Error).message}`);
     }
   }
 
@@ -1018,7 +1018,7 @@ export default function LLMPage() {
     <div className="flex min-w-0 flex-1 flex-col gap-5 pb-6">
       <header className="flex flex-wrap items-center justify-between gap-4 rounded-2xl border border-border/70 bg-gradient-to-br from-card to-primary/5 px-5 py-5 shadow-sm sm:px-7">
         <div className="min-w-0">
-          <p className="mb-1 text-[11px] font-semibold tracking-[0.16em] text-primary">ARTEX / MODELS</p>
+          <p className="mb-1 text-[11px] font-semibold tracking-[0.16em] text-primary">ARTEX / 模型</p>
           <h1 className="text-2xl font-semibold tracking-tight">模型配置</h1>
           <p className="mt-1 max-w-2xl text-sm leading-relaxed text-muted-foreground">
             管理智能体使用的模型连接、默认配置与故障切换。点击配置卡片可编辑，星标表示当前默认配置。
@@ -1103,7 +1103,7 @@ export default function LLMPage() {
                       {/* The two pool-related fields only matter when the pool is on; when it is off they take no space */}
                       {poolOn &&
                         !p.is_default &&
-                        (p.pool_exclude ? <span>Excluded from pool</span> : <span>Priority {p.priority ?? 0}</span>)}
+                        (p.pool_exclude ? <span>排除出模型池</span> : <span>优先级 {p.priority ?? 0}</span>)}
                     </div>
 
                     <div className="mt-1 flex gap-2">

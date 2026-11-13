@@ -133,7 +133,7 @@ function Chips({ items, mono }: { items: string[]; mono?: boolean }) {
 
 function SourceCell({ asset }: { asset: Asset }) {
   const source = firstText([asset.task_source], "legacy");
-  const summary = firstText([asset.task_source_summary], "Migrated from a historical task's asset association; no more detailed source information");
+  const summary = firstText([asset.task_source_summary], "来自历史任务资产关联迁移，无更多详细来源信息");
   return (
     <Tooltip>
       <TooltipTrigger asChild>
@@ -293,11 +293,11 @@ function AddTaskAssetsSheet({
     try {
       const result = await api.registerTaskAssetScopes(taskId, parsedScope.rules);
       const assetSummary = result.assets_linked + result.assets_existing;
-      toast.success(`Registered ${result.requested} scopes, linked ${assetSummary} domain/IP assets`);
+      toast.success(`已登记 ${result.requested} 条范围，关联 ${assetSummary} 个域名/IP 资产`);
       onAttached();
       onOpenChange(false);
     } catch (reason) {
-      toast.error(`Failed to add: ${String((reason as Error)?.message ?? reason)}`);
+      toast.error(`添加失败：${String((reason as Error)?.message ?? reason)}`);
     } finally {
       setSaving(false);
     }
@@ -307,9 +307,9 @@ function AddTaskAssetsSheet({
     <Sheet open={open} onOpenChange={onOpenChange}>
       <SheetContent className="w-full sm:max-w-xl">
         <SheetHeader>
-          <SheetTitle>Add test assets</SheetTitle>
+          <SheetTitle>添加测试资产</SheetTitle>
           <SheetDescription>
-            Enter the test scope directly. Domains and IPs create or reuse global assets; CIDRs, ICP records, and keywords act as agent scope context.
+            直接输入测试范围。域名和 IP 会创建或复用全局资产；CIDR、ICP备案和关键词作为智能体范围上下文。
           </SheetDescription>
         </SheetHeader>
         <div className="flex min-h-0 flex-1 flex-col overflow-y-auto px-4">
@@ -318,13 +318,13 @@ function AddTaskAssetsSheet({
             value={scopeText}
             onValueChange={setScopeText}
             parsed={parsedScope}
-            label="Test assets and scope"
-            description="One entry per line; domains, IPs, CIDRs, ICP records, and keywords are recognized automatically."
+            label="测试资产及范围"
+            description="每行一项，自动识别域名、IP、CIDR、ICP备案及关键词。"
           />
         </div>
         <SheetFooter>
           <Button variant="outline" onClick={() => onOpenChange(false)} disabled={saving}>
-            Cancel
+            取消
           </Button>
           <Button
             onClick={() => void attach()}
@@ -404,7 +404,7 @@ export function AssetsTab({ taskId }: { taskId: string }) {
           setRows([]);
           setTotal(0);
         } else {
-          toast.error(`Failed to load task assets: ${message}`);
+          toast.error(`加载任务资产失败：${message}`);
         }
       } finally {
         if (active && assetsRequestRef.current === request) {
@@ -438,11 +438,11 @@ export function AssetsTab({ taskId }: { taskId: string }) {
     setRemoving(true);
     try {
       await api.detachTaskAsset(taskId, removeTarget.id);
-      toast.success(`Removed ${assetLabel(removeTarget)} from the current task`);
+      toast.success(`已从当前任务移除 ${assetLabel(removeTarget)}`);
       setRemoveTarget(null);
       refresh();
     } catch (reason) {
-      toast.error(`Failed to remove: ${String((reason as Error)?.message ?? reason)}`);
+      toast.error(`移除失败：${String((reason as Error)?.message ?? reason)}`);
     } finally {
       setRemoving(false);
     }
@@ -453,8 +453,8 @@ export function AssetsTab({ taskId }: { taskId: string }) {
       variant="ghost"
       size="icon-sm"
       onClick={() => setRemoveTarget(asset)}
-      aria-label={`Remove asset ${assetLabel(asset)} from the task`}
-      title="Remove from task"
+      aria-label={`从任务移除资产 ${assetLabel(asset)}`}
+      title="从任务移除"
     >
       <Trash2Icon />
     </Button>
@@ -521,7 +521,7 @@ export function AssetsTab({ taskId }: { taskId: string }) {
         </TabsContent>
 
         <TabsContent value="ip" className="mt-0 flex min-h-0 flex-1 flex-col">
-          <AssetCard cols={["IP", "C segment", "Bound domains", "Open ports", "Source", "Actions"]} {...commonCardProps}>
+          <AssetCard cols={["IP", "C 段", "绑定域名", "开放端口", "来源", "操作"]} {...commonCardProps}>
             {rows.map((asset) => (
               <TableRow key={asset.id}>
                 <TableCell className="font-medium font-mono text-xs">{asset.ip}</TableCell>
@@ -547,7 +547,7 @@ export function AssetsTab({ taskId }: { taskId: string }) {
         </TabsContent>
 
         <TabsContent value="subdomain" className="mt-0 flex min-h-0 flex-1 flex-col">
-          <AssetCard cols={["Domain", "Root domain", "Record type", "Record value", "Source", "Actions"]} {...commonCardProps}>
+          <AssetCard cols={["域名", "根域名", "记录类型", "记录值", "来源", "操作"]} {...commonCardProps}>
             {rows.map((asset) => (
               <TableRow key={asset.id}>
                 <TableCell className="font-medium font-mono text-xs">{asset.domain}</TableCell>
@@ -589,7 +589,7 @@ export function AssetsTab({ taskId }: { taskId: string }) {
 
         <TabsContent value="service" className="mt-0 flex min-h-0 flex-1 flex-col">
           <AssetCard
-            cols={["Address / service", "Status code", "Title", "Response size", "Fingerprints", "Auth", "Source", "Actions"]}
+            cols={["地址 / 服务", "状态码", "标题", "响应大小", "指纹", "认证", "来源", "操作"]}
             {...commonCardProps}
           >
             {rows.map((asset) => {
@@ -647,7 +647,7 @@ export function AssetsTab({ taskId }: { taskId: string }) {
         </TabsContent>
 
         <TabsContent value="endpoint" className="mt-0 flex min-h-0 flex-1 flex-col">
-          <AssetCard cols={["Method", "Full URL", "Params", "Source", "Actions"]} {...commonCardProps}>
+          <AssetCard cols={["方法", "完整 URL", "参数", "来源", "操作"]} {...commonCardProps}>
             {rows.map((asset) => (
               <TableRow key={asset.id}>
                 <TableCell className="w-16">
@@ -680,14 +680,14 @@ export function AssetsTab({ taskId }: { taskId: string }) {
       <AlertDialog open={Boolean(removeTarget)} onOpenChange={(open) => !open && !removing && setRemoveTarget(null)}>
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle>Remove from this task?</AlertDialogTitle>
+            <AlertDialogTitle>从当前任务移除？</AlertDialogTitle>
             <AlertDialogDescription className="[overflow-wrap:anywhere]">
-              {removeTarget ? `Remove "${assetLabel(removeTarget)}" from this task's test assets.` : ""}
-              Global assets, linked traffic, and historical blackboard anchors are kept.
+              {removeTarget ? `从当前任务的测试资产中移除「${assetLabel(removeTarget)}」。` : ""}
+              保留全局资产、关联流量及历史黑板锚点。
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel disabled={removing}>Cancel</AlertDialogCancel>
+            <AlertDialogCancel disabled={removing}>取消</AlertDialogCancel>
             <AlertDialogAction
               variant="destructive"
               disabled={removing}

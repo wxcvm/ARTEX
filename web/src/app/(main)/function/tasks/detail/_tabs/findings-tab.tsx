@@ -118,7 +118,7 @@ function Row({
                 : `/function/findings/detail?id=${f.finding_id}`
             }
             className="text-muted-foreground hover:text-primary inline-flex shrink-0 items-center gap-0.5 text-xs"
-            title="View vulnerability details"
+            title="查看漏洞详情"
           >
             Details
             <ArrowUpRightIcon className="size-3" />
@@ -127,7 +127,7 @@ function Row({
       </div>
       {open && (
         <div className="bg-muted/30 px-4 pb-4 pl-11">
-          <div className="mb-1 text-xs font-medium text-muted-foreground">Evidence / PoC</div>
+          <div className="mb-1 text-xs font-medium text-muted-foreground">证据 / PoC</div>
           <pre className="overflow-auto rounded-md border bg-background p-3 font-mono text-xs whitespace-pre-wrap">
             {f.evidence}
           </pre>
@@ -172,10 +172,10 @@ export function FindingsTab({ taskId }: { taskId: string }) {
     setFindings((cur) => cur.map((x) => (x.id === f.id ? { ...x, status: next } : x)));
     try {
       await api.setFindingStatus(f.finding_id, next);
-      toast.success(`Marked as "${statusMeta("finding", next).label}"`);
+      toast.success(`已标记为「${statusMeta("finding", next).label}」`);
     } catch (e) {
       setFindings((cur) => cur.map((x) => (x.id === f.id ? { ...x, status: prev } : x)));
-      toast.error("Update failed: " + (e as Error).message);
+      toast.error("更新失败：" + (e as Error).message);
     }
   }, []);
 
@@ -191,11 +191,11 @@ export function FindingsTab({ taskId }: { taskId: string }) {
     <Card className="overflow-hidden py-0">
       <CardContent className="px-0">
         <div className="flex items-center border-b px-4 py-2 text-xs text-muted-foreground">
-          <span className="min-w-0 flex-1">Vulnerabilities</span>
+          <span className="min-w-0 flex-1">漏洞</span>
           <button
             type="button"
             className="inline-flex items-center gap-1 outline-none focus-visible:underline"
-            aria-label={`Discovery time currently ${sortPreference.direction === "asc" ? "ascending" : "descending"}, click to toggle sort direction`}
+            aria-label={`发现时间当前${sortPreference.direction === "asc" ? "升序" : "降序"}，点击切换排序`}
             onClick={() =>
               setSortPreference((current) => ({
                 field: "time",
@@ -203,7 +203,7 @@ export function FindingsTab({ taskId }: { taskId: string }) {
               }))
             }
           >
-            <span>Discovery time</span>
+            <span>发现时间</span>
             {sortPreference.direction === "asc" ? (
               <ArrowUpIcon className="size-3.5" />
             ) : (
@@ -215,7 +215,7 @@ export function FindingsTab({ taskId }: { taskId: string }) {
           <Row key={f.id} f={f} contextTaskId={taskId} onStatus={onStatus} />
         ))}
         {items.length === 0 && (
-          <p className="px-4 py-8 text-center text-sm text-muted-foreground">No confirmed findings yet for this task or its directly linked tasks.</p>
+          <p className="px-4 py-8 text-center text-sm text-muted-foreground">当前任务及其直接关联任务暂无已确认发现。</p>
         )}
       </CardContent>
     </Card>

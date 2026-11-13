@@ -260,9 +260,9 @@ export default function TrafficPage() {
   const deleteVerb = deleteMode === "all" ? "Purge" : "Delete";
   const deleteTitle = deleteMode
     ? {
-        all: "Purge all traffic records?",
-        selected: `Delete all traffic for the ${selectedHosts.length} selected targets?`,
-        filter: "Delete all traffic for this target?",
+        all: "清空全部流量记录？",
+        selected: `删除选中的 ${selectedHosts.length} 个目标的全部流量？`,
+        filter: "删除此目标的全部流量？",
       }[deleteMode]
     : "";
 
@@ -291,14 +291,14 @@ export default function TrafficPage() {
           // Reclaimed space is the whole point of compacting an emptied index, so say so.
           const reclaimed = r.reclaimed ?? 0;
           const freed = reclaimed > 0 ? `, freeing ${fmtBytes(reclaimed)} of storage` : "";
-          toast.success(`Purged ${r.deleted} traffic records${freed}`);
+          toast.success(`已清理 ${r.deleted} 条流量记录${freed}`);
         }
         setPage(0);
         setReloadTick((t) => t + 1);
       })
       .catch((e) => {
         // Keep the confirmation open so the user can retry a failed deletion.
-        if (mode === "all") toast.error(`Purge failed: ${(e as Error).message}`);
+        if (mode === "all") toast.error(`清理失败：${(e as Error).message}`);
       })
       .finally(() => setDeleting(false));
   };
@@ -347,7 +347,7 @@ export default function TrafficPage() {
     <div className="flex min-h-0 min-w-0 flex-1 flex-col gap-4 pb-5">
       <header className="flex flex-wrap items-center justify-between gap-4 rounded-2xl border border-border/70 bg-gradient-to-br from-card to-primary/5 px-5 py-5 shadow-sm sm:px-7">
         <div className="min-w-0">
-          <p className="mb-1 text-[11px] font-semibold tracking-[0.16em] text-primary">ARTEX / TRAFFIC</p>
+          <p className="mb-1 text-[11px] font-semibold tracking-[0.16em] text-primary">ARTEX / 流量</p>
           <h1 className="text-2xl font-semibold tracking-tight">流量记录</h1>
           <p className="mt-1 text-sm leading-relaxed text-muted-foreground">查询录制的 HTTP 请求与响应，按目标、状态和内容筛选。</p>
         </div>
@@ -385,7 +385,7 @@ export default function TrafficPage() {
             collisionPadding={16}
           >
             <div className="flex items-center justify-between border-b px-3 py-2">
-              <span className="text-xs font-medium text-muted-foreground">Batch delete by target</span>
+              <span className="text-xs font-medium text-muted-foreground">按目标批量删除</span>
               <div className="flex items-center gap-1">
                 {hosts.length > 0 && (
                   <Tooltip>
@@ -396,8 +396,8 @@ export default function TrafficPage() {
                         onClick={() => setHostCountSortDirection((current) => (current === "desc" ? "asc" : "desc"))}
                         aria-label={
                           hostCountSortDirection === "desc"
-                            ? "Packet count is currently descending; click to switch to ascending"
-                            : "Packet count is currently ascending; click to switch to descending"
+                            ? "报文数量当前降序，点击切换为升序"
+                            : "报文数量当前升序，点击切换为降序"
                         }
                       >
                         {hostCountSortDirection === "desc" ? <ArrowDownWideNarrowIcon /> : <ArrowUpNarrowWideIcon />}
@@ -413,14 +413,14 @@ export default function TrafficPage() {
                     className="h-6 px-2 text-xs"
                     onClick={() => setSelectedHosts(allSelected ? [] : hosts.map((h) => h.host))}
                   >
-                    {allSelected ? "Clear all" : "Select all"}
+                    {allSelected ? "清除选择" : "全选"}
                   </Button>
                 )}
               </div>
             </div>
             <div className="max-h-64 overflow-y-auto">
               {hosts.length === 0 ? (
-                <div className="px-3 py-6 text-center text-xs text-muted-foreground">No traffic records</div>
+                <div className="px-3 py-6 text-center text-xs text-muted-foreground">暂无流量记录</div>
               ) : (
                 sortedHosts.map((h, index) => (
                   <label
@@ -454,37 +454,37 @@ export default function TrafficPage() {
                   setPickerOpen(false);
                 }}
               >
-                Delete selected ({selectedHosts.length})
+                删除选中项（{selectedHosts.length}）
               </Button>
             </div>
           </PopoverContent>
         </Popover>
         <div className="relative w-48">
-          <Input placeholder="host…" value={host} onChange={(e) => setHost(e.target.value)} className="h-8" />
+          <Input placeholder="主机…" value={host} onChange={(e) => setHost(e.target.value)} className="h-8" />
         </div>
         <Button
           variant="destructive"
           size="sm"
           className="h-8"
           disabled={!hostQ || deleting}
-          title={hostQ ? undefined : "Select a target on the left or enter a host first"}
+          title={hostQ ? undefined : "先在左侧选择目标或输入主机"}
           onClick={() => setDeleteMode("filter")}
         >
           <Trash2Icon className="size-3.5" />
-          Delete this target
+          删除此目标
         </Button>
         {/* Outline rather than a second destructive button: this one ignores every
-            filter, so it must not look one mis-click away from "Delete this target". */}
+            filter, so it must not look one mis-click away from "删除此目标". */}
         <Button
           variant="outline"
           size="sm"
           className="h-8 text-destructive hover:bg-destructive/10 hover:text-destructive"
           disabled={!traffic?.count || deleting}
-          title={traffic?.count ? "Delete all traffic and compact storage" : "No traffic records yet"}
+          title={traffic?.count ? "删除全部流量并压缩存储" : "暂无流量记录 yet"}
           onClick={() => setDeleteMode("all")}
         >
           <EraserIcon className="size-3.5" />
-          Purge all
+          清空全部
         </Button>
         <div className="relative min-w-[180px] flex-1 sm:max-w-sm">
           <SearchIcon className="absolute top-1/2 left-2.5 size-4 -translate-y-1/2 text-muted-foreground" />
@@ -629,7 +629,7 @@ export default function TrafficPage() {
                 <TableRow>
                   <TableHead className="w-10">
                     <Checkbox
-                      aria-label="Select this page's traffic"
+                      aria-label="选择本页流量"
                       checked={exchanges.length > 0 && exchanges.every((e) => selectedFlows.has(e.id))}
                       onCheckedChange={(checked) =>
                         setSelectedFlows((previous) => {
@@ -652,8 +652,8 @@ export default function TrafficPage() {
                     className="w-36"
                   />
                   <TableHead className="w-32">ID</TableHead>
-                  <TableHead className="w-44">host</TableHead>
-                  <TableHead className="w-20">Method</TableHead>
+                  <TableHead className="w-44">主机</TableHead>
+                  <TableHead className="w-20">方法</TableHead>
                   <TableHead>URL</TableHead>
                   <SortableHead
                     field="status"
@@ -663,10 +663,10 @@ export default function TrafficPage() {
                     onSort={toggleSort}
                     className="w-20"
                   />
-                  <TableHead className="w-36">content-type</TableHead>
+                  <TableHead className="w-36">内容类型</TableHead>
                   <SortableHead
                     field="resp_len"
-                    label="Response size"
+                    label="响应大小"
                     activeField={sort.field}
                     direction={sort.direction}
                     onSort={toggleSort}
@@ -684,7 +684,7 @@ export default function TrafficPage() {
                   >
                     <TableCell>
                       <Checkbox
-                        aria-label={`Select traffic ${e.id}`}
+                        aria-label={`选择流量 ${e.id}`}
                         checked={selectedFlows.has(e.id)}
                         onClick={(event) => event.stopPropagation()}
                         onCheckedChange={(checked) =>
@@ -777,14 +777,14 @@ export default function TrafficPage() {
               </SheetHeader>
               <Tabs defaultValue="request" className="min-h-0 flex-1 gap-0">
                 <TabsList className="mx-5 mt-4 grid w-auto grid-cols-2">
-                  <TabsTrigger value="request">Request</TabsTrigger>
-                  <TabsTrigger value="response">Response</TabsTrigger>
+                  <TabsTrigger value="request">请求</TabsTrigger>
+                  <TabsTrigger value="response">响应</TabsTrigger>
                 </TabsList>
                 <TabsContent value="request" className="min-h-0 overflow-auto">
                   {detailLoading ? (
                     <div className="flex items-center gap-2 p-5 text-xs text-muted-foreground">
                       <Loader2Icon className="size-3.5 animate-spin" />
-                      Loading messages…
+                      正在加载报文…
                     </div>
                   ) : (
                     <HttpCodeBlock raw={requestWithHost(detail?.req ?? "", selected)} />
@@ -794,7 +794,7 @@ export default function TrafficPage() {
                   {detailLoading ? (
                     <div className="flex items-center gap-2 p-5 text-xs text-muted-foreground">
                       <Loader2Icon className="size-3.5 animate-spin" />
-                      Loading messages…
+                      正在加载报文…
                     </div>
                   ) : (
                     <HttpCodeBlock raw={detail?.resp ?? ""} />
@@ -822,7 +822,7 @@ export default function TrafficPage() {
                   traffic records (including raw requests/responses), ignoring the current filters. This action cannot be undone. Traffic evidence already bound to findings lives in a separate evidence store and is unaffected.
                   <br />
                   <span className="text-muted-foreground">
-                    Purging also compacts storage, returning the index's disk space to the system; traffic recording pauses briefly during this time.
+                    清理还会压缩存储，将索引占用的磁盘空间归还系统；期间流量记录会短暂停止。
                   </span>
                 </>
               )}
@@ -845,7 +845,7 @@ export default function TrafficPage() {
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel disabled={deleting}>Cancel</AlertDialogCancel>
+            <AlertDialogCancel disabled={deleting}>取消</AlertDialogCancel>
             <AlertDialogAction
               onClick={(e) => {
                 e.preventDefault();

@@ -192,11 +192,11 @@ export default function AssetsPage() {
     setDeleting(true);
     try {
       const res = await api.deleteAssets(deleteIds);
-      toast.success(`Deleted ${res.deleted} assets`);
+      toast.success(`已删除 ${res.deleted} 个资产`);
       setSelected(new Set());
       refresh();
     } catch (e) {
-      toast.error("Delete failed: " + String((e as Error)?.message ?? e));
+      toast.error("删除失败：" + String((e as Error)?.message ?? e));
     } finally {
       setDeleting(false);
       setDeleteOpen(false);
@@ -210,12 +210,12 @@ export default function AssetsPage() {
       const res = await api.deleteCompany(companyDeleteTarget.id, companyDeleteAssets);
       const msg =
         companyDeleteAssets && res.assets_deleted > 0
-          ? `Company deleted, along with ${res.assets_deleted} assets`
-          : "Company deleted";
+          ? `已删除企业及其 ${res.assets_deleted} 个资产`
+          : "已删除企业";
       toast.success(msg);
       refresh();
     } catch (e) {
-      toast.error("Delete failed: " + String((e as Error)?.message ?? e));
+      toast.error("删除失败：" + String((e as Error)?.message ?? e));
     } finally {
       setCompanyDeleting(false);
       setCompanyDeleteTarget(null);
@@ -316,7 +316,7 @@ export default function AssetsPage() {
     <div className="flex h-[calc(100dvh-10rem)] min-h-[26rem] min-w-0 flex-col gap-4">
       <div className="flex flex-wrap items-center justify-between gap-4 rounded-2xl border border-border/70 bg-gradient-to-br from-card to-primary/5 px-5 py-5 shadow-sm sm:px-7">
         <div className="min-w-0">
-          <p className="mb-1 text-[11px] font-semibold tracking-[0.16em] text-primary">ARTEX / ASSETS</p>
+          <p className="mb-1 text-[11px] font-semibold tracking-[0.16em] text-primary">ARTEX / 资产</p>
           <h1 className="text-2xl font-semibold tracking-tight">资产管理</h1>
           <p className="mt-1 text-sm leading-relaxed text-muted-foreground">按类型查看、搜索与整理发现的资产。</p>
         </div>
@@ -356,10 +356,10 @@ export default function AssetsPage() {
               <Table>
                 <TableHeader className="sticky top-0 z-10 bg-card/95">
                   <TableRow>
-                    <TableHead>Company</TableHead>
-                    <TableHead className="w-24 text-right">Assets</TableHead>
-                    <TableHead>Asset scope</TableHead>
-                    <TableHead className="w-36 text-right">Actions</TableHead>
+                    <TableHead>企业</TableHead>
+                    <TableHead className="w-24 text-right">资产</TableHead>
+                    <TableHead>资产范围</TableHead>
+                    <TableHead className="w-36 text-right">操作</TableHead>
                   </TableRow>
                 </TableHeader>
                 <TableBody>
@@ -382,7 +382,7 @@ export default function AssetsPage() {
                             ))}
                           </div>
                         ) : (
-                          <span className="text-xs text-muted-foreground">No scope set</span>
+                          <span className="text-xs text-muted-foreground">未设置范围</span>
                         )}
                       </TableCell>
                       <TableCell className="text-right">
@@ -397,7 +397,7 @@ export default function AssetsPage() {
                               setCompanyDeleteTarget(c);
                               setCompanyDeleteAssets(false);
                             }}
-                            aria-label={`Delete company ${c.name}`}
+                            aria-label={`删除企业 ${c.name}`}
                           >
                             <Trash2Icon className="size-3.5" />
                           </Button>
@@ -408,7 +408,7 @@ export default function AssetsPage() {
                   {companies.length === 0 && (
                     <TableRow>
                       <TableCell colSpan={4} className="py-10 text-center text-sm text-muted-foreground">
-                        No companies yet. Click "Add company" in the top-right corner and fill in the asset scope; the system will automatically claim matching assets.
+                        暂无企业。点击右上角「添加企业」并填写资产范围，系统将自动归属匹配资产。
                       </TableCell>
                     </TableRow>
                   )}
@@ -441,7 +441,7 @@ export default function AssetsPage() {
                 <TableCell className="font-mono text-xs font-medium">{a.domain}</TableCell>
                 <TableCell className="text-xs">{a.icp || "—"}</TableCell>
                 <TableCell className="text-xs">
-                  {companyName(a.company_id) || <span className="text-muted-foreground">Unassigned</span>}
+                  {companyName(a.company_id) || <span className="text-muted-foreground">未归属</span>}
                 </TableCell>
                 <TableCell className="w-8 pl-0">
                   <Button
@@ -449,7 +449,7 @@ export default function AssetsPage() {
                     size="icon"
                     className="size-7 text-muted-foreground hover:text-destructive"
                     onClick={() => openDelete([a.id])}
-                    aria-label={`Delete asset ${a.domain || a.id}`}
+                    aria-label={`删除资产 ${a.domain || a.id}`}
                   >
                     <Trash2Icon className="size-3.5" />
                   </Button>
@@ -463,7 +463,7 @@ export default function AssetsPage() {
         <TabsContent value="ip" className="mt-0 flex min-h-0 flex-1 flex-col gap-2">
           {searchBox}
           <AssetCard
-            cols={["", "IP", "C-segment", "Bound domains", "Open ports", ""]}
+            cols={["", "IP", "C 段", "绑定域名", "开放端口", ""]}
             loaded={loaded}
             total={total}
             page={page}
@@ -496,7 +496,7 @@ export default function AssetsPage() {
                     size="icon"
                     className="size-7 text-muted-foreground hover:text-destructive"
                     onClick={() => openDelete([a.id])}
-                    aria-label={`Delete asset ${a.ip || a.id}`}
+                    aria-label={`删除资产 ${a.ip || a.id}`}
                   >
                     <Trash2Icon className="size-3.5" />
                   </Button>
@@ -510,7 +510,7 @@ export default function AssetsPage() {
         <TabsContent value="subdomain" className="mt-0 flex min-h-0 flex-1 flex-col gap-2">
           {searchBox}
           <AssetCard
-            cols={["", "Domain", "Root domain", "Record type", "Record value", ""]}
+            cols={["", "域名", "根域名", "记录类型", "记录值", ""]}
             loaded={loaded}
             total={total}
             page={page}
@@ -538,7 +538,7 @@ export default function AssetsPage() {
                     size="icon"
                     className="size-7 text-muted-foreground hover:text-destructive"
                     onClick={() => openDelete([a.id])}
-                    aria-label={`Delete asset ${a.domain || a.id}`}
+                    aria-label={`删除资产 ${a.domain || a.id}`}
                   >
                     <Trash2Icon className="size-3.5" />
                   </Button>
@@ -552,7 +552,7 @@ export default function AssetsPage() {
         <TabsContent value="app" className="mt-0 flex min-h-0 flex-1 flex-col gap-2">
           {searchBox}
           <AssetCard
-            cols={["", "App name", "Bundle ID", "Category", "ICP filing", ""]}
+            cols={["", "应用名称", "包标识", "分类", "ICP备案", ""]}
             loaded={loaded}
             total={total}
             page={page}
@@ -578,7 +578,7 @@ export default function AssetsPage() {
                     size="icon"
                     className="size-7 text-muted-foreground hover:text-destructive"
                     onClick={() => openDelete([a.id])}
-                    aria-label={`Delete asset ${a.app_name || a.id}`}
+                    aria-label={`删除资产 ${a.app_name || a.id}`}
                   >
                     <Trash2Icon className="size-3.5" />
                   </Button>
@@ -673,7 +673,7 @@ export default function AssetsPage() {
                       size="icon"
                       className="size-7 text-muted-foreground hover:text-destructive"
                       onClick={() => openDelete([a.id])}
-                      aria-label={`Delete asset ${a.url || a.id}`}
+                      aria-label={`删除资产 ${a.url || a.id}`}
                     >
                       <Trash2Icon className="size-3.5" />
                     </Button>
@@ -688,7 +688,7 @@ export default function AssetsPage() {
         <TabsContent value="endpoint" className="mt-0 flex min-h-0 flex-1 flex-col gap-2">
           {searchBox}
           <AssetCard
-            cols={["", "Method", "Full URL", "Params", ""]}
+            cols={["", "方法", "完整 URL", "参数", ""]}
             loaded={loaded}
             total={total}
             page={page}
@@ -725,7 +725,7 @@ export default function AssetsPage() {
                     size="icon"
                     className="size-7 text-muted-foreground hover:text-destructive"
                     onClick={() => openDelete([a.id])}
-                    aria-label={`Delete asset ${a.url || a.id}`}
+                    aria-label={`删除资产 ${a.url || a.id}`}
                   >
                     <Trash2Icon className="size-3.5" />
                   </Button>
@@ -739,14 +739,14 @@ export default function AssetsPage() {
       <AlertDialog open={deleteOpen} onOpenChange={setDeleteOpen}>
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle>Confirm delete</AlertDialogTitle>
+            <AlertDialogTitle>确认删除</AlertDialogTitle>
             <AlertDialogDescription>
               This will permanently delete <span className="font-semibold tabular-nums">{deleteIds.length}</span>{" "}
                asset records. This action cannot be undone.
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel disabled={deleting}>Cancel</AlertDialogCancel>
+            <AlertDialogCancel disabled={deleting}>取消</AlertDialogCancel>
             <AlertDialogAction
               onClick={(e) => {
                 e.preventDefault();
@@ -755,7 +755,7 @@ export default function AssetsPage() {
               disabled={deleting}
               className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
             >
-              {deleting ? "Deleting…" : "Confirm delete"}
+              {deleting ? "正在删除…" : "确认删除"}
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
@@ -772,10 +772,10 @@ export default function AssetsPage() {
       >
         <AlertDialogContent>
           <AlertDialogHeader>
-            <AlertDialogTitle>Delete company · {companyDeleteTarget?.name}</AlertDialogTitle>
+            <AlertDialogTitle>删除企业 · {companyDeleteTarget?.name}</AlertDialogTitle>
             <AlertDialogDescription asChild>
               <div className="space-y-3">
-                <p>This will permanently delete the company and its asset scope configuration. This action cannot be undone.</p>
+                <p>此操作将永久删除企业及其资产范围配置，无法撤销。</p>
                 <label
                   htmlFor="delete-assets-opt"
                   className="flex cursor-pointer items-center gap-2.5 rounded-md border p-3 hover:bg-muted/50"
@@ -786,15 +786,15 @@ export default function AssetsPage() {
                     onCheckedChange={(v) => setCompanyDeleteAssets(!!v)}
                   />
                   <span className="text-sm leading-snug">
-                    Also delete all assets under this company
-                    <span className="block text-xs text-muted-foreground">Leave unchecked to keep the assets and only remove the ownership</span>
+                    同时删除该企业下的全部资产
+                    <span className="block text-xs text-muted-foreground">不勾选则保留资产，仅移除归属关系</span>
                   </span>
                 </label>
               </div>
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel disabled={companyDeleting}>Cancel</AlertDialogCancel>
+            <AlertDialogCancel disabled={companyDeleting}>取消</AlertDialogCancel>
             <AlertDialogAction
               onClick={(e) => {
                 e.preventDefault();
@@ -803,7 +803,7 @@ export default function AssetsPage() {
               disabled={companyDeleting}
               className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
             >
-              {companyDeleting ? "Deleting…" : "Confirm delete"}
+              {companyDeleting ? "正在删除…" : "确认删除"}
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>
@@ -872,7 +872,7 @@ function AssetCard({
             ) : (
               <TableRow>
                 <TableCell colSpan={cols.length} className="py-12 text-center text-sm text-muted-foreground">
-                  {loaded ? "No data." : "Loading…"}
+                  {loaded ? "暂无数据。" : "正在加载…"}
                 </TableCell>
               </TableRow>
             )}
@@ -989,11 +989,11 @@ function CompanyDialog({ onSaved }: { onSaved: () => void }) {
 
   const submit = async () => {
     if (!name.trim()) {
-      toast.error("Please enter a company name");
+      toast.error("请输入企业名称");
       return;
     }
     if (parsedScope.errors.length > 0) {
-      toast.error("Please fix the invalid asset scope");
+      toast.error("请修正无效的资产范围");
       return;
     }
     setBusy(true);
@@ -1001,14 +1001,14 @@ function CompanyDialog({ onSaved }: { onSaved: () => void }) {
       const res = await api.createCompany(name.trim(), parsedScope.rules);
       const added = res.scope_added ?? 0;
       const invalid = res.scope_invalid ?? 0;
-      if (invalid > 0) toast.warning(`Company created, ${added} scopes added; ${invalid} invalid lines`);
-      else toast.success(`Company created, ${added} scopes added`);
+      if (invalid > 0) toast.warning(`已创建企业，添加 ${added} 条范围；${invalid} 行无效`);
+      else toast.success(`已创建企业，添加 ${added} 条范围`);
       setOpen(false);
       onSaved();
     } catch (e) {
       const msg = String((e as Error)?.message ?? e);
-      if (/:\s*409$/.test(msg)) toast.error("Company already exists; try a different name");
-      else toast.error(`Save failed: ${msg}`);
+      if (/:\s*409$/.test(msg)) toast.error("企业已存在，请使用其他名称");
+      else toast.error(`保存失败：${msg}`);
     } finally {
       setBusy(false);
     }
@@ -1023,16 +1023,16 @@ function CompanyDialog({ onSaved }: { onSaved: () => void }) {
       </SheetTrigger>
       <SheetContent className="w-full! max-w-none! gap-0 p-0 sm:w-[520px]! sm:max-w-[520px]!">
         <SheetHeader className="border-b p-6">
-          <SheetTitle>Add company</SheetTitle>
-          <SheetDescription>Configure the company and its asset scope. Keywords only serve as agent hints and do not automatically assign assets.</SheetDescription>
+          <SheetTitle>添加企业</SheetTitle>
+          <SheetDescription>配置企业及其资产范围。关键词仅作为智能体提示，不会自动归属资产。</SheetDescription>
         </SheetHeader>
         <div className="flex-1 overflow-y-auto p-6">
           <FieldGroup>
             <Field>
-              <FieldLabel htmlFor="cn-name">Company name</FieldLabel>
+              <FieldLabel htmlFor="cn-name">企业名称</FieldLabel>
               <Input
                 id="cn-name"
-                placeholder="e.g. Acme Corp (name must be unique)"
+                placeholder="例如某某公司（名称必须唯一）"
                 value={name}
                 onChange={(e) => setName(e.target.value)}
               />
@@ -1042,7 +1042,7 @@ function CompanyDialog({ onSaved }: { onSaved: () => void }) {
         </div>
         <SheetFooter className="flex-row justify-end gap-2 border-t p-4">
           <Button variant="outline" onClick={() => setOpen(false)} disabled={busy}>
-            Cancel
+            取消
           </Button>
           <Button onClick={submit} disabled={busy || !name.trim() || parsedScope.errors.length > 0}>
             {busy ? "Saving…" : "Save"}
@@ -1073,20 +1073,20 @@ function EditScopeDialog({ company, onSaved }: { company: Company; onSaved: () =
 
   const submit = async () => {
     if (parsedScope.errors.length > 0) {
-      toast.error("Please fix the invalid asset scope");
+      toast.error("请修正无效的资产范围");
       return;
     }
     setBusy(true);
     try {
       const res = await api.updateCompanyScope(company.id, parsedScope.rules, reason);
       const errCount = res.invalid ?? 0;
-      if (errCount > 0) toast.warning(`Saved; ${errCount} invalid lines`);
-      else toast.success(`Scope updated, ${res.added} entries in total`);
+      if (errCount > 0) toast.warning(`已保存；${errCount} 行无效`);
+      else toast.success(`范围已更新，共 ${res.added} 条`);
       showScopeWarnings(res.warnings);
       setOpen(false);
       onSaved();
     } catch (e) {
-      toast.error(`Save failed: ${String((e as Error)?.message ?? e)}`);
+      toast.error(`保存失败：${String((e as Error)?.message ?? e)}`);
     } finally {
       setBusy(false);
     }
@@ -1096,14 +1096,14 @@ function EditScopeDialog({ company, onSaved }: { company: Company; onSaved: () =
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
         <Button variant="outline" size="sm" className="h-7">
-          Edit
+          编辑
         </Button>
       </DialogTrigger>
       <DialogContent>
         <DialogHeader>
-          <DialogTitle>Edit asset scope · {company.name}</DialogTitle>
+          <DialogTitle>编辑资产范围 · {company.name}</DialogTitle>
           <DialogDescription>
-            Saving replaces all existing scopes. ICP matches assets exactly; company keywords only serve as agent hints.
+            保存将替换现有范围。ICP备案精确匹配资产；企业关键词仅作为智能体提示。
           </DialogDescription>
         </DialogHeader>
         <FieldGroup className="py-2">
@@ -1114,10 +1114,10 @@ function EditScopeDialog({ company, onSaved }: { company: Company; onSaved: () =
             parsed={parsedScope}
           />
           <Field>
-            <FieldLabel htmlFor="es-reason">Attribution basis (optional)</FieldLabel>
+            <FieldLabel htmlFor="es-reason">归属依据（可选）</FieldLabel>
             <Input
               id="es-reason"
-              placeholder="e.g. certificate / whois / ASN evidence"
+              placeholder="例如证书、WHOIS 或 ASN 证据"
               value={reason}
               onChange={(e) => setReason(e.target.value)}
             />
@@ -1125,10 +1125,10 @@ function EditScopeDialog({ company, onSaved }: { company: Company; onSaved: () =
         </FieldGroup>
         <DialogFooter>
           <Button variant="outline" onClick={() => setOpen(false)} disabled={busy}>
-            Cancel
+            取消
           </Button>
           <Button onClick={submit} disabled={busy || parsedScope.errors.length > 0}>
-            {busy ? "Saving…" : "Overwrite save"}
+            {busy ? "正在保存…" : "覆盖保存"}
           </Button>
         </DialogFooter>
       </DialogContent>
@@ -1152,24 +1152,24 @@ function AppendScopeDialog({ company, onSaved }: { company: Company; onSaved: ()
 
   const submit = async () => {
     if (parsedScope.rules.length === 0) {
-      toast.error("Please enter the scopes to append");
+      toast.error("请输入要追加的范围");
       return;
     }
     if (parsedScope.errors.length > 0) {
-      toast.error("Please fix the invalid asset scope");
+      toast.error("请修正无效的资产范围");
       return;
     }
     setBusy(true);
     try {
       const res = await api.addCompanyScope(company.id, parsedScope.rules, reason);
       const errCount = res.invalid ?? 0;
-      if (errCount > 0) toast.warning(`Saved; ${errCount} invalid lines`);
-      else toast.success(`Appended ${res.added} scopes`);
+      if (errCount > 0) toast.warning(`已保存；${errCount} 行无效`);
+      else toast.success(`已追加 ${res.added} 条范围`);
       showScopeWarnings(res.warnings);
       setOpen(false);
       onSaved();
     } catch (e) {
-      toast.error(`Save failed: ${String((e as Error)?.message ?? e)}`);
+      toast.error(`保存失败：${String((e as Error)?.message ?? e)}`);
     } finally {
       setBusy(false);
     }
@@ -1179,13 +1179,13 @@ function AppendScopeDialog({ company, onSaved }: { company: Company; onSaved: ()
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
         <Button variant="outline" size="sm" className="h-7">
-          Append
+          追加
         </Button>
       </DialogTrigger>
       <DialogContent>
         <DialogHeader>
-          <DialogTitle>Append asset scope · {company.name}</DialogTitle>
-          <DialogDescription>New scopes are appended to the existing ones. ICP matches assets exactly; company keywords only serve as agent hints.</DialogDescription>
+          <DialogTitle>追加资产范围 · {company.name}</DialogTitle>
+          <DialogDescription>新范围将追加到已有范围。ICP备案精确匹配资产；企业关键词仅作为智能体提示。</DialogDescription>
         </DialogHeader>
         <FieldGroup className="py-2">
           <ScopeTextEditor
@@ -1195,10 +1195,10 @@ function AppendScopeDialog({ company, onSaved }: { company: Company; onSaved: ()
             parsed={parsedScope}
           />
           <Field>
-            <FieldLabel htmlFor="as-reason">Attribution basis (optional)</FieldLabel>
+            <FieldLabel htmlFor="as-reason">归属依据（可选）</FieldLabel>
             <Input
               id="as-reason"
-              placeholder="e.g. certificate / whois / ASN evidence"
+              placeholder="例如证书、WHOIS 或 ASN 证据"
               value={reason}
               onChange={(e) => setReason(e.target.value)}
             />
@@ -1206,7 +1206,7 @@ function AppendScopeDialog({ company, onSaved }: { company: Company; onSaved: ()
         </FieldGroup>
         <DialogFooter>
           <Button variant="outline" onClick={() => setOpen(false)} disabled={busy}>
-            Cancel
+            取消
           </Button>
           <Button onClick={submit} disabled={busy || parsedScope.rules.length === 0 || parsedScope.errors.length > 0}>
             {busy ? "Saving…" : "Append"}
