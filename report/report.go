@@ -59,9 +59,9 @@ func MarkdownLocalized(in Input, locale string) string {
 	fmt.Fprintf(&b, tr("- **生成时间**：%s\n\n", "- **Generated at**: %s\n\n"), in.GeneratedAt.Format("2006-01-02 15:04:05"))
 
 	// summary
-	fmt.Fprintf(&b, tr("## 摘要\n\n", "## Summary\n\n"))
+	b.WriteString(tr("## 摘要\n\n", "## Summary\n\n"))
 	fmt.Fprintf(&b, tr("- 已确认发现：**%d**\n", "- Confirmed findings: **%d**\n"), len(in.Findings))
-	fmt.Fprintf(&b, tr("- 资产：", "- Assets: "))
+	b.WriteString(tr("- 资产：", "- Assets: "))
 	var types []string
 	for t := range in.AssetCounts {
 		types = append(types, t)
@@ -76,7 +76,7 @@ func MarkdownLocalized(in Input, locale string) string {
 	b.WriteString("\n\n")
 
 	// findings
-	fmt.Fprintf(&b, tr("## 发现结果\n\n", "## Findings\n\n"))
+	b.WriteString(tr("## 发现结果\n\n", "## Findings\n\n"))
 	if len(in.Findings) == 0 {
 		b.WriteString(tr("_本次未确认漏洞；这不代表不存在安全问题。_\n\n", "_No vulnerabilities confirmed this time._\n\n"))
 	} else {
