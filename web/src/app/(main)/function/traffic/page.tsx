@@ -1,6 +1,8 @@
 "use client";
 
 import * as React from "react";
+import { useUiLocale } from "@/lib/ui-locale.client";
+import { uiText } from "@/lib/ui-locale";
 
 import {
   ArrowDownWideNarrowIcon,
@@ -113,11 +115,13 @@ const SORT_STORAGE_KEY = "traffic-sort";
 const STATUS_BUCKETS = ["2xx", "3xx", "4xx", "5xx"];
 
 export default function TrafficPage() {
+  const locale = useUiLocale();
+  const tr = (zh: string, en: string) => uiText(locale, zh, en);
   const [selectedFlows, setSelectedFlows] = React.useState<Set<string>>(() => new Set());
 
   const copyTrafficID = async (id: string) => {
-    if (await copyText(id)) toast.success("已复制流量 ID");
-    else toast.error("复制失败，请手动选择流量 ID");
+    if (await copyText(id)) toast.success(tr("已复制流量 ID", "Traffic ID copied"));
+    else toast.error(tr("复制失败，请手动选择流量 ID", "Copy failed; select the traffic ID manually"));
   };
   const [linking, setLinking] = React.useState(false);
   const [page, setPage] = React.useState(0);
@@ -257,12 +261,12 @@ export default function TrafficPage() {
 
   // "Purge" for the unfiltered purge, "Delete" for the host-scoped ones — the dialog's
   // title and its confirm button both follow from which is in play.
-  const deleteVerb = deleteMode === "all" ? "清空" : "删除";
+  const deleteVerb = deleteMode === "all" ? tr("清空", "Clear") : tr("删除", "Delete");
   const deleteTitle = deleteMode
     ? {
-        all: "清空全部流量记录？",
-        selected: `删除选中的 ${selectedHosts.length} 个目标的全部流量？`,
-        filter: "删除此目标的全部流量？",
+        all: tr("清空全部流量记录？", "Clear all traffic records?"),
+        selected: tr(`删除选中的 ${selectedHosts.length} 个目标的全部流量？`, `Delete all traffic for ${selectedHosts.length} selected targets?`),
+        filter: tr("删除此目标的全部流量？", "Delete all traffic for this target?"),
       }[deleteMode]
     : "";
 
@@ -290,15 +294,15 @@ export default function TrafficPage() {
         if (mode === "all") {
           // Reclaimed space is the whole point of compacting an emptied index, so say so.
           const reclaimed = r.reclaimed ?? 0;
-          const freed = reclaimed > 0 ? `, freeing ${fmtBytes(reclaimed)} of storage` : "";
-          toast.success(`已清理 ${r.deleted} 条流量记录${freed}`);
+          const freed = reclaimed > 0 ? tr(`，释放 ${fmtBytes(reclaimed)} 存储空间`, `, freeing ${fmtBytes(reclaimed)} of storage`) : "";
+          toast.success(tr(`已清理 ${r.deleted} 条流量记录${freed}`, `Cleared ${r.deleted} traffic records${freed}`));
         }
         setPage(0);
         setReloadTick((t) => t + 1);
       })
       .catch((e) => {
         // Keep the confirmation open so the user can retry a failed deletion.
-        if (mode === "all") toast.error(`清理失败：${(e as Error).message}`);
+        if (mode === "all") toast.error(tr(`清理失败：${(e as Error).message}`, `Cleanup failed: ${(e as Error).message}`));
       })
       .finally(() => setDeleting(false));
   };
@@ -347,9 +351,9 @@ export default function TrafficPage() {
     <div className="flex min-h-0 min-w-0 flex-1 flex-col gap-4 pb-5">
       <header className="flex flex-wrap items-center justify-between gap-4 rounded-2xl border border-border/70 bg-gradient-to-br from-card to-primary/5 px-5 py-5 shadow-sm sm:px-7">
         <div className="min-w-0">
-          <p className="mb-1 text-[11px] font-semibold tracking-[0.16em] text-primary">ARTEX / 流量</p>
-          <h1 className="text-2xl font-semibold tracking-tight">流量记录</h1>
-          <p className="mt-1 text-sm leading-relaxed text-muted-foreground">查询录制的 HTTP 请求与响应，按目标、状态和内容筛选。</p>
+          <p className="mb-1 text-[11px] font-semibold tracking-[0.16em] text-primary">{tr("ARTEX / 流量", "ARTEX / TRAFFIC")}</p>
+          <h1 className="text-2xl font-semibold tracking-tight">{tr("流量记录", "Traffic records")}</h1>
+          <p className="mt-1 text-sm leading-relaxed text-muted-foreground">{tr("查询录制的 HTTP 请求与响应，按目标、状态和内容筛选。", "Browse recorded HTTP requests and responses; filter by target, status and content.")}</p>
         </div>
         <div className="flex min-w-0 flex-wrap items-center gap-2 text-sm">
           <span
@@ -361,11 +365,11 @@ export default function TrafficPage() {
             )}
           >
             <RadioTowerIcon className="size-3.5" />
-            {traffic?.enabled ? "正在采集" : "未开启采集"}
+            {traffic?.enabled ? tr("正在采集", "Recording") : tr("未开启采集", "Capture disabled")}
           </span>
           {traffic?.proxy && <span className="max-w-[14rem] truncate font-mono text-xs text-muted-foreground" title={traffic.proxy}>{traffic.proxy}</span>}
           <span className="text-xs text-muted-foreground">
-            共 <span className="tabular-nums">{traffic?.count ?? 0}</span> 条
+            {tr(`共 ${traffic?.count ?? 0} 条`, `${traffic?.count ?? 0} total`)}
           </span>
         </div>
       </header>
@@ -376,7 +380,7 @@ export default function TrafficPage() {
           <PopoverTrigger asChild>
             <Button variant="outline" size="sm" className="h-8">
               <ListChecksIcon className="size-3.5" />
-              {selectedHosts.length > 0 ? `已选目标（${selectedHosts.length}）` : "选择目标…"}
+              {selectedHosts.length > 0 ? tr(`已选目标（${selectedHosts.length}）`, `Selected targets (${selectedHosts.length})`) : tr("选择目标…", "Select targets…")}
             </Button>
           </PopoverTrigger>
           <PopoverContent
@@ -385,7 +389,7 @@ export default function TrafficPage() {
             collisionPadding={16}
           >
             <div className="flex items-center justify-between border-b px-3 py-2">
-              <span className="text-xs font-medium text-muted-foreground">按目标批量删除</span>
+              <span className="text-xs font-medium text-muted-foreground">{tr("按目标批量删除", "Delete by target")}</span>
               <div className="flex items-center gap-1">
                 {hosts.length > 0 && (
                   <Tooltip>
@@ -396,14 +400,14 @@ export default function TrafficPage() {
                         onClick={() => setHostCountSortDirection((current) => (current === "desc" ? "asc" : "desc"))}
                         aria-label={
                           hostCountSortDirection === "desc"
-                            ? "报文数量当前降序，点击切换为升序"
-                            : "报文数量当前升序，点击切换为降序"
+                            ? tr("报文数量当前降序，点击切换为升序", "Packet count descending; click for ascending")
+                            : tr("报文数量当前升序，点击切换为降序", "Packet count ascending; click for descending")
                         }
                       >
                         {hostCountSortDirection === "desc" ? <ArrowDownWideNarrowIcon /> : <ArrowUpNarrowWideIcon />}
                       </Button>
                     </TooltipTrigger>
-                    <TooltipContent>By packet count, {hostCountSortDirection === "desc" ? "descending" : "ascending"}</TooltipContent>
+                    <TooltipContent>{tr(hostCountSortDirection === "desc" ? "按报文数量降序" : "按报文数量升序", hostCountSortDirection === "desc" ? "Packet count descending" : "Packet count ascending")}</TooltipContent>
                   </Tooltip>
                 )}
                 {hosts.length > 0 && (
@@ -413,14 +417,14 @@ export default function TrafficPage() {
                     className="h-6 px-2 text-xs"
                     onClick={() => setSelectedHosts(allSelected ? [] : hosts.map((h) => h.host))}
                   >
-                    {allSelected ? "清除选择" : "全选"}
+                    {allSelected ? "清除选择" : tr("全选", "Select all")}
                   </Button>
                 )}
               </div>
             </div>
             <div className="max-h-64 overflow-y-auto">
               {hosts.length === 0 ? (
-                <div className="px-3 py-6 text-center text-xs text-muted-foreground">暂无流量记录</div>
+                <div className="px-3 py-6 text-center text-xs text-muted-foreground">{tr("暂无流量记录", "No traffic records")}</div>
               ) : (
                 sortedHosts.map((h, index) => (
                   <label
@@ -454,24 +458,24 @@ export default function TrafficPage() {
                   setPickerOpen(false);
                 }}
               >
-                删除选中项（{selectedHosts.length}）
+                {tr(`删除选中项（${selectedHosts.length}）`, `Delete selected (${selectedHosts.length})`)}
               </Button>
             </div>
           </PopoverContent>
         </Popover>
         <div className="relative w-48">
-          <Input placeholder="主机…" value={host} onChange={(e) => setHost(e.target.value)} className="h-8" />
+          <Input placeholder={tr("主机…", "Host…")} value={host} onChange={(e) => setHost(e.target.value)} className="h-8" />
         </div>
         <Button
           variant="destructive"
           size="sm"
           className="h-8"
           disabled={!hostQ || deleting}
-          title={hostQ ? undefined : "先在左侧选择目标或输入主机"}
+          title={hostQ ? undefined : tr("先在左侧选择目标或输入主机", "Select a target on the left or enter a host first")}
           onClick={() => setDeleteMode("filter")}
         >
           <Trash2Icon className="size-3.5" />
-          删除此目标
+          {tr("删除此目标", "Delete this target")}
         </Button>
         {/* Outline rather than a second destructive button: this one ignores every
             filter, so it must not look one mis-click away from "删除此目标". */}
@@ -480,16 +484,16 @@ export default function TrafficPage() {
           size="sm"
           className="h-8 text-destructive hover:bg-destructive/10 hover:text-destructive"
           disabled={!traffic?.count || deleting}
-          title={traffic?.count ? "删除全部流量并压缩存储" : "暂无流量记录"}
+          title={traffic?.count ? tr("删除全部流量并压缩存储", "Delete all traffic and compact storage") : tr("暂无流量记录", "No traffic records")}
           onClick={() => setDeleteMode("all")}
         >
           <EraserIcon className="size-3.5" />
-          清空全部
+          {tr("清空全部", "Clear all")}
         </Button>
         <div className="relative min-w-[180px] flex-1 sm:max-w-sm">
           <SearchIcon className="absolute top-1/2 left-2.5 size-4 -translate-y-1/2 text-muted-foreground" />
           <Input
-            placeholder="搜索 ID、URL、方法、状态等…"
+            placeholder={tr("搜索 ID、URL、方法、状态等…", "Search ID, URL, method, status…")}
             value={query}
             onChange={(e) => setQuery(e.target.value)}
             className="h-8 pl-8"
@@ -497,10 +501,10 @@ export default function TrafficPage() {
         </div>
         <Select value={method} onValueChange={setMethod}>
           <SelectTrigger size="sm" className="w-32">
-            <SelectValue placeholder="请求方法" />
+            <SelectValue placeholder={tr("请求方法", "Method")} />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="all">全部方法</SelectItem>
+            <SelectItem value="all">{tr("全部方法", "All methods")}</SelectItem>
             {METHODS.map((m) => (
               <SelectItem key={m} value={m}>
                 {m}
@@ -515,7 +519,7 @@ export default function TrafficPage() {
           <SelectContent>
             {PAGE_SIZES.map((n) => (
               <SelectItem key={n} value={String(n)}>
-                每页 {n} 条
+                {tr(`每页 ${n} 条`, `${n} per page`)}
               </SelectItem>
             ))}
           </SelectContent>
@@ -551,10 +555,10 @@ export default function TrafficPage() {
 
       {/* Advanced filters (issue #177): narrow 660k+ exchanges down to the one packet. */}
       <div className="flex min-w-0 flex-wrap items-center gap-2 rounded-xl border border-border/70 bg-muted/20 px-3 py-3">
-        <span className="pl-1 text-xs font-medium text-muted-foreground">高级筛选</span>
+        <span className="pl-1 text-xs font-medium text-muted-foreground">{tr("高级筛选", "Advanced filters")}</span>
         <div className="relative w-56">
           <Input
-            placeholder="响应内容（至少 3 个字符）"
+            placeholder={tr("响应内容（至少 3 个字符）", "Response content (at least 3 characters)")}
             value={body}
             onChange={(e) => setBody(e.target.value)}
             className="h-8"
@@ -562,7 +566,7 @@ export default function TrafficPage() {
         </div>
         <div className="relative w-52">
           <Input
-            placeholder="请求路径（例如 /api/user/）"
+            placeholder={tr("请求路径（例如 /api/user/）", "Request path (e.g. /api/user/)")}
             value={path}
             onChange={(e) => setPath(e.target.value)}
             className="h-8"
@@ -570,10 +574,10 @@ export default function TrafficPage() {
         </div>
         <Select value={statusFilter} onValueChange={setStatusFilter}>
           <SelectTrigger size="sm" className="w-28">
-            <SelectValue placeholder="状态" />
+            <SelectValue placeholder={tr("状态", "Status")} />
           </SelectTrigger>
           <SelectContent>
-            <SelectItem value="all">全部状态</SelectItem>
+            <SelectItem value="all">{tr("全部状态", "All statuses")}</SelectItem>
             {STATUS_BUCKETS.map((s) => (
               <SelectItem key={s} value={s}>
                 {s}
@@ -582,11 +586,11 @@ export default function TrafficPage() {
           </SelectContent>
         </Select>
         <div className="flex items-center gap-1 text-xs text-muted-foreground">
-          <span>响应大小</span>
+          <span>{tr("响应大小", "Response size")}</span>
           <Input
             type="number"
             min={0}
-            placeholder="最小 B"
+            placeholder={tr("最小 B", "Min B")}
             value={respMin}
             onChange={(e) => setRespMin(e.target.value)}
             className="h-8 w-24"
@@ -595,7 +599,7 @@ export default function TrafficPage() {
           <Input
             type="number"
             min={0}
-            placeholder="最大 B"
+            placeholder={tr("最大 B", "Max B")}
             value={respMax}
             onChange={(e) => setRespMax(e.target.value)}
             className="h-8 w-24"
@@ -604,19 +608,19 @@ export default function TrafficPage() {
         {hasAdvancedFilter ? (
           <Button variant="ghost" size="sm" className="h-8" onClick={resetAdvancedFilters}>
             <FilterXIcon className="size-3.5" />
-            清除筛选
+            {tr("清除筛选", "Clear filters")}
           </Button>
         ) : null}
       </div>
 
       <div className="flex flex-wrap items-center gap-2">
-        <span className="text-sm text-muted-foreground">已选 {selectedFlows.size} 条</span>
+        <span className="text-sm text-muted-foreground">{tr(`已选 ${selectedFlows.size} 条`, `${selectedFlows.size} selected`)}</span>
         <Button variant="outline" size="sm" disabled={selectedFlows.size === 0} onClick={() => setLinking(true)}>
-          关联发现结果
+          {tr("关联发现结果", "Link findings")}
         </Button>
         {selectedFlows.size > 0 ? (
           <Button variant="ghost" size="sm" onClick={() => setSelectedFlows(new Set())}>
-            清除选择
+            {tr("清除选择", "Clear selection")}
           </Button>
         ) : null}
       </div>
@@ -629,7 +633,7 @@ export default function TrafficPage() {
                 <TableRow>
                   <TableHead className="w-10">
                     <Checkbox
-                      aria-label="选择本页流量"
+                      aria-label={tr("选择本页流量", "Select traffic on this page")}
                       checked={exchanges.length > 0 && exchanges.every((e) => selectedFlows.has(e.id))}
                       onCheckedChange={(checked) =>
                         setSelectedFlows((previous) => {
@@ -645,28 +649,28 @@ export default function TrafficPage() {
                   </TableHead>
                   <SortableHead
                     field="ts"
-                    label="Time"
+                    label={tr("时间", "Time")}
                     activeField={sort.field}
                     direction={sort.direction}
                     onSort={toggleSort}
                     className="w-36"
                   />
                   <TableHead className="w-32">ID</TableHead>
-                  <TableHead className="w-44">主机</TableHead>
-                  <TableHead className="w-20">方法</TableHead>
+                  <TableHead className="w-44">{tr("主机", "Host")}</TableHead>
+                  <TableHead className="w-20">{tr("方法", "Method")}</TableHead>
                   <TableHead>URL</TableHead>
                   <SortableHead
                     field="status"
-                    label="Status"
+                    label={tr("状态", "Status")}
                     activeField={sort.field}
                     direction={sort.direction}
                     onSort={toggleSort}
                     className="w-20"
                   />
-                  <TableHead className="w-36">内容类型</TableHead>
+                  <TableHead className="w-36">{tr("内容类型", "Content type")}</TableHead>
                   <SortableHead
                     field="resp_len"
-                    label="响应大小"
+                    label={tr("响应大小", "Response size")}
                     activeField={sort.field}
                     direction={sort.direction}
                     onSort={toggleSort}
@@ -684,7 +688,7 @@ export default function TrafficPage() {
                   >
                     <TableCell>
                       <Checkbox
-                        aria-label={`选择流量 ${e.id}`}
+                        aria-label={tr(`选择流量 ${e.id}`, `Select traffic ${e.id}`)}
                         checked={selectedFlows.has(e.id)}
                         onClick={(event) => event.stopPropagation()}
                         onCheckedChange={(checked) =>
@@ -703,8 +707,8 @@ export default function TrafficPage() {
                         variant="ghost"
                         size="sm"
                         className="h-auto max-w-full gap-1 px-1 font-mono text-xs"
-                        title={`复制完整流量 ID：${e.id}`}
-                        aria-label={`复制流量 ID ${e.id}`}
+                        title={tr(`复制完整流量 ID：${e.id}`, `Copy full traffic ID: ${e.id}`)}
+                        aria-label={tr(`复制流量 ID ${e.id}`, `Copy traffic ID ${e.id}`)}
                         onClick={(event) => {
                           event.stopPropagation();
                           void copyTrafficID(e.id);
@@ -733,7 +737,7 @@ export default function TrafficPage() {
                 {exchanges.length === 0 && (
                   <TableRow>
                     <TableCell colSpan={9} className="py-12 text-center text-sm text-muted-foreground">
-                      {traffic === null ? "正在加载流量记录…" : "没有匹配的流量记录，请调整筛选条件。"}
+                      {traffic === null ? tr("正在加载流量记录…", "Loading traffic…") : tr("没有匹配的流量记录，请调整筛选条件。", "No matching traffic; adjust filters.")}
                     </TableCell>
                   </TableRow>
                 )}
@@ -764,7 +768,7 @@ export default function TrafficPage() {
                     variant="outline"
                     size="sm"
                     className="h-7 gap-1 font-mono text-xs"
-                    title={`复制完整流量 ID：${selected.id}`}
+                    title={tr(`复制完整流量 ID：${selected.id}`, `Copy full traffic ID: ${selected.id}`)}
                     onClick={() => void copyTrafficID(selected.id)}
                   >
                     <CopyIcon className="size-3" />
@@ -777,14 +781,14 @@ export default function TrafficPage() {
               </SheetHeader>
               <Tabs defaultValue="request" className="min-h-0 flex-1 gap-0">
                 <TabsList className="mx-5 mt-4 grid w-auto grid-cols-2">
-                  <TabsTrigger value="request">请求</TabsTrigger>
-                  <TabsTrigger value="response">响应</TabsTrigger>
+                  <TabsTrigger value="request">{tr("请求", "Request")}</TabsTrigger>
+                  <TabsTrigger value="response">{tr("响应", "Response")}</TabsTrigger>
                 </TabsList>
                 <TabsContent value="request" className="min-h-0 overflow-auto">
                   {detailLoading ? (
                     <div className="flex items-center gap-2 p-5 text-xs text-muted-foreground">
                       <Loader2Icon className="size-3.5 animate-spin" />
-                      正在加载报文…
+                      {tr("正在加载报文…", "Loading packet…")}
                     </div>
                   ) : (
                     <HttpCodeBlock raw={requestWithHost(detail?.req ?? "", selected)} />
@@ -794,7 +798,7 @@ export default function TrafficPage() {
                   {detailLoading ? (
                     <div className="flex items-center gap-2 p-5 text-xs text-muted-foreground">
                       <Loader2Icon className="size-3.5 animate-spin" />
-                      正在加载报文…
+                      {tr("正在加载报文…", "Loading packet…")}
                     </div>
                   ) : (
                     <HttpCodeBlock raw={detail?.resp ?? ""} />
@@ -822,30 +826,30 @@ export default function TrafficPage() {
                    条流量记录（含原始请求和响应），不受当前筛选条件限制。此操作无法撤销。已关联至发现结果的流量证据存储在独立证据库中，不受影响。
                   <br />
                   <span className="text-muted-foreground">
-                    清理还会压缩存储，将索引占用的磁盘空间归还系统；期间流量记录会短暂停止。
+                    {tr("清理还会压缩存储，将索引占用的磁盘空间归还系统；期间流量记录会短暂停止。", "Cleanup compacts storage and returns index space to the system; recording briefly pauses.")}
                   </span>
                 </>
               )}
               {deleteMode === "selected" && (
                 <>
-                  此操作将永久删除选中的 <span className="font-semibold tabular-nums">{selectedHosts.length}</span> 个目标（
+                  {tr(`此操作将永久删除选中的 ${selectedHosts.length} 个目标（`, `This permanently deletes traffic for ${selectedHosts.length} selected targets (`)}
                   <span className="font-mono">
                     {selectedHosts.slice(0, 3).join(", ")}
                     {selectedHosts.length > 3 ? "…" : ""}
                   </span>
-                  ）的全部流量记录（含原始请求和响应）。此操作无法撤销。
+                  {tr("）的全部流量记录（含原始请求和响应）。此操作无法撤销。", ") including raw requests and responses. This cannot be undone.")}
                 </>
               )}
               {deleteMode === "filter" && (
                 <>
-                  此操作将永久删除主机名包含 <span className="font-mono font-semibold">{hostQ}</span>{" "}
+                  {tr("此操作将永久删除主机名包含", "This permanently deletes traffic for hosts containing")} <span className="font-mono font-semibold">{hostQ}</span>{" "}
                    的全部流量记录（含原始请求和响应）。此操作无法撤销。
                 </>
               )}
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel disabled={deleting}>取消</AlertDialogCancel>
+            <AlertDialogCancel disabled={deleting}>{tr("取消", "Cancel")}</AlertDialogCancel>
             <AlertDialogAction
               onClick={(e) => {
                 e.preventDefault();
@@ -854,7 +858,7 @@ export default function TrafficPage() {
               disabled={deleting}
               className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
             >
-              {deleting ? `${deleteVerb}…` : `确认${deleteVerb}`}
+              {deleting ? `${deleteVerb}…` : tr(`确认${deleteVerb}`, `Confirm ${deleteVerb.toLowerCase()}`)}
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>

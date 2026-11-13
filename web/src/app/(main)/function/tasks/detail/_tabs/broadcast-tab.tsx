@@ -1,6 +1,8 @@
 "use client";
 
 import * as React from "react";
+import { useUiLocale } from "@/lib/ui-locale.client";
+import { uiText, type UiLocale } from "@/lib/ui-locale";
 
 import {
   ArrowDownIcon,
@@ -93,11 +95,14 @@ const KIND_META: Record<string, KindMeta> = {
 };
 
 // Filterable kinds. The start (fact/state=origin) is not listed separately; it is filtered together with "Fact".
+const englishKind: Record<string, string> = { task: "Root task", begin: "Start", goal: "Goal", intent: "Intent", fact: "Fact", finding: "Vulnerability", hint: "Hint", digest: "Digest" };
+const englishState: Record<string, string> = { "起点": "Start", "已确认": "Confirmed", "已排除": "Dismissed", "待采纳": "Pending adoption", "已采纳": "Adopted", "有效": "Active", "已替代": "Superseded" };
+const chineseRel: Record<string, string> = { spawns: "派生", derived_from: "意图链", yields: "产出", proves: "证明", covers: "压缩" };
 const FILTER_KINDS: ExploreKind[] = ["goal", "intent", "fact", "finding", "hint", "digest"];
 
 const REL_LABEL: Record<string, string> = {
   spawns: "Spawns",
-  derived_from: "意图链",
+  derived_from: "Intent chain",
   yields: "Yields",
   proves: "Proves",
   covers: "Compresses",
@@ -176,7 +181,6 @@ function relTime(ts: number, now: number): string {
   return `${Math.floor(sec / 86400)} days ago`;
 }
 
-const dayFmt = new Intl.DateTimeFormat("zh-CN", { month: "long", day: "numeric", weekday: "short" });
 const clockFmt = new Intl.DateTimeFormat("zh-CN", {
   hour: "2-digit",
   minute: "2-digit",
@@ -185,6 +189,8 @@ const clockFmt = new Intl.DateTimeFormat("zh-CN", {
 });
 
 function NodeStateBadge({ node }: { node: TaskNode }) {
+  const locale = useUiLocale();
+  const tr = (zh: string, en: string) => uiText(locale, zh, en);
   if (node.type === "goal") return <StatusBadge domain="goal" value={node.state} dot />;
   if (node.type === "intent") return <StatusBadge domain="intent" value={node.state} dot />;
   const meta = STATE_META[node.type]?.[node.state];
@@ -197,25 +203,29 @@ function NodeStateBadge({ node }: { node: TaskNode }) {
       )}
     >
       <span className={cn("size-1.5 rounded-full", toneDot[meta.tone])} />
-      {meta.label}
+      {locale === "en" ? englishState[meta.label] ?? meta.label : meta.label}
     </span>
   );
 }
 
 function KindChip({ kind }: { kind: string }) {
+  const locale = useUiLocale();
+  const tr = (zh: string, en: string) => uiText(locale, zh, en);
   const meta = KIND_META[kind] ?? KIND_META.fact;
   return (
-    <span className={cn("rounded px-1.5 py-0.5 text-xs font-medium whitespace-nowrap", meta.chip)}>{meta.label}</span>
+    <span className={cn("rounded px-1.5 py-0.5 text-xs font-medium whitespace-nowrap", meta.chip)}>{locale === "en" ? englishKind[kind] ?? meta.label : meta.label}</span>
   );
 }
 
 // Assets anchored to a node: type label + identifiable text. The data ships with the broadcast page (node id → assets),
 // and is shown on expand without extra requests.
 function AssetList({ assets, dense = false }: { assets: FindingAsset[]; dense?: boolean }) {
+  const locale = useUiLocale();
+  const tr = (zh: string, en: string) => uiText(locale, zh, en);
   if (assets.length === 0) return null;
   return (
     <div>
-      <div className="mb-1.5 text-xs font-medium text-muted-foreground">Assets involved · {assets.length}</div>
+      <div className="mb-1.5 text-xs font-medium text-muted-foreground">{tr("关联资产", "Assets involved")} · {assets.length}</div>
       <ul className="flex flex-wrap gap-1.5">
         {assets.map((a) => {
           // At runtime a.type may be a kind not covered by the label table; fall back to the raw string. The type cast keeps the fallback from being flagged as redundant.
@@ -243,6 +253,8 @@ function AssetList({ assets, dense = false }: { assets: FindingAsset[]; dense?: 
 // Node card shown when hovering an upstream/downstream entry: type/state/source/time + summary + payload snippet + involved assets.
 // Data comes from refs already fetched on this page — the broadcast API returns neighbor nodes in full.
 function RelatedNodeCard({ node, assets }: { node: TaskNode; assets: FindingAsset[] }) {
+  const locale = useUiLocale();
+  const tr = (zh: string, en: string) => uiText(locale, zh, en);
   const kind = viewKind(node);
   const meta = KIND_META[kind] ?? KIND_META.fact;
   const ts = Date.parse(node.ts);
@@ -258,11 +270,11 @@ function RelatedNodeCard({ node, assets }: { node: TaskNode; assets: FindingAsse
         )}
       </div>
       <div className="flex flex-wrap gap-x-3 gap-y-0.5 text-xs text-muted-foreground">
-        <span>Type {meta.label}</span>
-        <span>Source {node.origin || "system"}</span>
-        <span>{Number.isNaN(ts) ? node.ts : new Date(ts).toLocaleString("zh-CN")}</span>
+        <span>{tr("类型", "Type")} {locale === "en" ? englishKind[kind] ?? meta.label : meta.label}</span>
+        <span>{tr("来源", "Source")} {node.origin || "system"}</span>
+        <span>{Number.isNaN(ts) ? node.ts : new Date(ts).toLocaleString(locale)}</span>
       </div>
-      <p className="line-clamp-4 text-xs break-words">{summary || "(no summary)"}</p>
+      <p className="line-clamp-4 text-xs break-words">{summary || tr("（暂无摘要）", "(no summary)")}</p>
       <AssetList assets={assets} dense />
       <pre className="max-h-40 overflow-auto rounded border bg-muted/40 p-2 font-mono text-[11px] whitespace-pre-wrap">
         {prettyPayload(node.payload)}
@@ -283,6 +295,8 @@ function RelatedList({
   refs: Record<string, TaskNode>;
   assets: Record<string, FindingAsset[]>;
 }) {
+  const locale = useUiLocale();
+  const tr = (zh: string, en: string) => uiText(locale, zh, en);
   if (rows.length === 0) return null;
   return (
     <div className="min-w-0 flex-1">
@@ -293,7 +307,7 @@ function RelatedList({
           return (
             <li key={`${row.rel}-${row.id}`} className="flex min-w-0 items-center gap-2 text-xs">
               <span className="shrink-0 rounded bg-muted px-1.5 py-0.5 text-muted-foreground">
-                {REL_LABEL[row.rel] ?? row.rel}
+                {(locale === "en" ? REL_LABEL[row.rel] : chineseRel[row.rel]) ?? row.rel}
               </span>
               {node ? (
                 <HoverCard openDelay={150} closeDelay={100}>
@@ -303,7 +317,7 @@ function RelatedList({
                       className="flex min-w-0 cursor-help items-center gap-2 text-left hover:underline"
                     >
                       <KindChip kind={viewKind(node)} />
-                      <span className="truncate">{summaryOf(node) || `节点 #${node.id}`}</span>
+                      <span className="truncate">{summaryOf(node) || tr(`节点 #${node.id}`, `Node #${node.id}`)}</span>
                     </button>
                   </HoverCardTrigger>
                   <HoverCardContent align="start" className="w-96">
@@ -311,7 +325,7 @@ function RelatedList({
                   </HoverCardContent>
                 </HoverCard>
               ) : (
-                <span className="text-muted-foreground">Node #{row.id}</span>
+                <span className="text-muted-foreground">{tr("节点", "Node")} #{row.id}</span>
               )}
             </li>
           );
@@ -336,6 +350,8 @@ function BroadcastRow({
   now: number;
   fresh: boolean;
 }) {
+  const locale = useUiLocale();
+  const tr = (zh: string, en: string) => uiText(locale, zh, en);
   const [open, setOpen] = React.useState(false);
   const kind = viewKind(node);
   const meta = KIND_META[kind] ?? KIND_META.fact;
@@ -386,7 +402,7 @@ function BroadcastRow({
               )}
               {fresh && (
                 <span className="rounded bg-primary px-1.5 py-0.5 text-[10px] font-semibold text-primary-foreground">
-                  新建
+                  {tr("新建", "New")}
                 </span>
               )}
               <span className="ml-auto shrink-0 text-xs text-muted-foreground">{node.origin || "system"}</span>
@@ -399,23 +415,23 @@ function BroadcastRow({
           <div className="mt-2 ml-5 flex flex-col gap-3 rounded-md border bg-muted/30 p-3">
             <div className="flex flex-wrap gap-x-4 gap-y-1 text-xs text-muted-foreground">
               <span>
-                Node <code className="font-mono">#{node.id}</code>
+                {tr("节点", "Node")} <code className="font-mono">#{node.id}</code>
               </span>
-              <span>Type {meta.label}</span>
-              <span>Source {node.origin || "system"}</span>
-              <span>{Number.isNaN(ts) ? node.ts : new Date(ts).toLocaleString("zh-CN")}</span>
+              <span>{tr("类型", "Type")} {locale === "en" ? englishKind[kind] ?? meta.label : meta.label}</span>
+              <span>{tr("来源", "Source")} {node.origin || "system"}</span>
+              <span>{Number.isNaN(ts) ? node.ts : new Date(ts).toLocaleString(locale)}</span>
             </div>
             {node.state === "deleted" && node.delete_reason && (
               <div className="rounded-md border border-destructive/30 bg-destructive/5 px-3 py-2 text-xs">
-                <span className="font-medium text-destructive">删除原因</span>
+                <span className="font-medium text-destructive">{tr("删除原因", "Deletion reason")}</span>
                 <span className="ml-2 break-words text-muted-foreground">{node.delete_reason}</span>
               </div>
             )}
             <AssetList assets={assets[node.id] ?? []} />
             {(upstream.length > 0 || downstream.length > 0) && (
               <div className="flex flex-col gap-3 sm:flex-row">
-                <RelatedList title="上游 · 来源" rows={upstream} refs={refs} assets={assets} />
-                <RelatedList title="下游 · 产出" rows={downstream} refs={refs} assets={assets} />
+                <RelatedList title={tr("上游 · 来源", "Upstream · sources")} rows={upstream} refs={refs} assets={assets} />
+                <RelatedList title={tr("下游 · 产出", "Downstream · results")} rows={downstream} refs={refs} assets={assets} />
               </div>
             )}
             <div>
@@ -432,6 +448,8 @@ function BroadcastRow({
 }
 
 export function BroadcastTab({ taskId }: { taskId: string }) {
+  const locale = useUiLocale();
+  const tr = (zh: string, en: string) => uiText(locale, zh, en);
   const [kinds, setKinds] = React.useState<ExploreKind[]>([]);
   const [queryInput, setQueryInput] = React.useState("");
   const [query, setQuery] = React.useState("");
@@ -558,7 +576,7 @@ export function BroadcastTab({ taskId }: { taskId: string }) {
   const groups: Array<{ day: string; rows: TaskNode[] }> = [];
   for (const node of items) {
     const ts = Date.parse(node.ts);
-    const day = Number.isNaN(ts) ? "未知日期" : dayFmt.format(ts);
+    const day = Number.isNaN(ts) ? tr("未知日期", "Unknown date") : new Intl.DateTimeFormat(locale, { month: "long", day: "numeric", weekday: "short" }).format(ts);
     const last = groups[groups.length - 1];
     if (last && last.day === day) last.rows.push(node);
     else groups.push({ day, rows: [node] });
@@ -573,9 +591,9 @@ export function BroadcastTab({ taskId }: { taskId: string }) {
           <Input
             value={queryInput}
             onChange={(e) => setQueryInput(e.target.value)}
-            placeholder="搜索内容、来源或节点 ID"
+            placeholder={tr("搜索内容、来源或节点 ID", "Search content, source or node ID")}
             className="h-8 pl-8"
-            aria-label="搜索广播"
+            aria-label={tr("搜索广播", "Search broadcasts")}
           />
         </div>
         <div className="flex flex-wrap items-center gap-1">
@@ -607,7 +625,7 @@ export function BroadcastTab({ taskId }: { taskId: string }) {
                 setPage(1);
               }}
             >
-              清除
+              {tr("清除", "Clear")}
             </Button>
           )}
         </div>
@@ -620,17 +638,17 @@ export function BroadcastTab({ taskId }: { taskId: string }) {
               setOrder((o) => (o === "desc" ? "asc" : "desc"));
               setPage(1);
             }}
-            aria-label={order === "desc" ? "当前最新优先，点击切换为最早优先" : "当前最早优先，点击切换为最新优先"}
+            aria-label={order === "desc" ? tr("当前最新优先，点击切换为最早优先", "Newest first; click for oldest first") : tr("当前最早优先，点击切换为最新优先", "Oldest first; click for newest first")}
           >
             {order === "desc" ? <ArrowDownIcon /> : <ArrowUpIcon />}
-            {order === "desc" ? "最新优先" : "最早优先"}
+            {order === "desc" ? tr("最新优先", "Newest first") : tr("最早优先", "Oldest first")}
           </Button>
           <Button
             variant={live ? "outline" : "secondary"}
             size="sm"
             className="h-8"
             onClick={() => setLive((v) => !v)}
-            aria-label={live ? "暂停自动刷新" : "恢复自动刷新"}
+            aria-label={live ? tr("暂停自动刷新", "Pause auto-refresh") : tr("恢复自动刷新", "Resume auto-refresh")}
           >
             {live ? <PauseIcon /> : <PlayIcon />}
             {live ? "Auto-refresh" : "Paused"}
@@ -646,7 +664,7 @@ export function BroadcastTab({ taskId }: { taskId: string }) {
           className="flex w-full items-center justify-center gap-1.5 border-b bg-primary/10 py-1.5 text-xs font-medium text-primary hover:bg-primary/15"
         >
           <ArrowUpToLineIcon className="size-3.5" />
-          {pending > 99 ? "99+" : pending} new broadcasts · Back to latest
+          {pending > 99 ? "99+" : pending} {tr("条新广播 · 返回最新", "new broadcasts · Back to latest")}
         </button>
       )}
 
@@ -659,7 +677,7 @@ export function BroadcastTab({ taskId }: { taskId: string }) {
           </div>
         ) : items.length === 0 ? (
           <p className="py-10 text-center text-sm text-muted-foreground">
-            {query || kinds.length > 0 ? "暂无符合筛选条件的广播。" : "此任务尚未产生探索节点。"}
+            {query || kinds.length > 0 ? tr("暂无符合筛选条件的广播。", "No matching broadcasts.") : tr("此任务尚未产生探索节点。", "This task has no exploration nodes yet.")}
           </p>
         ) : (
           groups.map((group) => (
@@ -711,7 +729,7 @@ export function BroadcastTab({ taskId }: { taskId: string }) {
             size="icon-sm"
             disabled={page <= 1}
             onClick={() => setPage((p) => Math.max(1, p - 1))}
-            aria-label="上一页"
+            aria-label={tr("上一页", "Previous page")}
           >
             <ChevronLeftIcon />
           </Button>
@@ -723,7 +741,7 @@ export function BroadcastTab({ taskId }: { taskId: string }) {
             size="icon-sm"
             disabled={page >= pageCount}
             onClick={() => setPage((p) => Math.min(pageCount, p + 1))}
-            aria-label="下一页"
+            aria-label={tr("下一页", "Next page")}
           >
             <ChevronRightIcon />
           </Button>
