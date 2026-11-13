@@ -130,7 +130,7 @@ export default function CommandsPage() {
       <div className="flex items-center justify-between gap-4">
         <div className="flex items-center gap-2">
           <TerminalIcon className="h-5 w-5 text-muted-foreground" />
-          <h1 className="text-xl font-semibold tracking-tight">Tool executions</h1>
+          <h1 className="text-xl font-semibold tracking-tight">工具执行记录</h1>
           <Badge variant="secondary">{total}</Badge>
         </div>
       </div>
@@ -140,14 +140,14 @@ export default function CommandsPage() {
         <div className="relative max-w-sm flex-1">
           <SearchIcon className="absolute top-1/2 left-2.5 size-4 -translate-y-1/2 text-muted-foreground" />
           <Input
-            placeholder="Search tools / arguments..."
+            placeholder="搜索工具或参数…"
             value={query}
             onChange={(e) => setQuery(e.target.value)}
             className="h-8 pl-8"
           />
         </div>
         <Input
-          placeholder="Task ID"
+          placeholder="任务 ID"
           className="h-8 w-28"
           value={taskFilter}
           onChange={(e) => setTaskFilter(e.target.value.replace(/\D/g, ""))}
@@ -205,12 +205,12 @@ export default function CommandsPage() {
             <Table>
               <TableHeader className="sticky top-0 z-10 bg-card">
                 <TableRow>
-                  <TableHead className="w-[130px]">Time</TableHead>
-                  <TableHead className="w-[60px]">Task</TableHead>
-                  <TableHead className="w-[90px]">Worker</TableHead>
-                  <TableHead className="w-[110px]">Tool</TableHead>
-                  <TableHead>Input</TableHead>
-                  <TableHead className="w-[60px]">Status</TableHead>
+                  <TableHead className="w-[130px]">时间</TableHead>
+                  <TableHead className="w-[60px]">任务</TableHead>
+                  <TableHead className="w-[90px]">执行智能体</TableHead>
+                  <TableHead className="w-[110px]">工具</TableHead>
+                  <TableHead>输入</TableHead>
+                  <TableHead className="w-[60px]">状态</TableHead>
                 </TableRow>
               </TableHeader>
               <TableBody>
@@ -223,7 +223,7 @@ export default function CommandsPage() {
                 ) : commands.length === 0 ? (
                   <TableRow>
                     <TableCell colSpan={6} className="py-12 text-center text-sm text-muted-foreground">
-                      No tool execution records yet
+                      暂无工具执行记录
                     </TableCell>
                   </TableRow>
                 ) : (
@@ -272,13 +272,13 @@ export default function CommandsPage() {
         </Card>
       </div>
 
-      {/* Tool call stats: the same set of records as the table (same filters, no pagination) */}
+      {/* 工具调用统计: the same set of records as the table (same filters, no pagination) */}
       <Dialog open={statsOpen} onOpenChange={setStatsOpen}>
         <DialogContent className="sm:max-w-lg">
           <DialogHeader>
-            <DialogTitle>Tool call stats</DialogTitle>
+            <DialogTitle>工具调用统计</DialogTitle>
             <DialogDescription>
-              {taskFilter || queryQ ? "All records under the current filters" : "All tool execution records"}
+              {taskFilter || queryQ ? "当前筛选条件下的所有记录" : "全部工具执行记录"}
               {stats.length > 0 && (
                 <>
                   {" · "}
@@ -300,7 +300,7 @@ export default function CommandsPage() {
               <Loader2Icon className="mx-auto h-5 w-5 animate-spin text-muted-foreground" />
             </div>
           ) : stats.length === 0 ? (
-            <div className="py-10 text-center text-sm text-muted-foreground">No stats data</div>
+            <div className="py-10 text-center text-sm text-muted-foreground">暂无统计数据</div>
           ) : (
             <div className="-mr-2 max-h-[55vh] space-y-1 overflow-auto pr-2">
               {stats.map((s) => (
@@ -337,7 +337,7 @@ export default function CommandsPage() {
           {selected && (
             <>
               <SheetHeader className="border-b px-5 py-4">
-                <SheetTitle className="pr-8">Tool execution details</SheetTitle>
+                <SheetTitle className="pr-8">工具执行详情</SheetTitle>
                 <SheetDescription>{fmtTime(selected.created_at)}</SheetDescription>
                 <div className="flex flex-wrap items-center gap-2 pt-2">
                   <Badge variant="outline" className="text-xs font-mono">
@@ -362,7 +362,7 @@ export default function CommandsPage() {
               </SheetHeader>
               <div className="grid min-h-0 flex-1 grid-rows-2 divide-y">
                 <div className="flex min-h-0 min-w-0 flex-col">
-                  <div className="border-b px-5 py-2 text-xs font-medium text-muted-foreground">Input</div>
+                  <div className="border-b px-5 py-2 text-xs font-medium text-muted-foreground">输入</div>
                   <div className="min-h-0 flex-1 overflow-auto">
                     <pre className="p-5 font-mono text-xs break-all whitespace-pre-wrap">
                       {toolInput(selected.command)}
@@ -370,7 +370,7 @@ export default function CommandsPage() {
                   </div>
                 </div>
                 <div className="flex min-h-0 min-w-0 flex-col">
-                  <div className="border-b px-5 py-2 text-xs font-medium text-muted-foreground">Output</div>
+                  <div className="border-b px-5 py-2 text-xs font-medium text-muted-foreground">输出</div>
                   <div className="min-h-0 flex-1 overflow-auto">
                     <pre
                       className={cn(

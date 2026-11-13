@@ -538,7 +538,7 @@ export default function TasksPage() {
         }
         load();
       } catch (e) {
-        toast.error("Delete failed: " + (e as Error).message);
+        toast.error("删除失败：" + (e as Error).message);
         throw e;
       }
     },
@@ -570,11 +570,11 @@ export default function TasksPage() {
     async (task: Task, name: string) => {
       try {
         await api.renameTask(task.id, name);
-        toast.success(`Task #${task.id} renamed`);
+        toast.success(`任务 #${task.id} 已重命名`);
         lastRef.current = "";
         load();
       } catch (error) {
-        toast.error(`Rename failed: ${(error as Error).message}`);
+        toast.error(`重命名失败：${(error as Error).message}`);
         throw error;
       }
     },
@@ -586,11 +586,11 @@ export default function TasksPage() {
       const pinned = taskIsPinned(task);
       try {
         await api.pinTask(task.id, !pinned);
-        toast.success(pinned ? `Task #${task.id} unpinned` : `Task #${task.id} pinned`);
+        toast.success(pinned ? `任务 #${task.id} 已取消置顶` : `任务 #${task.id} 已置顶`);
         lastRef.current = "";
         load();
       } catch (error) {
-        toast.error(`${pinned ? "Unpin" : "Pin"} failed: ${(error as Error).message}`);
+        toast.error(`${pinned ? "取消置顶" : "置顶"} failed: ${(error as Error).message}`);
         throw error;
       }
     },
@@ -601,12 +601,12 @@ export default function TasksPage() {
     async (task: Task) => {
       try {
         await api.archiveTask(task.id);
-        toast.success(`Task #${task.id} queued for archiving`);
+        toast.success(`任务 #${task.id} 已加入归档队列`);
         setActiveTab("archived");
         lastRef.current = "";
         load();
       } catch (error) {
-        toast.error(`Archive failed: ${(error as Error).message}`);
+        toast.error(`归档失败：${(error as Error).message}`);
         throw error;
       }
     },
@@ -710,7 +710,7 @@ export default function TasksPage() {
     async (action: "pause" | "resume", ids: string[]) => {
       if (ids.length === 0 || batchControlling) return;
       if (ids.length > 100) {
-        toast.error("You can control at most 100 tasks at once");
+        toast.error("一次最多可控制 100 个任务");
         return;
       }
       setBatchControlling(action);
@@ -749,7 +749,7 @@ export default function TasksPage() {
       const ids = [...selectedIds];
       if (ids.length === 0 || movingCategory) return;
       if (ids.length > 100) {
-        toast.error("You can change the category of at most 100 tasks at once");
+        toast.error("一次最多可修改 100 个任务的分类");
         return;
       }
       setMovingCategory(true);
@@ -771,7 +771,7 @@ export default function TasksPage() {
         }
         refreshCategoriesAndTasks();
       } catch (error) {
-        toast.error(`Failed to change category: ${(error as Error).message}`);
+        toast.error(`修改分类失败：${(error as Error).message}`);
       } finally {
         setMovingCategory(false);
       }
@@ -952,9 +952,9 @@ export default function TasksPage() {
                       className="font-mono"
                       onSort={sortTasksBy}
                     />
-                    <TableHead>Name</TableHead>
-                    <TableHead>Description</TableHead>
-                    <TableHead>Goal</TableHead>
+                    <TableHead>名称</TableHead>
+                    <TableHead>描述</TableHead>
+                    <TableHead>目标</TableHead>
                     <SortableTaskHead
                       field="status"
                       label="Status"
@@ -962,11 +962,11 @@ export default function TasksPage() {
                       direction={sortDirection}
                       onSort={sortTasksBy}
                     />
-                    <TableHead className="text-center">Goal progress</TableHead>
-                    <TableHead className="text-center" title="Critical / High / Medium / Low">
+                    <TableHead className="text-center">目标进度</TableHead>
+                    <TableHead className="text-center" title="严重 / 高 / 中 / 低">
                       Findings <span className="text-muted-foreground font-normal">C/H/M/L</span>
                     </TableHead>
-                    <TableHead className="text-center">Running workers</TableHead>
+                    <TableHead className="text-center">运行中智能体</TableHead>
                     <SortableTaskHead
                       field="created"
                       label="Created at"
@@ -1106,10 +1106,10 @@ function ConcurrencySettingsDialog() {
     setSaving(true);
     try {
       await api.setSettings({ task_concurrency_enabled: enabled, task_concurrency_limit: nextLimit });
-      toast.success(enabled ? `Concurrency limit enabled: at most ${nextLimit} tasks can run simultaneously` : "Task concurrency limit disabled");
+      toast.success(enabled ? `已启用并发限制：最多同时运行 ${nextLimit} 个任务` : "任务并发限制已关闭");
       setOpen(false);
     } catch (error) {
-      toast.error(`Save failed: ${(error as Error).message}`);
+      toast.error(`保存失败：${(error as Error).message}`);
     } finally {
       setSaving(false);
     }
@@ -1118,28 +1118,28 @@ function ConcurrencySettingsDialog() {
   return (
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
-        <Button size="sm" variant="outline" className="ml-auto" aria-label="Task concurrency settings">
+        <Button size="sm" variant="outline" className="ml-auto" aria-label="任务并发设置">
           <SlidersHorizontalIcon /> Concurrency
         </Button>
       </DialogTrigger>
       <DialogContent className="sm:max-w-md">
         <DialogHeader>
-          <DialogTitle>Task concurrency limit</DialogTitle>
+          <DialogTitle>任务并发限制</DialogTitle>
           <DialogDescription>
-            Limit how many tasks can run simultaneously. Once the limit is reached, new tasks queue in creation order and start automatically as slots free up.
+            限制同时运行的任务数量。达到上限后，新任务按创建顺序排队，空位释放时自动启动。
           </DialogDescription>
         </DialogHeader>
         <div className="grid gap-5 py-2">
           <div className="flex items-center justify-between gap-4">
             <div className="grid gap-1">
-              <Label htmlFor="task-concurrency-enabled">Enable task concurrency limit</Label>
+              <Label htmlFor="task-concurrency-enabled">启用任务并发限制</Label>
               <span className="text-muted-foreground text-xs">Off by default</span>
             </div>
             <Switch id="task-concurrency-enabled" checked={enabled} onCheckedChange={setEnabled} disabled={loading} />
           </div>
           {enabled && (
             <div className="grid gap-2">
-              <Label htmlFor="task-concurrency-limit">Max concurrent tasks</Label>
+              <Label htmlFor="task-concurrency-limit">最大并发任务数</Label>
               <Input
                 id="task-concurrency-limit"
                 type="number"
@@ -1154,7 +1154,7 @@ function ConcurrencySettingsDialog() {
         </div>
         <DialogFooter>
           <DialogClose asChild>
-            <Button variant="outline">Cancel</Button>
+            <Button variant="outline">取消</Button>
           </DialogClose>
           <Button onClick={save} disabled={loading || saving}>
             {saving && <Loader2Icon className="animate-spin" />} Save
@@ -1240,7 +1240,7 @@ const TaskRow = React.memo(function TaskRow({
             <span className={n > 0 ? cls : "text-muted-foreground"}>{n}</span>
           );
           return (
-            <span className="font-medium whitespace-nowrap" title="Critical / High / Medium / Low">
+            <span className="font-medium whitespace-nowrap" title="严重 / 高 / 中 / 低">
               {seg(f.critical, "text-rose-600 dark:text-rose-400")}
               <span className="text-muted-foreground">/</span>
               {seg(f.high, "text-red-600 dark:text-red-400")}
@@ -1295,7 +1295,7 @@ const TaskRow = React.memo(function TaskRow({
       </TableCell>
       <TableCell className="sticky right-0 z-10 bg-card text-right shadow-[-1px_0_0_0_hsl(var(--border))] group-hover:bg-muted/50">
         <div className="flex items-center justify-end gap-0.5">
-          <Button size="icon" variant="ghost" asChild aria-label="View task details" title="View task details">
+          <Button size="icon" variant="ghost" asChild aria-label="查看任务详情" title="查看任务详情">
             <Link href={`/function/tasks/detail?id=${encodeURIComponent(task.id)}`}>
               <EyeIcon />
             </Link>
@@ -1392,7 +1392,7 @@ function TaskNameEditor({ task, onRename }: { task: Task; onRename: (task: Task,
         size="icon-xs"
         className="shrink-0 opacity-100 transition-opacity [@media(hover:hover)]:opacity-0 [@media(hover:hover)]:group-focus-within:opacity-100 [@media(hover:hover)]:group-hover:opacity-100"
         aria-label={`Rename task #${task.id}`}
-        title="Rename"
+        title="重命名"
         onClick={() => {
           setName(task.name ?? "");
           setEditing(true);
@@ -1421,7 +1421,7 @@ function TaskPinAction({ task, onTogglePinned }: { task: Task; onTogglePinned: (
       size="icon"
       disabled={pinning}
       aria-label={pinned ? `Unpin task #${task.id}` : `Pin task #${task.id}`}
-      title={pinned ? "Unpin" : "Pin"}
+      title={pinned ? "取消置顶" : "置顶"}
       onClick={async () => {
         setPinning(true);
         try {
@@ -1460,7 +1460,7 @@ function TaskControlButton({
       size="icon"
       variant="ghost"
       aria-label={label}
-      title={action ? label : "Cannot pause or resume in this state"}
+      title={action ? label : "当前状态无法暂停或恢复"}
       disabled={!action || pending}
       onClick={async () => {
         if (!action) return;
@@ -1502,13 +1502,13 @@ function ArchiveConfirmDialog({
       <AlertDialogTrigger asChild>{trigger}</AlertDialogTrigger>
       <AlertDialogContent>
         <AlertDialogHeader>
-          <AlertDialogTitle>{count === 1 ? "Archive task" : `Archive ${count} tasks`}</AlertDialogTitle>
+          <AlertDialogTitle>{count === 1 ? "归档任务" : `归档 ${count} 个任务`}</AlertDialogTitle>
           <AlertDialogDescription className="[overflow-wrap:anywhere]">
-            Archiving stops task scheduling and compresses the graph, LLM history, files, and exclusive assets and traffic into local cold storage. Once archived, a task can be restored from "Archived".
+            归档会停止任务调度，并将图谱、模型历史、文件、独占资产和流量压缩到本地冷存储。归档后可在「已归档」中恢复任务。
           </AlertDialogDescription>
         </AlertDialogHeader>
         <AlertDialogFooter>
-          <AlertDialogCancel disabled={pending}>Cancel</AlertDialogCancel>
+          <AlertDialogCancel disabled={pending}>取消</AlertDialogCancel>
           <AlertDialogAction
             disabled={pending}
             onClick={async (event) => {
@@ -1523,7 +1523,7 @@ function ArchiveConfirmDialog({
             }}
           >
             {pending && <Spinner data-icon="inline-start" />}
-            Confirm archive
+            确认归档
           </AlertDialogAction>
         </AlertDialogFooter>
       </AlertDialogContent>
@@ -1534,7 +1534,7 @@ function ArchiveConfirmDialog({
 function TaskArchiveAction({ task, onArchive }: { task: Task; onArchive: (task: Task) => Promise<void> }) {
   const reason = archiveBlockReason(task);
   const trigger = (
-    <Button size="icon" variant="ghost" disabled={Boolean(reason)} aria-label={`Archive task #${task.id}`}>
+    <Button size="icon" variant="ghost" disabled={Boolean(reason)} aria-label={`归档任务 #${task.id}`}>
       <ArchiveIcon />
     </Button>
   );
@@ -1629,13 +1629,13 @@ function ArchiveDeleteDialog({
       <AlertDialogTrigger asChild>{trigger}</AlertDialogTrigger>
       <AlertDialogContent>
         <AlertDialogHeader>
-          <AlertDialogTitle>Permanently delete {archives.length} task archives?</AlertDialogTitle>
+          <AlertDialogTitle>永久删除 {archives.length} 个任务归档？</AlertDialogTitle>
           <AlertDialogDescription className="[overflow-wrap:anywhere]">
             About {formatArchiveBytes(bytes)} of archive packages and {rows.toLocaleString()} related data snapshots will be permanently deleted. This action cannot be undone.
           </AlertDialogDescription>
         </AlertDialogHeader>
         <AlertDialogFooter>
-          <AlertDialogCancel disabled={pending}>Cancel</AlertDialogCancel>
+          <AlertDialogCancel disabled={pending}>取消</AlertDialogCancel>
           <AlertDialogAction
             variant="destructive"
             disabled={pending}
@@ -1651,7 +1651,7 @@ function ArchiveDeleteDialog({
             }}
           >
             {pending && <Spinner data-icon="inline-start" />}
-            Delete permanently
+            永久删除
           </AlertDialogAction>
         </AlertDialogFooter>
       </AlertDialogContent>
@@ -1697,7 +1697,7 @@ function TaskArchivesPanel({ onChanged }: { onChanged: () => void }) {
         if (restored) onChanged();
       }
     } catch (error) {
-      toast.error(`Failed to load the archive list: ${(error as Error).message}`);
+      toast.error(`加载归档列表失败：${(error as Error).message}`);
     } finally {
       setLoading(false);
     }
@@ -1753,11 +1753,11 @@ function TaskArchivesPanel({ onChanged }: { onChanged: () => void }) {
         const archiveID = Number(item.archive_id ?? item.id);
         if (item.ok && Number.isSafeInteger(archiveID) && archiveID > 0) pendingRestoreIDs.current.add(archiveID);
       }
-      if (succeeded > 0) toast.success(`Queued ${succeeded} tasks for restore`);
-      if (failed > 0) toast.error(`${failed} tasks could not be restored`);
+      if (succeeded > 0) toast.success(`已将 ${succeeded} 个任务加入恢复队列`);
+      if (failed > 0) toast.error(`${failed} 个任务无法恢复`);
       afterAction();
     } catch (error) {
-      toast.error(`Restore failed: ${(error as Error).message}`);
+      toast.error(`恢复失败：${(error as Error).message}`);
     }
   }
 
@@ -1778,11 +1778,11 @@ function TaskArchivesPanel({ onChanged }: { onChanged: () => void }) {
           : await api.deleteTaskArchives(items.map((archive) => archive.id));
       const succeeded = result.items.filter((item) => item.ok).length;
       const failed = result.items.length - succeeded;
-      if (succeeded > 0) toast.success(`Queued ${succeeded} archives for permanent deletion`);
-      if (failed > 0) toast.error(`${failed} archives could not be deleted`);
+      if (succeeded > 0) toast.success(`已将 ${succeeded} 个归档加入永久删除队列`);
+      if (failed > 0) toast.error(`${failed} 个归档无法删除`);
       afterAction();
     } catch (error) {
-      toast.error(`Permanent delete failed: ${(error as Error).message}`);
+      toast.error(`永久删除失败：${(error as Error).message}`);
       throw error;
     }
   }
@@ -1792,10 +1792,10 @@ function TaskArchivesPanel({ onChanged }: { onChanged: () => void }) {
       if (archive.state === "archive_failed") await api.archiveTask(String(archive.task_id));
       if (archive.state === "restore_failed") await api.restoreTaskArchive(archive.id);
       if (archive.state === "delete_failed") await api.deleteTaskArchive(archive.id);
-      toast.success("Re-queued for processing");
+      toast.success("已重新加入处理队列");
       afterAction();
     } catch (error) {
-      toast.error(`Retry failed: ${(error as Error).message}`);
+      toast.error(`重试失败：${(error as Error).message}`);
     }
   }
 
@@ -1811,7 +1811,7 @@ function TaskArchivesPanel({ onChanged }: { onChanged: () => void }) {
                 setQuery(event.target.value);
                 setPage(1);
               }}
-              placeholder="Search task name / description / ID"
+              placeholder="搜索任务名称、描述或 ID"
               className="pl-8"
             />
           </div>
@@ -1823,21 +1823,21 @@ function TaskArchivesPanel({ onChanged }: { onChanged: () => void }) {
             }}
           >
             <SelectTrigger className="w-36">
-              <SelectValue placeholder="State" />
+              <SelectValue placeholder="状态" />
             </SelectTrigger>
             <SelectContent>
               <SelectGroup>
-                <SelectItem value="all">All statuses</SelectItem>
-                <SelectItem value="archive_queued">Archive queued</SelectItem>
-                <SelectItem value="archiving">Archiving</SelectItem>
-                <SelectItem value="ready">Restorable</SelectItem>
-                <SelectItem value="restore_queued">Restore queued</SelectItem>
-                <SelectItem value="restoring">Restoring</SelectItem>
-                <SelectItem value="delete_queued">Delete queued</SelectItem>
-                <SelectItem value="deleting">Deleting</SelectItem>
-                <SelectItem value="archive_failed">Archive failed</SelectItem>
-                <SelectItem value="restore_failed">Restore failed</SelectItem>
-                <SelectItem value="delete_failed">Delete failed</SelectItem>
+                <SelectItem value="all">全部状态</SelectItem>
+                <SelectItem value="archive_queued">等待归档</SelectItem>
+                <SelectItem value="archiving">正在归档</SelectItem>
+                <SelectItem value="ready">可恢复</SelectItem>
+                <SelectItem value="restore_queued">等待恢复</SelectItem>
+                <SelectItem value="restoring">正在恢复</SelectItem>
+                <SelectItem value="delete_queued">等待删除</SelectItem>
+                <SelectItem value="deleting">正在删除</SelectItem>
+                <SelectItem value="archive_failed">归档失败</SelectItem>
+                <SelectItem value="restore_failed">恢复失败</SelectItem>
+                <SelectItem value="delete_failed">删除失败</SelectItem>
               </SelectGroup>
             </SelectContent>
           </Select>
@@ -1890,14 +1890,14 @@ function TaskArchivesPanel({ onChanged }: { onChanged: () => void }) {
                     aria-label="Select the archives on this page"
                   />
                 </TableHead>
-                <TableHead>Task</TableHead>
-                <TableHead>Original status</TableHead>
-                <TableHead>Category</TableHead>
-                <TableHead>Archived at</TableHead>
-                <TableHead>Compressed size</TableHead>
-                <TableHead>Data records</TableHead>
-                <TableHead className="min-w-44">State</TableHead>
-                <TableHead className="text-right">Actions</TableHead>
+                <TableHead>任务</TableHead>
+                <TableHead>原始状态</TableHead>
+                <TableHead>分类</TableHead>
+                <TableHead>归档时间</TableHead>
+                <TableHead>压缩大小</TableHead>
+                <TableHead>数据记录</TableHead>
+                <TableHead className="min-w-44">状态</TableHead>
+                <TableHead className="text-right">操作</TableHead>
               </TableRow>
             </TableHeader>
             <TableBody>
@@ -1941,7 +1941,7 @@ function TaskArchivesPanel({ onChanged }: { onChanged: () => void }) {
                     </TableCell>
                     <TableCell
                       className="whitespace-nowrap text-xs"
-                      title={`Before compression: ${formatArchiveBytes(archive.original_size)}`}
+                      title={`压缩前：${formatArchiveBytes(archive.original_size)}`}
                     >
                       {archiveCompressionLabel(archive)}
                     </TableCell>
@@ -1974,7 +1974,7 @@ function TaskArchivesPanel({ onChanged }: { onChanged: () => void }) {
                             variant="ghost"
                             onClick={() => void retry(archive)}
                             aria-label="Retry archive operation"
-                            title="Retry"
+                            title="重试"
                           >
                             <Undo2Icon />
                           </Button>
@@ -1985,7 +1985,7 @@ function TaskArchivesPanel({ onChanged }: { onChanged: () => void }) {
                             variant="ghost"
                             onClick={() => void restoreMany([archive])}
                             aria-label="Restore task"
-                            title="Restore task"
+                            title="恢复任务"
                           >
                             <Undo2Icon />
                           </Button>
@@ -1995,7 +1995,7 @@ function TaskArchivesPanel({ onChanged }: { onChanged: () => void }) {
                             archives={[archive]}
                             onConfirm={() => deleteMany([archive])}
                             trigger={
-                              <Button size="icon" variant="ghost" aria-label="Permanently delete archive" title="Permanently delete">
+                              <Button size="icon" variant="ghost" aria-label="永久删除归档" title="永久删除">
                                 <Trash2Icon />
                               </Button>
                             }
@@ -2181,13 +2181,13 @@ function DeleteTaskDialog({
   return (
     <AlertDialog open={open} onOpenChange={handleOpenChange}>
       <AlertDialogTrigger asChild>
-        <Button size="icon" variant="outline" aria-label="Delete task">
+        <Button size="icon" variant="outline" aria-label="删除任务">
           <Trash2Icon className="text-destructive" />
         </Button>
       </AlertDialogTrigger>
       <AlertDialogContent>
         <AlertDialogHeader>
-          <AlertDialogTitle>Delete task #{task.id}?</AlertDialogTitle>
+          <AlertDialogTitle>删除任务 #{task.id}？</AlertDialogTitle>
           <AlertDialogDescription className="break-words">
             {task.description ? (
               <>
@@ -2205,7 +2205,7 @@ function DeleteTaskDialog({
         </AlertDialogHeader>
         <DeleteOptionFields idPrefix={task.id} options={options} onOptionsChange={setOptions} disabled={deleting} />
         <AlertDialogFooter>
-          <AlertDialogCancel disabled={deleting}>Cancel</AlertDialogCancel>
+          <AlertDialogCancel disabled={deleting}>取消</AlertDialogCancel>
           <AlertDialogAction
             variant="destructive"
             disabled={deleting}
@@ -2258,18 +2258,18 @@ function MoveTasksCategoryDialog({
       </DialogTrigger>
       <DialogContent>
         <DialogHeader>
-          <DialogTitle>Change the category of {count} selected tasks</DialogTitle>
-          <DialogDescription>The target category applies to all selected tasks; choosing "Uncategorized" moves them out of their current category.</DialogDescription>
+          <DialogTitle>修改选中的 {count} 个任务的分类</DialogTitle>
+          <DialogDescription>目标分类将应用于所有选中的任务，选择「未分类」会将任务移出当前分类。</DialogDescription>
         </DialogHeader>
         <Field>
           <FieldLabel htmlFor="bulk-category">Target category</FieldLabel>
           <Select value={target} onValueChange={setTarget} disabled={moving}>
             <SelectTrigger id="bulk-category" className="w-full">
-              <SelectValue placeholder="Select a category" />
+              <SelectValue placeholder="选择分类" />
             </SelectTrigger>
             <SelectContent>
               <SelectGroup>
-                <SelectItem value={UNCATEGORIZED_VALUE}>Uncategorized</SelectItem>
+                <SelectItem value={UNCATEGORIZED_VALUE}>未分类</SelectItem>
                 {categories.map((category) => (
                   <SelectItem key={category.id} value={String(category.id)}>
                     {category.name}
@@ -2342,9 +2342,9 @@ function BulkDeleteTasksDialog({
       </AlertDialogTrigger>
       <AlertDialogContent className="max-h-[85vh] overflow-y-auto">
         <AlertDialogHeader>
-          <AlertDialogTitle>Delete {ids.length} selected tasks?</AlertDialogTitle>
+          <AlertDialogTitle>删除选中的 {ids.length} 个任务？</AlertDialogTitle>
           <AlertDialogDescription>
-            The execution records and exploration graphs of these tasks will be permanently deleted; the cleanup options below apply to all selected tasks.
+            这些任务的执行记录和探索图谱将永久删除；以下清理选项适用于所有选中的任务。
           </AlertDialogDescription>
         </AlertDialogHeader>
         <div className="text-muted-foreground flex flex-wrap gap-1 text-xs">
@@ -2357,7 +2357,7 @@ function BulkDeleteTasksDialog({
         </div>
         <DeleteOptionFields idPrefix="bulk" options={options} onOptionsChange={setOptions} disabled={deleting} />
         <AlertDialogFooter>
-          <AlertDialogCancel disabled={deleting}>Cancel</AlertDialogCancel>
+          <AlertDialogCancel disabled={deleting}>取消</AlertDialogCancel>
           <AlertDialogAction
             variant="destructive"
             disabled={deleting}
@@ -2417,7 +2417,7 @@ function SourceTaskPicker({
         </ComboboxValue>
         <ComboboxChipsInput
           id="source-tasks"
-          placeholder={atLimit ? `Link up to ${MAX_SOURCE_TASKS} tasks` : "Search task ID, description, or goal"}
+          placeholder={atLimit ? `Link up to ${MAX_SOURCE_TASKS} tasks` : "搜索任务 ID、描述或目标"}
           disabled={atLimit}
         />
       </ComboboxChips>
@@ -2502,9 +2502,9 @@ function CategoryPicker({
       onValueChange(created.id);
       setInputValue("");
       onCategoryCreated();
-      toast.success(`Category "${created.name}" created`);
+      toast.success(`已创建分类「${created.name}」`);
     } catch (e) {
-      toast.error(`Failed to create category: ${(e as Error).message}`);
+      toast.error(`创建分类失败：${(e as Error).message}`);
     } finally {
       setCreating(false);
     }
@@ -3054,7 +3054,7 @@ function CategoryManagementSheet({
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
-            <AlertDialogCancel disabled={deleting}>Cancel</AlertDialogCancel>
+            <AlertDialogCancel disabled={deleting}>取消</AlertDialogCancel>
             <AlertDialogAction
               variant="destructive"
               disabled={deleting}
@@ -3258,7 +3258,7 @@ function CreateTaskSheet({
               <FieldDescription>Optional, single category; used for task list filtering and archiving, never affecting agent execution.</FieldDescription>
             </Field>
             <div className="grid gap-2">
-              <Label htmlFor="description">Description</Label>
+              <Label htmlFor="description">描述</Label>
               <Textarea
                 id="description"
                 className="min-h-32"
@@ -3293,7 +3293,7 @@ function CreateTaskSheet({
               </div>
             </div>
             <div className="grid gap-2">
-              <Label htmlFor="goal">Goal</Label>
+              <Label htmlFor="goal">目标</Label>
               <Textarea
                 id="goal"
                 className="min-h-32"
@@ -3474,7 +3474,7 @@ function CreateTaskSheet({
 
         <SheetFooter className="flex-row justify-end gap-2 border-t p-4">
           <SheetClose asChild>
-            <Button variant="outline">Cancel</Button>
+            <Button variant="outline">取消</Button>
           </SheetClose>
           <Button onClick={createTask} disabled={creating || uploading}>
             {creating && <Spinner data-icon="inline-start" />}
