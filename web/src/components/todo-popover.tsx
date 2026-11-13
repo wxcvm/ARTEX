@@ -1,5 +1,8 @@
 "use client";
 
+import { useUiLocale } from "@/lib/ui-locale.client";
+import { uiText } from "@/lib/ui-locale";
+
 import * as React from "react";
 import { ListTodo } from "lucide-react";
 
@@ -18,6 +21,8 @@ export function TodoPopover({
   seq: number | null;
   fetchDetail: (seq: number) => Promise<string>;
 }) {
+  const locale = useUiLocale();
+  const tr = (zh: string, en: string) => uiText(locale, zh, en);
   const [open, setOpen] = React.useState(false);
   const [todos, setTodos] = React.useState<{ content: string; status: string }[] | null>(null);
   const [loading, setLoading] = React.useState(false);
@@ -33,7 +38,7 @@ export function TodoPopover({
       const parsed = JSON.parse(start >= 0 ? detail.slice(start) : detail);
       setTodos(Array.isArray(parsed?.todos) ? parsed.todos : []);
     } catch {
-      setErr("Failed to parse todos");
+      setErr("parse");
       setTodos(null);
     } finally {
       setLoading(false);
@@ -53,20 +58,20 @@ export function TodoPopover({
         <button
           type="button"
           disabled={disabled}
-          title={disabled ? "No todos in this session" : "View latest todos"}
+          title={disabled ? tr("本会话暂无待办", "No todos in this session") : tr("查看最新待办", "View latest todos")}
           className="text-muted-foreground/70 hover:text-primary flex items-center gap-0.5 text-xs disabled:pointer-events-none disabled:opacity-40"
         >
           <ListTodo className="size-3" />
-          Todo
+          {tr("待办", "Todo")}
         </button>
       </PopoverTrigger>
       <PopoverContent align="end" className="max-h-80 w-80 overflow-auto p-2">
         <p className="text-muted-foreground px-1 pb-1 text-[11px] font-medium">
-          Latest todos{loading ? " · Loading…" : ""}
+          {tr("最新待办", "Latest todos")}{loading ? tr(" · 加载中…", " · Loading…") : ""}
         </p>
-        {err && <p className="text-destructive px-1 text-xs">{err}</p>}
+        {err && <p className="text-destructive px-1 text-xs">{tr("无法解析待办记录", "Failed to parse todos")}</p>}
         {todos && todos.length === 0 && !loading && (
-          <p className="text-muted-foreground px-1 text-xs">(empty)</p>
+          <p className="text-muted-foreground px-1 text-xs">{tr("（空）", "(empty)")}</p>
         )}
         <ul className="space-y-0.5">
           {(todos ?? []).map((t, i) => (

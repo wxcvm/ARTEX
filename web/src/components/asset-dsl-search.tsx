@@ -1,5 +1,8 @@
 "use client";
 
+import { useUiLocale } from "@/lib/ui-locale.client";
+import { uiText } from "@/lib/ui-locale";
+
 import * as React from "react";
 
 import { SearchIcon } from "lucide-react";
@@ -263,6 +266,39 @@ const KIND_STYLE: Record<string, string> = {
 // AssetDslSearch is the shared DSL search box: a monospace input with a
 // field/operator/logic autocomplete popover and a status line ("found N" /
 // error / loading). Used by both the global asset view and the per-task view.
+const dslDescriptionsZh: Record<string, string> = {
+  "Domain (root domain/subdomain/service domain)": "域名（根域名 / 子域名 / 服务域名）",
+  "IPv4/IPv6 address": "IPv4 / IPv6 地址",
+  "Full URL (service/endpoint)": "完整 URL（服务 / 接口）",
+  "Root domain": "根域名",
+  "Page title (HTTP service)": "页面标题（HTTP 服务）",
+  "ICP filing number": "ICP备案号",
+  "Service name (non-HTTP service)": "服务名（非 HTTP 服务）",
+  "App name": "应用名称",
+  "App Bundle ID": "应用包标识",
+  "App category": "应用分类",
+  "App ICP filing": "应用 ICP 备案",
+  "HTTP method GET/POST/PUT/…": "HTTP 方法 GET/POST/PUT/…",
+  "Service type: http | other": "服务类型：http | other",
+  "DNS record type A/CNAME/MX/…": "DNS 记录类型 A/CNAME/MX/…",
+  "Technology fingerprint (array field)": "技术指纹（数组字段）",
+  "Port number (integer)": "端口号（整数）",
+  "HTTP status code (integer)": "HTTP 状态码（整数）",
+  "Owning company ID (integer)": "所属企业 ID（整数）",
+  "Source task ID (integer)": "来源任务 ID（整数）",
+  "AND (both conditions must match)": "AND（两个条件均需匹配）",
+  "OR (either one matches)": "OR（任一条件匹配）",
+  "fuzzy match": "模糊匹配",
+  "exact match": "精确匹配",
+  "exclude": "排除",
+  "equals": "等于",
+  "not equals": "不等于",
+  "greater than": "大于",
+  "greater than or equal": "大于等于",
+  "less than": "小于",
+  "less than or equal": "小于等于"
+};
+
 export function AssetDslSearch({
   query,
   onChange,
@@ -276,6 +312,8 @@ export function AssetDslSearch({
   error: string;
   count?: number;
 }) {
+  const locale = useUiLocale();
+  const tr = (zh: string, en: string) => uiText(locale, zh, en);
   const inputRef = React.useRef<HTMLInputElement>(null);
   const [suggestions, setSuggestions] = React.useState<DslSuggestion[]>([]);
   const [selIdx, setSelIdx] = React.useState(0);
@@ -341,7 +379,7 @@ export function AssetDslSearch({
         <SearchIcon className="pointer-events-none absolute top-1/2 left-2.5 size-4 -translate-y-1/2 text-muted-foreground" />
         <Input
           ref={inputRef}
-          placeholder="DSL search: domain=example AND status_code>=400"
+          placeholder={tr("DSL 搜索：domain=example AND status_code>=400", "DSL search: domain=example AND status_code>=400")}
           value={query}
           onChange={handleChange}
           onKeyDown={handleKeyDown}
@@ -367,7 +405,7 @@ export function AssetDslSearch({
                 }}
               >
                 <span className={cn("shrink-0 font-mono text-xs font-semibold", KIND_STYLE[s.kind])}>{s.label}</span>
-                <span className="text-xs text-muted-foreground">{s.desc}</span>
+                <span className="text-xs text-muted-foreground">{locale === "en" ? s.desc : dslDescriptionsZh[s.desc] ?? s.desc}</span>
               </button>
             ))}
           </div>
@@ -375,7 +413,7 @@ export function AssetDslSearch({
       </div>
       {query.trim() && !open && (
         <p className="pl-1 text-[11px] text-muted-foreground">
-          {loading ? "Searching…" : error ? <span className="text-destructive">{error}</span> : `Found ${count ?? 0}`}
+          {loading ? tr("正在搜索…", "Searching…") : error ? <span className="text-destructive">{error}</span> : tr(`找到 ${count ?? 0} 项`, `Found ${count ?? 0} items`)}
         </p>
       )}
     </div>

@@ -66,3 +66,18 @@ test("empty evidence sections remain explicit", () => {
   d.lineage.nodes = [];
   assert.ok(buildFindingReportMarkdown(d).includes("## 复测记录\n\n（暂无）"));
 });
+
+
+test("localized standalone export changes headings but preserves report and evidence", () => {
+  const data = sample();
+  const zh = buildFindingReportMarkdown(data, "zh-CN");
+  const en = buildFindingReportMarkdown(data, "en");
+  assert.match(zh, /## 详细报告/);
+  assert.match(en, /## Detailed report/);
+  for (const md of [zh, en]) {
+    assert.ok(md.includes(data.finding.report));
+    assert.ok(md.includes(data.finding.evidence));
+    assert.ok(md.includes(data.packets[0].request.content));
+    assert.ok(md.includes("Header: one"));
+  }
+});
