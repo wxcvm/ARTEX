@@ -1,6 +1,10 @@
+"use client";
+
+import { useUiLocale } from "@/lib/ui-locale.client";
 import { cn } from "@/lib/utils";
 import {
   statusMeta,
+  statusLabel,
   toneClasses,
   toneDot,
   type StatusDomain,
@@ -18,6 +22,7 @@ export function StatusBadge({
   dot?: boolean;
   className?: string;
 }) {
+  const locale = useUiLocale();
   const meta = statusMeta(domain, value);
   return (
     <span
@@ -30,7 +35,7 @@ export function StatusBadge({
       {dot && (
         <span className={cn("size-1.5 rounded-full", toneDot[meta.tone])} />
       )}
-      {meta.label}
+      {statusLabel(domain, value, locale)}
     </span>
   );
 }

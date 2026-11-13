@@ -126,3 +126,51 @@ export type StatusDomain = keyof typeof maps;
 export function statusMeta(domain: StatusDomain, key: string): StatusMeta {
   return maps[domain][key] ?? { label: key, tone: "neutral" };
 }
+
+
+// Presentation-only localization; statusMeta retains its original semantics for existing callers.
+const chineseStatusLabels: Record<string, string> = {
+  "Open": "待处理",
+  "Running": "运行中",
+  "Paused": "已暂停",
+  "Completed": "已完成",
+  "Error": "错误",
+  "Budget exhausted": "预算耗尽",
+  "Stopped": "已停止",
+  "Deleted": "已删除",
+  "Created": "已创建",
+  "Queued": "排队中",
+  "Failed": "失败",
+  "Timed out": "已超时",
+  "Critical": "严重",
+  "High": "高危",
+  "Medium": "中危",
+  "Low": "低危",
+  "Pending": "待处理",
+  "In progress": "进行中",
+  "Confirmed": "已确认",
+  "Resolved": "已解决",
+  "Fixed": "已修复",
+  "False positive": "误报",
+  "Ignored": "已忽略",
+  "Duplicate": "重复",
+  "Risk accepted": "风险已接受",
+  "Exploring": "探索中",
+  "Stalled": "停滞",
+  "Idle": "空闲",
+  "Met": "已达成",
+  "Abandoned": "已放弃",
+  "Allow": "允许",
+  "Block": "阻止",
+  "Observed": "已观察",
+  "Tombstoned": "已作废",
+  "Sending": "发送中",
+  "Sent": "已发送",
+  "Skipped": "已跳过"
+};
+
+export function statusLabel(domain: StatusDomain, key: string, locale: "zh-CN" | "en" = "zh-CN"): string {
+  const meta = Object.hasOwn(maps[domain], key) ? maps[domain][key] : undefined;
+  if (!meta) return key;
+  return locale === "zh-CN" ? chineseStatusLabels[meta.label] ?? meta.label : meta.label;
+}
