@@ -19,32 +19,33 @@ export function ReportTab({ taskId }: { taskId: string }) {
   const locale = useUiLocale();
   const tr = (zh: string, en: string) => uiText(locale, zh, en);
   const [report, setReport] = React.useState<string>("");
-  const [reportTaskId, setReportTaskId] = React.useState(taskId);
+  const reportKey = `${taskId}:${locale}`;
+  const [reportTaskId, setReportTaskId] = React.useState(reportKey);
   // When the task changes, never display the previous task's report.
-  const currentReport = reportTaskId === taskId ? report : "";
+  const currentReport = reportTaskId === reportKey ? report : "";
   const [loading, setLoading] = React.useState(true);
   const [copied, setCopied] = React.useState(false);
   const [error, setError] = React.useState("");
-  const [errorTaskId, setErrorTaskId] = React.useState(taskId);
-  const currentError = errorTaskId === taskId ? error : "";
+  const [errorTaskId, setErrorTaskId] = React.useState(reportKey);
+  const currentError = errorTaskId === reportKey ? error : "";
   const [refresh, setRefresh] = React.useState(0);
 
   React.useEffect(() => {
     let active = true;
     setLoading(true);
     api
-      .report(taskId)
+      .report(taskId, locale)
       .then((text) => {
         if (active) {
           setReport(text);
-          setReportTaskId(taskId);
-          setErrorTaskId(taskId);
+          setReportTaskId(reportKey);
+          setErrorTaskId(reportKey);
           setError("");
         }
       })
       .catch((cause) => {
         if (active) {
-          setErrorTaskId(taskId);
+          setErrorTaskId(reportKey);
           setError(cause instanceof Error ? cause.message : "报告请求失败");
         }
       })
@@ -54,11 +55,11 @@ export function ReportTab({ taskId }: { taskId: string }) {
     return () => {
       active = false;
     };
-  }, [taskId, refresh]);
+  }, [taskId, locale, reportKey, refresh]);
 
   React.useEffect(() => {
     setCopied(false);
-  }, [taskId]);
+  }, [reportKey]);
 
   async function copy() {
     if (!currentReport) return;

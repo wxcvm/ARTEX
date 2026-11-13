@@ -291,6 +291,7 @@ export default function FindingsPage() {
     setExporting(true);
     try {
       await api.exportFindings({
+        locale,
         format: exportFormat,
         scope: exportScope,
         filters: { severity, status, vulnclass, task, query, sort },

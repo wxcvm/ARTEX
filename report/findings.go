@@ -37,56 +37,61 @@ func findingTitle(f *db.DBFinding) string {
 // FindingsMarkdown combines a batch of findings into a summary report (summary + grouped by severity,
 // each entry with class/status/owning task/evidence/detailed report).
 func FindingsMarkdown(fs []*db.DBFinding, generatedAt time.Time) string {
+	return FindingsMarkdownLocalized(fs, generatedAt, "en")
+}
+
+func FindingsMarkdownLocalized(fs []*db.DBFinding, generatedAt time.Time, locale string) string {
+	tr := func(zh, en string) string { return reportText(locale, zh, en) }
 	items := append([]*db.DBFinding(nil), fs...)
 	sortFindingsForExport(items)
 
 	var b strings.Builder
-	b.WriteString("# Vulnerability Findings Summary Report\n\n")
-	fmt.Fprintf(&b, "- **Generated at**: %s\n", generatedAt.Format("2006-01-02 15:04:05"))
-	fmt.Fprintf(&b, "- **Total findings**: %d\n\n", len(items))
+	b.WriteString(tr("# 漏洞发现汇总报告\n\n", "# Vulnerability Findings Summary Report\n\n"))
+	fmt.Fprintf(&b, tr("- **生成时间**：%s\n", "- **Generated at**: %s\n"), generatedAt.Format("2006-01-02 15:04:05"))
+	fmt.Fprintf(&b, tr("- **发现总数**：%d\n\n", "- **Total findings**: %d\n\n"), len(items))
 
 	// Summary: counts per severity.
 	counts := map[string]int{}
 	for _, f := range items {
 		counts[f.Severity]++
 	}
-	b.WriteString("## Summary\n\n")
-	b.WriteString("| Severity | Count |\n| --- | --- |\n")
+	b.WriteString(tr("## 摘要\n\n", "## Summary\n\n"))
+	b.WriteString(tr("| 严重程度 | 数量 |\n| --- | --- |\n", "| Severity | Count |\n| --- | --- |\n"))
 	for _, s := range []struct{ key, label string }{
 		{"critical", "Critical"}, {"high", "High"}, {"medium", "Medium"}, {"low", "Low"},
 	} {
-		fmt.Fprintf(&b, "| %s | %d |\n", s.label, counts[s.key])
+		fmt.Fprintf(&b, "| %s | %d |\n", reportText(locale, reportSeverity(locale, s.key), s.label), counts[s.key])
 	}
 	b.WriteString("\n")
 
 	if len(items) == 0 {
-		b.WriteString("_No matching vulnerabilities._\n")
+		b.WriteString(tr("_没有符合条件的漏洞。_\n", "_No matching vulnerabilities._\n"))
 		return b.String()
 	}
 
-	b.WriteString("## Vulnerability Details\n\n")
+	b.WriteString(tr("## 漏洞详情\n\n", "## Vulnerability Details\n\n"))
 	for i, f := range items {
-		fmt.Fprintf(&b, "### %d. [%s] %s\n\n", i+1, strings.ToUpper(nz(f.Severity, "info")), findingTitle(f))
+		fmt.Fprintf(&b, "### %d. [%s] %s\n\n", i+1, reportSeverity(locale, nz(f.Severity, "info")), nz(f.Name, nz(f.VulnClass, tr("未分类", "Uncategorized"))))
 		if f.VulnClass != "" {
-			fmt.Fprintf(&b, "- **Class**: %s\n", f.VulnClass)
+			fmt.Fprintf(&b, tr("- **类型**：%s\n", "- **Class**: %s\n"), f.VulnClass)
 		}
-		fmt.Fprintf(&b, "- **Status**: %s\n", nz(f.Status, "pending"))
+		fmt.Fprintf(&b, tr("- **状态**：%s\n", "- **Status**: %s\n"), nz(f.Status, "pending"))
 		if desc := strings.TrimSpace(f.TaskDescription); desc != "" {
-			fmt.Fprintf(&b, "- **Task**: %s\n", desc)
+			fmt.Fprintf(&b, tr("- **任务**：%s\n", "- **Task**: %s\n"), desc)
 		}
-		fmt.Fprintf(&b, "- **Found at**: %s\n\n", f.CreatedAt.Format("2006-01-02 15:04:05"))
+		fmt.Fprintf(&b, tr("- **发现时间**：%s\n\n", "- **Found at**: %s\n\n"), f.CreatedAt.Format("2006-01-02 15:04:05"))
 		if s := strings.TrimSpace(f.Summary); s != "" {
 			fmt.Fprintf(&b, "%s\n\n", s)
 		}
 		if e := strings.TrimSpace(f.Evidence); e != "" {
-			fmt.Fprintf(&b, "**Evidence:**\n\n```\n%s\n```\n\n", e)
+			fmt.Fprintf(&b, tr("**证据：**\n\n```\n%s\n```\n\n", "**Evidence:**\n\n```\n%s\n```\n\n"), e)
 		}
 		if rep := strings.TrimSpace(f.Report); rep != "" {
-			b.WriteString("**Detailed report:**\n\n")
+			b.WriteString(tr("**详细报告：**\n\n", "**Detailed report:**\n\n"))
 			b.WriteString(rep)
 			b.WriteString("\n\n")
 		}
-		b.WriteString(findingTrafficMarkdown(f, false))
+		b.WriteString(findingTrafficMarkdownLocalized(f, false, locale))
 		b.WriteString("---\n\n")
 	}
 	return b.String()
@@ -94,30 +99,35 @@ func FindingsMarkdown(fs []*db.DBFinding, generatedAt time.Time) string {
 
 // SingleFindingMarkdown renders a single vulnerability as a standalone Markdown (used for "one file per vulnerability" packaging).
 func SingleFindingMarkdown(f *db.DBFinding, generatedAt time.Time) string {
+	return SingleFindingMarkdownLocalized(f, generatedAt, "en")
+}
+
+func SingleFindingMarkdownLocalized(f *db.DBFinding, generatedAt time.Time, locale string) string {
+	tr := func(zh, en string) string { return reportText(locale, zh, en) }
 	var b strings.Builder
-	fmt.Fprintf(&b, "# [%s] %s\n\n", strings.ToUpper(nz(f.Severity, "info")), findingTitle(f))
+	fmt.Fprintf(&b, "# [%s] %s\n\n", reportSeverity(locale, nz(f.Severity, "info")), nz(f.Name, nz(f.VulnClass, tr("未分类", "Uncategorized"))))
 	if f.VulnClass != "" {
-		fmt.Fprintf(&b, "- **Class**: %s\n", f.VulnClass)
+		fmt.Fprintf(&b, tr("- **类型**：%s\n", "- **Class**: %s\n"), f.VulnClass)
 	}
-	fmt.Fprintf(&b, "- **Severity**: %s\n", nz(f.Severity, "info"))
-	fmt.Fprintf(&b, "- **Status**: %s\n", nz(f.Status, "pending"))
+	fmt.Fprintf(&b, tr("- **严重程度**：%s\n", "- **Severity**: %s\n"), nz(f.Severity, "info"))
+	fmt.Fprintf(&b, tr("- **状态**：%s\n", "- **Status**: %s\n"), nz(f.Status, "pending"))
 	if desc := strings.TrimSpace(f.TaskDescription); desc != "" {
-		fmt.Fprintf(&b, "- **Task**: %s\n", desc)
+		fmt.Fprintf(&b, tr("- **任务**：%s\n", "- **Task**: %s\n"), desc)
 	}
-	fmt.Fprintf(&b, "- **Found at**: %s\n", f.CreatedAt.Format("2006-01-02 15:04:05"))
-	fmt.Fprintf(&b, "- **Generated at**: %s\n\n", generatedAt.Format("2006-01-02 15:04:05"))
+	fmt.Fprintf(&b, tr("- **发现时间**：%s\n", "- **Found at**: %s\n"), f.CreatedAt.Format("2006-01-02 15:04:05"))
+	fmt.Fprintf(&b, tr("- **生成时间**：%s\n\n", "- **Generated at**: %s\n\n"), generatedAt.Format("2006-01-02 15:04:05"))
 	if s := strings.TrimSpace(f.Summary); s != "" {
-		fmt.Fprintf(&b, "## Summary\n\n%s\n\n", s)
+		fmt.Fprintf(&b, tr("## 摘要\n\n%s\n\n", "## Summary\n\n%s\n\n"), s)
 	}
 	if e := strings.TrimSpace(f.Evidence); e != "" {
-		fmt.Fprintf(&b, "## Evidence\n\n```\n%s\n```\n\n", e)
+		fmt.Fprintf(&b, tr("## 证据\n\n```\n%s\n```\n\n", "## Evidence\n\n```\n%s\n```\n\n"), e)
 	}
 	if rep := strings.TrimSpace(f.Report); rep != "" {
-		b.WriteString("## Detailed Report\n\n")
+		b.WriteString(tr("## 详细报告\n\n", "## Detailed Report\n\n"))
 		b.WriteString(rep)
 		b.WriteString("\n")
 	}
-	b.WriteString(findingTrafficMarkdown(f, true))
+	b.WriteString(findingTrafficMarkdownLocalized(f, true, locale))
 	return b.String()
 }
 
@@ -194,23 +204,28 @@ func findingTrafficIDs(f *db.DBFinding) string {
 }
 
 func findingTrafficMarkdown(f *db.DBFinding, attachments bool) string {
+	return findingTrafficMarkdownLocalized(f, attachments, "en")
+}
+
+func findingTrafficMarkdownLocalized(f *db.DBFinding, attachments bool, locale string) string {
+	tr := func(zh, en string) string { return reportText(locale, zh, en) }
 	stale := f.Report != "" && f.EvidenceVersion != f.ReportEvidenceVersion
 	if len(f.TrafficBindings) == 0 && !stale {
 		return ""
 	}
 	var out strings.Builder
-	out.WriteString("\n## Related Traffic Evidence\n\n")
-	fmt.Fprintf(&out, "Evidence version: %d; bindings: %d.\n\n", f.EvidenceVersion, len(f.TrafficBindings))
+	out.WriteString(tr("\n## 关联流量证据\n\n", "\n## Related Traffic Evidence\n\n"))
+	fmt.Fprintf(&out, tr("证据版本：%d；关联数量：%d。\n\n", "Evidence version: %d; bindings: %d.\n\n"), f.EvidenceVersion, len(f.TrafficBindings))
 	if stale {
-		out.WriteString("The evidence has changed; the detailed report needs updating.\n\n")
+		out.WriteString(tr("证据已变更，详细报告需要更新。\n\n", "The evidence has changed; the detailed report needs updating.\n\n"))
 	}
 	for i, b := range f.TrafficBindings {
-		fmt.Fprintf(&out, "%d. **Evidence #%d · %s** — `%s %s`, status %d\n", i+1, b.ID, b.Role, b.Snapshot.Method, strings.ReplaceAll(b.Snapshot.URL, "`", "%60"), b.Snapshot.Status)
+		fmt.Fprintf(&out, tr("%d. **证据 #%d · %s** — `%s %s`，状态码 %d\n", "%d. **Evidence #%d · %s** — `%s %s`, status %d\n"), i+1, b.ID, b.Role, b.Snapshot.Method, strings.ReplaceAll(b.Snapshot.URL, "`", "%60"), b.Snapshot.Status)
 		if b.Note != "" {
 			fmt.Fprintf(&out, "   %s\n", strings.ReplaceAll(b.Note, "\n", "\n   "))
 		}
 		if attachments {
-			fmt.Fprintf(&out, "   [Request message](evidence/%d/%d/request.http) · [Response message](evidence/%d/%d/response.http)\n", f.ID, b.ID, f.ID, b.ID)
+			fmt.Fprintf(&out, tr("   [请求报文](evidence/%d/%d/request.http) · [响应报文](evidence/%d/%d/response.http)\n", "   [Request message](evidence/%d/%d/request.http) · [Response message](evidence/%d/%d/response.http)\n"), f.ID, b.ID, f.ID, b.ID)
 		}
 	}
 	out.WriteString("\n")

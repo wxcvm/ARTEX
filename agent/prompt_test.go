@@ -115,3 +115,18 @@ func TestLocalizedStockPromptLanguage(t *testing.T) {
 		t.Fatal("custom language preference was overridden")
 	}
 }
+
+func TestLocalizedRetesterPrompt(t *testing.T) {
+	prev := PromptOverride
+	t.Cleanup(func() { PromptOverride = prev })
+	legacy := strings.Replace(RetesterDefaultPrompt, retesterLanguage, legacyRetesterLanguage, 1)
+	PromptOverride = func(string) (string, bool) { return legacy, true }
+	if got := chatSystem("retester", "/data", "/work"); !strings.Contains(got, retesterLanguage) || strings.Contains(got, legacyRetesterLanguage) {
+		t.Fatal("the runtime retester prompt did not pick up the Chinese default")
+	}
+	custom := legacy + "\nCustom language choice."
+	PromptOverride = func(string) (string, bool) { return custom, true }
+	if got := chatSystem("retester", "/data", "/work"); !strings.HasPrefix(got, custom) {
+		t.Fatal("custom retester prompt was modified")
+	}
+}

@@ -582,11 +582,12 @@ export const api = {
   // sends ids (a finding_id list); scope=filtered sends the current filters (the FindingQuery filter fields); scope=all ignores filters.
   exportFindings: async (opts: {
     format: "md-single" | "md-zip" | "csv" | "json" | "sarif";
+    locale?: "zh-CN" | "en";
     scope: "filtered" | "all" | "selected";
     filters?: Omit<FindingQuery, "page" | "pageSize">;
     ids?: string[];
   }) => {
-    const p = new URLSearchParams({ format: opts.format, scope: opts.scope });
+    const p = new URLSearchParams({ format: opts.format, scope: opts.scope, lang: opts.locale ?? "zh-CN" });
     if (opts.scope === "selected") {
       p.set("ids", (opts.ids ?? []).join(","));
     } else if (opts.scope === "filtered" && opts.filters) {
@@ -884,10 +885,12 @@ export const api = {
     ).then((r) => ({ ...r, deliveries: arr(r.deliveries) }));
   },
   notifyRetryDelivery: (id: number) => post<{ ok: boolean }>(`/notify/deliveries/${id}/retry`),
-  report: async (task?: string) => {
+  report: async (task?: string, locale: "zh-CN" | "en" = "zh-CN") => {
     if (MOCK) return taskOutcomeScenarioReport(task ?? "") ?? mockReport(task);
     const token = getToken();
-    const r = await fetch(`/api/report${tq(task)}`, {
+    const params = new URLSearchParams({ lang: locale });
+    if (task) params.set("task", task);
+    const r = await fetch(`/api/report?${params}`, {
       headers: token ? { Authorization: `Bearer ${token}` } : {},
     });
     if (!r.ok) throw new Error(`report: ${r.status}`);

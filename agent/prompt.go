@@ -33,6 +33,9 @@ func localizedDefaultTemplate(agentKey, tmpl string) string {
 	if tmpl == legacyAssistantPrompt {
 		return DefaultAssistantPrompt
 	}
+	if agentKey == "retester" && tmpl == strings.Replace(RetesterDefaultPrompt, retesterLanguage, legacyRetesterLanguage, 1) {
+		return RetesterDefaultPrompt
+	}
 	if agentKey == "reporter" && tmpl == strings.Replace(ReporterDefaultPrompt, reporterLanguage, legacyReporterLanguage, 1) {
 		return ReporterDefaultPrompt
 	}
