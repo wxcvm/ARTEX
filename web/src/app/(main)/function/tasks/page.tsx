@@ -3089,6 +3089,8 @@ function CreateTaskSheet({
   onCreated: () => void;
   onCategoriesChanged: () => void;
 }) {
+  const locale = useUiLocale();
+  const t = (zh: string, en: string) => uiText(locale, zh, en);
   const [open, setOpen] = React.useState(false);
   const [name, setName] = React.useState("");
   const [categoryID, setCategoryID] = React.useState<number | undefined>(undefined);
@@ -3141,7 +3143,7 @@ function CreateTaskSheet({
       setDescription((prev) => appendUploads(prev, r.attachments));
       setUploadCount((n) => n + r.attachments.length);
     } catch (e) {
-      toast.error("Upload failed: " + (e as Error).message);
+      toast.error(t("上传失败：", "Upload failed: ") + (e as Error).message);
     } finally {
       setUploading(false);
       if (fileInputRef.current) fileInputRef.current.value = ""; // allow re-picking the same file
@@ -3150,11 +3152,11 @@ function CreateTaskSheet({
 
   async function createTask() {
     if (!description.trim() || !goal.trim()) {
-      toast.error("Please fill in the description and goal");
+      toast.error(t("请填写描述和目标", "Please fill in the description and goal"));
       return;
     }
     if (sourceTaskIDs.length > MAX_SOURCE_TASKS) {
-      toast.error(`Link up to ${MAX_SOURCE_TASKS} source tasks`);
+      toast.error(t(`最多关联 ${MAX_SOURCE_TASKS} 个源任务`, `Link up to ${MAX_SOURCE_TASKS} source tasks`));
       return;
     }
     setCreating(true);
@@ -3180,7 +3182,7 @@ function CreateTaskSheet({
           .map((c) => ({ domain: c.domain.trim(), username: c.username.trim(), password: c.password, note: c.note?.trim() ?? "" }))
           .filter((c) => c.domain !== "" && c.username !== ""),
       });
-      toast.success("Task created");
+      toast.success(t("任务已创建", "Task created"));
       setName("");
       setCategoryID(undefined);
       setDescription("");
@@ -3199,7 +3201,7 @@ function CreateTaskSheet({
       setOpen(false);
       onCreated();
     } catch (e) {
-      toast.error("Create failed: " + (e as Error).message);
+      toast.error(t("创建失败：", "Create failed: ") + (e as Error).message);
     } finally {
       setCreating(false);
     }
@@ -3209,7 +3211,7 @@ function CreateTaskSheet({
     <Sheet open={open} onOpenChange={setOpen}>
       <SheetTrigger asChild>
         <Button size="sm">
-          <PlusIcon /> New task
+          <PlusIcon /> {t("新建任务", "New task")}
         </Button>
       </SheetTrigger>
       {/* A 45vw-wide right drawer: full-height and scrollable, so long forms are no longer bound by dialog height. Narrow screens fall back to full width.
@@ -3220,8 +3222,8 @@ function CreateTaskSheet({
         className="w-full! max-w-none! gap-0 p-0 sm:w-[45vw]! sm:max-w-[45vw]!"
       >
         <SheetHeader className="border-b p-6">
-          <SheetTitle>New task</SheetTitle>
-          <SheetDescription>Fill in the test target and goal; advanced parameters can be expanded as needed.</SheetDescription>
+          <SheetTitle>{t("新建任务", "New task")}</SheetTitle>
+          <SheetDescription>{t("填写测试目标及描述，可按需展开高级设置。", "Fill in the test target and goal; advanced parameters can be expanded as needed.")}</SheetDescription>
         </SheetHeader>
 
         <div className="flex-1 overflow-y-auto p-6">
@@ -3243,16 +3245,16 @@ function CreateTaskSheet({
               portalContainer={sheetContentRef}
             />
             <div className="grid gap-2">
-              <Label htmlFor="name">Name (optional)</Label>
+              <Label htmlFor="name">{t("名称（可选）", "Name (optional)")}</Label>
               <Input
                 id="name"
-                placeholder="A recognizable name for the task, e.g. Acme website penetration test"
+                placeholder={t("可辨识的任务名称，例如某网站安全测试", "A recognizable name for the task, e.g. Acme website penetration test")}
                 value={name}
                 onChange={(e) => setName(e.target.value)}
               />
             </div>
             <Field>
-              <FieldLabel htmlFor="task-category">Task category</FieldLabel>
+              <FieldLabel htmlFor="task-category">{t("任务分类", "Task category")}</FieldLabel>
               <CategoryPicker
                 categories={categories}
                 value={categoryID}
@@ -3260,14 +3262,14 @@ function CreateTaskSheet({
                 onCategoryCreated={onCategoriesChanged}
                 portalContainer={sheetContentRef}
               />
-              <FieldDescription>Optional, single category; used for task list filtering and archiving, never affecting agent execution.</FieldDescription>
+              <FieldDescription>{t("可选，仅选一个分类，用于列表筛选与归档，不影响智能体执行。", "Optional, single category; used for task list filtering and archiving, never affecting agent execution.")}</FieldDescription>
             </Field>
             <div className="grid gap-2">
-              <Label htmlFor="description">描述</Label>
+              <Label htmlFor="description">{t("描述", "Description")}</Label>
               <Textarea
                 id="description"
                 className="min-h-32"
-                placeholder="Test target and background, e.g. test the example.com site"
+                placeholder={t("测试目标与背景，例如对 example.com 进行授权安全评估", "Test target and background, e.g. test the example.com site")}
                 value={description}
                 onChange={(e) => setDescription(e.target.value)}
               />
@@ -3288,27 +3290,27 @@ function CreateTaskSheet({
                   disabled={uploading}
                 >
                   {uploading ? <Loader2Icon className="animate-spin" /> : <PaperclipIcon />}
-                  Upload files
+                  {t("上传文件", "Upload files")}
                 </Button>
                 <span className="text-muted-foreground text-xs">
                   {uploadCount > 0
-                    ? `${uploadCount} files uploaded; their absolute paths were appended to the end of the description (editable)`
-                    : "Multi-select; after upload, absolute file paths are appended to the description for the worker to open with Read/Bash"}
+                    ? t(`已上传 ${uploadCount} 个文件，绝对路径已附加到描述末尾（可编辑）`, `${uploadCount} files uploaded; their absolute paths were appended to the description (editable)`)
+                    : t("支持多选；上传后将绝对路径附加到描述，供执行智能体使用 Read/Bash 打开。", "Multi-select; after upload, absolute file paths are appended to the description for the worker to open with Read/Bash")}
                 </span>
               </div>
             </div>
             <div className="grid gap-2">
-              <Label htmlFor="goal">目标</Label>
+              <Label htmlFor="goal">{t("目标", "Goal")}</Label>
               <Textarea
                 id="goal"
                 className="min-h-32"
-                placeholder="What to achieve, e.g. gain admin panel access or server privileges"
+                placeholder={t("期望达成的验证目标，例如确认已修复的问题是否仍然存在", "What to achieve, e.g. gain admin panel access or server privileges")}
                 value={goal}
                 onChange={(e) => setGoal(e.target.value)}
               />
             </div>
             <Field>
-              <FieldLabel htmlFor="source-tasks">Linked tasks</FieldLabel>
+              <FieldLabel htmlFor="source-tasks">{t("关联任务", "Linked tasks")}</FieldLabel>
               <SourceTaskPicker
                 tasks={tasks}
                 value={sourceTaskIDs}
@@ -3316,12 +3318,11 @@ function CreateTaskSheet({
                 portalContainer={sheetContentRef}
               />
               <FieldDescription>
-                Link up to {MAX_SOURCE_TASKS}{" "}
-                tasks. Live, read-only inheritance of the selected tasks' persistent blackboards, asset scope, and related traffic; the new task writes to its own blackboard.
+                {t(`最多关联 ${MAX_SOURCE_TASKS} 个任务。实时只读继承选中任务的持久黑板、资产范围与关联流量；新任务写入自己的黑板。`, `Link up to ${MAX_SOURCE_TASKS} tasks. Live read-only inheritance of persistent blackboards, asset scope and related traffic; the new task writes to its own blackboard.`)}
               </FieldDescription>
             </Field>
             <Field>
-              <FieldLabel htmlFor="task-companies">Linked company asset scope</FieldLabel>
+              <FieldLabel htmlFor="task-companies">{t("关联企业资产范围", "Linked company asset scope")}</FieldLabel>
               <CompanyPicker
                 companies={companies}
                 value={companyIDs}
@@ -3329,19 +3330,18 @@ function CreateTaskSheet({
                 portalContainer={sheetContentRef}
               />
               <FieldDescription>
-                On task creation, the selected companies' current assets are added to "Test assets", and their domains, IPs, CIDRs, ICPs, and company keywords are provided to the agent
-                as scope context; no intents are generated automatically and execution goals are not forced to change.
+                {t("创建任务时，将选中企业的当前资产加入测试资产，并向智能体提供域名、IP、CIDR、ICP备案及企业关键词作为范围上下文；不会自动生成意图，也不会强制改变执行目标。", "On creation, the selected companies' assets are added to Test assets; domains, IPs, CIDRs, ICPs and keywords become scope context. No intents are generated automatically and execution goals are unchanged.")}
               </FieldDescription>
             </Field>
             <Field>
-              <FieldLabel htmlFor="task-intercept-rules">Task-level asset intercept / allow rules (optional)</FieldLabel>
+              <FieldLabel htmlFor="task-intercept-rules">{t("任务级资产拦截 / 允许规则（可选）", "Task-level asset intercept / allow rules (optional)")}</FieldLabel>
               <AssetInterceptRulesEditor value={interceptRules} onChange={setInterceptRules} />
               <FieldDescription>
-                Applies to this task only and is not written to global rules. Evaluation order: "Block" rules (including global ones) match first, and a hit forbids testing; with no hit and "Allow" rules configured for this task, an asset must match an allow rule to be permitted, otherwise testing is likewise forbidden; with no allow rules configured, no whitelist is active.
+                {t("仅对当前任务生效，不写入全局规则。先匹配阻止规则（含全局规则），命中即禁止测试；未命中且配置了允许规则时，必须匹配允许规则才可测试；未设置允许规则则不启用白名单。", "Applies only to this task, not global rules. Block rules (including global ones) are evaluated first; a hit forbids testing. If no block matches and allow rules exist, the asset must match one. Without allow rules, no allowlist is active.")}
               </FieldDescription>
             </Field>
             <Field>
-              <FieldLabel htmlFor="llm-profiles">LLM config chain</FieldLabel>
+              <FieldLabel htmlFor="llm-profiles">{t("模型配置链", "LLM config chain")}</FieldLabel>
               <TaskLLMProfileChain
                 profiles={profiles}
                 value={llmProfileIDs}
@@ -3349,25 +3349,25 @@ function CreateTaskSheet({
                 inputId="llm-profiles"
                 portalContainer={sheetContentRef}
               />
-              <FieldDescription>Failover follows the list order; the first entry is the current config, and the next one is used only when the quota is clearly insufficient.</FieldDescription>
+              <FieldDescription>{t("故障切换按列表顺序进行，首项为当前配置，仅在明确额度不足时使用下一项。", "Failover follows the list order; the first entry is the current config, and the next one is used only when the quota is clearly insufficient.")}</FieldDescription>
             </Field>
             <Field>
-              <FieldLabel htmlFor="task-credentials">Test accounts (optional)</FieldLabel>
+              <FieldLabel htmlFor="task-credentials">{t("测试账号（可选）", "Test accounts (optional)")}</FieldLabel>
               <div className="grid gap-2">
                 {credentials.map((c, i) => (
                   <div key={i} className="grid gap-2 sm:grid-cols-[1fr_1fr_1fr_auto]">
                     <Input
-                      placeholder="domain (e.g. target.example.com)"
+                      placeholder={t("域名（例如 target.example.com）", "domain (e.g. target.example.com)")}
                       value={c.domain}
                       onChange={(e) => setCredentials((prev) => prev.map((x, j) => (j === i ? { ...x, domain: e.target.value } : x)))}
                     />
                     <Input
-                      placeholder="email or username"
+                      placeholder={t("邮箱或用户名", "email or username")}
                       value={c.username}
                       onChange={(e) => setCredentials((prev) => prev.map((x, j) => (j === i ? { ...x, username: e.target.value } : x)))}
                     />
                     <Input
-                      placeholder="password (empty = agent generates)"
+                      placeholder={t("密码（留空由智能体生成）", "password (empty = agent generates)")}
                       value={c.password}
                       onChange={(e) => setCredentials((prev) => prev.map((x, j) => (j === i ? { ...x, password: e.target.value } : x)))}
                     />
@@ -3375,14 +3375,14 @@ function CreateTaskSheet({
                       type="button"
                       variant="ghost"
                       size="icon"
-                      aria-label="Remove account"
+                      aria-label={t("移除账号", "Remove account")}
                       onClick={() => setCredentials((prev) => prev.filter((_, j) => j !== i))}
                     >
                       <TrashIcon />
                     </Button>
                     <Input
                       className="sm:col-span-4"
-                      placeholder="note (optional, e.g. program alias account)"
+                      placeholder={t("备注（可选，例如项目别名账号）", "note (optional, e.g. program alias account)")}
                       value={c.note ?? ""}
                       onChange={(e) => setCredentials((prev) => prev.map((x, j) => (j === i ? { ...x, note: e.target.value } : x)))}
                     />
@@ -3395,13 +3395,11 @@ function CreateTaskSheet({
                   className="w-fit"
                   onClick={() => setCredentials((prev) => [...prev, { domain: "", username: "", password: "", note: "" }])}
                 >
-                  <PlusIcon className="size-4" /> Add account
+                  <PlusIcon className="size-4" /> {t("添加账号", "Add account")}
                 </Button>
               </div>
               <FieldDescription>
-                Test accounts reused by the agent for authenticated testing. Leave the password empty to have the agent register that
-                account itself and record the password it chose. Use dedicated test accounts only — anything declared here is sent to
-                the configured LLM provider during the task.
+                {t("智能体复用测试账号进行认证测试。密码留空时，由智能体注册并记录生成的密码。仅使用专用测试账号；此处声明的信息会在任务中发送给已配置的模型服务。", "Agents reuse these accounts for authenticated testing. Leave the password empty to let the agent register the account and record its password. Use dedicated test accounts only; declared information is sent to the configured LLM provider during the task.")}
               </FieldDescription>
             </Field>
 
@@ -3409,39 +3407,38 @@ function CreateTaskSheet({
             <Collapsible>
               <CollapsibleTrigger className="group flex w-full items-center gap-2 border-t pt-4 text-sm font-medium">
                 <ChevronRightIcon className="text-muted-foreground size-4 transition-transform group-data-[state=open]:rotate-90" />
-                Advanced settings
-                <span className="text-muted-foreground ml-auto text-xs font-normal">Timeout · Heartbeat · First intent</span>
+                {t("高级设置", "Advanced settings")}
+                <span className="text-muted-foreground ml-auto text-xs font-normal">{t("超时 · 心跳 · 首个意图", "Timeout · Heartbeat · First intent")}</span>
               </CollapsibleTrigger>
               <CollapsibleContent className="grid gap-5 pt-5">
                 <div className="grid gap-2">
-                  <Label htmlFor="timeout-min">Task timeout (minutes, optional)</Label>
+                  <Label htmlFor="timeout-min">{t("任务超时（分钟，可选）", "Task timeout (minutes, optional)")}</Label>
                   <Input
                     id="timeout-min"
                     type="number"
                     min={0}
                     className="w-40"
-                    placeholder="Empty = no limit"
+                    placeholder={t("留空不限时", "Empty = no limit")}
                     value={timeoutMin}
                     onChange={(e) => setTimeoutMin(e.target.value)}
                   />
                   <p className="text-muted-foreground text-xs">
-                    When the time is up, a graceful wind-down is triggered (each agent writes back + the planner makes the final verdict) and the task enters the timeout terminal state.
+                    {t("到达时限后，触发平稳收尾（各智能体回写，规划器作最终判定），任务进入超时终态。", "When the time is up, a graceful wind-down is triggered (each agent writes back + the planner makes the final verdict) and the task enters the timeout terminal state.")}
                   </p>
                 </div>
                 <div className="grid gap-2">
-                  <Label htmlFor="heartbeat-min">planner heartbeat (minutes)</Label>
+                  <Label htmlFor="heartbeat-min">{t("规划器心跳（分钟）", "planner heartbeat (minutes)")}</Label>
                   <Input
                     id="heartbeat-min"
                     type="number"
                     min={10}
                     className="w-40"
-                    placeholder="Default 10"
+                    placeholder={t("默认 10", "Default 10")}
                     value={heartbeatMin}
                     onChange={(e) => setHeartbeatMin(e.target.value)}
                   />
                   <p className="text-muted-foreground text-xs">
-                    When this much time has passed since the last planning round ended or the task started, with no
-                    triggers in between, a planning round fires automatically (deadlock backstop + wakes supervision of running workers). Minimum 10 minutes.
+                    {t("距离上次规划结束或任务启动达到此时长且期间无触发时，自动发起一轮规划（防止死锁并唤醒对运行中智能体的监督）。最小 10 分钟。", "After this interval with no trigger since the previous planning round or task start, another planning round starts automatically (deadlock backstop and worker supervision). Minimum 10 minutes.")}
                   </p>
                 </div>
                 <div className="grid gap-2">
@@ -3451,11 +3448,10 @@ function CreateTaskSheet({
                       checked={seedFirstIntent}
                       onCheckedChange={(v) => setSeedFirstIntent(!!v)}
                     />
-                    Dispatch the first intent directly (description + goal)
+                    {t("直接派发首个意图（描述 + 目标）", "Dispatch the first intent directly (description + goal)")}
                   </label>
                   <p className="text-muted-foreground text-xs">
-                    When enabled, the "description + goal" is dispatched as one intent right at creation; the worker starts without waiting for the first planning round and the planner
-                    takes over afterwards to judge/follow up. Recommended for settings like CTF where one run usually solves it directly; disabled follows the standard plan-then-execute flow.
+                    {t("开启后，创建时将描述和目标作为一个意图直接派发，执行智能体无需等待首轮规划；规划器随后进行判定与跟进。适用于通常单轮即可完成的测试场景（如 CTF）；关闭则使用先规划后执行的标准流程。", "Dispatch the description and goal as one intent at creation; the worker starts before the first planning round and the planner follows up. Useful for single-run scenarios such as CTF; off uses standard plan-then-execute.")}
                   </p>
                 </div>
                 <div className="grid gap-2">
@@ -3465,11 +3461,10 @@ function CreateTaskSheet({
                       checked={coverageEnabled}
                       onCheckedChange={(v) => setCoverageEnabled(!!v)}
                     />
-                    Asset coverage feature
+                    {t("资产覆盖功能", "Asset coverage feature")}
                   </label>
                   <p className="text-muted-foreground text-xs">
-                    On by default: computes and displays test coverage, shows testing progress on the situational graph, and automatically accumulates the test scope. When off, coverage is no longer computed or displayed,
-                    the situational graph shows assets without progress, and agents no longer receive scope-related tools. Disabling does not affect "Linked company asset scope".
+                    {t("默认开启：计算并展示测试覆盖率，在态势图谱展示测试进展，自动积累测试范围。关闭后不再计算或展示覆盖率，图谱仅显示资产，智能体不再获得范围相关工具。不影响关联企业资产范围。", "On by default: computes and displays coverage, shows progress on the situational graph and accumulates scope. Off disables coverage, shows assets without progress, and removes scope tools from agents. Linked company scope is unaffected.")}
                   </p>
                 </div>
               </CollapsibleContent>
@@ -3479,11 +3474,11 @@ function CreateTaskSheet({
 
         <SheetFooter className="flex-row justify-end gap-2 border-t p-4">
           <SheetClose asChild>
-            <Button variant="outline">取消</Button>
+            <Button variant="outline">{t("取消", "Cancel")}</Button>
           </SheetClose>
           <Button onClick={createTask} disabled={creating || uploading}>
             {creating && <Spinner data-icon="inline-start" />}
-            {creating ? "Creating" : "Create"}
+            {creating ? t("正在创建", "Creating") : t("创建", "Create")}
           </Button>
         </SheetFooter>
       </SheetContent>
