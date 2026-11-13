@@ -405,13 +405,13 @@ export default function SkillsPage() {
     setUploading(true);
     try {
       const r = await api.uploadSkill(file, overwrite);
-      toast.success(`已安装技能：${r.name}（${r.files} 个文件）`);
+      toast.success(tr(`已安装技能：${r.name}（${r.files} 个文件）`, `Installed skill: ${r.name} (${r.files} files)`));
       load();
     } catch (e) {
       const msg = (e as Error).message;
       // offer overwrite when the skill already exists
       if (!overwrite && msg.includes("already exists")) {
-        if (window.confirm(`${msg}\n\n是否覆盖同名技能？`)) {
+        if (window.confirm(`${msg}\n\n${tr("是否覆盖同名技能？", "Overwrite the skill with the same name?")}`)) {
           await uploadZip(file, true);
           return;
         }
@@ -512,11 +512,11 @@ export default function SkillsPage() {
     try {
       if (c.kind === "dir") {
         await api.createSkillDir(c.skill, fullPath);
-        toast.success(`已创建文件夹：${fullPath}`);
+        toast.success(tr(`已创建文件夹：${fullPath}`, `Created folder: ${fullPath}`));
         ensureExpanded(c.skill, fullPath);
       } else {
         await api.writeSkillFile(c.skill, fullPath, "");
-        toast.success(`已创建文件：${fullPath}`);
+        toast.success(tr(`已创建文件：${fullPath}`, `Created file: ${fullPath}`));
         setSelected({ skill: c.skill, path: fullPath });
         ensureExpanded(c.skill, c.inDir);
       }
@@ -535,7 +535,7 @@ export default function SkillsPage() {
   async function deletePath(skill: string, path: string) {
     try {
       await api.deleteSkillPath(skill, path);
-      toast.success(`已删除：${path}`);
+      toast.success(tr(`已删除：${path}`, `Deleted: ${path}`));
       if (selected?.skill === skill && selected.path === path) setSelected(null);
       load();
     } catch (e) {
@@ -546,7 +546,7 @@ export default function SkillsPage() {
   async function deleteSkill(name: string) {
     try {
       await api.deleteSkill(name);
-      toast.success(`已删除技能：${name}`);
+      toast.success(tr(`已删除技能：${name}`, `Deleted skill: ${name}`));
       if (selected?.skill === name) setSelected(null);
       load();
     } catch (e) {
@@ -769,7 +769,7 @@ export default function SkillsPage() {
                     key={m.skill}
                     type="button"
                     onClick={() => draftMissingSkill(m.skill)}
-                    title={`为 ${m.skill} 创建草稿`}
+                    title={tr(`为 ${m.skill} 创建草稿`, `Create draft for ${m.skill}`)}
                     className="flex w-full items-center gap-2 rounded px-1 py-1 text-left text-sm hover:bg-muted"
                   >
                     <code className="min-w-0 flex-1 truncate font-mono text-xs" title={m.skill}>{m.skill}</code>
@@ -1053,9 +1053,9 @@ export default function SkillsPage() {
         <AlertDialogContent>
           <AlertDialogHeader>
             <AlertDialogTitle>
-              {pendingDelete?.kind === "skill" && `删除技能「${pendingDelete.skill}」？`}
-              {pendingDelete?.kind === "dir" && `删除文件夹「${pendingDelete.path}」？`}
-              {pendingDelete?.kind === "file" && `删除文件「${pendingDelete.path}」？`}
+              {pendingDelete?.kind === "skill" && tr(`删除技能「${pendingDelete.skill}」？`, `Delete skill “${pendingDelete.skill}”?`)}
+              {pendingDelete?.kind === "dir" && tr(`删除文件夹「${pendingDelete.path}」？`, `Delete folder “${pendingDelete.path}”?`)}
+              {pendingDelete?.kind === "file" && tr(`删除文件「${pendingDelete.path}」？`, `Delete file “${pendingDelete.path}”?`)}
             </AlertDialogTitle>
             <AlertDialogDescription>
               {pendingDelete?.kind === "skill"
