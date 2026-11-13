@@ -452,8 +452,8 @@ export default function ToolsPage() {
               <CardTitle>{tr("系统工具", "System tools")}</CardTitle>
               <CardDescription>
                 {query.trim()
-                  ? `${systemTools.length} / ${allSystemCount} matching; click a card to edit the description, parameter defaults and agent bindings`
-                  : `${allSystemCount} total; click a card to edit the description, parameter defaults and agent bindings`}
+                  ? tr(`匹配 ${systemTools.length} / ${allSystemCount} 项；点击卡片编辑说明、参数默认值及智能体绑定`, `${systemTools.length} / ${allSystemCount} matching; click a card to edit the description, parameter defaults and agent bindings`)
+                  : tr(`共 ${allSystemCount} 项；点击卡片编辑说明、参数默认值及智能体绑定`, `${allSystemCount} total; click a card to edit the description, parameter defaults and agent bindings`)}
               </CardDescription>
             </CardHeader>
             <CardContent>
