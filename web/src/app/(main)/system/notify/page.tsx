@@ -31,7 +31,7 @@ import {
   parseKV,
   SEVERITY_OPTIONS,
 } from "./_components/channel-fields";
-import { ConfigField, FilterSummary } from "./_components/channel-form";
+import { ConfigField, FilterSummary, notificationText } from "./_components/channel-form";
 import { DeliveryList } from "./_components/delivery-list";
 import { formatBacklog, StatTile } from "./_components/stat-tile";
 
@@ -400,7 +400,7 @@ export default function NotifyPage() {
                 </CardHeader>
                 <CardContent className="grid gap-3">
                   <div className="flex flex-wrap items-center gap-2">
-                    <Badge variant="outline">{KIND_LABEL[ch.kind] ?? ch.kind}</Badge>
+                    <Badge variant="outline">{notificationText(KIND_LABEL[ch.kind] ?? ch.kind, locale)}</Badge>
                     <Badge variant="outline">{ch.mode === "digest" ? tr("汇总", "Digest") : tr("实时", "Realtime")}</Badge>
                     {!ch.enabled && <Badge variant="outline">{tr("已停用", "Disabled")}</Badge>}
                   </div>
@@ -421,7 +421,7 @@ export default function NotifyPage() {
           <SheetHeader>
             <SheetTitle>{editing ? editing.name : tr("添加通知渠道", "Add notification channel")}</SheetTitle>
             <SheetDescription>
-              {KIND_LABEL[form.kind] ?? form.kind}
+              {notificationText(KIND_LABEL[form.kind] ?? form.kind, locale)}
               {defaultRate > 0 ? tr(` · 默认限流 ${defaultRate} 条/分钟`, ` · Default ${defaultRate}/min`) : tr(" · 不限流", " · Unlimited")}
             </SheetDescription>
           </SheetHeader>
@@ -444,7 +444,7 @@ export default function NotifyPage() {
                   <SelectContent>
                     {(meta?.kinds ?? []).map((k) => (
                       <SelectItem key={k.kind} value={k.kind}>
-                        {KIND_LABEL[k.kind] ?? k.kind}
+                        {notificationText(KIND_LABEL[k.kind] ?? k.kind, locale)}
                       </SelectItem>
                     ))}
                   </SelectContent>
@@ -528,7 +528,7 @@ export default function NotifyPage() {
                       <SelectContent>
                         {SEVERITY_OPTIONS.map((o) => (
                           <SelectItem key={o.value || "all"} value={o.value || "all"}>
-                            {o.label}
+                            {notificationText(o.label, locale)}
                           </SelectItem>
                         ))}
                       </SelectContent>

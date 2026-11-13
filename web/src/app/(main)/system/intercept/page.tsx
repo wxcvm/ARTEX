@@ -1,5 +1,9 @@
 "use client";
 
+import { useUiLocale } from "@/lib/ui-locale.client";
+import { uiText } from "@/lib/ui-locale";
+
+
 import * as React from "react";
 import { toast } from "sonner";
 import {
@@ -175,9 +179,11 @@ const defaultForm = (): RuleForm => ({
 // ---- small components ----
 
 function ActionBadge({ action }: { action: InterceptAction }) {
-  if (action === "allow") return <Badge variant="secondary">允许</Badge>;
-  if (action === "deny")  return <Badge variant="destructive">阻止</Badge>;
-  return <Badge variant="outline" className="border-amber-400 text-amber-600">询问</Badge>;
+  const locale = useUiLocale();
+  const tr = (zh: string, en: string) => uiText(locale, zh, en);
+  if (action === "allow") return <Badge variant="secondary">{tr("允许", "Allow")}</Badge>;
+  if (action === "deny")  return <Badge variant="destructive">{tr("阻止", "Deny")}</Badge>;
+  return <Badge variant="outline" className="border-amber-400 text-amber-600">{tr("询问", "Ask")}</Badge>;
 }
 
 function Field({ label, children }: { label: string; children: React.ReactNode }) {
@@ -206,6 +212,8 @@ const defaultJudge = (): JudgeConfig => ({
 });
 
 function JudgeCard() {
+  const locale = useUiLocale();
+  const tr = (zh: string, en: string) => uiText(locale, zh, en);
   const [cfg, setCfg] = React.useState<JudgeConfig>(defaultJudge());
   const [profiles, setProfiles] = React.useState<LLMProfile[]>([]);
   const [loading, setLoading] = React.useState(true);
@@ -228,7 +236,7 @@ function JudgeCard() {
       setCfg(j);
       setProfiles(ps);
     } catch (e) {
-      toast.error("加载模型兜底配置失败：" + (e as Error).message);
+      toast.error(tr("加载模型兜底配置失败：", "Failed to load fallback configuration: ") + (e as Error).message);
     } finally {
       setLoading(false);
     }
@@ -251,10 +259,10 @@ function JudgeCard() {
     setSaving(true);
     try {
       await api.interceptSetJudgeConfig(cfg);
-      toast.success("已保存模型兜底配置");
+      toast.success(tr("已保存模型兜底配置", "Fallback configuration saved"));
       await load(); // read back: if the prompt was cleared, the built-in template is refilled
     } catch (e) {
-      toast.error("保存失败：" + (e as Error).message);
+      toast.error(tr("保存失败：", "Save failed: ") + (e as Error).message);
     } finally {
       setSaving(false);
     }
@@ -267,9 +275,9 @@ function JudgeCard() {
       await api.interceptSetJudgeConfig({ ...cfg, prompt: "" });
       const j = await api.interceptGetJudgeConfig();
       setCfg(j);
-      toast.success("已恢复内置默认模板");
+      toast.success(tr("已恢复内置默认模板", "Built-in template restored"));
     } catch (e) {
-      toast.error("恢复失败：" + (e as Error).message);
+      toast.error(tr("恢复失败：", "Restore failed: ") + (e as Error).message);
     } finally {
       setSaving(false);
     }
@@ -286,9 +294,9 @@ function JudgeCard() {
         <div className="flex items-center gap-2.5">
           <BotIcon className={`h-5 w-5 shrink-0 ${cfg.enabled ? "text-violet-600" : "text-muted-foreground"}`} />
           <div>
-            <p className="text-sm font-semibold leading-tight">模型兜底审批</p>
+            <p className="text-sm font-semibold leading-tight">{tr("模型兜底审批", "Model fallback approval")}</p>
             <p className="text-xs text-muted-foreground mt-0.5">
-              仅在<span className="font-medium text-foreground">拦截范围</span>内且<span className="font-medium text-foreground">未匹配拦截规则</span>的命令，由模型进行语义判断（允许 / 转人工审批 / 阻止）
+              仅在<span className="font-medium text-foreground">{tr("拦截范围", "Interception scope")}</span>内且<span className="font-medium text-foreground">未匹配拦截规则</span>的命令，由模型进行语义判断（允许 / 转人工审批 / 阻止）
             </p>
           </div>
         </div>
@@ -304,26 +312,26 @@ function JudgeCard() {
           <CardContent className="p-4">
             <div className="mb-3 flex items-center justify-between">
               <div>
-                <p className="text-sm font-medium">审批 Token 用量</p>
+                <p className="text-sm font-medium">{tr("审批 Token 用量", "Approval token usage")}</p>
                 <p className="text-xs text-muted-foreground">
-                  模型兜底审批累计用量，独立统计（worker=judge），不计入各模型配置统计
+                  {tr("模型兜底审批累计用量，独立统计（worker=judge），不计入各模型配置统计", "Cumulative fallback review usage (worker=judge), tracked separately from model profiles")}
                 </p>
               </div>
               <Button variant="ghost" size="sm" className="h-7 text-xs" onClick={loadUsage}>
-                刷新
+                {tr("刷新", "Refresh")}
               </Button>
             </div>
             <div className="grid grid-cols-2 gap-3 sm:grid-cols-5">
-              <JudgeStat label="审批调用" value={usage.calls.toLocaleString()} />
-              <JudgeStat label="输入 Token" value={fmtTokens(usage.input_tokens)} />
-              <JudgeStat label="输出 Token" value={fmtTokens(usage.output_tokens)} />
-              <JudgeStat label="缓存读取" value={fmtTokens(usage.cache_read_tokens)} />
-              <JudgeStat label="缓存写入" value={fmtTokens(usage.cache_write_tokens)} />
+              <JudgeStat label={tr("审批调用", "Review calls")} value={usage.calls.toLocaleString()} />
+              <JudgeStat label={tr("输入 Token", "Input tokens")} value={fmtTokens(usage.input_tokens)} />
+              <JudgeStat label={tr("输出 Token", "Output tokens")} value={fmtTokens(usage.output_tokens)} />
+              <JudgeStat label={tr("缓存读取", "Cache read")} value={fmtTokens(usage.cache_read_tokens)} />
+              <JudgeStat label={tr("缓存写入", "Cache write")} value={fmtTokens(usage.cache_write_tokens)} />
             </div>
             {usage.daily.length > 0 && (
               <div className="mt-4">
                 <p className="mb-2 text-[10px] uppercase tracking-wider text-muted-foreground">
-                  最近 30 天每日用量（输入 + 输出）
+                  {tr("最近 30 天每日用量（输入 + 输出）", "Daily usage over 30 days (input + output)")}
                 </p>
                 <JudgeSparkbars daily={usage.daily} />
               </div>
@@ -339,18 +347,18 @@ function JudgeCard() {
             <CardContent className="flex h-full flex-col gap-2 p-4">
               <div className="flex items-center justify-between">
                 <div>
-                  <p className="text-sm font-medium">审批提示词</p>
-                  <p className="text-xs text-muted-foreground">模型依据此提示词决定 ALLOW / ASK / DENY，可直接编辑</p>
+                  <p className="text-sm font-medium">{tr("审批提示词", "Review prompt")}</p>
+                  <p className="text-xs text-muted-foreground">{tr("模型依据此提示词决定 ALLOW / ASK / DENY，可直接编辑", "The model uses this prompt to decide ALLOW / ASK / DENY; edit it directly")}</p>
                 </div>
                 <Button variant="ghost" size="sm" className="h-7 text-xs" onClick={restorePrompt} disabled={saving}>
-                  恢复默认模板
+                  {tr("恢复默认模板", "Restore default template")}
                 </Button>
               </div>
               <Textarea
                 className="min-h-[22rem] flex-1 resize-none font-mono text-xs leading-relaxed"
                 value={cfg.prompt}
                 onChange={(e) => patch({ prompt: e.target.value })}
-                placeholder="留空使用内置模板"
+                placeholder={tr("留空使用内置模板", "Empty uses the built-in template")}
                 spellCheck={false}
               />
               <p className="text-right text-[11px] text-muted-foreground">{cfg.prompt.length} chars</p>
@@ -361,12 +369,12 @@ function JudgeCard() {
           <Card className="lg:col-span-2">
             <CardContent className="space-y-5 p-4">
               <div className="space-y-4">
-                <p className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">审批模型与策略</p>
-                <Field label="审批模型">
+                <p className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">{tr("审批模型与策略", "Review model and policy")}</p>
+                <Field label={tr("审批模型", "Review model")}>
                   <Select value={String(cfg.profile_id || 0)} onValueChange={(v) => patch({ profile_id: Number(v) })}>
                     <SelectTrigger><SelectValue /></SelectTrigger>
                     <SelectContent>
-                      <SelectItem value={FOLLOW_ACTIVE}>跟随当前配置</SelectItem>
+                      <SelectItem value={FOLLOW_ACTIVE}>{tr("跟随当前配置", "Follow active configuration")}</SelectItem>
                       {profiles.map((p) => (
                         <SelectItem key={p.id} value={p.id}>
                           {p.name} ({p.model})
@@ -375,7 +383,7 @@ function JudgeCard() {
                     </SelectContent>
                   </Select>
                 </Field>
-                <Field label="模型审批超时（秒）">
+                <Field label={tr("模型审批超时（秒）", "Model review timeout (seconds)")}>
                   <Input
                     type="number"
                     min={1}
@@ -386,13 +394,13 @@ function JudgeCard() {
                     }}
                   />
                 </Field>
-                <Field label="模型失败时（错误 / 超时 / 无法解析）">
+                <Field label={tr("模型失败时（错误 / 超时 / 无法解析）", "On model failure (error / timeout / parse failure)")}>
                   <Select value={cfg.fail_action} onValueChange={(v) => patch({ fail_action: v as JudgeConfig["fail_action"] })}>
                     <SelectTrigger><SelectValue /></SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="allow">允许</SelectItem>
-                      <SelectItem value="ask">转人工审批</SelectItem>
-                      <SelectItem value="deny">阻止</SelectItem>
+                      <SelectItem value="allow">{tr("允许", "Allow")}</SelectItem>
+                      <SelectItem value="ask">{tr("转人工审批", "Escalate to human approval")}</SelectItem>
+                      <SelectItem value="deny">{tr("阻止", "Deny")}</SelectItem>
                     </SelectContent>
                   </Select>
                 </Field>
@@ -401,8 +409,8 @@ function JudgeCard() {
               <Separator />
 
               <div className="space-y-4">
-                <p className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">人工审批（模型决定 ask 时）</p>
-                <Field label="审批等待超时（秒）">
+                <p className="text-[10px] font-semibold uppercase tracking-wider text-muted-foreground">{tr("人工审批（模型决定 ask 时）", "Human approval (when model decides ask)")}</p>
+                <Field label={tr("审批等待超时（秒）", "Approval wait timeout (seconds)")}>
                   <Input
                     type="number"
                     min={5}
@@ -413,12 +421,12 @@ function JudgeCard() {
                     }}
                   />
                 </Field>
-                <Field label="超时默认操作">
+                <Field label={tr("超时默认操作", "Default timeout action")}>
                   <Select value={cfg.ask_timeout_action} onValueChange={(v) => patch({ ask_timeout_action: v as JudgeConfig["ask_timeout_action"] })}>
                     <SelectTrigger><SelectValue /></SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="deny">阻止</SelectItem>
-                      <SelectItem value="allow">允许</SelectItem>
+                      <SelectItem value="deny">{tr("阻止", "Deny")}</SelectItem>
+                      <SelectItem value="allow">{tr("允许", "Allow")}</SelectItem>
                     </SelectContent>
                   </Select>
                 </Field>
@@ -430,7 +438,7 @@ function JudgeCard() {
 
       <div className="flex justify-end">
         <Button size="sm" onClick={save} disabled={saving || loading}>
-          {saving ? "正在保存…" : "保存配置"}
+          {saving ? tr("正在保存…", "Saving…") : tr("保存配置", "Save configuration")}
         </Button>
       </div>
     </div>
@@ -440,6 +448,8 @@ function JudgeCard() {
 // ---- page ----
 
 export default function InterceptPage() {
+  const locale = useUiLocale();
+  const tr = (zh: string, en: string) => uiText(locale, zh, en);
   const [rules, setRules]     = React.useState<InterceptRule[]>([]);
   const [loading, setLoading] = React.useState(true);
   const [open, setOpen]       = React.useState(false);
@@ -473,7 +483,7 @@ export default function InterceptPage() {
       const r = await api.interceptRules();
       setRules(r);
     } catch {
-      toast.error("加载拦截规则失败");
+      toast.error(tr("加载拦截规则失败", "Failed to load interception rules"));
     } finally {
       setLoading(false);
     }
@@ -520,17 +530,17 @@ export default function InterceptPage() {
   }
 
   async function handleSave() {
-    if (!form.name.trim())    { toast.error("名称不能为空"); return; }
-    if (!form.pattern.trim()) { toast.error("匹配内容不能为空"); return; }
-    if (regexErr)             { toast.error("正则表达式语法无效"); return; }
+    if (!form.name.trim())    { toast.error(tr("名称不能为空", "Name cannot be empty")); return; }
+    if (!form.pattern.trim()) { toast.error(tr("匹配内容不能为空", "Pattern cannot be empty")); return; }
+    if (regexErr)             { toast.error(tr("正则表达式语法无效", "Invalid regex syntax")); return; }
     setSaving(true);
     try {
       if (editing) {
         await api.updateInterceptRule(editing.id, form);
-        toast.success("规则已更新");
+        toast.success(tr("规则已更新", "Rule updated"));
       } else {
         await api.createInterceptRule(form);
-        toast.success("规则已创建");
+        toast.success(tr("规则已创建", "Rule created"));
       }
       setOpen(false);
       load();
@@ -544,7 +554,7 @@ export default function InterceptPage() {
   async function handleDelete(id: number) {
     try {
       await api.deleteInterceptRule(id);
-      toast.success("规则已删除");
+      toast.success(tr("规则已删除", "Rule deleted"));
       load();
     } catch (e) {
       toast.error((e as Error).message);
@@ -570,7 +580,7 @@ export default function InterceptPage() {
       setAllTools(tools);
       setEnabledTools(new Set(cfg.enabled_tools));
     } catch (e) {
-      toast.error("加载失败：" + (e as Error).message);
+      toast.error(tr("加载失败：", "Load failed: ") + (e as Error).message);
     } finally {
       setScopeLoading(false);
     }
@@ -588,11 +598,11 @@ export default function InterceptPage() {
     setScopeSaving(true);
     try {
       await api.interceptSetToolConfig([...enabledTools]);
-      toast.success("拦截范围已保存");
+      toast.success(tr("拦截范围已保存", "Interception scope saved"));
       setScopeTools([...enabledTools]);
       setScopeOpen(false);
     } catch (e) {
-      toast.error("保存失败：" + (e as Error).message);
+      toast.error(tr("保存失败：", "Save failed: ") + (e as Error).message);
     } finally {
       setScopeSaving(false);
     }
@@ -609,9 +619,9 @@ export default function InterceptPage() {
       <div className="flex items-center gap-2.5">
         <ShieldAlertIcon className="h-5 w-5 shrink-0" />
         <div>
-          <h1 className="text-lg font-semibold leading-tight">命令拦截</h1>
+          <h1 className="text-lg font-semibold leading-tight">{tr("命令拦截", "Command interception")}</h1>
           <p className="text-sm text-muted-foreground mt-0.5">
-            工具执行前匹配拦截规则，未匹配的命令可由模型兜底审批
+            {tr("工具执行前匹配拦截规则，未匹配的命令可由模型兜底审批", "Match rules before tool execution; unmatched commands may receive model fallback review")}
           </p>
         </div>
       </div>
@@ -626,10 +636,10 @@ export default function InterceptPage() {
       >
         <div className="flex min-w-0 items-center gap-2 text-sm">
           <ListFilterIcon className="h-4 w-4 shrink-0 text-muted-foreground" />
-          <span className="shrink-0 font-medium">拦截范围</span>
+          <span className="shrink-0 font-medium">{tr("拦截范围", "Interception scope")}</span>
           {scopeTools.length === 0 ? (
             <span className="text-amber-700 dark:text-amber-500">
-              未启用任何工具，拦截规则和模型兜底均不生效
+              {tr("未启用任何工具，拦截规则和模型兜底均不生效", "No tools enabled; interception rules and model fallback are inactive")}
             </span>
           ) : (
             <>
@@ -647,52 +657,52 @@ export default function InterceptPage() {
           onClick={openScope}
         >
           <ListFilterIcon className="h-4 w-4" />
-          调整范围
+          {tr("调整范围", "Adjust scope")}
         </Button>
       </div>
 
       <Tabs defaultValue="rules" className="flex-1">
         <TabsList>
-          <TabsTrigger value="rules">拦截规则</TabsTrigger>
-          <TabsTrigger value="judge">模型配置</TabsTrigger>
+          <TabsTrigger value="rules">{tr("拦截规则", "Interception rules")}</TabsTrigger>
+          <TabsTrigger value="judge">{tr("模型配置", "Model configuration")}</TabsTrigger>
         </TabsList>
 
         {/* ---- tab: interception rules ---- */}
         <TabsContent value="rules" className="mt-4 flex flex-col gap-4">
           <div className="flex items-center justify-between gap-3">
             <p className="text-xs text-muted-foreground">
-              规则按优先级从高到低依次匹配，首个命中规则生效
+              {tr("规则按优先级从高到低依次匹配，首个命中规则生效", "Rules are evaluated in descending priority; the first match applies")}
             </p>
             <Button onClick={openNew} size="sm" className="shrink-0">
               <PlusIcon className="h-4 w-4" />
-              创建规则
+              {tr("创建规则", "Create rule")}
             </Button>
           </div>
 
           <Card>
             <CardContent className="p-0">
           {loading ? (
-            <p className="p-6 text-sm text-muted-foreground">正在加载…</p>
+            <p className="p-6 text-sm text-muted-foreground">{tr("正在加载…", "Loading…")}</p>
           ) : rules.length === 0 ? (
             <div className="flex flex-col items-center justify-center gap-2 py-16 text-center">
               <ShieldAlertIcon className="h-8 w-8 text-muted-foreground/40" />
-              <p className="text-sm text-muted-foreground">暂无规则</p>
+              <p className="text-sm text-muted-foreground">{tr("暂无规则", "No rules")}</p>
               <Button size="sm" variant="outline" onClick={openNew}>
                 <PlusIcon className="h-4 w-4" />
-                创建第一条规则
+                {tr("创建第一条规则", "Create first rule")}
               </Button>
             </div>
           ) : (
             <Table>
               <TableHeader>
                 <TableRow className="hover:bg-transparent">
-                  <TableHead className="w-[72px]">优先级</TableHead>
-                  <TableHead>名称</TableHead>
-                  <TableHead className="w-[90px]">目标</TableHead>
-                  <TableHead className="w-[80px]">类型</TableHead>
-                  <TableHead>匹配内容</TableHead>
-                  <TableHead className="w-[72px]">策略</TableHead>
-                  <TableHead className="w-[64px] text-center">启用</TableHead>
+                  <TableHead className="w-[72px]">{tr("优先级", "Priority")}</TableHead>
+                  <TableHead>{tr("名称", "Name")}</TableHead>
+                  <TableHead className="w-[90px]">{tr("目标", "Target")}</TableHead>
+                  <TableHead className="w-[80px]">{tr("类型", "Type")}</TableHead>
+                  <TableHead>{tr("匹配内容", "Pattern")}</TableHead>
+                  <TableHead className="w-[72px]">{tr("策略", "Action")}</TableHead>
+                  <TableHead className="w-[64px] text-center">{tr("启用", "Enable")}</TableHead>
                   <TableHead className="w-[80px]" />
                 </TableRow>
               </TableHeader>
@@ -705,7 +715,7 @@ export default function InterceptPage() {
                     <TableCell className="font-medium text-sm">{rule.name}</TableCell>
                     <TableCell>
                       <span className="text-xs text-muted-foreground">
-                        {rule.match_target === "tool_name" ? "工具名称" : "输入内容"}
+                        {rule.match_target === "tool_name" ? tr("工具名称", "Tool name") : tr("输入内容", "Input")}
                       </span>
                     </TableCell>
                     <TableCell>
@@ -763,22 +773,22 @@ export default function InterceptPage() {
       <Sheet open={open} onOpenChange={setOpen}>
         <SheetContent side="right" className="flex flex-col gap-0 p-0 sm:max-w-md">
           <SheetHeader className="border-b px-6 py-4">
-            <SheetTitle>{editing ? "编辑规则" : "创建规则"}</SheetTitle>
+            <SheetTitle>{editing ? tr("编辑规则", "Edit rule") : tr("创建规则", "Create rule")}</SheetTitle>
             <SheetDescription className="text-xs">
-              优先匹配高优先级规则，首个命中后跳过其他规则
+              {tr("优先匹配高优先级规则，首个命中后跳过其他规则", "Higher-priority rules match first; remaining rules are skipped after a match")}
             </SheetDescription>
           </SheetHeader>
 
           <div className="flex-1 min-h-0 overflow-y-auto px-6 py-5 space-y-5">
-            <Field label="Name">
+            <Field label={tr("名称", "Name")}>
               <Input
-                placeholder="输入规则名称"
+                placeholder={tr("输入规则名称", "Enter rule name")}
                 value={form.name}
                 onChange={(e) => set({ name: e.target.value })}
               />
             </Field>
 
-            <Field label="优先级（数值越大越先匹配）">
+            <Field label={tr("优先级（数值越大越先匹配）", "Priority (higher matches first)")}>
               <Input
                 type="number"
                 value={form.priority}
@@ -788,33 +798,33 @@ export default function InterceptPage() {
 
             <Separator />
 
-            <Field label="匹配目标">
+            <Field label={tr("匹配目标", "Match target")}>
               <Select
                 value={form.match_target}
                 onValueChange={(v) => set({ match_target: v as RuleForm["match_target"] })}
               >
                 <SelectTrigger><SelectValue /></SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="tool_name">工具名称（tool_name）</SelectItem>
-                  <SelectItem value="tool_input">输入内容（tool_input JSON）</SelectItem>
+                  <SelectItem value="tool_name">{tr("工具名称（tool_name）", "Tool name (tool_name)")}</SelectItem>
+                  <SelectItem value="tool_input">{tr("输入内容（tool_input JSON）", "Input (tool_input JSON)")}</SelectItem>
                 </SelectContent>
               </Select>
             </Field>
 
-            <Field label="匹配类型">
+            <Field label={tr("匹配类型", "Match type")}>
               <Select
                 value={form.match_type}
                 onValueChange={(v) => set({ match_type: v as RuleForm["match_type"] })}
               >
                 <SelectTrigger><SelectValue /></SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="string">包含字符串</SelectItem>
-                  <SelectItem value="regex">正则表达式</SelectItem>
+                  <SelectItem value="string">{tr("包含字符串", "Contains string")}</SelectItem>
+                  <SelectItem value="regex">{tr("正则表达式", "Regular expression")}</SelectItem>
                 </SelectContent>
               </Select>
             </Field>
 
-            <Field label="Pattern">
+            <Field label={tr("匹配内容", "Pattern")}>
               <Input
                 placeholder={form.match_type === "regex" ? "^Bash$" : "rm -rf"}
                 value={form.pattern}
@@ -831,22 +841,22 @@ export default function InterceptPage() {
 
             <Separator />
 
-            <Field label="拦截策略">
+            <Field label={tr("拦截策略", "Interception action")}>
               <Select
                 value={form.action}
                 onValueChange={(v) => set({ action: v as InterceptAction })}
               >
                 <SelectTrigger><SelectValue /></SelectTrigger>
                 <SelectContent>
-                  <SelectItem value="allow">允许 — 直接放行，跳过剩余规则</SelectItem>
-                  <SelectItem value="deny">阻止 — 拦截并向模型返回拒绝消息</SelectItem>
-                  <SelectItem value="ask">询问用户 — 等待审批</SelectItem>
+                  <SelectItem value="allow">{tr("允许 — 直接放行，跳过剩余规则", "Allow — bypass remaining rules")}</SelectItem>
+                  <SelectItem value="deny">{tr("阻止 — 拦截并向模型返回拒绝消息", "Deny — intercept and return denial to model")}</SelectItem>
+                  <SelectItem value="ask">{tr("询问用户 — 等待审批", "Ask — wait for user approval")}</SelectItem>
                 </SelectContent>
               </Select>
             </Field>
 
             {form.action !== "allow" && (
-              <Field label={form.action === "deny" ? "拒绝消息（返回给模型）" : "审批备注（可选）"}>
+              <Field label={form.action === "deny" ? tr("拒绝消息（返回给模型）", "Denial message (returned to model)") : tr("审批备注（可选）", "Approval note (optional)")}>
                 <Textarea
                   placeholder={form.action === "deny" ? "已被安全策略阻止" : ""}
                   value={form.message}
@@ -862,8 +872,8 @@ export default function InterceptPage() {
                 <Separator />
                 <div className="flex items-center justify-between">
                   <div>
-                    <p className="text-sm font-medium">启用审批超时</p>
-                    <p className="text-xs text-muted-foreground">超时后自动处理，无需继续等待</p>
+                    <p className="text-sm font-medium">{tr("启用审批超时", "Enable approval timeout")}</p>
+                    <p className="text-xs text-muted-foreground">{tr("超时后自动处理，无需继续等待", "Apply the timeout action automatically")}</p>
                   </div>
                   <Switch
                     checked={form.timeout_enabled}
@@ -872,7 +882,7 @@ export default function InterceptPage() {
                 </div>
                 {form.timeout_enabled && (
                   <div className="flex items-end gap-3">
-                    <Field label="超时（秒）">
+                    <Field label={tr("超时（秒）", "Timeout (seconds)")}>
                       <Input
                         type="number"
                         min={5}
@@ -884,15 +894,15 @@ export default function InterceptPage() {
                         }}
                       />
                     </Field>
-                    <Field label="超时操作">
+                    <Field label={tr("超时操作", "Timeout action")}>
                       <Select
                         value={form.timeout_action}
                         onValueChange={(v) => set({ timeout_action: v as "deny" | "allow" })}
                       >
                         <SelectTrigger className="w-32"><SelectValue /></SelectTrigger>
                         <SelectContent>
-                          <SelectItem value="deny">自动拒绝</SelectItem>
-                          <SelectItem value="allow">自动允许</SelectItem>
+                          <SelectItem value="deny">{tr("自动拒绝", "Automatically deny")}</SelectItem>
+                          <SelectItem value="allow">{tr("自动允许", "Automatically allow")}</SelectItem>
                         </SelectContent>
                       </Select>
                     </Field>
@@ -909,12 +919,12 @@ export default function InterceptPage() {
                 checked={form.enabled}
                 onCheckedChange={(v) => set({ enabled: v })}
               />
-              <Label htmlFor="rule-enabled" className="cursor-pointer">启用此规则</Label>
+              <Label htmlFor="rule-enabled" className="cursor-pointer">{tr("启用此规则", "Enable this rule")}</Label>
             </div>
           </div>
 
           <SheetFooter className="border-t px-6 py-4 flex-row justify-end gap-2">
-            <Button variant="outline" onClick={() => setOpen(false)}>取消</Button>
+            <Button variant="outline" onClick={() => setOpen(false)}>{tr("取消", "Cancel")}</Button>
             <Button onClick={handleSave} disabled={saving || !!regexErr}>
               {saving ? "Saving…" : "Save"}
             </Button>
@@ -928,22 +938,22 @@ export default function InterceptPage() {
           <DialogHeader className="shrink-0 border-b px-6 py-4">
             <DialogTitle className="flex items-center gap-2">
               <ListFilterIcon className="h-4 w-4" />
-              拦截范围
+              {tr("拦截范围", "Interception scope")}
             </DialogTitle>
             <DialogDescription className="text-xs">
-              仅启用拦截的工具会进行规则匹配，其他工具直接通过
+              {tr("仅启用拦截的工具会进行规则匹配，其他工具直接通过", "Only tools enabled for interception are matched; others pass through")}
             </DialogDescription>
           </DialogHeader>
 
           <div className="flex-1 min-h-0 overflow-y-auto px-6 py-4 space-y-5">
             {scopeLoading ? (
-              <p className="text-sm text-muted-foreground py-4">正在加载…</p>
+              <p className="text-sm text-muted-foreground py-4">{tr("正在加载…", "Loading…")}</p>
             ) : (
               toolGroups.map((group, gi) => (
                 <div key={group.label}>
                   {gi > 0 && <Separator className="mb-5" />}
                   <p className="text-[10px] font-semibold text-muted-foreground uppercase tracking-wider mb-2">
-                    {group.label}
+                    {locale === "en" ? ({ "执行": "Execution", "写入 / 编辑": "Write / edit", "系统工具": "System tools", "自定义工具": "Custom tools" } as Record<string, string>)[group.label] ?? group.label : group.label}
                   </p>
                   <div className="space-y-0.5">
                     {group.tools.map((t) => (
@@ -973,9 +983,9 @@ export default function InterceptPage() {
           </div>
 
           <div className="shrink-0 border-t px-6 py-3 flex justify-end gap-2">
-            <Button variant="outline" size="sm" onClick={() => setScopeOpen(false)}>取消</Button>
+            <Button variant="outline" size="sm" onClick={() => setScopeOpen(false)}>{tr("取消", "Cancel")}</Button>
             <Button size="sm" onClick={saveScope} disabled={scopeSaving || scopeLoading}>
-              {scopeSaving ? "Saving…" : "Save"}
+              {scopeSaving ? tr("正在保存…", "Saving…") : tr("保存", "Save")}
             </Button>
           </div>
         </DialogContent>

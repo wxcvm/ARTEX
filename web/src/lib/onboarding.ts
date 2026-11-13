@@ -35,6 +35,41 @@ export const onboardingGuides = {
   },
 } as const;
 
+export const onboardingGuidesEn = {
+  "database": {
+    "purpose": "The database stores accounts, tasks and results. Desktop ARTEX can prepare an independent database without manual port or password entry.",
+    "materials": "Open ARTEX normally. If PostgreSQL is missing, install it using an internet connection. Do not run ARTEX as administrator.",
+    "actions": "Choose automatic local database setup and wait for inspection, initialization, startup, verification and saving. If PostgreSQL is missing, install PostgreSQL 16 as directed, then retry. Existing connection details can be entered in Existing database / Advanced settings.",
+    "example": "Example: the independent database uses 127.0.0.1 and automatically selects a port in 15432–15442. ARTEX saves these values; do not copy them manually.",
+    "success": "Database ready appears and password setup opens. Detecting a service or port alone does not establish database or account access.",
+    "failure": "If an old service has no data directory, create a separate new database; this will not repair or overwrite the old service. For permission errors launch ARTEX normally. For occupied ports close the conflicting program or use an advanced connection. Retry without deleting old data."
+  },
+  "account": {
+    "purpose": "This password is for ARTEX login, not PostgreSQL or the AI API key. Existing accounts do not need to be reinitialized.",
+    "materials": "Prepare a login password of at least eight characters. Desktop-managed instances obtain a one-time setup token automatically; browser or external instances require a token.",
+    "actions": "Enter the password twice and choose Set password and continue. If the token was not obtained automatically, open manual entry, find first-time setup token in startup logs and copy its value.",
+    "example": "Example Windows desktop log: %LOCALAPPDATA%\\ARTEX\\desktop-backend.log. For Docker use docker compose logs artex. The example path is not a token.",
+    "success": "Login succeeds and Connect AI opens. Use the new ARTEX password for future logins.",
+    "failure": "Check mismatched passwords. If the token expired, read logs from the current instance. If initialization state is unknown, restore the backend first; do not reset an existing account."
+  },
+  "model": {
+    "purpose": "The AI model understands tasks and generates plans. Its API key is issued by the model provider, not ARTEX.",
+    "materials": "Obtain protocol, endpoint, exact model ID and API key from the provider. Local Ollama usually needs no key but must be running with a downloaded model.",
+    "actions": "Choose protocol and enter endpoint, model and key following provider documentation. Test and enable sends a real request, then saves and activates the profile after a valid reply. Provider charges may apply.",
+    "example": "Format example only: OpenAI-compatible URL https://api.example.com/v1, model example-model. These examples are not live credentials. Ollama commonly uses http://127.0.0.1:11434.",
+    "success": "Actual model reply, latency and Saved and enabled appear. An existing active profile is not automatically retested in this guide.",
+    "failure": "401/403: check key and permissions. 404: check URL, protocol and model ID. Timeout: check service or configure proxy. Retry save or activation failures without clearing the input."
+  },
+  "start": {
+    "purpose": "Learn task creation, progress and results before operating. Browse the knowledge base without a model.",
+    "materials": "Tasks need a working model plus target, task description and execution environment. Knowledge browsing needs no task.",
+    "actions": "Open Create first task, enter name, description and desired result, review settings and start yourself. View progress, sessions, assets and reports in task details; review and export findings.",
+    "example": "Example description: organize assets and configuration issues in a designated test environment. Example goal: a reviewable list of issues. Examples are not entered or executed automatically.",
+    "success": "Actual execution produces visible progress and results. Zero findings, incomplete and failed are different outcomes; task creation alone is not success.",
+    "failure": "If a task cannot start, check active model and service availability, then task errors and logs. If a report is missing, check task state. Reopen the guide anytime."
+  }
+} as const;
+
 export function modelErrorGuide(message: string): string {
   if (/401|403|unauthorized|authentication|api.?key/i.test(message)) return "检查 API Key 是否有效、额度及模型权限；不要填写 ARTEX 登录密码。";
   if (/404|not found/i.test(message)) return "核对协议、接口地址和模型名；地址应符合模型提供方文档。";
