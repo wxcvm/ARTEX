@@ -132,7 +132,7 @@ function SectionTitle({
 export default function DashboardPage() {
   // data state
   const [tasks, setTasks] = React.useState<Task[]>([]);
-  const [findings, set发现结果] = React.useState<Finding[]>([]);
+  const [findings, setFindings] = React.useState<Finding[]>([]);
   const [stats, setStats] = React.useState<Stats | null>(null);
   const [settings, setSettings] = React.useState<Settings | null>(null);
   const [pending, setPending] = React.useState<InterceptPending[]>([]);
@@ -197,7 +197,7 @@ export default function DashboardPage() {
           api.conversationTokens(),
         ]);
         if (!alive) return;
-        set发现结果(findings);
+        setFindings(findings);
         setStats(stats);
         setSettings(settings);
         setPending(pending);
