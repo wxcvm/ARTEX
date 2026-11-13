@@ -49,9 +49,9 @@ import { api } from "@/lib/api";
 import { skillLabel, skillSummary } from "@/lib/resource-labels";
 import type { Agent, SkillItem, MCPServer, SkillCall, MissingSkill } from "@/lib/types";
 
-function fmtTime(ts?: string) {
-  if (!ts) return "从未调用";
-  return new Date(ts).toLocaleString("zh-CN", {
+function fmtTime(ts: string | undefined, locale: string) {
+  if (!ts) return locale === "en" ? "Never called" : "从未调用";
+  return new Date(ts).toLocaleString(locale === "en" ? "en-US" : "zh-CN", {
     month: "2-digit",
     day: "2-digit",
     hour: "2-digit",
@@ -261,7 +261,7 @@ function SkillsOverview({
                   className="flex w-full items-center gap-2 rounded px-1.5 py-1 text-left hover:bg-muted"
                 >
                   <span className="min-w-0 flex-1 truncate font-mono text-xs" title={s.name}>{locale === "en" ? s.name : skillLabel(s.name)}</span>
-                  <span className="shrink-0 text-[11px] tabular-nums text-muted-foreground">{fmtTime(s.last_used)}</span>
+                  <span className="shrink-0 text-[11px] tabular-nums text-muted-foreground">{fmtTime(s.last_used, locale)}</span>
                 </button>
               ))}
             </div>
@@ -586,7 +586,7 @@ export default function SkillsPage() {
     setDetailMcps(next);
     try {
       await api.updateSkillMeta(skillName, { mcps: next });
-      toast.success(`${mcpOn ? "已关联" : "已取消关联"} "${mcpName}"`);
+      toast.success(tr(`${mcpOn ? "已关联" : "已取消关联"} "${mcpName}"`, `${mcpOn ? "Linked" : "Unlinked"} "${mcpName}"`));
       load();
     } catch (e) {
       // roll back on error
@@ -599,7 +599,7 @@ export default function SkillsPage() {
     const on = (visibility[skillName] ?? []).includes(agentId);
     try {
       await api.toggleSkillVisibility(agentId, skillName, !on);
-      toast.success(`${on ? "已撤销" : "已授予"}「${agentName}」的可见权限`);
+      toast.success(tr(`${on ? "已撤销" : "已授予"}「${agentName}」的可见权限`, `${on ? "Revoked" : "Granted"} visibility for “${agentName}”`));
       const ids = await api.skillVisibility(skillName);
       setVisibility((v) => ({ ...v, [skillName]: ids }));
     } catch (e) {
@@ -847,7 +847,7 @@ export default function SkillsPage() {
                       {s.calls > 0 && (
                         <span
                           className="shrink-0 rounded bg-muted px-1 text-[10px] tabular-nums text-muted-foreground"
-                          title={`调用 ${s.calls} 次 · 最近 ${fmtTime(s.last_used)}`}
+                          title={tr(`调用 ${s.calls} 次 · 最近 ${fmtTime(s.last_used, locale)}`, `${s.calls} calls · Last ${fmtTime(s.last_used, locale)}`)}
                         >
                           {s.calls}
                         </span>
@@ -940,8 +940,8 @@ export default function SkillsPage() {
                       <p className="text-xs text-muted-foreground">{tr("覆盖任务数", "Tasks covered")}</p>
                     </div>
                     <div className="rounded-md border p-2">
-                      <p className="truncate text-sm font-medium" title={fmtTime(selectedSkill.last_used)}>
-                        {fmtTime(selectedSkill.last_used)}
+                      <p className="truncate text-sm font-medium" title={fmtTime(selectedSkill.last_used, locale)}>
+                        {fmtTime(selectedSkill.last_used, locale)}
                       </p>
                       <p className="text-xs text-muted-foreground">{tr("最近调用", "Recent calls")}</p>
                     </div>
@@ -962,7 +962,7 @@ export default function SkillsPage() {
                       <div className="max-h-56 overflow-y-auto">
                         {usageCalls.map((c, i) => (
                           <div key={`${c.ts}-${i}`} className="flex items-center gap-2 border-b px-2 py-1 text-xs last:border-b-0">
-                            <span className="tabular-nums text-muted-foreground">{fmtTime(c.ts)}</span>
+                            <span className="tabular-nums text-muted-foreground">{fmtTime(c.ts, locale)}</span>
                             <Badge variant="outline" className="font-normal">{c.agent_key || "—"}</Badge>
                             <span className="ml-auto text-muted-foreground">
                               {c.task_id > 0 ? `任务 #${c.task_id}` : c.session_id ? tr("对话会话", "Chat session") : "—"}
