@@ -1,5 +1,9 @@
 "use client";
 
+import { useUiLocale } from "@/lib/ui-locale.client";
+import { uiText } from "@/lib/ui-locale";
+
+
 import * as React from "react";
 
 import Link from "next/link";
@@ -23,7 +27,7 @@ import { Separator } from "@/components/ui/separator";
 import { SidebarTrigger } from "@/components/ui/sidebar";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { api } from "@/lib/api";
-import { statusMeta } from "@/lib/status";
+import { statusLabel } from "@/lib/status";
 import type { Finding, FindingStatus, Severity } from "@/lib/types";
 
 import { FindingLineageView } from "./lineage";
@@ -41,8 +45,8 @@ const FINDING_STATUSES: FindingStatus[] = [
   "risk_accepted",
 ];
 
-function fmtTime(ts: string) {
-  return new Date(ts).toLocaleString("zh-CN");
+function fmtTime(ts: string, locale: "zh-CN" | "en") {
+  return new Date(ts).toLocaleString(locale);
 }
 
 // FieldRow is one label/value line in the right-hand status panel.
@@ -56,6 +60,8 @@ function FieldRow({ label, children }: { label: string; children: React.ReactNod
 }
 
 function FindingDetailInner() {
+  const locale = useUiLocale();
+  const tr = (zh: string, en: string) => uiText(locale, zh, en);
   const searchParams = useSearchParams();
   const id = searchParams.get("id") ?? "";
   const contextTaskId = searchParams.get("context_task") ?? "";
@@ -86,13 +92,13 @@ function FindingDetailInner() {
       try {
         const updated = await api.setFindingSeverity(id, next);
         setFinding(updated);
-        toast.success(`严重程度已修改为「${statusMeta("severity", next).label}」`);
+        toast.success(uiText(locale, `严重程度已修改为「${statusLabel("severity", next, locale)}」`, `Severity changed to ${statusLabel("severity", next, locale)}`));
       } catch (e) {
         setFinding((cur) => (cur ? { ...cur, severity: prev } : cur));
-        toast.error("更新失败：" + (e as Error).message);
+        toast.error(uiText(locale, "更新失败：", "Update failed: ") + (e as Error).message);
       }
     },
-    [finding, id],
+    [finding, id, locale],
   );
 
   const changeStatus = React.useCallback(
@@ -103,23 +109,23 @@ function FindingDetailInner() {
       try {
         const updated = await api.setFindingStatus(id, next);
         setFinding(updated);
-        toast.success(`状态已修改为「${statusMeta("finding", next).label}」`);
+        toast.success(uiText(locale, `状态已修改为「${statusLabel("finding", next, locale)}」`, `Status changed to ${statusLabel("finding", next, locale)}`));
       } catch (e) {
         setFinding((cur) => (cur ? { ...cur, status: prev } : cur));
-        toast.error("更新失败：" + (e as Error).message);
+        toast.error(uiText(locale, "更新失败：", "Update failed: ") + (e as Error).message);
       }
     },
-    [finding, id],
+    [finding, id, locale],
   );
 
   if (!finding) {
     return (
       <div className="flex flex-1 flex-col items-center justify-center gap-3 p-10 text-center">
-        <p className="text-muted-foreground">{loaded ? `未找到发现结果 ${id}` : "正在加载…"}</p>
+        <p className="text-muted-foreground">{loaded ? tr(`未找到发现结果 ${id}`, `Finding ${id} not found`) : tr("正在加载…", "Loading…")}</p>
         {loaded && (
           <Button asChild variant="outline">
             <Link href="/function/findings">
-              <ArrowLeftIcon /> Back to findings
+              <ArrowLeftIcon /> {tr("返回发现结果", "Back to findings")}
             </Link>
           </Button>
         )}
@@ -127,7 +133,7 @@ function FindingDetailInner() {
     );
   }
 
-  const title = finding.name || finding.vulnclass || "Uncategorized";
+  const title = finding.name || finding.vulnclass || tr("未分类", "Uncategorized");
 
   return (
     <Tabs value={tab} onValueChange={setTab} className="flex flex-1 flex-col gap-0">
@@ -150,12 +156,12 @@ function FindingDetailInner() {
           <StatusBadge domain="finding" value={finding.status} dot />
           <FindingReportExportButton key={id} findingId={id} contextTask={contextTaskId || undefined} />
           {finding.inherited && finding.source_task_id && (
-            <Badge variant="outline">Source task #{finding.source_task_id} · read-only</Badge>
+            <Badge variant="outline">{tr(`来源任务 #${finding.source_task_id} · 只读`, `Source task #${finding.source_task_id} · read-only`)}</Badge>
           )}
         </div>
         <TabsList>
-          <TabsTrigger value="overview">概览</TabsTrigger>
-          <TabsTrigger value="lineage">探索图谱</TabsTrigger>
+          <TabsTrigger value="overview">{tr("概览", "Overview")}</TabsTrigger>
+          <TabsTrigger value="lineage">{tr("探索图谱", "Exploration graph")}</TabsTrigger>
         </TabsList>
       </header>
 
@@ -168,16 +174,16 @@ function FindingDetailInner() {
             <div className="flex flex-col gap-4 lg:col-span-2">
               <Card>
                 <CardHeader>
-                  <CardTitle className="text-sm">摘要</CardTitle>
+                  <CardTitle className="text-sm">{tr("摘要", "Summary")}</CardTitle>
                 </CardHeader>
                 <CardContent>
-                  <p className="text-sm leading-relaxed whitespace-pre-wrap">{finding.summary || "(no digest)"}</p>
+                  <p className="text-sm leading-relaxed whitespace-pre-wrap">{finding.summary || tr("（暂无摘要）", "(No summary)")}</p>
                 </CardContent>
               </Card>
               <FindingRetestPanel key={id} findingId={id} readOnly={finding.inherited} onCompleted={load} />
               <Card>
                 <CardHeader>
-                  <CardTitle className="text-sm">证据 / PoC</CardTitle>
+                  <CardTitle className="text-sm">{tr("证据 / PoC", "Evidence / PoC")}</CardTitle>
                 </CardHeader>
                 <CardContent>
                   {finding.evidence ? (
@@ -185,7 +191,7 @@ function FindingDetailInner() {
                       {finding.evidence}
                     </pre>
                   ) : (
-                    <p className="text-sm text-muted-foreground">（暂无证据）</p>
+                    <p className="text-sm text-muted-foreground">{tr("（暂无证据）", "(No evidence)")}</p>
                   )}
                 </CardContent>
               </Card>
@@ -199,19 +205,19 @@ function FindingDetailInner() {
               {/* Below evidence: detailed report (rendered Markdown) */}
               <Card>
                 <CardHeader className="flex-row items-center justify-between">
-                  <CardTitle className="text-sm">详细报告</CardTitle>
-                  {finding.report && <CopyButton text={finding.report} successMessage="详细报告已复制" />}
+                  <CardTitle className="text-sm">{tr("详细报告", "Detailed report")}</CardTitle>
+                  {finding.report && <CopyButton text={finding.report} successMessage={tr("详细报告已复制", "Detailed report copied")} />}
                 </CardHeader>
                 <CardContent>
                   {finding.report_stale ? (
                     <Alert>
-                      <AlertDescription>流量证据已变更，详细报告等待更新。</AlertDescription>
+                      <AlertDescription>{tr("流量证据已变更，详细报告等待更新。", "Traffic evidence changed; detailed report awaits update.")}</AlertDescription>
                     </Alert>
                   ) : null}
                   {finding.report ? (
                     <Markdown text={finding.report} />
                   ) : (
-                    <p className="text-sm text-muted-foreground">暂无详细报告。</p>
+                    <p className="text-sm text-muted-foreground">{tr("暂无详细报告。", "No detailed report.")}</p>
                   )}
                 </CardContent>
               </Card>
@@ -220,18 +226,18 @@ function FindingDetailInner() {
             {/* Right column: status panel */}
             <Card className="h-fit lg:sticky lg:top-24">
               <CardHeader>
-                <CardTitle className="text-sm">状态</CardTitle>
+                <CardTitle className="text-sm">{tr("状态", "Status")}</CardTitle>
               </CardHeader>
               <CardContent className="divide-y">
                 {/* Vulnerability ID */}
-                <FieldRow label="漏洞 ID">
+                <FieldRow label={tr("漏洞 ID", "Finding ID")}>
                   <code className="rounded bg-muted px-1.5 py-0.5 font-mono text-xs text-muted-foreground">
                     #{finding.id}
                   </code>
                 </FieldRow>
 
                 {/* Severity */}
-                <FieldRow label="严重程度">
+                <FieldRow label={tr("严重程度", "Severity")}>
                   {finding.inherited ? (
                     <StatusBadge domain="severity" value={finding.severity} dot />
                   ) : (
@@ -243,7 +249,7 @@ function FindingDetailInner() {
                         <SelectGroup>
                           {SEVERITIES.map((sv) => (
                             <SelectItem key={sv} value={sv}>
-                              {statusMeta("severity", sv).label}
+                              {statusLabel("severity", sv, locale)}
                             </SelectItem>
                           ))}
                         </SelectGroup>
@@ -253,7 +259,7 @@ function FindingDetailInner() {
                 </FieldRow>
 
                 {/* Triage status */}
-                <FieldRow label="复核状态">
+                <FieldRow label={tr("复核状态", "Triage status")}>
                   {finding.inherited ? (
                     <StatusBadge domain="finding" value={finding.status} dot />
                   ) : (
@@ -265,7 +271,7 @@ function FindingDetailInner() {
                         <SelectGroup>
                           {FINDING_STATUSES.map((st) => (
                             <SelectItem key={st} value={st}>
-                              {statusMeta("finding", st).label}
+                              {statusLabel("finding", st, locale)}
                             </SelectItem>
                           ))}
                         </SelectGroup>
@@ -275,7 +281,7 @@ function FindingDetailInner() {
                 </FieldRow>
 
                 {/* Vulnerability type */}
-                <FieldRow label="漏洞类型">
+                <FieldRow label={tr("漏洞类型", "Vulnerability type")}>
                   {finding.vulnclass ? (
                     <code className="rounded bg-muted px-1.5 py-0.5 font-mono text-xs">{finding.vulnclass}</code>
                   ) : (
@@ -284,7 +290,7 @@ function FindingDetailInner() {
                 </FieldRow>
 
                 {/* Assets */}
-                <FieldRow label="资产">
+                <FieldRow label={tr("资产", "Assets")}>
                   {finding.assets && finding.assets.length > 0 ? (
                     <div className="flex flex-wrap justify-end gap-1">
                       {finding.assets.map((a) => (
@@ -303,7 +309,7 @@ function FindingDetailInner() {
                 </FieldRow>
 
                 {/* Task */}
-                <FieldRow label="任务">
+                <FieldRow label={tr("任务", "Task")}>
                   {finding.task_id ? (
                     <Link
                       href={`/function/tasks/detail?id=${finding.task_id}`}
@@ -314,13 +320,13 @@ function FindingDetailInner() {
                       <ArrowUpRightIcon className="size-3 shrink-0" />
                     </Link>
                   ) : (
-                    <span className="text-muted-foreground">—（任务已删除）</span>
+                    <span className="text-muted-foreground">{tr("—（任务已删除）", "— (Task deleted)")}</span>
                   )}
                 </FieldRow>
 
                 {/* Found at */}
-                <FieldRow label="发现时间">
-                  <span className="tabular-nums">{fmtTime(finding.ts)}</span>
+                <FieldRow label={tr("发现时间", "Discovered at")}>
+                  <span className="tabular-nums">{fmtTime(finding.ts, locale)}</span>
                 </FieldRow>
               </CardContent>
             </Card>

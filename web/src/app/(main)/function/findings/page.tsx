@@ -1,5 +1,9 @@
 "use client";
 
+import { useUiLocale } from "@/lib/ui-locale.client";
+import { uiText } from "@/lib/ui-locale";
+
+
 import * as React from "react";
 
 import Link from "next/link";
@@ -130,6 +134,8 @@ const EMPTY_STATS: FindingStats = {
 };
 
 export default function FindingsPage() {
+  const locale = useUiLocale();
+  const tr = (zh: string, en: string) => uiText(locale, zh, en);
   const [view, setView] = React.useState<FindingView>("flat");
   const [severity, setSeverity] = React.useState<"all" | Severity>("all");
   const [status, setStatus] = React.useState<"all" | FindingStatus>("all");
@@ -746,12 +752,12 @@ export default function FindingsPage() {
   }
 
   const statCards = [
-    { label: "全部发现", value: stats.total, icon: BugIcon },
-    { label: "待处理", value: stats.pending, tone: "text-amber-500", icon: ClockIcon },
-    { label: "严重", value: stats.critical, tone: "text-rose-600", icon: ShieldAlertIcon },
-    { label: "高危", value: stats.high, tone: "text-red-500", icon: TriangleAlertIcon },
-    { label: "中危", value: stats.medium, tone: "text-amber-500", icon: TriangleAlertIcon },
-    { label: "低危", value: stats.low, tone: "text-slate-500", icon: InfoIcon },
+    { label: tr("全部发现", "All findings"), value: stats.total, icon: BugIcon },
+    { label: tr("待处理", "Pending"), value: stats.pending, tone: "text-amber-500", icon: ClockIcon },
+    { label: tr("严重", "Critical"), value: stats.critical, tone: "text-rose-600", icon: ShieldAlertIcon },
+    { label: tr("高危", "High"), value: stats.high, tone: "text-red-500", icon: TriangleAlertIcon },
+    { label: tr("中危", "Medium"), value: stats.medium, tone: "text-amber-500", icon: TriangleAlertIcon },
+    { label: tr("低危", "Low"), value: stats.low, tone: "text-slate-500", icon: InfoIcon },
   ];
 
   // The "current filter" count in the export dialog: both views share the same filters, only the counting source differs.
@@ -812,16 +818,16 @@ export default function FindingsPage() {
     <div className="flex min-w-0 flex-1 flex-col gap-5 pb-6">
       <header className="flex flex-wrap items-center justify-between gap-4 rounded-2xl border border-border/70 bg-gradient-to-br from-card to-primary/5 px-5 py-5 shadow-sm sm:px-7">
         <div className="min-w-0">
-          <p className="mb-1 text-[11px] font-semibold tracking-[0.16em] text-primary">ARTEX / FINDINGS</p>
-          <h1 className="text-2xl font-semibold tracking-tight">发现结果</h1>
-          <p className="mt-1 text-sm leading-relaxed text-muted-foreground">汇总不同任务的发现结果，按严重程度、任务或资产查看。</p>
+          <p className="mb-1 text-[11px] font-semibold tracking-[0.16em] text-primary">{tr("ARTEX / 发现结果", "ARTEX / FINDINGS")}</p>
+          <h1 className="text-2xl font-semibold tracking-tight">{tr("发现结果", "Findings")}</h1>
+          <p className="mt-1 text-sm leading-relaxed text-muted-foreground">{tr("汇总不同任务的发现结果，按严重程度、任务或资产查看。", "View findings across tasks by severity, task or asset.")}</p>
         </div>
         <div className="min-w-0 overflow-x-auto">
           <Tabs value={view} onValueChange={(v) => setView(v as FindingView)}>
             <TabsList className="min-w-max rounded-lg bg-muted/60 p-1">
-              <TabsTrigger value="flat">全部发现</TabsTrigger>
-              <TabsTrigger value="grouped">按任务</TabsTrigger>
-              <TabsTrigger value="asset">按资产</TabsTrigger>
+              <TabsTrigger value="flat">{tr("全部发现", "All findings")}</TabsTrigger>
+              <TabsTrigger value="grouped">{tr("按任务", "By task")}</TabsTrigger>
+              <TabsTrigger value="asset">{tr("按资产", "By asset")}</TabsTrigger>
             </TabsList>
           </Tabs>
         </div>
@@ -851,8 +857,8 @@ export default function FindingsPage() {
               type="search"
               value={search}
               onChange={(event) => setSearch(event.target.value)}
-              placeholder="搜索发现结果"
-              aria-label="搜索发现结果"
+              placeholder={tr("搜索发现结果", "Search findings")}
+              aria-label={tr("搜索发现结果", "Search findings")}
             />
             <InputGroupAddon>
               <SearchIcon aria-hidden="true" />
@@ -869,11 +875,11 @@ export default function FindingsPage() {
           >
             {(
               [
-                ["all", "全部"],
-                ["critical", "严重"],
-                ["high", "高危"],
-                ["medium", "中危"],
-                ["low", "低危"],
+                ["all", tr("全部", "All")],
+                ["critical", tr("严重", "Critical")],
+                ["high", tr("高危", "High")],
+                ["medium", tr("中危", "Medium")],
+                ["low", tr("低危", "Low")],
               ] as const
             ).map(([val, label]) => (
               <ToggleGroupItem key={val} value={val} aria-label={`Filter by ${label} severity`}>
@@ -884,10 +890,10 @@ export default function FindingsPage() {
 
           <Select value={status} onValueChange={(v) => setStatus(v as "all" | FindingStatus)}>
             <SelectTrigger size="sm" className="w-32">
-              <SelectValue placeholder="状态" />
+              <SelectValue placeholder={tr("状态", "Status")} />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="all">全部状态</SelectItem>
+              <SelectItem value="all">{tr("全部状态", "All statuses")}</SelectItem>
               {FINDING_STATUSES.map((st) => (
                 <SelectItem key={st} value={st}>
                   {statusMeta("finding", st).label}
@@ -898,10 +904,10 @@ export default function FindingsPage() {
 
           <Select value={vulnclass} onValueChange={setVulnclass}>
             <SelectTrigger size="sm" className="w-40">
-              <SelectValue placeholder="漏洞类型" />
+              <SelectValue placeholder={tr("漏洞类型", "Vulnerability type")} />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="all">全部类型</SelectItem>
+              <SelectItem value="all">{tr("全部类型", "All types")}</SelectItem>
               {stats.vulnclasses.map((vc) => (
                 <SelectItem key={vc} value={vc}>
                   {vc}
@@ -912,11 +918,11 @@ export default function FindingsPage() {
 
           <Select value={task} onValueChange={setTask}>
             <SelectTrigger size="sm" className="w-48">
-              <SelectValue placeholder="任务" />
+              <SelectValue placeholder={tr("任务", "Task")} />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="all">全部任务</SelectItem>
-              <SelectItem value={UNASSIGNED_TASK}>未关联 / 任务已删除</SelectItem>
+              <SelectItem value="all">{tr("全部任务", "All tasks")}</SelectItem>
+              <SelectItem value={UNASSIGNED_TASK}>{tr("未关联 / 任务已删除", "Unassigned / task deleted")}</SelectItem>
               {(stats.tasks ?? []).map((t) => {
                 const id = String(t.id);
                 const label = t.name || t.description || `Task #${id} (deleted)`;
@@ -942,8 +948,8 @@ export default function FindingsPage() {
               <SelectValue />
             </SelectTrigger>
             <SelectContent>
-              <SelectItem value="severity">按严重程度</SelectItem>
-              <SelectItem value="time">按时间</SelectItem>
+              <SelectItem value="severity">{tr("按严重程度", "By severity")}</SelectItem>
+              <SelectItem value="time">{tr("按时间", "By time")}</SelectItem>
             </SelectContent>
           </Select>
 
@@ -988,7 +994,7 @@ export default function FindingsPage() {
                   className={cn("hover:text-foreground", assetScope === null && "font-medium text-foreground")}
                   onClick={() => setAssetScope(null)}
                 >
-                  All assets
+                  {tr("全部资产", "All assets")}
                 </button>
                 {assetPath.map((node) => (
                   <React.Fragment key={node.key}>
@@ -1108,7 +1114,7 @@ export default function FindingsPage() {
             })}
             {groups.length === 0 && (
               <Card>
-                <CardContent className="py-12 text-center text-sm text-muted-foreground">没有匹配的发现结果，请调整筛选条件。</CardContent>
+                <CardContent className="py-12 text-center text-sm text-muted-foreground">{tr("没有匹配的发现结果，请调整筛选条件。", "No matching findings; adjust filters.")}</CardContent>
               </Card>
             )}
             <TablePagination
@@ -1202,13 +1208,13 @@ export default function FindingsPage() {
       <Dialog open={exportOpen} onOpenChange={setExportOpen}>
         <DialogContent>
           <DialogHeader>
-            <DialogTitle>Export findings</DialogTitle>
+            <DialogTitle>{tr("导出发现结果", "Export findings")}</DialogTitle>
             <DialogDescription>Choose the export scope and format; the browser downloads the file automatically once generated.</DialogDescription>
           </DialogHeader>
 
           <div className="flex flex-col gap-5 py-1">
             <div className="flex flex-col gap-2">
-              <span className="text-xs text-muted-foreground">Export scope</span>
+              <span className="text-xs text-muted-foreground">{tr("导出范围", "Export scope")}</span>
               <RadioGroup value={exportScope} onValueChange={(v) => setExportScope(v as typeof exportScope)}>
                 <label htmlFor="export-scope-filtered" className="flex items-center gap-2 text-sm">
                   <RadioGroupItem id="export-scope-filtered" value="filtered" /> Export the current filter results ({filteredTotal}{" "}
@@ -1222,13 +1228,13 @@ export default function FindingsPage() {
                   className={cn("flex items-center gap-2 text-sm", selectedIds.size === 0 && "text-muted-foreground")}
                 >
                   <RadioGroupItem id="export-scope-selected" value="selected" disabled={selectedIds.size === 0} />
-                  Export the {selectedIds.size} selected items
+                  {tr(`导出选中的 ${selectedIds.size} 项`, `Export the ${selectedIds.size} selected items`)}
                 </label>
               </RadioGroup>
             </div>
 
             <div className="flex flex-col gap-2">
-              <span className="text-xs text-muted-foreground">Export format</span>
+              <span className="text-xs text-muted-foreground">{tr("导出格式", "Export format")}</span>
               <RadioGroup value={exportFormat} onValueChange={(v) => setExportFormat(v as typeof exportFormat)}>
                 <label htmlFor="export-format-md-single" className="flex items-center gap-2 text-sm">
                   <RadioGroupItem id="export-format-md-single" value="md-single" /> Markdown summary report (a single .md file)
