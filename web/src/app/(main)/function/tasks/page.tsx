@@ -119,6 +119,9 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Textarea } from "@/components/ui/textarea";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
+import { statusLabel } from "@/lib/status";
+import { useUiLocale } from "@/lib/ui-locale.client";
+import { uiText } from "@/lib/ui-locale";
 import { api } from "@/lib/api";
 import { getLocalStorageValue, setLocalStorageValue } from "@/lib/local-storage.client";
 import { type SortDirection, useStoredSortPreference } from "@/lib/sort-preference";
@@ -305,6 +308,8 @@ function compareTasks(left: Task, right: Task, field: TaskSortField, direction: 
 }
 
 export default function TasksPage() {
+  const locale = useUiLocale();
+  const t = (zh: string, en: string) => uiText(locale, zh, en);
   const [activeTab, setActiveTab] = React.useState("current");
   const [tasks, setTasks] = React.useState<Task[]>([]);
   const [categories, setCategories] = React.useState<TaskCategory[]>([]);
@@ -781,20 +786,20 @@ export default function TasksPage() {
 
   return (
     <Tabs value={activeTab} onValueChange={setActiveTab} className="min-w-0 gap-4">
-      <aside className="rounded-lg border bg-muted/20 p-3 text-sm">首次使用：创建任务 → 核对目标与设置 → 自行启动 → 在详情查看进度和报告。<a className="ml-2 text-primary underline" href="/welcome">打开配置引导</a><a className="ml-2 text-primary underline" href="/help#6-第一个任务从创建到查看结果">任务、结果与导出指南</a></aside>
+      <aside className="rounded-lg border bg-muted/20 p-3 text-sm">{t("首次使用：创建任务 → 核对目标与设置 → 自行启动 → 在详情查看进度和报告。", "First use: create a task → review targets and settings → start it → view progress and reports in details.")}<a className="ml-2 text-primary underline" href="/welcome">{t("打开配置引导", "Open setup guide")}</a><a className="ml-2 text-primary underline" href="/help#6-第一个任务从创建到查看结果">{t("任务、结果与导出指南", "Tasks, results & export guide")}</a></aside>
       <div className="flex flex-wrap items-center justify-between gap-4 rounded-2xl border border-border/70 bg-gradient-to-br from-card to-primary/5 px-5 py-5 shadow-sm sm:px-7">
         <div className="min-w-0">
-          <p className="mb-1 text-[11px] font-semibold tracking-[0.16em] text-primary">ARTEX / TASKS</p>
-          <h1 className="text-2xl font-semibold tracking-tight">任务管理</h1>
-          <p className="mt-1 text-sm leading-relaxed text-muted-foreground">创建、筛选与管理任务，在此查看执行状态和进展。</p>
+          <p className="mb-1 text-[11px] font-semibold tracking-[0.16em] text-primary">{t("ARTEX / 任务", "ARTEX / TASKS")}</p>
+          <h1 className="text-2xl font-semibold tracking-tight">{t("任务管理", "Task management")}</h1>
+          <p className="mt-1 text-sm leading-relaxed text-muted-foreground">{t("创建、筛选与管理任务，在此查看执行状态和进展。", "Create, filter and manage tasks; view execution status and progress.")}</p>
         </div>
         <span className="rounded-lg border border-border/70 bg-background/60 px-3 py-2 text-sm text-muted-foreground">
-          当前任务 <strong className="ml-1 tabular-nums text-foreground">{tasks.length}</strong>
+          {t("当前任务", "Current tasks")} <strong className="ml-1 tabular-nums text-foreground">{tasks.length}</strong>
         </span>
       </div>
       <TabsList className="mx-0 w-fit max-w-full rounded-lg bg-muted/60 p-1">
-        <TabsTrigger value="current">当前任务</TabsTrigger>
-        <TabsTrigger value="archived">已归档</TabsTrigger>
+        <TabsTrigger value="current">{t("当前任务", "Current tasks")}</TabsTrigger>
+        <TabsTrigger value="archived">{t("已归档", "Archived")}</TabsTrigger>
       </TabsList>
       <TabsContent value="current" className="mt-0 min-w-0">
         <Card className="min-w-0 overflow-hidden rounded-xl border-border/70 bg-card/90 shadow-sm">
@@ -803,7 +808,7 @@ export default function TasksPage() {
               <div className="relative w-full sm:max-w-xs">
                 <SearchIcon className="text-muted-foreground pointer-events-none absolute top-1/2 left-2.5 size-4 -translate-y-1/2" />
                 <Input
-                  placeholder="搜索任务描述、目标或 ID"
+                  placeholder={t("搜索任务描述、目标或 ID", "Search descriptions, goals or IDs")}
                   value={query}
                   onChange={(e) => setQuery(e.target.value)}
                   className="pl-8"
@@ -812,7 +817,7 @@ export default function TasksPage() {
                   <button
                     type="button"
                     onClick={() => setQuery("")}
-                    aria-label="清除搜索"
+                    aria-label={t("清除搜索", "Clear search")}
                     className="text-muted-foreground hover:text-foreground absolute top-1/2 right-2 -translate-y-1/2"
                   >
                     <XIcon className="size-4" />
@@ -821,14 +826,14 @@ export default function TasksPage() {
               </div>
               <Select value={statusFilter} onValueChange={(v) => setStatusFilter(v as TaskStatus | "all")}>
                 <SelectTrigger className="w-36">
-                  <SelectValue placeholder="状态" />
+                  <SelectValue placeholder={t("状态", "Status")} />
                 </SelectTrigger>
                 <SelectContent>
                   <SelectGroup>
-                    <SelectItem value="all">全部状态</SelectItem>
+                    <SelectItem value="all">{t("全部状态", "All statuses")}</SelectItem>
                     {STATUS_OPTIONS.map((s) => (
                       <SelectItem key={s.value} value={s.value}>
-                        {s.label}
+                        {statusLabel("task", s.value, locale)}
                       </SelectItem>
                     ))}
                   </SelectGroup>
@@ -836,12 +841,12 @@ export default function TasksPage() {
               </Select>
               <Select value={categoryFilter} onValueChange={setCategoryFilter}>
                 <SelectTrigger className="w-40">
-                  <SelectValue placeholder="任务分类" />
+                  <SelectValue placeholder={t("任务分类", "Task category")} />
                 </SelectTrigger>
                 <SelectContent>
                   <SelectGroup>
-                    <SelectItem value="all">全部分类</SelectItem>
-                    <SelectItem value={UNCATEGORIZED_VALUE}>未分类</SelectItem>
+                    <SelectItem value="all">{t("全部分类", "All categories")}</SelectItem>
+                    <SelectItem value={UNCATEGORIZED_VALUE}>{t("未分类", "Uncategorized")}</SelectItem>
                     {categories.map((category) => (
                       <SelectItem key={category.id} value={String(category.id)}>
                         {category.name}
@@ -851,13 +856,13 @@ export default function TasksPage() {
                 </SelectContent>
               </Select>
               <span className="text-muted-foreground text-xs tabular-nums">
-                显示 {filtered.length} / {tasks.length} 项任务
+                {t(`显示 ${filtered.length} / ${tasks.length} 项任务`, `Showing ${filtered.length} / ${tasks.length} tasks`)}
               </span>
               {selectedIds.size > 0 && (
                 <>
-                  <span className="text-xs tabular-nums">{selectedIds.size} selected</span>
+                  <span className="text-xs tabular-nums">{t(`已选择 ${selectedIds.size} 项`, `${selectedIds.size} selected`)}</span>
                   <Button size="sm" variant="ghost" onClick={() => setSelectedIds(new Set())}>
-                    清除选择
+                    {t("清除选择", "Clear selection")}
                   </Button>
                   {pausableTaskIDs.length > 0 && (
                     <Button
@@ -871,7 +876,7 @@ export default function TasksPage() {
                       ) : (
                         <PauseIcon data-icon="inline-start" />
                       )}
-                      Pause {pausableTaskIDs.length}
+                      {t("暂停", "Pause")} {pausableTaskIDs.length}
                     </Button>
                   )}
                   {resumableTaskIDs.length > 0 && (
@@ -886,7 +891,7 @@ export default function TasksPage() {
                       ) : (
                         <PlayIcon data-icon="inline-start" />
                       )}
-                      Resume {resumableTaskIDs.length}
+                      {t("恢复", "Resume")} {resumableTaskIDs.length}
                     </Button>
                   )}
                   {archivableTaskIDs.length > 0 && (
@@ -896,7 +901,7 @@ export default function TasksPage() {
                       trigger={
                         <Button size="sm" variant="outline">
                           <ArchiveIcon data-icon="inline-start" />
-                          Archive {archivableTaskIDs.length}
+                          {t("归档", "Archive")} {archivableTaskIDs.length}
                         </Button>
                       }
                     />
@@ -927,11 +932,11 @@ export default function TasksPage() {
 
             {tasks.length === 0 ? (
               <div className="text-muted-foreground mx-4 flex min-h-52 items-center justify-center rounded-xl border border-dashed border-border/70 bg-muted/10 px-5 py-12 text-center text-sm sm:mx-5 lg:mx-6">
-                暂无任务。可以使用上方的“新建任务”入口开始。
+                {t("暂无任务。可以使用上方的“新建任务”入口开始。", "No tasks yet. Create a new task to get started.")}
               </div>
             ) : filtered.length === 0 ? (
               <div className="text-muted-foreground mx-4 flex min-h-52 items-center justify-center rounded-xl border border-dashed border-border/70 bg-muted/10 px-5 py-12 text-center text-sm sm:mx-5 lg:mx-6">
-                没有匹配的任务。可以调整搜索或筛选条件。
+                {t("没有匹配的任务。可以调整搜索或筛选条件。", "No matching tasks. Adjust the search or filters.")}
               </div>
             ) : (
               <Table className="min-w-[1050px] text-sm **:data-[slot='table-cell']:px-4 **:data-[slot='table-head']:px-4">
@@ -941,7 +946,7 @@ export default function TasksPage() {
                       <Checkbox
                         checked={headerChecked}
                         onCheckedChange={(checked) => toggleSelectedPage(checked === true)}
-                        aria-label="Select all tasks on this page"
+                        aria-label={t("选择本页全部任务", "Select all tasks on this page")}
                       />
                     </TableHead>
                     <SortableTaskHead
@@ -952,24 +957,24 @@ export default function TasksPage() {
                       className="font-mono"
                       onSort={sortTasksBy}
                     />
-                    <TableHead>名称</TableHead>
-                    <TableHead>描述</TableHead>
-                    <TableHead>目标</TableHead>
+                    <TableHead>{t("名称", "Name")}</TableHead>
+                    <TableHead>{t("描述", "Description")}</TableHead>
+                    <TableHead>{t("目标", "Goal")}</TableHead>
                     <SortableTaskHead
                       field="status"
-                      label="Status"
+                      label={t("状态", "Status")}
                       activeField={sortField}
                       direction={sortDirection}
                       onSort={sortTasksBy}
                     />
-                    <TableHead className="text-center">目标进度</TableHead>
-                    <TableHead className="text-center" title="严重 / 高 / 中 / 低">
-                      Findings <span className="text-muted-foreground font-normal">C/H/M/L</span>
+                    <TableHead className="text-center">{t("目标进度", "Goal progress")}</TableHead>
+                    <TableHead className="text-center" title={t("严重 / 高 / 中 / 低", "Critical / High / Medium / Low")}>
+                      {t("发现结果", "Findings")} <span className="text-muted-foreground font-normal">C/H/M/L</span>
                     </TableHead>
-                    <TableHead className="text-center">运行中智能体</TableHead>
+                    <TableHead className="text-center">{t("运行中智能体", "Running agents")}</TableHead>
                     <SortableTaskHead
                       field="created"
-                      label="Created at"
+                      label={t("创建时间", "Created at")}
                       activeField={sortField}
                       direction={sortDirection}
                       align="right"
@@ -977,7 +982,7 @@ export default function TasksPage() {
                     />
                     <SortableTaskHead
                       field="duration"
-                      label="Duration"
+                      label={t("耗时", "Duration")}
                       activeField={sortField}
                       direction={sortDirection}
                       align="right"
@@ -985,7 +990,7 @@ export default function TasksPage() {
                     />
                     <TableHead className="text-right">Token</TableHead>
                     <TableHead className="sticky right-0 z-10 bg-card text-right shadow-[-1px_0_0_0_hsl(var(--border))]">
-                      Actions
+                      {t("操作", "Actions")}
                     </TableHead>
                   </TableRow>
                 </TableHeader>

@@ -38,6 +38,8 @@ import {
 } from "@/components/ui/alert-dialog";
 import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle } from "@/components/ui/sheet";
 import { AgentEditor } from "@/components/agent-editor";
+import { useUiLocale } from "@/lib/ui-locale.client";
+import { uiText } from "@/lib/ui-locale";
 import { api } from "@/lib/api";
 import type { Agent } from "@/lib/types";
 
@@ -52,13 +54,15 @@ function AgentGridCard({
   onOpen: () => void;
   onDeleted: () => void;
 }) {
+  const locale = useUiLocale();
+  const t = (zh: string, en: string) => uiText(locale, zh, en);
   async function del() {
     try {
       await api.deleteAgent(agent.key);
-      toast.success(`已删除智能体「${agent.name}」`);
+      toast.success(t(`已删除智能体「${agent.name}」`, `Deleted agent "${agent.name}"`));
       onDeleted();
     } catch (e) {
-      toast.error("删除失败：" + (e as Error).message);
+      toast.error(t("删除失败：", "Delete failed: ") + (e as Error).message);
     }
   }
   return (
@@ -70,26 +74,26 @@ function AgentGridCard({
           <span className="text-muted-foreground font-mono text-xs">{agent.key}</span>
           {agent.builtin ? (
             <Badge variant="secondary" className="px-1.5 py-0 text-[10px]">
-              内置
+              {t("内置", "Built-in")}
             </Badge>
           ) : (
             <Badge variant="outline" className="px-1.5 py-0 text-[10px]">
-              自定义
+              {t("自定义", "Custom")}
             </Badge>
           )}
           {!agent.enabled && (
             <Badge variant="outline" className="text-destructive px-1.5 py-0 text-[10px]">
-              已停用
+              {t("已停用", "Disabled")}
             </Badge>
           )}
         </div>
         <p className="text-muted-foreground line-clamp-2 min-h-8 text-xs">
-          {agent.description || "（暂无说明）"}
+          {agent.description || t("（暂无说明）", "(No description)")}
         </p>
         <div className="text-muted-foreground flex flex-wrap gap-1.5 text-[10px]">
           <span className="rounded border px-1.5 py-0.5">MCP {agent.mcp_count ?? 0}</span>
-          <span className="rounded border px-1.5 py-0.5">技能 {agent.skill_count ?? 0}</span>
-          <span className="rounded border px-1.5 py-0.5">工具 {agent.tool_count ?? 0}</span>
+          <span className="rounded border px-1.5 py-0.5">{t("技能", "Skills")} {agent.skill_count ?? 0}</span>
+          <span className="rounded border px-1.5 py-0.5">{t("工具", "Tools")} {agent.tool_count ?? 0}</span>
         </div>
       </button>
       {!agent.builtin && (
@@ -105,14 +109,14 @@ function AgentGridCard({
           </AlertDialogTrigger>
           <AlertDialogContent>
             <AlertDialogHeader>
-              <AlertDialogTitle>删除智能体「{agent.name}」？</AlertDialogTitle>
+              <AlertDialogTitle>{t(`删除智能体「${agent.name}」？`, `Delete agent "${agent.name}"?`)}</AlertDialogTitle>
               <AlertDialogDescription>
-                此操作也会删除该智能体的提示词、变量、可见资源及工具绑定，且无法撤销。
+                {t("此操作也会删除该智能体的提示词、变量、可见资源及工具绑定，且无法撤销。", "This permanently deletes the agent's prompts, variables, visible resources and tool bindings.")}
               </AlertDialogDescription>
             </AlertDialogHeader>
             <AlertDialogFooter>
-              <AlertDialogCancel>取消</AlertDialogCancel>
-              <AlertDialogAction onClick={del}>删除</AlertDialogAction>
+              <AlertDialogCancel>{t("取消", "Cancel")}</AlertDialogCancel>
+              <AlertDialogAction onClick={del}>{t("删除", "Delete")}</AlertDialogAction>
             </AlertDialogFooter>
           </AlertDialogContent>
         </AlertDialog>
@@ -122,6 +126,8 @@ function AgentGridCard({
 }
 
 function CreateAgentDialog({ onCreated }: { onCreated: (key: string) => void }) {
+  const locale = useUiLocale();
+  const t = (zh: string, en: string) => uiText(locale, zh, en);
   const [open, setOpen] = React.useState(false);
   const [key, setKey] = React.useState("");
   const [name, setName] = React.useState("");
@@ -132,14 +138,14 @@ function CreateAgentDialog({ onCreated }: { onCreated: (key: string) => void }) 
     setBusy(true);
     try {
       const a = await api.createAgent(key.trim(), name.trim(), description.trim());
-      toast.success(`已创建智能体「${a.name}」`);
+      toast.success(t(`已创建智能体「${a.name}」`, `Created agent "${a.name}"`));
       setOpen(false);
       setKey("");
       setName("");
       setDescription("");
       onCreated(a.key);
     } catch (e) {
-      toast.error("创建失败：" + (e as Error).message);
+      toast.error(t("创建失败：", "Create failed: ") + (e as Error).message);
     } finally {
       setBusy(false);
     }
@@ -152,44 +158,44 @@ function CreateAgentDialog({ onCreated }: { onCreated: (key: string) => void }) 
     <Dialog open={open} onOpenChange={setOpen}>
       <DialogTrigger asChild>
         <Button size="sm">
-          <PlusIcon /> 创建智能体
+          <PlusIcon /> {t("创建智能体", "Create agent")}
         </Button>
       </DialogTrigger>
       <DialogContent>
         <DialogHeader>
-          <DialogTitle>创建自定义智能体</DialogTitle>
+          <DialogTitle>{t("创建自定义智能体", "Create custom agent")}</DialogTitle>
           <DialogDescription>
-            创建对话助手。标识符用于内部识别，创建后不可修改；名称和说明用于展示。
+            {t("创建对话助手。标识符用于内部识别，创建后不可修改；名称和说明用于展示。", "Create a conversational assistant. The identifier is immutable; the name and description are for display.")}
           </DialogDescription>
         </DialogHeader>
         <div className="grid gap-4 py-2">
           <div className="grid gap-1.5">
-            <Label htmlFor="agent-key">标识符</Label>
+            <Label htmlFor="agent-key">{t("标识符", "Identifier")}</Label>
             <Input
               id="agent-key"
-              placeholder="例如 research_helper"
+              placeholder={t("例如 research_helper", "e.g. research_helper")}
               value={key}
               onChange={(e) => setKey(e.target.value)}
               className="font-mono"
             />
             {key.length > 0 && !keyOk && (
-              <span className="text-destructive text-xs">必须以小写字母开头，仅支持小写字母、数字和下划线</span>
+              <span className="text-destructive text-xs">{t("必须以小写字母开头，仅支持小写字母、数字和下划线", "Start with a lowercase letter; use lowercase letters, digits and underscores only")}</span>
             )}
           </div>
           <div className="grid gap-1.5">
-            <Label htmlFor="agent-name">名称</Label>
+            <Label htmlFor="agent-name">{t("名称", "Name")}</Label>
             <Input
               id="agent-name"
-              placeholder="例如：研究助手"
+              placeholder={t("例如：研究助手", "e.g. Research assistant")}
               value={name}
               onChange={(e) => setName(e.target.value)}
             />
           </div>
           <div className="grid gap-1.5">
-            <Label htmlFor="agent-desc">说明</Label>
+            <Label htmlFor="agent-desc">{t("说明", "Description")}</Label>
             <Textarea
               id="agent-desc"
-              placeholder="用一句话介绍智能体的用途"
+              placeholder={t("用一句话介绍智能体的用途", "Describe the agent's purpose in one sentence")}
               rows={2}
               value={description}
               onChange={(e) => setDescription(e.target.value)}
@@ -198,7 +204,7 @@ function CreateAgentDialog({ onCreated }: { onCreated: (key: string) => void }) 
         </div>
         <DialogFooter>
           <Button onClick={create} disabled={!canCreate}>
-            创建
+            {t("创建", "Create")}
           </Button>
         </DialogFooter>
       </DialogContent>
@@ -207,6 +213,8 @@ function CreateAgentDialog({ onCreated }: { onCreated: (key: string) => void }) 
 }
 
 export default function AgentsPage() {
+  const locale = useUiLocale();
+  const t = (zh: string, en: string) => uiText(locale, zh, en);
   const [agents, setAgents] = React.useState<Agent[]>([]);
   const [editKey, setEditKey] = React.useState<string | null>(null);
 
@@ -223,9 +231,9 @@ export default function AgentsPage() {
     <div className="flex flex-1 flex-col gap-4 md:gap-6">
       <div className="flex items-start justify-between gap-3">
         <div>
-          <h1 className="text-xl font-semibold tracking-tight">智能体</h1>
+          <h1 className="text-xl font-semibold tracking-tight">{t("智能体", "Agents")}</h1>
           <p className="text-muted-foreground text-sm">
-            管理内置智能体的提示词和配置，以及创建和管理自定义对话助手
+            {t("管理内置智能体的提示词和配置，以及创建和管理自定义对话助手", "Manage built-in agent prompts and settings, or create and manage custom assistants.")}
           </p>
         </div>
         <CreateAgentDialog
@@ -238,12 +246,12 @@ export default function AgentsPage() {
 
       <Card>
         <CardHeader>
-          <CardTitle>智能体列表</CardTitle>
-          <CardDescription>共 {agents.length} 个</CardDescription>
+          <CardTitle>{t("智能体列表", "Agent list")}</CardTitle>
+          <CardDescription>{t(`共 ${agents.length} 个`, `${agents.length} agents`)}</CardDescription>
         </CardHeader>
         <CardContent>
           {agents.length === 0 ? (
-            <p className="text-muted-foreground py-6 text-center text-sm">（暂无智能体）</p>
+            <p className="text-muted-foreground py-6 text-center text-sm">{t("（暂无智能体）", "(No agents)")}</p>
           ) : (
             <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
               {agents.map((a) => (
@@ -267,11 +275,11 @@ export default function AgentsPage() {
                   <span className="text-muted-foreground font-mono text-xs">{editing.key}</span>
                   {!editing.builtin && (
                     <Badge variant="outline" className="px-1.5 py-0 text-[10px]">
-                      自定义
+                      {t("自定义", "Custom")}
                     </Badge>
                   )}
                 </SheetTitle>
-                <SheetDescription>{editing.description || "提示词、配置、可见资源和工具绑定"}</SheetDescription>
+                <SheetDescription>{editing.description || t("提示词、配置、可见资源和工具绑定", "Prompts, settings, visible resources and tool bindings")}</SheetDescription>
               </SheetHeader>
               <AgentEditor agentKey={editing.key} onSaved={reload} />
             </>

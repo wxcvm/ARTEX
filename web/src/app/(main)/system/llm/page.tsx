@@ -26,6 +26,8 @@ import { Separator } from "@/components/ui/separator";
 import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle } from "@/components/ui/sheet";
 import { Switch } from "@/components/ui/switch";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { useUiLocale } from "@/lib/ui-locale.client";
+import { uiText } from "@/lib/ui-locale";
 import { api } from "@/lib/api";
 import type { LLMPoolMember, LLMPoolStatus, LLMProfile, LLMRetryOverride } from "@/lib/types";
 import { cn } from "@/lib/utils";
@@ -138,6 +140,8 @@ function PoolSheet({
   pool: LLMPoolStatus | null;
   onReload: () => Promise<void>;
 }) {
+  const locale = useUiLocale();
+  const t = (zh: string, en: string) => uiText(locale, zh, en);
   const [busy, setBusy] = React.useState(false);
 
   // The cooldown countdown is the remaining seconds computed by the backend — fetched on a timer only while the drawer is open and some profile is unhealthy, to keep it ticking.
@@ -154,12 +158,12 @@ function PoolSheet({
       await api.setSettings(patch);
       await onReload();
       if (patch.llm_pool_enabled !== undefined) {
-        toast.success(patch.llm_pool_enabled ? "已启用模型池" : "已关闭模型池");
+        toast.success(patch.llm_pool_enabled ? t("已启用模型池", "Model pool enabled") : t("已关闭模型池", "Model pool disabled"));
       } else {
-        toast.success("故障切换设置已更新");
+        toast.success(t("故障切换设置已更新", "Failover settings updated"));
       }
     } catch (e) {
-      toast.error(`应用设置失败：${(e as Error).message}`);
+      toast.error(`${t("应用设置失败：", "Apply settings failed: ")}${(e as Error).message}`);
     } finally {
       setBusy(false);
     }
@@ -169,9 +173,9 @@ function PoolSheet({
     try {
       await api.resetLLMPool(id);
       await onReload();
-      toast.success(id ? "配置已恢复" : "全部配置已恢复");
+      toast.success(id ? t("配置已恢复", "Configuration recovered") : t("全部配置已恢复", "All configurations recovered"));
     } catch (e) {
-      toast.error(`恢复失败：${(e as Error).message}`);
+      toast.error(`${t("恢复失败：", "Recovery failed: ")}${(e as Error).message}`);
     }
   }
 
@@ -186,7 +190,7 @@ function PoolSheet({
       <SheetContent side="right" className="flex flex-col gap-0 p-0 data-[side=right]:sm:max-w-lg">
         <SheetHeader className="px-4">
           <SheetTitle className="flex items-center gap-2">
-            <ZapIcon className="size-4" /> 模型池 · 故障切换
+            <ZapIcon className="size-4" /> {t("模型池 · 故障切换", "Model pool · Failover")}
           </SheetTitle>
           <SheetDescription>
             开启后，<b>未固定模型配置</b>的智能体在当前配置不可用时（余额不足、密钥失效、限流或服务错误），会自动切换到下一项配置。
@@ -196,14 +200,14 @@ function PoolSheet({
         <div className="flex min-h-0 flex-1 flex-col gap-4 overflow-y-auto px-4 pb-6">
           <div className="flex items-center justify-between gap-4 rounded-lg border p-3">
             <div className="grid gap-0.5">
-              <Label className="text-sm">启用模型池</Label>
-              <p className="text-muted-foreground text-xs">默认关闭。关闭时仅使用当前启用的配置，失败不会切换。</p>
+              <Label className="text-sm">{t("启用模型池", "Enable model pool")}</Label>
+              <p className="text-muted-foreground text-xs">{t("默认关闭。关闭时仅使用当前启用的配置，失败不会切换。", "Off by default. When off, only the active configuration is used; failures do not trigger failover.")}</p>
             </div>
             <Switch
               checked={enabled}
               disabled={busy}
               onCheckedChange={(v) => void toggle({ llm_pool_enabled: v })}
-              aria-label="模型池开关"
+              aria-label={t("模型池开关", "Model pool switch")}
             />
           </div>
 
@@ -211,17 +215,17 @@ function PoolSheet({
             <>
               <div className="flex items-center justify-between gap-4 rounded-lg border p-3">
                 <div className="grid gap-0.5">
-                  <Label className="text-sm">固定配置失败时也允许切换</Label>
+                  <Label className="text-sm">{t("固定配置失败时也允许切换", "Allow failover for pinned configurations")}</Label>
                   <p className="text-muted-foreground text-xs">
-                    默认关闭：智能体或任务指定配置后，仅使用该配置，失败时不会自动切换其他模型。
-                    开启后，指定配置失败时也会按下方模型池顺序切换。
+                    {t("默认关闭：智能体或任务指定配置后，仅使用该配置，失败时不会自动切换其他模型。", "Off by default: agents and tasks use their pinned configuration without automatic failover.")}
+                    {t("开启后，指定配置失败时也会按下方模型池顺序切换。", "When enabled, pinned configurations also follow the pool order on failure.")}
                   </p>
                 </div>
                 <Switch
                   checked={pool?.bind_fallback ?? false}
                   disabled={busy}
                   onCheckedChange={(v) => void toggle({ llm_pool_bind_fallback: v })}
-                  aria-label="固定配置失败切换开关"
+                  aria-label={t("固定配置失败切换开关", "Pinned configuration failover switch")}
                 />
               </div>
 
@@ -229,7 +233,7 @@ function PoolSheet({
 
               <div className="grid gap-2">
                 <div className="flex items-center justify-between">
-                  <Label className="text-sm">模型池顺序</Label>
+                  <Label className="text-sm">{t("模型池顺序", "Pool order")}</Label>
                   {tripped.length > 0 && (
                     <Button size="sm" variant="ghost" onClick={() => void recover()}>
                       <RotateCcwIcon /> Recover all
@@ -261,10 +265,10 @@ function PoolSheet({
                         <span className="font-medium">{m.name}</span>
                         {m.active && (
                           <Badge variant="outline" className="border-amber-400/50 text-amber-500">
-                            已启用
+                            {t("已启用", "Active")}
                           </Badge>
                         )}
-                        {excluded && <Badge variant="outline">排除出模型池</Badge>}
+                        {excluded && <Badge variant="outline">{t("排除出模型池", "Excluded from pool")}</Badge>}
                         <div className="ml-auto flex items-center gap-2">
                           {m.state === "tripped" && m.cooldown_secs > 0 && (
                             <span className="text-muted-foreground text-xs">Cooldown {cooldownText(m.cooldown_secs)}</span>
@@ -277,8 +281,8 @@ function PoolSheet({
                               size="icon"
                               variant="ghost"
                               className="size-7"
-                              aria-label="立即恢复"
-                              title="立即恢复：清除熔断状态，下次调用重新尝试此配置"
+                              aria-label={t("立即恢复", "Recover now")}
+                              title={t("立即恢复：清除熔断状态，下次调用重新尝试此配置", "Recover now: clear the breaker and retry this configuration on the next call")}
                               onClick={() => void recover(m.profile_id)}
                             >
                               <RotateCcwIcon className="size-3.5" />
@@ -300,13 +304,13 @@ function PoolSheet({
                 })}
                 {chain.length === 0 && (
                   <div className="rounded-lg border border-dashed p-4 text-center text-muted-foreground text-sm">
-                    暂无模型配置
+                    {t("暂无模型配置", "No configurations")}
                   </div>
                 )}
               </div>
 
               <div className="rounded-lg border border-dashed p-3 text-muted-foreground text-xs leading-relaxed">
-                当前启用配置始终排在首位，其余按优先级从高到低排列。配置失败后进入冷却（60 秒 → 5 分钟 → 30 分钟），冷却期间跳过，恢复后自动重新参与。上下文窗口无法容纳当前请求的配置也会跳过。固定模型的智能体和任务默认不参与模型池。
+                {t("当前启用配置始终排在首位，其余按优先级从高到低排列。配置失败后进入冷却（60 秒 → 5 分钟 → 30 分钟），冷却期间跳过，恢复后自动重新参与。上下文窗口无法容纳当前请求的配置也会跳过。固定模型的智能体和任务默认不参与模型池。", "The active configuration comes first, followed by descending priority. Failed configurations cool down (60 seconds → 5 minutes → 30 minutes) and rejoin when recovered. Configurations with insufficient context are skipped. Pinned agents and tasks are excluded by default.")}
               </div>
             </>
           )}
@@ -331,6 +335,8 @@ function ProfileSheet({
   onOpenChange: (o: boolean) => void;
   onSaved: (id: string) => void;
 }) {
+  const locale = useUiLocale();
+  const t = (zh: string, en: string) => uiText(locale, zh, en);
   const isNew = !profile;
   const [name, setName] = React.useState("");
   const [format, setFormat] = React.useState<ProfileFormat>("anthropic");
@@ -497,7 +503,7 @@ function ProfileSheet({
 
   async function save() {
     if (!name.trim() || !model.trim()) {
-      toast.error("请填写配置名称和模型");
+      toast.error(t("请填写配置名称和模型", "Enter a configuration name and model"));
       return;
     }
     if (saving) return;
@@ -528,11 +534,11 @@ function ProfileSheet({
         retry,
       });
       if (isNew) toast.success(`已创建：${name.trim()}（在卡片中设为启用即可使用）`);
-      else toast.success(profile?.is_default ? "已保存；当前启用配置立即生效，无需重启" : "已保存");
+      else toast.success(profile?.is_default ? t("已保存；当前启用配置立即生效，无需重启", "Saved; the active configuration takes effect immediately without restarting") : t("已保存", "Saved"));
       onSaved(String(id));
       onOpenChange(false);
     } catch (e) {
-      toast.error(`保存失败：${(e as Error).message}`);
+      toast.error(`${t("保存失败：", "Save failed: ")}${(e as Error).message}`);
     } finally {
       setSaving(false);
     }
@@ -553,49 +559,49 @@ function ProfileSheet({
       >
         <SheetHeader className="px-4">
           <SheetTitle className="flex items-center gap-2">
-            {isNew ? "添加模型连接" : `编辑模型：${profile?.name}`}
+            {isNew ? t("添加模型连接", "Add model connection") : t(`编辑模型：${profile?.name}`, `Edit model: ${profile?.name}`)}
             {profile?.is_default && (
               <Badge variant="outline" className="border-amber-400/50 text-amber-500">
-                已启用
+                {t("已启用", "Active")}
               </Badge>
             )}
           </SheetTitle>
           <SheetDescription>
             {isNew
-              ? "填写模型名称、接口类型与访问凭据；保存后可在卡片上设为默认模型。"
-              : "修改后保存即可生效；当前默认模型的修改无需重启服务。"}
+              ? t("填写模型名称、接口类型与访问凭据；保存后可在卡片上设为默认模型。", "Enter the model name, API format and credentials; set it as default from the card after saving.")
+              : t("修改后保存即可生效；当前默认模型的修改无需重启服务。", "Save to apply changes; editing the default model requires no restart.")}
           </SheetDescription>
         </SheetHeader>
 
         <div className="flex min-h-0 min-w-0 flex-1 flex-col gap-4 overflow-y-auto px-4 pb-5 sm:px-5">
           <div className="grid gap-4 sm:grid-cols-2">
             <div className="grid gap-2">
-              <Label htmlFor="p-name">配置名称</Label>
+              <Label htmlFor="p-name">{t("配置名称", "Configuration name")}</Label>
               <Input
                 id="p-name"
-                placeholder="例如：我的日常模型"
+                placeholder={t("例如：我的日常模型", "e.g. My daily model")}
                 value={name}
                 onChange={(e) => setName(e.target.value)}
               />
             </div>
             <div className="grid gap-2">
-              <Label>接口类型</Label>
+              <Label>{t("接口类型", "API format")}</Label>
               <Select value={format} onValueChange={(v) => setFormat(v as ProfileFormat)}>
                 <SelectTrigger>
-                  <SelectValue placeholder="选择接口类型" />
+                  <SelectValue placeholder={t("选择接口类型", "Choose API format")} />
                 </SelectTrigger>
                 <SelectContent>
                   <SelectItem value="anthropic">Anthropic API</SelectItem>
-                  <SelectItem value="openai">OpenAI 兼容（Chat Completions）</SelectItem>
+                  <SelectItem value="openai">{t("OpenAI 兼容（Chat Completions）", "OpenAI compatible (Chat Completions)")}</SelectItem>
                   <SelectItem value="openai-responses">OpenAI Responses API</SelectItem>
-                  <SelectItem value="ollama">本机 Ollama（无需密钥）</SelectItem>
+                  <SelectItem value="ollama">{t("本机 Ollama（无需密钥）", "Local Ollama (no key required)")}</SelectItem>
                 </SelectContent>
               </Select>
             </div>
           </div>
 
           <div className="grid min-w-0 gap-2">
-            <Label htmlFor="p-model">模型名称</Label>
+            <Label htmlFor="p-model">{t("模型名称", "Model name")}</Label>
             <div className="flex min-w-0 flex-wrap gap-2">
               <Input
                 id="p-model"
@@ -615,11 +621,11 @@ function ProfileSheet({
                     className="shrink-0"
                     disabled={loadingModels}
                     onClick={() => void loadModels()}
-                    aria-label="从接口获取可用模型列表"
-                    title="从当前接口获取可用模型；不支持列举时可手动输入"
+                    aria-label={t("从接口获取可用模型列表", "Fetch available models")}
+                    title={t("从当前接口获取可用模型；不支持列举时可手动输入", "Fetch available models; enter manually if listing is unsupported")}
                   >
                     {loadingModels ? <Loader2Icon className="size-4 animate-spin" /> : <RefreshCwIcon className="size-4" />}
-                    {loadingModels ? "正在获取…" : "获取列表"}
+                    {loadingModels ? t("正在获取…", "Fetching…") : t("获取列表", "Fetch list")}
                   </Button>
                 </PopoverTrigger>
                 {models.length > 0 && (
@@ -643,12 +649,12 @@ function ProfileSheet({
             </div>
             <p role={modelListFeedback?.ok ? "status" : modelListFeedback ? "alert" : undefined}
               className={cn("text-xs leading-relaxed break-words", modelListFeedback?.ok ? "text-emerald-500" : "text-muted-foreground")}>
-              {modelListFeedback?.message ?? "可以直接输入模型名称；获取列表只是可选的辅助操作。"}
+              {modelListFeedback?.message ?? t("可以直接输入模型名称；获取列表只是可选的辅助操作。", "Enter a model name directly; fetching the list is optional.")}
             </p>
           </div>
 
           <div className="grid gap-2">
-            <Label htmlFor="p-base-url">接口地址（可选）</Label>
+            <Label htmlFor="p-base-url">{t("接口地址（可选）", "API base URL (optional)")}</Label>
             <Input
               id="p-base-url"
               className="font-mono"
@@ -658,14 +664,14 @@ function ProfileSheet({
             />
             <p className="text-xs leading-relaxed text-muted-foreground">
               {format === "ollama"
-                ? "本机 Ollama 默认使用 127.0.0.1:11434，可留空。"
-                : "官方接口可留空；使用 LM Studio 或其他兼容网关时填写对应 API 地址。"}
+                ? t("本机 Ollama 默认使用 127.0.0.1:11434，可留空。", "Local Ollama defaults to 127.0.0.1:11434; leave empty to use it.")
+                : t("官方接口可留空；使用 LM Studio 或其他兼容网关时填写对应 API 地址。", "Leave empty for official endpoints; enter the API URL for LM Studio or other compatible gateways.")}
             </p>
           </div>
 
           <div className="grid gap-2">
             <Label htmlFor="p-api-key">
-              {format === "ollama" ? "API 密钥（Ollama 可留空）" : "API 密钥"}
+              {format === "ollama" ? t("API 密钥（Ollama 可留空）", "API key (optional for Ollama)") : t("API 密钥", "API key")}
             </Label>
             <Input
               id="p-api-key"
@@ -684,12 +690,12 @@ function ProfileSheet({
               aria-controls="model-advanced-settings"
               onClick={() => setAdvancedOpen((value) => !value)}
             >
-              <span>高级设置 <span className="font-normal text-muted-foreground">· 代理、速率、推理、重试</span></span>
-              <span className="shrink-0 text-xs font-normal text-muted-foreground">{advancedOpen ? "收起" : "展开"}</span>
+              <span>{t("高级设置", "Advanced settings")} <span className="font-normal text-muted-foreground">{t("· 代理、速率、推理、重试", "· Proxy, rates, reasoning, retry")}</span></span>
+              <span className="shrink-0 text-xs font-normal text-muted-foreground">{advancedOpen ? t("收起", "Collapse") : t("展开", "Expand")}</span>
             </button>
             <div id="model-advanced-settings" className={advancedOpen ? "grid min-w-0 gap-4 border-t border-border/70 px-4 py-4" : "hidden"}>
           <div className="grid gap-2">
-            <Label htmlFor="p-proxy">代理（可选）</Label>
+            <Label htmlFor="p-proxy">{t("代理（可选）", "Proxy (optional)")}</Label>
             <Input
               id="p-proxy"
               className="font-mono"
@@ -703,11 +709,11 @@ function ProfileSheet({
           </div>
 
           <div className="grid gap-2">
-            <Label htmlFor="p-session-header">自定义会话请求头（可选）</Label>
+            <Label htmlFor="p-session-header">{t("自定义会话请求头（可选）", "Custom session header (optional)")}</Label>
             <Input
               id="p-session-header"
               className="font-mono"
-              placeholder="例如 x-session-id（留空不发送）"
+              placeholder={t("例如 x-session-id（留空不发送）", "e.g. x-session-id (empty = omitted)")}
               value={sessionHeaderKey}
               onChange={(e) => setSessionHeaderKey(e.target.value)}
             />
@@ -717,11 +723,11 @@ function ProfileSheet({
           </div>
 
           <div className="grid gap-2">
-            <Label htmlFor="p-user-agent">自定义 User-Agent（可选）</Label>
+            <Label htmlFor="p-user-agent">{t("自定义 User-Agent（可选）", "Custom User-Agent (optional)")}</Label>
             <Input
               id="p-user-agent"
               className="font-mono"
-              placeholder="例如 my-app/1.0（留空使用默认 UA）"
+              placeholder={t("例如 my-app/1.0（留空使用默认 UA）", "e.g. my-app/1.0 (empty = default UA)")}
               value={userAgent}
               onChange={(e) => setUserAgent(e.target.value)}
             />
@@ -732,15 +738,15 @@ function ProfileSheet({
 
           <div className="grid gap-4 sm:grid-cols-3">
             <div className="grid gap-2">
-              <Label htmlFor="p-rps">每秒速率限制</Label>
+              <Label htmlFor="p-rps">{t("每秒速率限制", "Requests per second")}</Label>
               <Input id="p-rps" type="number" min={0} value={rps} onChange={(e) => setRps(e.target.value)} />
             </div>
             <div className="grid gap-2">
-              <Label htmlFor="p-rpm">每分钟速率限制</Label>
+              <Label htmlFor="p-rpm">{t("每分钟速率限制", "Requests per minute")}</Label>
               <Input id="p-rpm" type="number" min={0} value={rpm} onChange={(e) => setRpm(e.target.value)} />
             </div>
             <div className="grid gap-2">
-              <Label htmlFor="p-cw">上下文窗口（K）</Label>
+              <Label htmlFor="p-cw">{t("上下文窗口（K）", "Context window (K)")}</Label>
               <Input
                 id="p-cw"
                 type="number"
@@ -760,10 +766,10 @@ function ProfileSheet({
             <div className="flex flex-col items-start gap-3 sm:flex-row sm:items-center sm:justify-between">
               <div className="grid gap-0.5">
                 <Label htmlFor="p-priority" className="text-sm">
-                  模型池优先级
+                  {t("模型池优先级", "Pool priority")}
                 </Label>
                 <p className="text-muted-foreground text-xs">
-                  数值越大越优先。当前启用配置始终优先，不受此数值影响。相同优先级的配置轮流排在前面，分摊额度。
+                  {t("数值越大越优先。当前启用配置始终优先，不受此数值影响。相同优先级的配置轮流排在前面，分摊额度。", "Higher values rank first. The active configuration always comes first. Equal priorities rotate to share quota.")}
                 </p>
               </div>
               <Input
@@ -776,21 +782,21 @@ function ProfileSheet({
             </div>
             <div className="flex flex-col items-start gap-3 border-t pt-3 sm:flex-row sm:items-center sm:justify-between">
               <div className="grid gap-0.5">
-                <Label className="text-sm">排除出模型池</Label>
+                <Label className="text-sm">{t("排除出模型池", "Excluded from pool")}</Label>
                 <p className="text-muted-foreground text-xs">
                   开启后，此配置不会作为故障切换目标，但智能体或任务仍可明确指定它。适用于保留给特定智能体的高成本模型，避免被其他智能体的失败消耗。
                 </p>
               </div>
-              <Switch checked={poolExclude} onCheckedChange={setPoolExclude} aria-label="排除出模型池" />
+              <Switch checked={poolExclude} onCheckedChange={setPoolExclude} aria-label={t("排除出模型池", "Excluded from pool")} />
             </div>
             <div className="flex flex-col items-start gap-3 border-t pt-3 sm:flex-row sm:items-center sm:justify-between">
               <div className="grid gap-0.5">
-                <Label className="text-sm">流式输出</Label>
+                <Label className="text-sm">{t("流式输出", "Streaming output")}</Label>
                 <p className="text-muted-foreground text-xs">
                   开启（默认）使用 SSE 流式输出，实时显示进度和 Token 数量。关闭后使用非流式请求（stream:false，一次返回完整响应），可兼容 SSE 实现异常的网关，但不再显示实时生成进度。
                 </p>
               </div>
-              <Switch checked={streaming} onCheckedChange={setStreaming} aria-label="流式输出" />
+              <Switch checked={streaming} onCheckedChange={setStreaming} aria-label={t("流式输出", "Streaming output")} />
             </div>
           </div>
 
@@ -798,7 +804,7 @@ function ProfileSheet({
             <div className="flex flex-col items-start gap-3 sm:flex-row sm:items-center sm:justify-between">
               <div className="grid gap-0.5">
                 <Label htmlFor="p-max-tokens" className="text-sm">
-                  输出上限 · max tokens
+                  {t("输出上限 · max tokens", "Output limit · max tokens")}
                 </Label>
                 <p className="text-muted-foreground text-xs">
                   单次回复可生成的最大 Token 数，每次请求均携带。0（默认）表示不发送该字段，使用服务端默认值。此值不同于上方的上下文窗口：后者表示模型总容量，仅在本地用于计算压缩阈值。设置过低可能导致推理模型在思考过程中被截断，无法输出答案。
@@ -816,7 +822,7 @@ function ProfileSheet({
             </div>
             <div className="flex flex-col items-start gap-3 border-t pt-3 sm:flex-row sm:items-center sm:justify-between">
               <div className="grid gap-0.5">
-                <Label className="text-sm">上限字段名称</Label>
+                <Label className="text-sm">{t("上限字段名称", "Limit field")}</Label>
                 <p className="text-muted-foreground text-xs">{MAX_TOKENS_FIELD_HINTS[format]}</p>
               </div>
               <Select
@@ -841,7 +847,7 @@ function ProfileSheet({
           <div className="grid gap-3 rounded-lg border p-3">
             <div className="flex flex-col items-start gap-3 sm:flex-row sm:items-center sm:justify-between">
               <div className="grid gap-0.5">
-                <Label className="text-sm">思考开关 · thinking.type</Label>
+                <Label className="text-sm">{t("思考开关 · thinking.type", "Thinking switch · thinking.type")}</Label>
                 <p className="text-muted-foreground text-xs">
                   控制是否发送 thinking 字段。不发送表示省略该字段（兼容不支持此字段的模型，如 MiniMax）；关闭发送 disabled，开启发送 enabled。与下方思考强度独立。
                 </p>
@@ -861,7 +867,7 @@ function ProfileSheet({
             </div>
             <div className="flex flex-col items-start gap-3 border-t pt-3 sm:flex-row sm:items-center sm:justify-between">
               <div className="grid gap-0.5">
-                <Label className="text-sm">思考强度 · reasoning_effort</Label>
+                <Label className="text-sm">{t("思考强度 · reasoning_effort", "Reasoning effort · reasoning_effort")}</Label>
                 <p className="text-muted-foreground text-xs">
                   A separate effort knob (OpenAI reasoning_effort / Anthropic output_config.effort). Some APIs have no thinking
                   field and activate thinking via effort alone, so it can be set on its own without sending the thinking switch.
@@ -891,7 +897,7 @@ function ProfileSheet({
           {testing && (
             <div role="status" aria-live="polite" className="flex items-center gap-2 px-4 pt-3 text-sm text-muted-foreground sm:px-5">
               <Loader2Icon className="size-4 animate-spin" />
-              正在向模型发送测试请求并检查响应…
+              {t("正在向模型发送测试请求并检查响应…", "Sending a test request and checking the response…")}
             </div>
           )}
           {!testing && testFeedback && (
@@ -908,7 +914,7 @@ function ProfileSheet({
               <p className="mt-1 leading-relaxed text-muted-foreground">{testFeedback.hint}</p>
               {testFeedback.detail && (
                 <details className="mt-2">
-                  <summary className="cursor-pointer text-xs font-medium">查看{testFeedback.ok ? "模型回复" : "原始错误"}</summary>
+                  <summary className="cursor-pointer text-xs font-medium">{t("查看", "View ")}{testFeedback.ok ? t("模型回复", "Model response") : t("原始错误", "Raw error")}</summary>
                   <pre className="mt-1 whitespace-pre-wrap break-all font-mono text-xs text-muted-foreground">{testFeedback.detail}</pre>
                 </details>
               )}
@@ -917,12 +923,12 @@ function ProfileSheet({
           <div className="flex flex-wrap gap-2 px-4 py-3 sm:px-5">
           <Button variant="outline" className="min-w-0 flex-1 sm:flex-none" onClick={testConnection} disabled={testing}>
             {testing ? <Loader2Icon className="animate-spin" /> : <PlugZapIcon />}
-            {testing ? "正在测试…" : "测试连接"}
+            {testing ? t("正在测试…", "Testing…") : t("测试连接", "Test connection")}
           </Button>
           <Button onClick={save} disabled={saving} className="min-w-0 flex-1">
             {saving && <Loader2Icon className="animate-spin" />}
             {!saving && (isNew ? <PlusIcon /> : <SaveIcon />)}
-            {isNew ? "保存模型配置" : "保存更改"}
+            {isNew ? t("保存模型配置", "Save configuration") : t("保存更改", "Save changes")}
           </Button>
           </div>
         </div>
@@ -934,6 +940,8 @@ function ProfileSheet({
 // ─────────────────────────────────────────────────────────────────────────────
 
 export default function LLMPage() {
+  const locale = useUiLocale();
+  const t = (zh: string, en: string) => uiText(locale, zh, en);
   const [profiles, setProfiles] = React.useState<LLMProfile[]>([]);
   const [pool, setPool] = React.useState<LLMPoolStatus | null>(null);
   const [poolOpen, setPoolOpen] = React.useState(false);
@@ -980,13 +988,13 @@ export default function LLMPage() {
       toast.success(`已启用：${name}`);
       await load();
     } catch (e) {
-      toast.error(`启用失败：${(e as Error).message}`);
+      toast.error(`${t("启用失败：", "Activation failed: ")}${(e as Error).message}`);
     }
   }
 
   async function remove(p: LLMProfile) {
     if (p.is_default) {
-      toast.error("无法删除当前启用的配置");
+      toast.error(t("无法删除当前启用的配置", "Cannot delete the active configuration"));
       return;
     }
     try {
@@ -994,7 +1002,7 @@ export default function LLMPage() {
       toast.success(`已删除：${p.name}`);
       await load();
     } catch (e) {
-      toast.error(`删除失败：${(e as Error).message}`);
+      toast.error(`${t("删除失败：", "Delete failed: ")}${(e as Error).message}`);
     }
   }
 
@@ -1004,33 +1012,33 @@ export default function LLMPage() {
     <div className="flex min-w-0 flex-1 flex-col gap-5 pb-6">
       <header className="flex flex-wrap items-center justify-between gap-4 rounded-2xl border border-border/70 bg-gradient-to-br from-card to-primary/5 px-5 py-5 shadow-sm sm:px-7">
         <div className="min-w-0">
-          <p className="mb-1 text-[11px] font-semibold tracking-[0.16em] text-primary">ARTEX / 模型</p>
-          <h1 className="text-2xl font-semibold tracking-tight">模型配置</h1>
+          <p className="mb-1 text-[11px] font-semibold tracking-[0.16em] text-primary">{t("ARTEX / 模型", "ARTEX / MODELS")}</p>
+          <h1 className="text-2xl font-semibold tracking-tight">{t("模型配置", "Model configuration")}</h1>
           <p className="mt-1 max-w-2xl text-sm leading-relaxed text-muted-foreground">
-            管理智能体使用的模型连接、默认配置与故障切换。点击配置卡片可编辑，星标表示当前默认配置。
+            {t("管理智能体使用的模型连接、默认配置与故障切换。点击配置卡片可编辑，星标表示当前默认配置。", "Manage agent model connections, defaults and failover. Click a card to edit; the star identifies the default.")}
           </p>
         </div>
         <div className="flex flex-wrap items-center gap-2">
           <Button size="sm" variant="outline" onClick={() => setPoolOpen(true)}>
-            <ZapIcon /> 模型池设置
+            <ZapIcon /> {t("模型池设置", "Model pool settings")}
             {poolOn && (
               <Badge variant="outline" className="ml-1 border-emerald-500/50 text-emerald-600 dark:text-emerald-400">
-                已开启
+                {t("已开启", "Enabled")}
               </Badge>
             )}
           </Button>
           <Button size="sm" variant="outline" onClick={() => openEditor(null)}>
-            <PlusIcon /> 新建模型配置
+            <PlusIcon /> {t("新建模型配置", "New model configuration")}
           </Button>
         </div>
       </header>
 
       <Tabs defaultValue="profiles" className="min-w-0 flex-1">
         <TabsList className="h-auto max-w-full rounded-lg bg-muted/60 p-1">
-          <TabsTrigger value="profiles">模型连接</TabsTrigger>
-          <TabsTrigger value="retry">重试与退避</TabsTrigger>
-          <TabsTrigger value="privacy">密钥保护</TabsTrigger>
-          <TabsTrigger value="outbound">连接审计</TabsTrigger>
+          <TabsTrigger value="profiles">{t("模型连接", "Model connections")}</TabsTrigger>
+          <TabsTrigger value="retry">{t("重试与退避", "Retry & backoff")}</TabsTrigger>
+          <TabsTrigger value="privacy">{t("密钥保护", "Key protection")}</TabsTrigger>
+          <TabsTrigger value="outbound">{t("连接审计", "Connection audit")}</TabsTrigger>
         </TabsList>
 
         <TabsContent value="profiles" className="mt-4">
@@ -1082,14 +1090,14 @@ export default function LLMPage() {
                       <span>
                         {p.rate_per_second}/s · {p.rate_per_minute}/min
                       </span>
-                      {p.proxy && <span className="truncate">Proxy {p.proxy}</span>}
+                      {p.proxy && <span className="truncate">{t("代理", "Proxy")} {p.proxy}</span>}
                       {p.reasoning_effort && (
-                        <span>Thinking {p.reasoning_effort === "off" ? "off" : p.reasoning_effort}</span>
+                        <span>{t("思考", "Thinking")} {p.reasoning_effort === "off" ? "off" : p.reasoning_effort}</span>
                       )}
                       {/* The two pool-related fields only matter when the pool is on; when it is off they take no space */}
                       {poolOn &&
                         !p.is_default &&
-                        (p.pool_exclude ? <span>排除出模型池</span> : <span>优先级 {p.priority ?? 0}</span>)}
+                        (p.pool_exclude ? <span>{t("排除出模型池", "Excluded from pool")}</span> : <span>{t("优先级", "Priority")} {p.priority ?? 0}</span>)}
                     </div>
 
                     <div className="mt-1 flex gap-2">
@@ -1103,12 +1111,12 @@ export default function LLMPage() {
                           void activate(p.id, p.name);
                         }}
                       >
-                        {p.is_default ? "当前默认" : "设为默认"}
+                        {p.is_default ? t("当前默认", "Current default") : t("设为默认", "Set as default")}
                       </Button>
                       <Button
                         size="icon"
                         variant="outline"
-                        aria-label="删除模型配置"
+                        aria-label={t("删除模型配置", "Delete model configuration")}
                         onClick={(e) => {
                           e.stopPropagation();
                           void remove(p);
@@ -1125,13 +1133,13 @@ export default function LLMPage() {
               <div className="col-span-full flex min-h-64 flex-col items-center justify-center gap-4 rounded-2xl border border-dashed border-border/70 bg-card/70 px-6 py-12 text-center">
                 <PlugZapIcon className="size-9 text-primary" aria-hidden="true" />
                 <div>
-                  <h2 className="text-lg font-semibold">还没有模型配置</h2>
+                  <h2 className="text-lg font-semibold">{t("还没有模型配置", "No model configurations")}</h2>
                   <p className="mt-1 max-w-md text-sm leading-relaxed text-muted-foreground">
-                    添加已有模型服务的地址、模型名称和凭据，再选择默认配置，即可供智能体使用。
+                    {t("添加已有模型服务的地址、模型名称和凭据，再选择默认配置，即可供智能体使用。", "Add a model service address, model name and credentials, then select a default for agents.")}
                   </p>
                 </div>
                 <Button onClick={() => openEditor(null)}>
-                  <PlusIcon /> 添加第一个模型
+                  <PlusIcon /> {t("添加第一个模型", "Add first model")}
                 </Button>
               </div>
             )}
