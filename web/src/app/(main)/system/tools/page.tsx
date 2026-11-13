@@ -733,7 +733,7 @@ function CustomToolDialog({
               </SelectContent>
             </Select>
             {kind === "shell" && (
-              <p className="text-muted-foreground text-xs">适用于 nmap、sqlmap、ffuf 等常用工具。模型已了解其用法，只需声明可在 Bash 中调用。名称和说明将追加到 Bash 工具说明。</p>
+              <p className="text-muted-foreground text-xs">{tr("适用于 nmap、sqlmap、ffuf 等常用工具。模型已了解其用法，只需声明可在 Bash 中调用。名称和说明将追加到 Bash 工具说明。", "For familiar tools such as nmap, sqlmap and ffuf, declare their availability in Bash. The name and description are appended to the Bash tool description.")}</p>
             )}
           </div>
 
@@ -746,7 +746,7 @@ function CustomToolDialog({
           )}
           {kind === "script" && (
             <div className="grid gap-1.5">
-              <Label className="text-xs">Python 正文（参数通过 stdin JSON 或 os.environ["TOOL_X"] 传入）</Label>
+              <Label className="text-xs">{tr("Python 正文（参数通过 stdin JSON 或 os.environ[\"TOOL_X\"] 传入）", "Python body (parameters via stdin JSON or os.environ[\"TOOL_X\"])")}</Label>
               <Textarea className="font-mono text-xs" rows={10} value={ex.code}
                 placeholder={'import json,sys\nargs=json.load(sys.stdin)\nprint(...)'}
                 onChange={(e) => setEx({ ...ex, code: e.target.value })} />
@@ -833,7 +833,7 @@ function CustomToolDialog({
             <div className="grid gap-1.5 rounded-md border p-3">
               <Label className="text-xs font-medium">{tr("测试运行（使用当前表单，不保存配置）", "Test run (uses current form without saving)")}</Label>
               <Textarea className="font-mono text-xs" rows={2} value={paramsText}
-                placeholder={'示例参数 JSON，例如 {"target":"example.com"}'}
+                placeholder={tr('示例参数 JSON，例如 {"target":"example.com"}', 'Example parameter JSON, e.g. {"target":"example.com"}')}
                 onChange={(e) => setParamsText(e.target.value)} />
               <div>
                 <Button size="sm" variant="outline" onClick={runTest} disabled={testing}>
