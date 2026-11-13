@@ -42,3 +42,13 @@ test("every shipped skill has a Chinese catalog introduction", () => {
   assert.equal(toolSummary("custom_tool"), undefined);
   assert.equal(toolSummary("constructor"), undefined);
 });
+
+ test("every catalog tool has a Chinese name and introduction", () => {
+  const keys = ["graph_overview","list_findings","list_facts","node_detail","add_intent","list_goals","prove_goal","goal_met","report_finding","record_fact","set_goals","set_constraints","add_hint","kill_work","steer_work","get_worker_output","get_worker_trace","search_all_worker_traces","list_worker_traces","expand_digest","insert_assets","add_company_scope","add_task_scope","list_untested_assets","list_assets","list_companies","save_task_credential","list_task_credentials","delete_assets_by_host","create_skill","update_skill_file","create_custom_tool","update_custom_tool","mcp_status","create_mcp","update_mcp","kb_search","kb_get","list_tasks","spawn_task","pause_task","add_task_hint","get_task_graph","list_task_findings","get_task_worker_trace","list_task_worker_traces","search_task_worker_traces","get_task_node_detail","update_finding_report","get_finding_traffic","traffic_search","traffic_get","read_task_purge_intel","asset_neighbors"];
+  assert.equal(keys.length, 54);
+  for (const key of keys) {
+    assert.notEqual(toolLabel(key), key);
+    assert.match(toolSummary(key), /[\u3400-\u9fff]/u, key);
+    assert.equal(toolSummary(key, false), undefined);
+  }
+});
