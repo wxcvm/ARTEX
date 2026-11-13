@@ -2213,8 +2213,8 @@ func (s *Server) pgListModels(w http.ResponseWriter, r *http.Request) {
 // (see agent.nowStr, rendered fresh each turn), so a prompt may always reference
 // {{.Now}} — e.g. subtract it from a fixed start stamp to reason about elapsed time.
 var globalPromptVars = []db.PromptVar{
-	{Name: "Now", Description: "current server time (refreshed live on every run; subtract a fixed start time from it to measure elapsed time)", Example: "2026-08-11 14:30:00 CST", Source: "runtime"},
-	{Name: "DataDir", Description: "server data root directory (the root of all task/session artifacts; each agent actually writes to a subdirectory beneath it, e.g. <DataDir>/<taskID>)", Example: "/app/data", Source: "runtime"},
+	{Name: "Now", Description: "当前服务器时间（每次运行实时刷新，可减去固定开始时间计算耗时）", Example: "2026-08-11 14:30:00 CST", Source: "runtime"},
+	{Name: "DataDir", Description: "服务器数据根目录（所有任务及会话产物的根目录；智能体写入其子目录，例如 <DataDir>/<taskID>）", Example: "/app/data", Source: "runtime"},
 }
 
 // withGlobalVars appends the universal runtime vars onto an agent's own catalog,

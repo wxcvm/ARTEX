@@ -101,7 +101,9 @@ Operator handoff on environmental blocks:
 // agents — they have no per-key in-code default. It is seeded into agent_prompts
 // when a custom agent is created (so the editor isn't blank) and used as the
 // render fallback in RunChat when the DB prompt is somehow missing.
-const DefaultAssistantPrompt = `You are a helpful AI assistant. Answer the user's questions concisely and accurately in English; use the available tools when needed to get the task done. Do only what the user asks; never fabricate information.`
+const legacyAssistantPrompt = `You are a helpful AI assistant. Answer the user's questions concisely and accurately in English; use the available tools when needed to get the task done. Do only what the user asks; never fabricate information.`
+
+const DefaultAssistantPrompt = `你是一位有帮助的 AI 助手。默认使用简体中文简明、准确地回答用户；用户明确要求其他语言时遵循其要求。必要时使用可用工具完成任务。只做用户要求的事，不编造信息。保留代码、命令、技术标识和原始证据的原文。`
 
 // ReporterDefaultPrompt is the seeded prompt for the "report writing" (reporter)
 // custom agent — triggered when report_finding fires. It gathers the finding's
@@ -142,7 +144,14 @@ First **accurately extract from the context the task_id, the exploration node no
 - **One finding per report, no collapsing**: this report covers exactly one finding; additional locations of the same root cause are listed inside it, never silently merged away or spun off.
 - **Fix-oriented and verifiable**: the reproduction steps must be followable, and the remediation must be actionable.
 - **Concise**: no boilerplate, no filler, no restating the template itself.
-- Write in **English** throughout. When done (update_finding_report succeeded), finish with one or two sentences stating which finding you wrote the report for.`
+- Write human-readable report headings, explanations and the closing message in **Simplified Chinese (简体中文)** by default, unless the user explicitly requests another language. Preserve tool names, JSON field names, commands, code, identifiers and quoted evidence exactly; only translate explanatory prose. When done (update_finding_report succeeded), finish with one or two sentences stating which finding you wrote the report for.`
+
+// humanOutputLanguage changes only the presentation language, never machine-readable
+// fields, tool arguments, protocol markers, commands, or raw evidence.
+const humanOutputLanguage = "\n\nLanguage preference: Default to Simplified Chinese (简体中文) for human-facing replies, progress explanations, summaries and report prose unless the user explicitly requests another language. Keep tool names, structured output schemas, field names, enum values, commands, code and quoted evidence unchanged."
+
+const legacyReporterLanguage = "Write in **English** throughout."
+const reporterLanguage = "Write human-readable report headings, explanations and the closing message in **Simplified Chinese (简体中文)** by default, unless the user explicitly requests another language. Preserve tool names, JSON field names, commands, code, identifiers and quoted evidence exactly; only translate explanatory prose."
 
 // BuiltinPromptSeeds returns each built-in agent's default EDITABLE prompt body
 // keyed by agent key. The server seeds these into agent_prompts on startup (only
@@ -150,11 +159,11 @@ First **accurately extract from the context the task_id, the exploration node no
 // source while the same string stays as the in-code render fallback.
 func BuiltinPromptSeeds() map[string]string {
 	return map[string]string{
-		"goals":     goalsDefaultTmpl,
-		"planner":   plannerDefaultTmpl,
-		"mainagent": mainAgentDefaultTmpl,
-		"worker":    workerDefaultTmpl,
-		"auto":      autoDefaultTmpl,
-		"pentest":   pentestDefaultTmpl,
+		"goals":     goalsDefaultTmpl + humanOutputLanguage,
+		"planner":   plannerDefaultTmpl + humanOutputLanguage,
+		"mainagent": mainAgentDefaultTmpl + humanOutputLanguage,
+		"worker":    workerDefaultTmpl + humanOutputLanguage,
+		"auto":      autoDefaultTmpl + humanOutputLanguage,
+		"pentest":   pentestDefaultTmpl + humanOutputLanguage,
 	}
 }

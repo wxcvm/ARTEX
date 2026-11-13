@@ -223,32 +223,32 @@ func intp(v int) *int { return &v }
 // later toggles); interactiveShell here is only for new agents that need
 // "on by default at row creation".
 var builtinAgents = []builtinAgent{
-	{"goals", "Goal Decomposer", "goals", "Breaks a penetration testing task's goal into several independent, verifiable sub-goals.", []promptVar{
-		{"EngagementDescription", "Task description (test target/background)", "Test the example.com site", "exploration"},
+	{"goals", "目标分解器", "goals", "将测试任务目标分解为多个独立、可验证的子目标。", []promptVar{
+		{"EngagementDescription", "任务描述（测试目标或背景）", "Test the example.com site", "exploration"},
 		// Now is a global runtime variable (see server.globalPromptVars) and is no
 		// longer defined in each agent's catalog, otherwise withGlobalVars would
 		// collide with the global entry when appending.
 	}, false, nil},
-	{"planner", "Planner", "planner", "Reads the posture, judges goals, and only adds exploration intents when there is a genuinely uncovered new direction (one planning loop per task).", []promptVar{
-		{"Goal", "Overall task goal", "Gain admin access to example.com", "exploration"},
-		{"AssetSummary", "Asset count/type distribution summary (optional)", "domain:3 ip:5 site:2", "distilled"},
+	{"planner", "规划器", "planner", "读取任务进展、判断目标，仅在存在尚未覆盖的新方向时添加探索意图（每个任务一个规划循环）。", []promptVar{
+		{"Goal", "总体任务目标", "Gain admin access to example.com", "exploration"},
+		{"AssetSummary", "资产数量与类型分布摘要（可选）", "domain:3 ip:5 site:2", "distilled"},
 	}, false, nil},
-	{"mainagent", "Main", "main", "Human-machine interface: observes progress and turns human intent into hints or high-priority intents.", []promptVar{
-		{"Goal", "Current task goal", "Gain admin access to example.com", "exploration"},
-		{"AssetSummary", "Initial posture summary (optional)", "domain:3 ip:5", "distilled"},
-		{"FindingsSummary", "Confirmed vulnerability summary (optional)", "high:1 medium:2", "distilled"},
+	{"mainagent", "主智能体", "main", "人机交互入口：观察进度，将用户意图转化为提示或高优先级意图。", []promptVar{
+		{"Goal", "当前任务目标", "Gain admin access to example.com", "exploration"},
+		{"AssetSummary", "初始态势摘要（可选）", "domain:3 ip:5", "distilled"},
+		{"FindingsSummary", "已确认漏洞摘要（可选）", "high:1 medium:2", "distilled"},
 	}, false, nil},
-	{"worker", "Worker", "worker", "Picks up one intent and executes it, writes discovered facts/vulnerabilities back to the knowledge graph, then stops.", []promptVar{
-		{"ProxyAddr", "Recorded proxy address (drives the if/else dual wording)", "127.0.0.1:8080", "runtime"},
-		{"WorkerName", "Worker self-identifier (optional)", "worker-1", "runtime"},
+	{"worker", "执行智能体", "worker", "领取一个意图并执行，将发现的事实或漏洞写回知识图谱后结束。", []promptVar{
+		{"ProxyAddr", "记录代理地址（用于 if/else 条件文案）", "127.0.0.1:8080", "runtime"},
+		{"WorkerName", "执行智能体标识（可选）", "worker-1", "runtime"},
 	}, false, nil},
 	// Auto: built-in "platform operations" agent. Does not join the pentest
 	// orchestration loop; driven from the chat page, operates the platform with tools.
-	{"auto", "Auto", "assistant", "Platform operations assistant: manages tasks (create/view/pause/hint) and assets with tools, and can create/modify skills, custom tools, and MCP.", nil, false, nil},
+	{"auto", "平台助手", "assistant", "平台操作助手：通过工具管理任务（创建、查看、暂停、提示）及资产，并可创建或修改技能、自定义工具和 MCP。", nil, false, nil},
 	// Pentest: built-in "solo pentest" agent. Driven from the chat page, it walks the
 	// full pentest chain alone from recon to wrap-up, planning, executing and
 	// verifying by itself. Interactive shell is on by default.
-	{"pentest", "Penetration Testing", "assistant", "Solo pentest agent: single-handedly walks the full chain from recon → attack surface → deep exploitation → verification → wrap-up, with its own planning, execution, and adversarial verification.", nil, true, intp(0)},
+	{"pentest", "渗透测试助手", "assistant", "独立测试智能体：负责完整测试流程，包含规划、执行、验证与收尾。", nil, true, intp(0)},
 }
 
 // seedBuiltins inserts the fixed built-in agents and their variable catalog (idempotent).
