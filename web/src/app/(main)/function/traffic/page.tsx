@@ -257,7 +257,7 @@ export default function TrafficPage() {
 
   // "Purge" for the unfiltered purge, "Delete" for the host-scoped ones — the dialog's
   // title and its confirm button both follow from which is in play.
-  const deleteVerb = deleteMode === "all" ? "Purge" : "Delete";
+  const deleteVerb = deleteMode === "all" ? "清空" : "删除";
   const deleteTitle = deleteMode
     ? {
         all: "清空全部流量记录？",
@@ -480,7 +480,7 @@ export default function TrafficPage() {
           size="sm"
           className="h-8 text-destructive hover:bg-destructive/10 hover:text-destructive"
           disabled={!traffic?.count || deleting}
-          title={traffic?.count ? "删除全部流量并压缩存储" : "暂无流量记录 yet"}
+          title={traffic?.count ? "删除全部流量并压缩存储" : "暂无流量记录"}
           onClick={() => setDeleteMode("all")}
         >
           <EraserIcon className="size-3.5" />
@@ -818,8 +818,8 @@ export default function TrafficPage() {
             <AlertDialogDescription>
               {deleteMode === "all" && (
                 <>
-                  This will permanently delete all <span className="font-semibold tabular-nums">{traffic?.count ?? 0}</span>{" "}
-                  traffic records (including raw requests/responses), ignoring the current filters. This action cannot be undone. Traffic evidence already bound to findings lives in a separate evidence store and is unaffected.
+                  此操作将永久删除全部 <span className="font-semibold tabular-nums">{traffic?.count ?? 0}</span>{" "}
+                   条流量记录（含原始请求和响应），不受当前筛选条件限制。此操作无法撤销。已关联至发现结果的流量证据存储在独立证据库中，不受影响。
                   <br />
                   <span className="text-muted-foreground">
                     清理还会压缩存储，将索引占用的磁盘空间归还系统；期间流量记录会短暂停止。
@@ -828,18 +828,18 @@ export default function TrafficPage() {
               )}
               {deleteMode === "selected" && (
                 <>
-                  This will permanently delete all traffic records for <span className="font-semibold tabular-nums">{selectedHosts.length}</span> targets (
+                  此操作将永久删除选中的 <span className="font-semibold tabular-nums">{selectedHosts.length}</span> 个目标（
                   <span className="font-mono">
                     {selectedHosts.slice(0, 3).join(", ")}
                     {selectedHosts.length > 3 ? "…" : ""}
                   </span>
-                  ), including raw requests/responses. This action cannot be undone.
+                  ）的全部流量记录（含原始请求和响应）。此操作无法撤销。
                 </>
               )}
               {deleteMode === "filter" && (
                 <>
-                  This will permanently delete all traffic records for hosts containing <span className="font-mono font-semibold">{hostQ}</span>{" "}
-                  (including raw requests/responses). This action cannot be undone.
+                  此操作将永久删除主机名包含 <span className="font-mono font-semibold">{hostQ}</span>{" "}
+                   的全部流量记录（含原始请求和响应）。此操作无法撤销。
                 </>
               )}
             </AlertDialogDescription>
@@ -854,7 +854,7 @@ export default function TrafficPage() {
               disabled={deleting}
               className="bg-destructive text-destructive-foreground hover:bg-destructive/90"
             >
-              {deleting ? `${deleteVerb}…` : `Confirm ${deleteVerb}`}
+              {deleting ? `${deleteVerb}…` : `确认${deleteVerb}`}
             </AlertDialogAction>
           </AlertDialogFooter>
         </AlertDialogContent>

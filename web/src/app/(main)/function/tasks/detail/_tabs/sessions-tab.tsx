@@ -2120,14 +2120,11 @@ export function SessionsTab({ taskId, taskPaused = false }: { taskId: string; ta
               <AlertDialogDescription className="break-words whitespace-normal">
                 {deleteMode === "hard" ? (
                   <>
-                    <strong>永久删除</strong> physically removes this intent and the downstream nodes <strong>supported solely by it</strong>
-                    (cascading to the leaves to avoid orphaned data); shared nodes, goals, and the task's root facts are kept.
-                    <strong>This action is irreversible.</strong> The planner is notified of the deletion and re-plans accordingly.
+                    <strong>永久删除</strong>会实际移除该意图及<strong>仅由此意图支撑的下游节点</strong>（级联至叶节点，避免孤立数据）；共享节点、目标及任务根事实将保留。<strong>此操作无法撤销。</strong>规划器会收到通知并重新规划。
                   </>
                 ) : (
                   <>
-                    <strong>软删除</strong> marks the intent as "deleted" and records the reason; the intent node, execution records,
-                    registered facts, and findings <strong>are all kept</strong>. The planner receives "intent deleted by user + reason" and re-plans accordingly.
+                    <strong>软删除</strong>将意图标记为已删除并记录原因；意图节点、执行记录、已登记事实及发现结果<strong>全部保留</strong>。规划器会收到删除通知及原因，并重新规划。
                   </>
                 )}
               </AlertDialogDescription>

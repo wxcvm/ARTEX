@@ -186,11 +186,10 @@ function PoolSheet({
       <SheetContent side="right" className="flex flex-col gap-0 p-0 data-[side=right]:sm:max-w-lg">
         <SheetHeader className="px-4">
           <SheetTitle className="flex items-center gap-2">
-            <ZapIcon className="size-4" /> LLM Pool · Failover
+            <ZapIcon className="size-4" /> 模型池 · 故障切换
           </SheetTitle>
           <SheetDescription>
-            When enabled, an Agent <b>without a pinned model</b> automatically fails over to the next config when the current one is unusable (insufficient balance / dead Key / rate limiting /
-            service error).
+            开启后，<b>未固定模型配置</b>的智能体在当前配置不可用时（余额不足、密钥失效、限流或服务错误），会自动切换到下一项配置。
           </SheetDescription>
         </SheetHeader>
 
@@ -307,9 +306,7 @@ function PoolSheet({
               </div>
 
               <div className="rounded-lg border border-dashed p-3 text-muted-foreground text-xs leading-relaxed">
-                The active profile is always first; the rest follow priority from high to low (set per profile). After a failure a profile enters a cooldown (60s → 5min →
-                30min), is skipped while cooling down, and switches back automatically once recovered. Profiles whose context window cannot fit the current request are skipped. Agents
-                and tasks with a pinned model do not join the pool by default.
+                当前启用配置始终排在首位，其余按优先级从高到低排列。配置失败后进入冷却（60 秒 → 5 分钟 → 30 分钟），冷却期间跳过，恢复后自动重新参与。上下文窗口无法容纳当前请求的配置也会跳过。固定模型的智能体和任务默认不参与模型池。
               </div>
             </>
           )}
@@ -701,8 +698,7 @@ function ProfileSheet({
               onChange={(e) => setProxy(e.target.value)}
             />
             <p className="text-muted-foreground text-xs">
-              Only outbound LLM requests go through this proxy; http/https/socks5 are supported, optionally with credentials (e.g.
-              socks5://user:pass@host:port — URL-encode the password if it contains special characters). Leave empty for no proxy (direct connection).
+              仅模型出站请求经过此代理，支持 HTTP、HTTPS、SOCKS5，可配置认证信息（例如 socks5://user:pass@host:port；密码含特殊字符时需 URL 编码）。留空为直连。
             </p>
           </div>
 
@@ -716,9 +712,7 @@ function ProfileSheet({
               onChange={(e) => setSessionHeaderKey(e.target.value)}
             />
             <p className="text-muted-foreground text-xs">
-              Once a header name is set, every request carries this HTTP header, with the value filled in automatically as the <b>current session's session id</b> (chat sessions like
-              conv-12, workers like exp3-worker-i87). Meant for gateways that do prompt caching /
-              sticky routing on a session-id header; stable across turns of one session, distinct across sessions. Leave empty to not send it.
+              设置请求头名称后，每次请求会自动携带<b>当前会话 ID</b>（例如对话 conv-12、执行会话 exp3-worker-i87）。适用于按会话 ID 做提示词缓存或粘性路由的网关；同一会话保持一致，不同会话相互独立。留空不发送。
             </p>
           </div>
 
@@ -732,8 +726,7 @@ function ProfileSheet({
               onChange={(e) => setUserAgent(e.target.value)}
             />
             <p className="text-muted-foreground text-xs">
-              Overrides the <b>User-Agent</b> header on every outbound LLM request. Useful for gateways that route or allow-list by
-              User-Agent. Leave empty to keep the default User-Agent unchanged.
+              覆盖每次模型出站请求的 <b>User-Agent</b> 请求头，适用于依据 User-Agent 路由或匹配白名单的网关。留空保留默认值。
             </p>
           </div>
 
@@ -760,18 +753,17 @@ function ProfileSheet({
             </div>
           </div>
           <p className="-mt-2 text-muted-foreground text-xs">
-            Rate limits of 0 mean unlimited, shared across all agents. The context window is in K (thousand tokens); 0 = the 200K default, capped at 1000 (i.e.
-            1M). Setting it too high keeps compression from ever triggering.
+            速率限制为 0 表示不限速，由所有智能体共享。上下文窗口单位为 K（千 Token），0 使用默认 200K，最大 1000K（即 1M）。设置过高可能导致上下文压缩无法触发。
           </p>
 
           <div className="grid gap-3 rounded-lg border p-3">
             <div className="flex flex-col items-start gap-3 sm:flex-row sm:items-center sm:justify-between">
               <div className="grid gap-0.5">
                 <Label htmlFor="p-priority" className="text-sm">
-                  Pool priority
+                  模型池优先级
                 </Label>
                 <p className="text-muted-foreground text-xs">
-                  Higher numbers are picked first; the active profile is always first regardless of this value. Profiles with equal priority take turns leading, spreading quota naturally.
+                  数值越大越优先。当前启用配置始终优先，不受此数值影响。相同优先级的配置轮流排在前面，分摊额度。
                 </p>
               </div>
               <Input
@@ -786,8 +778,7 @@ function ProfileSheet({
               <div className="grid gap-0.5">
                 <Label className="text-sm">排除出模型池</Label>
                 <p className="text-muted-foreground text-xs">
-                  When enabled, this profile is never used as a failover target (Agents / tasks can still pin it explicitly). Suited to expensive profiles reserved for one specific Agent
-                  that should not be burned through by other agents' failures.
+                  开启后，此配置不会作为故障切换目标，但智能体或任务仍可明确指定它。适用于保留给特定智能体的高成本模型，避免被其他智能体的失败消耗。
                 </p>
               </div>
               <Switch checked={poolExclude} onCheckedChange={setPoolExclude} aria-label="排除出模型池" />
@@ -796,9 +787,7 @@ function ProfileSheet({
               <div className="grid gap-0.5">
                 <Label className="text-sm">流式输出</Label>
                 <p className="text-muted-foreground text-xs">
-                  On (default) streams over SSE, with live in-flight progress and real-time token counting. Off uses true non-streaming (stream:false,
-                  returning the full response in one shot) — a way around gateways with broken SSE implementations (empty frames / dropped thinking-field frames),
-                  at the cost of losing live in-flight progress.
+                  开启（默认）使用 SSE 流式输出，实时显示进度和 Token 数量。关闭后使用非流式请求（stream:false，一次返回完整响应），可兼容 SSE 实现异常的网关，但不再显示实时生成进度。
                 </p>
               </div>
               <Switch checked={streaming} onCheckedChange={setStreaming} aria-label="流式输出" />
@@ -812,9 +801,7 @@ function ProfileSheet({
                   输出上限 · max tokens
                 </Label>
                 <p className="text-muted-foreground text-xs">
-                  How many tokens a single reply may generate at most; sent with every request. 0 (default) = the field is not sent, leaving it to the server default.
-                  This is not the same thing as the "context window" above: that is the model's total capacity, used only locally to compute the compression threshold.
-                  Set it too low and a reasoning model gets truncated mid-thinking, unable to emit even a one-word answer.
+                  单次回复可生成的最大 Token 数，每次请求均携带。0（默认）表示不发送该字段，使用服务端默认值。此值不同于上方的上下文窗口：后者表示模型总容量，仅在本地用于计算压缩阈值。设置过低可能导致推理模型在思考过程中被截断，无法输出答案。
                 </p>
               </div>
               <Input
@@ -856,8 +843,7 @@ function ProfileSheet({
               <div className="grid gap-0.5">
                 <Label className="text-sm">思考开关 · thinking.type</Label>
                 <p className="text-muted-foreground text-xs">
-                  Controls whether the thinking field is sent. Not sent = the field is omitted (compatible with models like MiniMax that lack support); Disabled = send
-                  disabled; Enabled = send enabled. Independent of the effort below.
+                  控制是否发送 thinking 字段。不发送表示省略该字段（兼容不支持此字段的模型，如 MiniMax）；关闭发送 disabled，开启发送 enabled。与下方思考强度独立。
                 </p>
               </div>
               <Select value={thinkingType} onValueChange={setThinkingType}>

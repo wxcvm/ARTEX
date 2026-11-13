@@ -741,8 +741,8 @@ export default function AssetsPage() {
           <AlertDialogHeader>
             <AlertDialogTitle>确认删除</AlertDialogTitle>
             <AlertDialogDescription>
-              This will permanently delete <span className="font-semibold tabular-nums">{deleteIds.length}</span>{" "}
-               asset records. This action cannot be undone.
+              此操作将永久删除 <span className="font-semibold tabular-nums">{deleteIds.length}</span>{" "}
+               条资产记录，无法撤销。
             </AlertDialogDescription>
           </AlertDialogHeader>
           <AlertDialogFooter>
