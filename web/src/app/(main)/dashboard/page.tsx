@@ -44,9 +44,9 @@ import { cn } from "@/lib/utils";
 // ── chart constants ───────────────────────────────────────────────────────────
 
 const dailyTrendConfig = {
-  input: { label: "Input", color: "hsl(217 91% 60%)" },
-  output: { label: "Output", color: "hsl(263 70% 60%)" },
-  cacheRead: { label: "Cache read", color: "hsl(160 60% 45%)" },
+  input: { label: "输入", color: "hsl(217 91% 60%)" },
+  output: { label: "输出", color: "hsl(263 70% 60%)" },
+  cacheRead: { label: "缓存读取", color: "hsl(160 60% 45%)" },
 } satisfies ChartConfig;
 
 // ── helpers ──────────────────────────────────────────────────────────────────
@@ -70,7 +70,7 @@ function fmtTokens(n: number): string {
 }
 
 const ASSET_TYPE_LABELS: Record<string, string> = {
-  root_domain: "Root domain",
+  root_domain: "根域名",
   ip: "IP",
   subdomain: "Subdomain",
   app: "App",
@@ -497,7 +497,7 @@ export default function DashboardPage() {
       <section className="relative overflow-hidden rounded-2xl border border-border/70 bg-gradient-to-br from-card via-card to-primary/10 px-5 py-5 shadow-sm sm:px-7 sm:py-6">
         <div className="relative flex flex-wrap items-center justify-between gap-5">
           <div className="min-w-0">
-            <div className="mb-2 text-xs font-semibold tracking-[0.18em] text-primary">ARTEX / WORKSPACE</div>
+            <div className="mb-2 text-xs font-semibold tracking-[0.18em] text-primary">ARTEX / 工作台</div>
             <h1 className="text-2xl font-semibold tracking-tight sm:text-3xl">工作台总览</h1>
             <p className="mt-2 max-w-2xl text-sm leading-relaxed text-muted-foreground">
               一站查看任务进展、发现结果、资产与系统健康状态。
@@ -634,8 +634,8 @@ export default function DashboardPage() {
             <div className="ml-1 flex gap-0.5 rounded-md border bg-muted/30 p-0.5">
               {(
                 [
-                  { v: "old", label: "Old" },
-                  { v: "new", label: "New" },
+                  { v: "old", label: "旧版" },
+                  { v: "new", label: "新版" },
                 ] as const
               ).map(({ v, label }) => (
                 <button
@@ -674,7 +674,7 @@ export default function DashboardPage() {
                   : "bg-muted/30 text-muted-foreground hover:text-foreground",
               )}
             >
-              All
+              全部
             </button>
             {llmProfiles.map((p) => {
               const key = Number(p.id);
@@ -703,7 +703,7 @@ export default function DashboardPage() {
                           : "bg-emerald-500/20 text-emerald-400",
                       )}
                     >
-                      Default
+                      默认
                     </span>
                   )}
                 </button>
@@ -718,7 +718,7 @@ export default function DashboardPage() {
           <div className="flex flex-col gap-4">
             {/* Total */}
             <div>
-              <div className="text-xs text-muted-foreground">Total (input+output)</div>
+              <div className="text-xs text-muted-foreground">总计（输入 + 输出）</div>
               <div className="mt-0.5 text-3xl font-bold tabular-nums tracking-tight">
                 {fmtTokens(displayedTokens.input + displayedTokens.output) || "—"}
               </div>
@@ -732,19 +732,19 @@ export default function DashboardPage() {
                 const total = displayedTokens.input + displayedTokens.output;
                 return [
                   {
-                    label: "Input (uncached)",
+                    label: "输入（未缓存）",
                     value: displayedTokens.input - displayedTokens.cacheRead,
                     barColor: dailyTrendConfig.input.color!,
                     text: "text-blue-400",
                   },
                   {
-                    label: "Cache hits",
+                    label: "缓存命中",
                     value: displayedTokens.cacheRead,
                     barColor: dailyTrendConfig.cacheRead.color!,
                     text: "text-emerald-400",
                   },
                   {
-                    label: "Output",
+                    label: "输出",
                     value: displayedTokens.output,
                     barColor: dailyTrendConfig.output.color!,
                     text: "text-violet-400",
@@ -776,7 +776,7 @@ export default function DashboardPage() {
               const hitPct = denominator > 0 ? Math.round((displayedTokens.cacheRead / denominator) * 100) : 0;
               return (
                 <div className="flex items-center justify-between rounded-lg border bg-muted/20 px-3 py-2 text-xs">
-                  <span className="text-muted-foreground">Cache hit rate</span>
+                  <span className="text-muted-foreground">缓存命中率</span>
                   <span
                     className={cn("font-semibold tabular-nums", hitPct > 50 ? "text-emerald-400" : "text-amber-400")}
                   >
@@ -995,7 +995,7 @@ export default function DashboardPage() {
         <div className="flex items-center justify-between border-b px-4 py-3">
           <div className="flex items-center gap-1.5 text-xs font-semibold">
             <ClockIcon className="size-3.5 text-muted-foreground" />
-            Tasks
+            任务
           </div>
           <div className="flex items-center gap-2">
             <span className="text-xs text-muted-foreground">{tasks.length} tasks</span>
@@ -1010,7 +1010,7 @@ export default function DashboardPage() {
         <table className="w-full border-collapse text-xs">
           <thead>
             <tr className="border-b">
-              {["Task", "Status", "Engine", "Goal progress", "In flight", "Last activity"].map((h) => (
+              {["任务", "状态", "引擎", "目标进度", "执行中", "最近活动"].map((h) => (
                 <th
                   key={h}
                   className="px-4 py-2 text-left text-[11px] font-semibold uppercase tracking-widest text-muted-foreground first:pl-4"
@@ -1024,7 +1024,7 @@ export default function DashboardPage() {
             {sortedTasks.length === 0 ? (
               <tr>
                 <td colSpan={6} className="px-4 py-6 text-center text-xs text-muted-foreground">
-                  No tasks
+                  暂无任务
                 </td>
               </tr>
             ) : (
@@ -1082,12 +1082,12 @@ export default function DashboardPage() {
       <div className="grid grid-cols-1 gap-4 xl:grid-cols-3">
         {/* Asset distribution */}
         <Card className="rounded-xl border-border/70 bg-card/90 p-5 shadow-sm">
-          <SectionTitle icon={NetworkIcon} sub="By type">
-            Asset distribution
+          <SectionTitle icon={NetworkIcon} sub="按类型">
+            资产分布
           </SectionTitle>
 
           {assetByType.length === 0 ? (
-            <div className="py-6 text-center text-xs text-muted-foreground">No asset data</div>
+            <div className="py-6 text-center text-xs text-muted-foreground">暂无资产数据</div>
           ) : (
             <div className="flex flex-col gap-2">
               {assetByType.map(([type, count]) => (
@@ -1168,7 +1168,7 @@ export default function DashboardPage() {
 
           <div className="flex flex-col gap-2">
             <div className="flex items-center justify-between rounded-lg border bg-muted/20 px-3 py-2">
-              <div className="text-xs text-muted-foreground">LLM config</div>
+              <div className="text-xs text-muted-foreground">模型配置</div>
               <Badge
                 variant="outline"
                 className={cn(
@@ -1178,12 +1178,12 @@ export default function DashboardPage() {
                     : "border-red-500/30 bg-red-500/10 text-red-400",
                 )}
               >
-                {stats?.llm_configured ? "Configured" : "Not configured"}
+                {stats?.llm_configured ? "已配置" : "未配置"}
               </Badge>
             </div>
 
             <div className="flex items-center justify-between rounded-lg border bg-muted/20 px-3 py-2">
-              <div className="text-xs text-muted-foreground">Traffic capture</div>
+              <div className="text-xs text-muted-foreground">流量采集</div>
               <Badge
                 variant="outline"
                 className={cn(
@@ -1199,7 +1199,7 @@ export default function DashboardPage() {
 
             {activeProfile && (
               <div className="flex items-center justify-between rounded-lg border bg-muted/20 px-3 py-2">
-                <div className="text-xs text-muted-foreground">Active model</div>
+                <div className="text-xs text-muted-foreground">当前模型</div>
                 <span className="font-mono text-xs">{activeProfile.model}</span>
               </div>
             )}
