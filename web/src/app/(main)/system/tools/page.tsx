@@ -315,10 +315,10 @@ function ToolEditor({
       <Separator className="mt-4" />
       <div className="flex flex-wrap gap-2 p-4">
         <Button size="sm" onClick={save} disabled={saving}>
-          <SaveIcon /> Save
+          <SaveIcon /> {tr("保存", "Save")}
         </Button>
         <Button size="sm" variant="outline" onClick={reset}>
-          <RotateCcwIcon /> Restore defaults
+          <RotateCcwIcon /> {tr("恢复默认值", "Restore defaults")}
         </Button>
       </div>
     </div>
@@ -489,7 +489,7 @@ export default function ToolsPage() {
                   </CardDescription>
                 </div>
                 <Button size="sm" onClick={() => setCustomEdit("new")}>
-                  <PlusIcon /> Create custom tool
+                  <PlusIcon /> {tr("创建自定义工具", "Create custom tool")}
                 </Button>
               </div>
             </CardHeader>
@@ -823,7 +823,7 @@ function CustomToolDialog({
 
           <div className="flex items-center gap-6">
             <label className="flex items-center gap-2 text-sm">
-              <Switch checked={enabled} onCheckedChange={setEnabled} /> Enable
+              <Switch checked={enabled} onCheckedChange={setEnabled} /> {tr("启用", "Enable")}
             </label>
             {kind !== "shell" && (
               <label className="flex items-center gap-2 text-sm">
@@ -860,11 +860,11 @@ function CustomToolDialog({
         <Separator />
         <div className="flex items-center gap-2 p-4">
           <Button size="sm" onClick={save} disabled={saving}>
-            <SaveIcon /> {isNew ? "Create" : "Save"}
+            <SaveIcon /> {isNew ? tr("创建", "Create") : tr("保存", "Save")}
           </Button>
           {!isNew && (
             <Button size="sm" variant="outline" className="text-destructive" onClick={del}>
-              <Trash2Icon /> Delete
+              <Trash2Icon /> {tr("删除", "Delete")}
             </Button>
           )}
         </div>
