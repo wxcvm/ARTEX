@@ -27,6 +27,9 @@ internal static class Program
         try
         {
             var bridge = Desktop.GetType("Artex.Desktop.SetupTokenBridge", true)!.GetMethod("IsSetupDocument", BindingFlags.Static | BindingFlags.NonPublic)!;
+            var route = Desktop.GetType("Artex.Desktop.SetupTokenBridge", true)!.GetMethod("InitialRoute", BindingFlags.Static | BindingFlags.NonPublic)!;
+            Check((string)route.Invoke(null, [false])! == "/setup/", "A cached browser login must not skip initial-password setup for a new database");
+            Check((string)route.Invoke(null, [true])! == "/", "Existing accounts should keep the normal entry route");
             foreach (var uri in new[] { "http://127.0.0.1:8787/setup", "http://127.0.0.1:8787/setup/" })
                 Check((bool)bridge.Invoke(null, [uri])!, "Valid setup document rejected");
             foreach (var uri in new[] { "https://example.com/setup", "http://localhost:8787/setup", "http://127.0.0.1:8788/setup", "http://127.0.0.1:8787/welcome", "http://127.0.0.1:8787/setup?next=external", "http://127.0.0.1:8787/setup#external", "http://x@127.0.0.1:8787/setup" })

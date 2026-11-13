@@ -89,7 +89,7 @@ internal static class ManagedPostgres
                 try
                 {
                     File.WriteAllText(passwordFile, cluster.AdminPassword + "\n", new UTF8Encoding(false));
-                    await RunAsync(Path.Combine(cluster.Bin, "initdb.exe"), ["-D", Data, "-U", "postgres", "--auth=scram-sha-256", "--encoding=UTF8", "--locale=C", "--pwfile=" + passwordFile], cancel);
+                    await RunAsync(Path.Combine(cluster.Bin, "initdb.exe"), ["-D", "data", "-U", "postgres", "--auth=scram-sha-256", "--encoding=UTF8", "--locale=C", "--pwfile=init-password.tmp"], cancel, workingDirectory: Root);
                 }
                 finally { File.Delete(passwordFile); }
             }
@@ -121,8 +121,8 @@ internal static class ManagedPostgres
     private static async Task EnsureStartedCoreAsync(Cluster c, CancellationToken cancel)
     {
         var ctl = Path.Combine(c.Bin, "pg_ctl.exe");
-        if (await RunAsync(ctl, ["status", "-D", Data], cancel, allowFailure: true) == 0) return;
-        await RunAsync(ctl, ["start", "-D", Data, "-l", Path.Combine(Root, "postgresql.log"), "-w", "-t", "30", "-o", $"-h 127.0.0.1 -p {c.Port}"], cancel, captureOutput: false);
+        if (await RunAsync(ctl, ["status", "-D", "data"], cancel, allowFailure: true, workingDirectory: Root) == 0) return;
+        await RunAsync(ctl, ["start", "-D", "data", "-l", "postgresql.log", "-w", "-t", "30", "-o", $"-h 127.0.0.1 -p {c.Port}"], cancel, captureOutput: false, workingDirectory: Root);
         startedHere = true;
     }
 
@@ -134,7 +134,7 @@ internal static class ManagedPostgres
             var c = ReadManifest();
             // FormClosed runs on the WinForms context. Do not block that context
             // while the async process waiter tries to resume back onto it.
-            if (c is not null) Task.Run(() => RunAsync(Path.Combine(c.Bin, "pg_ctl.exe"), ["stop", "-D", Data, "-m", "fast", "-w", "-t", "15"], CancellationToken.None)).GetAwaiter().GetResult();
+            if (c is not null) Task.Run(() => RunAsync(Path.Combine(c.Bin, "pg_ctl.exe"), ["stop", "-D", "data", "-m", "fast", "-w", "-t", "15"], CancellationToken.None, workingDirectory: Root)).GetAwaiter().GetResult();
             startedHere = false;
         }
         catch (Exception ex) { Debug.WriteLine("独立数据库未能正常停止：" + ex.GetType().Name); }
@@ -153,9 +153,9 @@ internal static class ManagedPostgres
     }
 
     internal static async Task<int> RunAsync(string executable, string[] arguments, CancellationToken cancel,
-        Dictionary<string, string>? environment = null, bool allowFailure = false, string? expectedText = null, string[]? secrets = null, bool captureOutput = true)
+        Dictionary<string, string>? environment = null, bool allowFailure = false, string? expectedText = null, string[]? secrets = null, bool captureOutput = true, string? workingDirectory = null)
     {
-        var info = new ProcessStartInfo(executable) { UseShellExecute = false, CreateNoWindow = true, RedirectStandardOutput = captureOutput, RedirectStandardError = captureOutput, WorkingDirectory = AppContext.BaseDirectory };
+        var info = new ProcessStartInfo(executable) { UseShellExecute = false, CreateNoWindow = true, RedirectStandardOutput = captureOutput, RedirectStandardError = captureOutput, WorkingDirectory = workingDirectory ?? AppContext.BaseDirectory };
         foreach (var a in arguments) info.ArgumentList.Add(a);
         if (environment is not null) foreach (var item in environment) info.Environment[item.Key] = item.Value;
         using var process = Process.Start(info) ?? throw new IOException("无法启动数据库程序。");

@@ -309,7 +309,18 @@ public sealed class MainForm : Form
             // NavigationCompleted is responsible for marking the page ready.
             ready = false;
             status.Text = "正在加载 ARTEX 页面…";
-            browser.CoreWebView2.Navigate(Service.AbsoluteUri);
+            var destination = Service;
+            if (ownedBackend is { HasExited: false })
+            {
+                using var response = await http.GetAsync(new Uri(Service, "api/auth/status"), cancel);
+                response.EnsureSuccessStatusCode();
+                using var initialization = JsonDocument.Parse(await response.Content.ReadAsStringAsync(cancel));
+                if (!initialization.RootElement.TryGetProperty("initialized", out var initialized) ||
+                    initialized.ValueKind is not (JsonValueKind.True or JsonValueKind.False))
+                    throw new InvalidDataException("无法确认登录账号初始化状态，请重新连接。");
+                destination = new Uri(Service, SetupTokenBridge.InitialRoute(initialized.GetBoolean()));
+            }
+            browser.CoreWebView2.Navigate(destination.AbsoluteUri);
         }
         catch (OperationCanceledException) when (cancel.IsCancellationRequested)
         {
