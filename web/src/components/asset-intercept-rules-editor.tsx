@@ -1,5 +1,8 @@
 "use client";
 
+import { useUiLocale } from "@/lib/ui-locale.client";
+import { uiText } from "@/lib/ui-locale";
+
 import * as React from "react";
 
 import { PlusIcon, Trash2Icon } from "lucide-react";
@@ -34,6 +37,8 @@ export function AssetInterceptRulesEditor({
   value: AssetInterceptRuleInput[];
   onChange: (v: AssetInterceptRuleInput[]) => void;
 }) {
+  const locale = useUiLocale();
+  const tr = (zh: string, en: string) => uiText(locale, zh, en);
   function update(i: number, patch: Partial<AssetInterceptRuleInput>) {
     onChange(value.map((r, idx) => (idx === i ? { ...r, ...patch } : r)));
   }
@@ -56,8 +61,8 @@ export function AssetInterceptRulesEditor({
               value={r.action}
               onChange={(e) => update(i, { action: e.target.value as "block" | "allow" })}
             >
-              <NativeSelectOption value="block">Block</NativeSelectOption>
-              <NativeSelectOption value="allow">Allow</NativeSelectOption>
+              <NativeSelectOption value="block">{tr("阻止", "Block")}</NativeSelectOption>
+              <NativeSelectOption value="allow">{tr("允许", "Allow")}</NativeSelectOption>
             </NativeSelect>
             <NativeSelect
               size="sm"
@@ -67,7 +72,7 @@ export function AssetInterceptRulesEditor({
             >
               {ASSET_INTERCEPT_KIND_OPTIONS.map((o) => (
                 <NativeSelectOption key={o.value} value={o.value}>
-                  {o.label}
+                  {locale === "en" ? o.label : ({ exact_domain: "域名（精确）", exact_ip: "IP（精确）", exact_url: "URL（精确）", fuzzy_domain: "域名（模糊）", fuzzy_ip: "IP（模糊）", fuzzy_url: "URL（模糊）", cidr: "CIDR 网段" })[o.value]}
                 </NativeSelectOption>
               ))}
             </NativeSelect>
@@ -79,7 +84,7 @@ export function AssetInterceptRulesEditor({
             />
             <Input
               className="w-[120px] shrink-0"
-              placeholder="Note (optional)"
+              placeholder={tr("备注（可选）", "Note (optional)")}
               value={r.note}
               onChange={(e) => update(i, { note: e.target.value })}
             />
@@ -96,7 +101,7 @@ export function AssetInterceptRulesEditor({
         );
       })}
       <Button type="button" size="sm" variant="outline" className="w-fit" onClick={add}>
-        <PlusIcon className="size-4" /> Add row
+        <PlusIcon className="size-4" /> {tr("添加规则", "Add row")}
       </Button>
     </div>
   );

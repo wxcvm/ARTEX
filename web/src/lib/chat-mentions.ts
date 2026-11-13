@@ -11,6 +11,13 @@ export const mentionKinds = [
 ] as const;
 
 export type MentionKind = (typeof mentionKinds)[number]["kind"];
+const mentionLabelsZh: Record<MentionKind, string> = { finding: "发现结果", asset: "资产", company: "企业", endpoint: "接口", ip: "IP", app: "应用", root_domain: "根域名", subdomain: "子域名", service: "服务" };
+
+// Display labels must never change the canonical mention token or API kind.
+export function mentionDisplayLabel(kind: MentionKind, locale: "zh-CN" | "en"): string {
+  return locale === "en" ? mentionKinds.find((item) => item.kind === kind)?.label ?? kind : mentionLabelsZh[kind] ?? kind;
+}
+
 export interface ChatMention {
   kind: MentionKind;
   id: number;

@@ -1028,6 +1028,7 @@ export default function SkillsPage() {
                 <span className="font-medium text-foreground">{selected.skill}</span>
                 <span>/</span>
                 <span className="font-mono">{selected.path}</span>
+                {locale !== "en" && skillSummary(selected.skill) && <span className="truncate" title={skillSummary(selected.skill)}>{tr("原文 · 中文简介见技能详情", "Original source · summary in skill details")}</span>}
                 <Button size="sm" className="ml-auto" onClick={saveFile} disabled={!dirty || saving}>
                   {saving ? tr("正在保存…", "Saving…") : tr("保存", "Save")}
                 </Button>
@@ -1037,6 +1038,7 @@ export default function SkillsPage() {
               ) : (
                 <Textarea
                   className="flex-1 resize-none font-mono text-xs"
+                  aria-label={tr("原始技能文件正文", "Original skill file content")}
                   value={fileContent}
                   onChange={(e) => { setFileContent(e.target.value); setDirty(true); }}
                 />

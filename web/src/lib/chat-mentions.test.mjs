@@ -29,3 +29,13 @@ test("tokens roundtrip labels and removing one reference preserves its neighbors
   const next = value.slice(0, selected[0].start) + value.slice(selected[0].start + selected[0].token.length);
   assert.equal(selectedMentions(next)[0].token, second);
 });
+
+
+test("reference labels localize without changing the canonical mention token", async () => {
+  const { mentionDisplayLabel, mentionToken, selectedMentions } = await import("./chat-mentions.ts");
+  const item = { kind: "finding", id: 42, label: "Original evidence", description: "" };
+  assert.equal(mentionDisplayLabel("finding", "zh-CN"), "发现结果");
+  assert.equal(mentionDisplayLabel("finding", "en"), "finding");
+  assert.equal(mentionToken(item), "@[finding#42 Original evidence]");
+  assert.equal(selectedMentions(mentionToken(item))[0].token, mentionToken(item));
+});
