@@ -34,6 +34,8 @@ import {
   SheetHeader,
   SheetTitle,
 } from "@/components/ui/sheet";
+import { useUiLocale } from "@/lib/ui-locale.client";
+import { uiText } from "@/lib/ui-locale";
 import { api } from "@/lib/api";
 import { toolLabel } from "@/lib/resource-labels";
 import { ExternalToolsPanel } from "@/components/external-tools-panel";
@@ -156,6 +158,8 @@ function ToolEditor({
   onSaved: () => void;
   onClose: () => void;
 }) {
+  const locale = useUiLocale();
+  const tr = (zh: string, en: string) => uiText(locale, zh, en);
   // traffic tools can't be bound/enabled until the global traffic capture switch is on.
   const trafficGated = TRAFFIC_TOOL_KEYS.has(tool.key) && !captureOn;
   const [description, setDescription] = React.useState(tool.description);
@@ -182,7 +186,7 @@ function ToolEditor({
       onSaved();
       onClose();
     } catch (e) {
-      toast.error("保存失败：" + (e as Error).message);
+      toast.error(tr("保存失败：", "Save failed: ") + (e as Error).message);
     } finally {
       setSaving(false);
     }
@@ -194,7 +198,7 @@ function ToolEditor({
       onSaved();
       onClose();
     } catch (e) {
-      toast.error("恢复失败：" + (e as Error).message);
+      toast.error(tr("恢复失败：", "Restore failed: ") + (e as Error).message);
     }
   }
 
@@ -209,7 +213,7 @@ function ToolEditor({
         {/* binding + switch */}
         <div className="flex flex-wrap items-center gap-x-6 gap-y-3">
           <div className="grid gap-1.5">
-            <Label className="text-muted-foreground text-xs">绑定智能体（决定哪些智能体可使用此工具）</Label>
+            <Label className="text-muted-foreground text-xs">{tr("绑定智能体（决定哪些智能体可使用此工具）", "Agent bindings (which agents can use this tool)")}</Label>
             <div className="flex flex-wrap gap-3">
               {agents.map((ag) => (
                 <label key={ag.key} className="flex items-center gap-2 text-sm">
@@ -222,21 +226,21 @@ function ToolEditor({
                   <span className="text-muted-foreground font-mono text-xs">{ag.key}</span>
                 </label>
               ))}
-              {agents.length === 0 && <span className="text-muted-foreground text-xs">（暂无智能体）</span>}
+              {agents.length === 0 && <span className="text-muted-foreground text-xs">{tr("（暂无智能体）", "(No agents)")}</span>}
             </div>
           </div>
           <div className="flex items-center gap-2">
             <Switch checked={enabled} onCheckedChange={setEnabled} id={`en-${tool.key}`} />
             <Label htmlFor={`en-${tool.key}`} className="text-sm">
-              启用
+              {tr("启用", "Enable")}
             </Label>
           </div>
         </div>
 
         {/* description */}
         <div className="grid gap-1.5">
-          <Label className="text-muted-foreground text-xs">原始工具说明（发送给模型）</Label>
-          <p className="text-xs text-muted-foreground">中文名称仅用于界面展示。这里保留模型实际使用的说明，可按需编辑。</p>
+          <Label className="text-muted-foreground text-xs">{tr("原始工具说明（发送给模型）", "Original tool description (sent to the model)")}</Label>
+          <p className="text-xs text-muted-foreground">{tr("中文名称仅用于界面展示。这里保留模型实际使用的说明，可按需编辑。", "Localized names are for display only. The actual model-facing description is preserved and editable.")}</p>
           <Textarea
             className="font-mono text-xs"
             rows={6}
@@ -248,9 +252,9 @@ function ToolEditor({
         {/* params */}
         <div className="grid gap-2">
           <Label className="text-muted-foreground text-xs">
-            参数（名称、类型、是否必填为只读；说明和默认值可编辑）
+            {tr("参数（名称、类型、是否必填为只读；说明和默认值可编辑）", "Parameters (name, type and required flag are read-only; descriptions and defaults are editable)")}
           </Label>
-          {rows.length === 0 && <span className="text-muted-foreground text-xs">（暂无参数）</span>}
+          {rows.length === 0 && <span className="text-muted-foreground text-xs">{tr("（暂无参数）", "(No parameters)")}</span>}
           {rows.map((r, i) => (
             <div
               key={(r.parentKey ?? "") + "." + r.name}
@@ -271,12 +275,12 @@ function ToolEditor({
                   </Badge>
                 )}
                 {r.parentKey && (
-                  <span className="text-muted-foreground text-[10px]">items 子字段</span>
+                  <span className="text-muted-foreground text-[10px]">{tr("items 子字段", "items subfields")}</span>
                 )}
               </div>
               <div className="grid gap-2">
                 <div className="grid gap-1">
-                  <Label className="text-muted-foreground text-[11px]">说明</Label>
+                  <Label className="text-muted-foreground text-[11px]">{tr("说明", "Description")}</Label>
                   <Input
                     className="text-xs"
                     value={r.description}
@@ -284,10 +288,10 @@ function ToolEditor({
                   />
                 </div>
                 <div className="grid gap-1">
-                  <Label className="text-muted-foreground text-[11px]">默认值</Label>
+                  <Label className="text-muted-foreground text-[11px]">{tr("默认值", "Default value")}</Label>
                   <Input
                     className="text-xs"
-                    placeholder={r.scalar ? "（留空表示无默认值）" : "仅支持标量"}
+                    placeholder={r.scalar ? tr("（留空表示无默认值）", "(empty = no default)") : tr("仅支持标量", "Scalar only")}
                     disabled={!r.scalar}
                     value={r.defaultStr}
                     onChange={(e) => setRow(i, { defaultStr: e.target.value })}
@@ -314,6 +318,8 @@ function ToolEditor({
 
 // ToolGridCard is one clickable tile in the catalog grid.
 function ToolGridCard({ tool, onClick }: { tool: Tool; onClick: () => void }) {
+  const locale = useUiLocale();
+  const tr = (zh: string, en: string) => uiText(locale, zh, en);
   return (
     <button
       type="button"
@@ -321,15 +327,15 @@ function ToolGridCard({ tool, onClick }: { tool: Tool; onClick: () => void }) {
       className="hover:border-primary/50 hover:bg-muted/40 focus-visible:ring-ring flex flex-col gap-2 rounded-lg border p-4 text-left transition-colors focus-visible:ring-2 focus-visible:outline-none"
     >
       <div className="flex flex-wrap items-center gap-2">
-        <span className="text-sm font-medium">{toolLabel(tool.key, tool.system)}</span>
-        {toolLabel(tool.key, tool.system) !== tool.key && <span className="font-mono text-[10px] text-muted-foreground">{tool.key}</span>}
+        <span className="text-sm font-medium">{locale === "en" ? tool.key : toolLabel(tool.key, tool.system)}</span>
+        {locale !== "en" && toolLabel(tool.key, tool.system) !== tool.key && <span className="font-mono text-[10px] text-muted-foreground">{tool.key}</span>}
         {tool.system ? (
           <Badge variant="secondary" className="px-1.5 py-0 text-[10px]">
-            系统
+            {tr("系统", "System")}
           </Badge>
         ) : (
           <Badge variant="outline" className="px-1.5 py-0 text-[10px]">
-            自定义 · {tool.kind}
+            {tr("自定义", "Custom")} · {tool.kind}
           </Badge>
         )}
         {tool.deferred && (
@@ -339,7 +345,7 @@ function ToolGridCard({ tool, onClick }: { tool: Tool; onClick: () => void }) {
         )}
         {!tool.enabled && (
           <Badge variant="outline" className="text-destructive px-1.5 py-0 text-[10px]">
-            已停用
+            {tr("已停用", "Disabled")}
           </Badge>
         )}
         <Badge
@@ -351,11 +357,11 @@ function ToolGridCard({ tool, onClick }: { tool: Tool; onClick: () => void }) {
         </Badge>
       </div>
       <p className="text-muted-foreground line-clamp-1 h-4 text-xs">
-        {tool.description || "（暂无说明）"}
+        {tool.description || tr("（暂无说明）", "(No description)")}
       </p>
       <div className="mt-auto flex flex-wrap gap-1 pt-1">
         {tool.agents.length === 0 && (
-          <span className="text-muted-foreground text-[10px]">（未绑定智能体）</span>
+          <span className="text-muted-foreground text-[10px]">{tr("（未绑定智能体）", "(No bound agents)")}</span>
         )}
         {tool.agents.map((a) => (
           <Badge key={a} variant="outline" className="px-1.5 py-0 text-[10px]">
@@ -368,6 +374,8 @@ function ToolGridCard({ tool, onClick }: { tool: Tool; onClick: () => void }) {
 }
 
 export default function ToolsPage() {
+  const locale = useUiLocale();
+  const tr = (zh: string, en: string) => uiText(locale, zh, en);
   const [tools, setTools] = React.useState<Tool[]>([]);
   const [activeTab, setActiveTab] = React.useState("system");
   const [agents, setAgents] = React.useState<Agent[]>([]);
@@ -408,14 +416,14 @@ export default function ToolsPage() {
     <div className="flex flex-1 flex-col gap-4 md:gap-6">
       <div className="flex flex-wrap items-start justify-between gap-3">
         <div>
-          <h1 className="text-xl font-semibold tracking-tight">工具管理</h1>
-          <p className="text-muted-foreground text-sm">管理系统工具的说明和绑定，以及自定义命令、脚本和 HTTP 工具</p>
+          <h1 className="text-xl font-semibold tracking-tight">{tr("工具管理", "Tool management")}</h1>
+          <p className="text-muted-foreground text-sm">{tr("管理系统工具的说明和绑定，以及自定义命令、脚本和 HTTP 工具", "Manage system tool descriptions and bindings, and custom command, script and HTTP tools.")}</p>
         </div>
         <div className="relative w-64">
           <SearchIcon className="text-muted-foreground absolute left-2.5 top-1/2 size-3.5 -translate-y-1/2" />
           <Input
             className="h-8 pl-8 text-sm"
-            placeholder="搜索工具名称、说明、智能体…"
+            placeholder={tr("搜索工具名称、说明、智能体…", "Search tool names, descriptions or agents…")}
             value={query}
             onChange={(e) => setQuery(e.target.value)}
           />
@@ -424,15 +432,15 @@ export default function ToolsPage() {
 
       <Tabs value={activeTab} onValueChange={setActiveTab}>
         <TabsList>
-          <TabsTrigger value="system">系统工具</TabsTrigger>
-          <TabsTrigger value="custom">自定义工具</TabsTrigger>
-          <TabsTrigger value="external">外部程序</TabsTrigger>
+          <TabsTrigger value="system">{tr("系统工具", "System tools")}</TabsTrigger>
+          <TabsTrigger value="custom">{tr("自定义工具", "Custom tools")}</TabsTrigger>
+          <TabsTrigger value="external">{tr("外部程序", "External programs")}</TabsTrigger>
         </TabsList>
 
         <TabsContent value="system">
           <Card>
             <CardHeader>
-              <CardTitle>系统工具</CardTitle>
+              <CardTitle>{tr("系统工具", "System tools")}</CardTitle>
               <CardDescription>
                 {query.trim()
                   ? `${systemTools.length} / ${allSystemCount} matching; click a card to edit the description, parameter defaults and agent bindings`
@@ -442,7 +450,7 @@ export default function ToolsPage() {
             <CardContent>
               {systemTools.length === 0 ? (
                 <p className="text-muted-foreground py-6 text-center text-sm">
-                  {query.trim() ? "没有匹配的系统工具" : "（暂无系统工具，等待后端初始化）"}
+                  {query.trim() ? tr("没有匹配的系统工具", "No matching system tools") : tr("（暂无系统工具，等待后端初始化）", "(No system tools; waiting for backend initialization)")}
                 </p>
               ) : (
                 <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
@@ -464,7 +472,7 @@ export default function ToolsPage() {
             <CardHeader>
               <div className="flex items-start justify-between gap-3">
                 <div>
-                  <CardTitle>自定义工具</CardTitle>
+                  <CardTitle>{tr("自定义工具", "Custom tools")}</CardTitle>
                   <CardDescription>
                     {query.trim()
                       ? `shell/command/script/http，匹配 ${customTools.length} / ${allCustomCount} 项；点击卡片编辑`
@@ -479,7 +487,7 @@ export default function ToolsPage() {
             <CardContent>
               {customTools.length === 0 ? (
                 <p className="text-muted-foreground py-6 text-center text-sm">
-                  {query.trim() ? "没有匹配的自定义工具" : "（暂无自定义工具，点击右上角「创建自定义工具」）"}
+                  {query.trim() ? tr("没有匹配的自定义工具", "No matching custom tools") : tr("（暂无自定义工具，点击右上角「创建自定义工具」）", "(No custom tools; click Create custom tool)")}
                 </p>
               ) : (
                 <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
@@ -501,9 +509,9 @@ export default function ToolsPage() {
           {selected && (
             <>
               <SheetHeader className="px-4">
-                <SheetTitle>{toolLabel(selected.key, selected.system)}</SheetTitle>
-                {toolLabel(selected.key, selected.system) !== selected.key && <p className="text-xs font-mono text-muted-foreground">工具标识：{selected.key}</p>}
-                <SheetDescription>编辑说明、参数默认值和智能体绑定</SheetDescription>
+                <SheetTitle>{locale === "en" ? selected.key : toolLabel(selected.key, selected.system)}</SheetTitle>
+                {locale !== "en" && toolLabel(selected.key, selected.system) !== selected.key && <p className="text-xs font-mono text-muted-foreground">{tr("工具标识：", "Tool ID: ")}{selected.key}</p>}
+                <SheetDescription>{tr("编辑说明、参数默认值和智能体绑定", "Edit descriptions, parameter defaults and agent bindings")}</SheetDescription>
               </SheetHeader>
               <ToolEditor
                 key={selected.key}
@@ -556,6 +564,8 @@ function CustomToolDialog({
   onClose: () => void;
   onSaved: () => void;
 }) {
+  const locale = useUiLocale();
+  const tr = (zh: string, en: string) => uiText(locale, zh, en);
   const isNew = edit === "new";
   const tool = edit && edit !== "new" ? edit : null;
   const [key, setKey] = React.useState("");
@@ -621,20 +631,20 @@ function CustomToolDialog({
 
   async function save() {
     if (isNew && !/^[a-z][a-z0-9_]*$/.test(key.trim())) {
-      toast.error("标识符必须以小写字母开头，仅支持小写字母、数字和下划线");
+      toast.error(tr("标识符必须以小写字母开头，仅支持小写字母、数字和下划线", "Identifier must start with a lowercase letter and contain only lowercase letters, digits and underscores"));
       return;
     }
     let schema: Record<string, unknown> = {};
     if (schemaText.trim()) {
-      try { schema = JSON.parse(schemaText); } catch { toast.error("参数 JSON Schema 无效"); return; }
+      try { schema = JSON.parse(schemaText); } catch { toast.error(tr("参数 JSON Schema 无效", "Invalid parameter JSON Schema")); return; }
     }
     if (kind === "http" && ex.headers.trim()) {
-      try { JSON.parse(ex.headers); } catch { toast.error("请求头 JSON 无效"); return; }
+      try { JSON.parse(ex.headers); } catch { toast.error(tr("请求头 JSON 无效", "Invalid header JSON")); return; }
     }
     if (kind === "http") {
       const props = (schema as { properties?: Record<string, unknown> }).properties;
       if (!props || Object.keys(props).length === 0) {
-        toast.error("HTTP 工具必须提供包含 properties 的非空参数 JSON Schema");
+        toast.error(tr("HTTP 工具必须提供包含 properties 的非空参数 JSON Schema", "HTTP tools require a non-empty parameter JSON Schema containing properties"));
         return;
       }
     }
@@ -643,10 +653,10 @@ function CustomToolDialog({
     try {
       if (isNew) await api.createCustomTool({ key: key.trim(), ...payload });
       else await api.updateCustomTool(tool!.key, payload);
-      toast.success(isNew ? "已创建自定义工具" : "已保存");
+      toast.success(isNew ? tr("已创建自定义工具", "Custom tool created") : tr("已保存", "Saved"));
       onSaved();
     } catch (e) {
-      toast.error("保存失败：" + (e as Error).message);
+      toast.error(tr("保存失败：", "Save failed: ") + (e as Error).message);
     } finally {
       setSaving(false);
     }
@@ -655,10 +665,10 @@ function CustomToolDialog({
     if (!tool) return;
     try {
       await api.deleteCustomTool(tool.key);
-      toast.success("已删除");
+      toast.success(tr("已删除", "Deleted"));
       onSaved();
     } catch (e) {
-      toast.error("删除失败：" + (e as Error).message);
+      toast.error(tr("删除失败：", "Delete failed: ") + (e as Error).message);
     }
   }
   // runTest dry-runs the CURRENT form (unsaved) with the sample params, so a
@@ -666,10 +676,10 @@ function CustomToolDialog({
   async function runTest() {
     let params: Record<string, unknown> = {};
     if (paramsText.trim()) {
-      try { params = JSON.parse(paramsText); } catch { toast.error("测试参数 JSON 无效"); return; }
+      try { params = JSON.parse(paramsText); } catch { toast.error(tr("测试参数 JSON 无效", "Invalid test parameter JSON")); return; }
     }
     if (kind === "http" && ex.headers.trim()) {
-      try { JSON.parse(ex.headers); } catch { toast.error("请求头 JSON 无效"); return; }
+      try { JSON.parse(ex.headers); } catch { toast.error(tr("请求头 JSON 无效", "Invalid header JSON")); return; }
     }
     setTesting(true);
     setTestResult(null);
@@ -690,30 +700,30 @@ function CustomToolDialog({
         className="flex flex-col gap-0 p-0 data-[side=right]:w-[45vw] data-[side=right]:sm:max-w-[45vw] data-[side=right]:min-w-[480px]"
       >
         <SheetHeader className="px-4">
-          <SheetTitle>{isNew ? "创建自定义工具" : `编辑 ${tool?.key}`}</SheetTitle>
+          <SheetTitle>{isNew ? tr("创建自定义工具", "Create custom tool") : tr(`编辑 ${tool?.key}`, `Edit ${tool?.key}`)}</SheetTitle>
           <SheetDescription>shell 为 Bash 环境声明（仅名称和说明，告知模型可在 Bash 中调用）；command、script、http 需要执行配置。</SheetDescription>
         </SheetHeader>
 
         <div className="flex min-h-0 flex-1 flex-col gap-4 overflow-y-auto px-4 pb-4">
           <div className="grid gap-1.5">
-            <Label className="text-xs">标识符</Label>
-            <Input className="font-mono" placeholder="例如 nmap_scan" value={key} disabled={!isNew}
+            <Label className="text-xs">{tr("标识符", "Identifier")}</Label>
+            <Input className="font-mono" placeholder={tr("例如 nmap_scan", "e.g. custom_tool")} value={key} disabled={!isNew}
               onChange={(e) => setKey(e.target.value)} />
           </div>
           <div className="grid gap-1.5">
-            <Label className="text-xs">说明（发送给模型）</Label>
+            <Label className="text-xs">{tr("说明（发送给模型）", "Description (sent to model)")}</Label>
             <Textarea rows={2} value={description} onChange={(e) => setDescription(e.target.value)} />
           </div>
 
           <div className="grid gap-1.5">
-            <Label className="text-xs">类型</Label>
+            <Label className="text-xs">{tr("类型", "Type")}</Label>
             <Select value={kind} onValueChange={(v) => setKind(v as "shell" | "command" | "script" | "http")}>
               <SelectTrigger className="w-56"><SelectValue /></SelectTrigger>
               <SelectContent>
-                <SelectItem value="shell">shell（Bash 环境声明）</SelectItem>
-                <SelectItem value="command">command（Shell 命令模板）</SelectItem>
-                <SelectItem value="script">script（Python 脚本）</SelectItem>
-                <SelectItem value="http">http（API 请求）</SelectItem>
+                <SelectItem value="shell">{tr("shell（Bash 环境声明）", "shell (Bash environment declaration)")}</SelectItem>
+                <SelectItem value="command">{tr("command（Shell 命令模板）", "command (shell command template)")}</SelectItem>
+                <SelectItem value="script">{tr("script（Python 脚本）", "script (Python script)")}</SelectItem>
+                <SelectItem value="http">{tr("http（API 请求）", "http (API request)")}</SelectItem>
               </SelectContent>
             </Select>
             {kind === "shell" && (
@@ -740,7 +750,7 @@ function CustomToolDialog({
             <div className="grid gap-2">
               <div className="flex gap-2">
                 <div className="grid gap-1.5">
-                  <Label className="text-xs">请求方法</Label>
+                  <Label className="text-xs">{tr("请求方法", "HTTP method")}</Label>
                   <Input className="w-24" value={ex.method} onChange={(e) => setEx({ ...ex, method: e.target.value })} />
                 </div>
                 <div className="grid flex-1 gap-1.5">
@@ -759,12 +769,12 @@ function CustomToolDialog({
               </div>
               <div className="flex items-center gap-4">
                 <div className="grid gap-1.5">
-                  <Label className="text-xs">代理 URL（留空则直连）</Label>
+                  <Label className="text-xs">{tr("代理 URL（留空则直连）", "Proxy URL (empty = direct)")}</Label>
                   <Input className="font-mono text-xs w-56" value={ex.proxy} onChange={(e) => setEx({ ...ex, proxy: e.target.value })} />
                 </div>
                 <label className="mt-4 flex items-center gap-2 text-sm">
                   <Checkbox checked={ex.use_recording_proxy} onCheckedChange={(v) => setEx({ ...ex, use_recording_proxy: !!v })} />
-                  使用流量记录代理
+                  {tr("使用流量记录代理", "Use traffic recording proxy")}
                 </label>
               </div>
             </div>
@@ -773,7 +783,7 @@ function CustomToolDialog({
           {kind !== "shell" && (
             <div className="flex items-center gap-3">
               <div className="grid gap-1.5">
-                <Label className="text-xs">超时（毫秒，留空使用默认值）</Label>
+                <Label className="text-xs">{tr("超时（毫秒，留空使用默认值）", "Timeout (ms; empty = default)")}</Label>
                 <Input type="number" className="w-32" value={ex.timeout_ms} onChange={(e) => setEx({ ...ex, timeout_ms: e.target.value })} />
               </div>
             </div>
@@ -791,7 +801,7 @@ function CustomToolDialog({
           )}
 
           <div className="grid gap-1.5">
-            <Label className="text-muted-foreground text-xs">绑定智能体</Label>
+            <Label className="text-muted-foreground text-xs">{tr("绑定智能体", "Bind agents")}</Label>
             <div className="flex flex-wrap gap-3">
               {agents.map((a) => (
                 <label key={a.key} className="flex items-center gap-2 text-sm">
@@ -815,13 +825,13 @@ function CustomToolDialog({
 
           {kind !== "shell" && (
             <div className="grid gap-1.5 rounded-md border p-3">
-              <Label className="text-xs font-medium">测试运行（使用当前表单，不保存配置）</Label>
+              <Label className="text-xs font-medium">{tr("测试运行（使用当前表单，不保存配置）", "Test run (uses current form without saving)")}</Label>
               <Textarea className="font-mono text-xs" rows={2} value={paramsText}
                 placeholder={'示例参数 JSON，例如 {"target":"example.com"}'}
                 onChange={(e) => setParamsText(e.target.value)} />
               <div>
                 <Button size="sm" variant="outline" onClick={runTest} disabled={testing}>
-                  <PlayIcon /> {testing ? "正在运行…" : "测试运行"}
+                  <PlayIcon /> {testing ? tr("正在运行…", "Running…") : tr("测试运行", "Test run")}
                 </Button>
               </div>
               {testResult && (
