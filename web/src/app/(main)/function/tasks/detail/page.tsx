@@ -96,18 +96,18 @@ function TaskLLMControl({ task, profiles, onUpdated }: { task: Task; profiles: L
   if (task.active_llm_profile_id) activeID = String(task.active_llm_profile_id);
   const activeProfile = profiles.find((profile) => profile.id === activeID);
   const currentLabel = exhausted
-    ? "Configuration chain exhausted"
-    : (activeProfile?.name ?? (activeID ? `Config #${activeID}` : "Follow default config"));
+    ? "配置链已耗尽"
+    : (activeProfile?.name ?? (activeID ? `配置 #${activeID}` : "跟随默认配置"));
   const activeIndex = chain.indexOf(activeID);
   const backupCount = activeIndex >= 0 ? Math.max(0, chain.length - activeIndex - 1) : 0;
   const currentTitle = [currentLabel, activeProfile?.model, backupCount > 0 ? `${backupCount} backups` : ""]
     .filter(Boolean)
     .join(" · ");
-  let editorDescription = "Changes to the order or the current config take effect from the next LLM call.";
-  if (terminal) editorDescription = "The task has ended; changes only affect subsequent main agent conversations.";
-  let saveLabel = "Save";
-  if (exhausted) saveLabel = "Save and reset";
-  if (saving) saveLabel = "Saving";
+  let editorDescription = "顺序或当前配置的修改将在下一次模型调用时生效。";
+  if (terminal) editorDescription = "任务已结束，修改仅影响后续主智能体对话。";
+  let saveLabel = "保存";
+  if (exhausted) saveLabel = "保存并重置";
+  if (saving) saveLabel = "正在保存";
 
   const syncDraft = React.useCallback(() => {
     const next = taskProfileIDs(task);
@@ -145,7 +145,7 @@ function TaskLLMControl({ task, profiles, onUpdated }: { task: Task; profiles: L
       setOpen(false);
       onUpdated();
     } catch (error) {
-      toast.error("Update failed: " + (error as Error).message);
+      toast.error("更新失败：" + (error as Error).message);
     } finally {
       setSaving(false);
     }
@@ -157,7 +157,7 @@ function TaskLLMControl({ task, profiles, onUpdated }: { task: Task; profiles: L
         <Button
           size="sm"
           variant={exhausted ? "destructive" : "outline"}
-          aria-label="View or switch the task LLM config"
+          aria-label="查看或切换任务模型配置"
           title={currentTitle}
         >
           <BrainIcon data-icon="inline-start" />
@@ -167,16 +167,16 @@ function TaskLLMControl({ task, profiles, onUpdated }: { task: Task; profiles: L
       </PopoverTrigger>
       <PopoverContent ref={popoverContentRef} align="start" className="w-[min(28rem,calc(100vw-2rem))] gap-4 p-4">
         <PopoverHeader>
-          <PopoverTitle>Task LLM config chain</PopoverTitle>
+          <PopoverTitle>任务模型配置链</PopoverTitle>
           <PopoverDescription>{editorDescription}</PopoverDescription>
         </PopoverHeader>
 
         {exhausted && (
           <Alert variant="destructive">
             <CircleAlertIcon />
-            <AlertTitle>Configuration chain quota exhausted</AlertTitle>
+            <AlertTitle>配置链额度耗尽</AlertTitle>
             <AlertDescription>
-              {task.llm_failover_reason ?? "All selected configs were judged to be out of quota. Saving the chain resets the failure state."}
+              {task.llm_failover_reason ?? "选中的配置均被判定为额度耗尽。保存配置链可重置失败状态。"}
             </AlertDescription>
           </Alert>
         )}
@@ -194,7 +194,7 @@ function TaskLLMControl({ task, profiles, onUpdated }: { task: Task; profiles: L
 
         <div className="flex justify-end gap-2">
           <Button type="button" variant="outline" size="sm" onClick={() => setOpen(false)}>
-            Close
+            关闭
           </Button>
           <Button type="button" size="sm" onClick={save} disabled={saving}>
             {saving && <Spinner data-icon="inline-start" />}
@@ -285,9 +285,9 @@ function TaskDetailInner() {
     try {
       await api.controlTask(id, next ? "pause" : "resume");
       setPaused(next);
-      toast.success(next ? "Exploration paused" : "Exploration resumed");
+      toast.success(next ? "探索已暂停" : "探索已恢复");
     } catch (e) {
-      toast.error("Operation failed: " + (e as Error).message);
+      toast.error("操作失败：" + (e as Error).message);
     }
   }
 
@@ -296,10 +296,10 @@ function TaskDetailInner() {
     setArchiving(true);
     try {
       await api.archiveTask(task.id);
-      toast.success("Task queued for archiving");
+      toast.success("任务已加入归档队列");
       router.push("/function/tasks");
     } catch (error) {
-      toast.error(`Archive failed: ${(error as Error).message}`);
+      toast.error(`归档失败：${(error as Error).message}`);
       setArchiving(false);
     }
   }
@@ -307,7 +307,7 @@ function TaskDetailInner() {
   if (!task) {
     return (
       <div className="flex flex-1 flex-col items-center justify-center gap-3 p-10 text-center">
-        <p className="text-muted-foreground">{loaded ? `Task ${id} was deleted, archived, or does not exist` : "Loading…"}</p>
+        <p className="text-muted-foreground">{loaded ? `任务 ${id} 已删除、已归档或不存在` : "正在加载…"}</p>
         {loaded && (
           <Button asChild variant="outline">
             <Link href="/function/tasks">
@@ -323,9 +323,9 @@ function TaskDetailInner() {
   const terminal = ["done", "failed", "timeout"].includes(task.status);
   const archiveLifecycleEligible = terminal || paused || task.status === "paused";
   const canArchive = archiveLifecycleEligible && !task.archive_blocked_by_task_id;
-  let archiveDisabledReason = task.queued ? "Queued tasks must be paused first" : "Running tasks must be paused first";
+  let archiveDisabledReason = task.queued ? "排队任务需先暂停" : "运行中任务需先暂停";
   if (archiveLifecycleEligible && task.archive_blocked_by_task_id) {
-    archiveDisabledReason = `The task is directly inherited by unarchived task #${task.archive_blocked_by_task_id}; archive the dependent task first`;
+    archiveDisabledReason = `此任务被未归档任务 #${task.archive_blocked_by_task_id} 直接继承；请先归档依赖任务`;
   }
   const engineMode = paused ? "paused" : (task.engine_mode ?? "idle");
   let controlVariant: "default" | "secondary" | "outline" = "outline";
@@ -345,7 +345,7 @@ function TaskDetailInner() {
       size="icon-sm"
       variant="ghost"
       disabled={!canArchive || archiving}
-      aria-label={canArchive ? "Archive task" : archiveDisabledReason}
+      aria-label={canArchive ? "归档任务" : archiveDisabledReason}
     >
       {archiving ? <Spinner /> : <ArchiveIcon />}
     </Button>
@@ -382,15 +382,15 @@ function TaskDetailInner() {
               <AlertDialogTrigger asChild>{archiveTrigger}</AlertDialogTrigger>
               <AlertDialogContent>
                 <AlertDialogHeader>
-                  <AlertDialogTitle>Archive task #{task.id}?</AlertDialogTitle>
+                  <AlertDialogTitle>归档任务 #{task.id}？</AlertDialogTitle>
                   <AlertDialogDescription>
                     The task graph, related records, exclusive assets and traffic, working files, and LLM
                     history will be compressed into cold storage. Once archiving completes, restore it from the "Archived" tab of the task list.
                   </AlertDialogDescription>
                 </AlertDialogHeader>
                 <AlertDialogFooter>
-                  <AlertDialogCancel>Cancel</AlertDialogCancel>
-                  <AlertDialogAction onClick={() => void archiveTask()}>Confirm archive</AlertDialogAction>
+                  <AlertDialogCancel>取消</AlertDialogCancel>
+                  <AlertDialogAction onClick={() => void archiveTask()}>确认归档</AlertDialogAction>
                 </AlertDialogFooter>
               </AlertDialogContent>
             </AlertDialog>
