@@ -101,7 +101,7 @@ function statusTone(code: number) {
 
 const PAGE_SIZES = [25, 50, 100, 200];
 
-const TABS: { key: string; label: string; icon: LucideIcon }[] = [
+const TABS: { key: string; label: string; en: string; icon: LucideIcon }[] = [
   { key: "company", label: "企业", en: "Company", icon: BuildingIcon },
   { key: "root_domain", label: "根域名", en: "Root domain", icon: GlobeIcon },
   { key: "ip", label: "IP", en: "IP", icon: NetworkIcon },
