@@ -145,6 +145,7 @@ type Engine struct {
 	stamped      sync.Map // taskID -> bool, whether first_run_at has been stamped (once per process)
 	inflight     sync.Map // taskID -> *int64, count of in-flight planner.Plan + worker.Execute (for drain)
 	coordStarted sync.Map // taskID -> bool, whether the deadline coordinator has started (deduplicated across Run/reload)
+	budgets sync.Map // taskID -> optional run budget ledger
 
 	// resolve returns a task's dedicated planner/worker (wired by the server as the
 	// authoritative task-router). nil,nil means this task is deliberately unavailable
@@ -287,6 +288,7 @@ func (e *Engine) StopTask(taskID string) {
 	e.stamped.Delete(taskID)
 	e.inflight.Delete(taskID)
 	e.coordStarted.Delete(taskID)
+	e.budgets.Delete(taskID)
 	e.deleteMu.Lock()
 	e.deleting.Delete(taskID)
 	e.deleteMu.Unlock()
@@ -543,6 +545,7 @@ type steerHooks struct {
 	limit int
 	// label looks like "worker-1 · #42"; used only for logging.
 	label string
+	budget *agent.IntentMeter
 }
 
 // Default number of reruns for idle turns (thinking only, neither body text nor tool
@@ -583,6 +586,9 @@ func (h steerHooks) PreToolUse(ctx context.Context, name string, input []byte) (
 	if msg, ok := h.drain(); ok {
 		return true, "[Planner real-time steering] " + msg +
 			"\n(This is the planner's immediate instruction for this intent; the tool call was not executed — adjust your next step accordingly. If it conflicts with your current plan, this takes precedence.)", nil
+	}
+	if h.budget != nil && h.budget.Exhausted() && agent.BudgetWrapupBlocks(name) {
+		return true, agent.WorkerBudgetWrapup, nil
 	}
 	if h.inner != nil {
 		return h.inner.PreToolUse(ctx, name, input)
@@ -874,7 +880,13 @@ func (e *Engine) plannerLoop(ctx context.Context, t *Task) {
 						Summary: "All goals have been met, the direct-injected intents have finished executing, and the task is over"})
 				}
 			}
+			if !isTerminalStatus(t.lifecycleSnapshot().Status) {
+				e.budgetStop(ctx, t)
+			}
 			return // the goalless branch never enters planner.Plan
+		}
+		if e.budgetStop(ctx, t) {
+			return
 		}
 		// quiet-mode (#79): an edge round is redundant while work is in flight
 		// and the open-goal set is unchanged since the last completed round —
@@ -908,7 +920,7 @@ func (e *Engine) plannerLoop(ctx context.Context, t *Task) {
 		triggers := t.drainTriggers()
 		taskIDInt, _ := strconv.ParseInt(t.ID, 10, 64)
 		e.BeginLLMCall(t.ID)
-		met, reason, err := planner.Plan(ectx, taskIDInt, e.m.assets, t.Store, t.Goal, triggers, emit)
+		met, reason, err := planner.Plan(e.budgetRoundCtx(ectx, t, false), taskIDInt, e.m.assets, t.Store, t.Goal, triggers, emit)
 		e.EndLLMCall(t.ID)
 		switch {
 		case err != nil && ectx.Err() == nil:
@@ -931,6 +943,9 @@ func (e *Engine) plannerLoop(ctx context.Context, t *Task) {
 		// tell "nothing changed" apart from "the plan input changed".
 		if fp, err := t.Store.OpenGoalFingerprint(); err == nil {
 			e.goalFP.Store(t.ID, fp)
+		}
+		if e.budgetBlocksClaim(t.ID) {
+			t.Notify()
 		}
 		e.touch(t.ID)
 	}
@@ -988,7 +1003,10 @@ func (e *Engine) workerLoop(ctx context.Context, t *Task, name string) {
 		if !e.beginTaskOperation(t.ID) {
 			return
 		}
-		claimed := e.runWorkerStep(ctx, t, name, worker)
+		claimed := false
+		if !e.budgetBlocksClaim(t.ID) {
+			claimed = e.runWorkerStep(ctx, t, name, worker)
+		}
 		e.decInflight(t.ID)
 		if !claimed && sleepCtx(ctx, 800*time.Millisecond) {
 			return
@@ -1049,6 +1067,10 @@ func (e *Engine) runIntent(ctx context.Context, t *Task, name string, worker *ag
 	}
 	label := fmt.Sprintf("%s · #%d", name, iid)
 	workCtx = intercept.WithTaskContext(workCtx, t.ID, label, taskEmit)
+	workCtx, meter := e.budgetIntent(workCtx, t.ID)
+	if meter != nil {
+		defer func() { meter.Finish(); if e.budgetBlocksClaim(t.ID) { t.Notify() } }()
+	}
 	// nudges deliberately sits outside the model_error rerun loop: the idle-turn rerun
 	// cap is a per-intent total, and one rerun round must not reset it back to zero.
 	hooks := steerHooks{
@@ -1057,6 +1079,7 @@ func (e *Engine) runIntent(ctx context.Context, t *Task, name string, worker *ag
 		nudges: &atomic.Int64{},
 		limit:  e.emptyTurnNudgeLimit(),
 		label:  label,
+		budget: meter,
 	}
 	wTaskID, _ := strconv.ParseInt(t.ID, 10, 64)
 	e.BeginLLMCall(t.ID)
@@ -1074,7 +1097,7 @@ func (e *Engine) runIntent(ctx context.Context, t *Task, name string, worker *ag
 	// [and has not entered settlement]; otherwise yield to the matching branch (no retries during settlement, so backoff does not eat into other workers' graceful-settlement window).
 	maxRetries, retryBackoff := e.modelErrorRetryPolicy()
 	for attempt := 1; attempt <= maxRetries &&
-		retryableWorkerModelError(reason, err) &&
+		retryableWorkerModelError(reason, err) && (meter == nil || !meter.Exhausted()) &&
 		workCtx.Err() == nil && ectx.Err() == nil && !e.IsPaused(t.ID) && !e.isSettling(t.ID); attempt++ {
 		log.Printf("[worker %s] task %s intent #%d finished with model_error, retrying after %v (%d/%d)",
 			name, t.ID, intent.ID, retryBackoff, attempt, maxRetries)

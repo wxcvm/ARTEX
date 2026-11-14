@@ -627,3 +627,9 @@ Users must comply with all laws and regulations of their country/region regardin
 
 This project is provided "as is", without any express or implied warranty. The authors and contributors are not liable for any direct or indirect loss, data loss, system damage, or legal disputes caused by the use of this tool (whether used properly or not). **Downloading, installing, or using this project means you have read, understood, and agreed to all of the above terms.**
 
+
+### Optional task/intent run budgets
+
+All four environment variables are unset by default (unlimited): `ARTEX_TASK_BUDGET_TOKENS`, `ARTEX_TASK_BUDGET_TURNS`, `ARTEX_INTENT_BUDGET_TOKENS`, `ARTEX_INTENT_BUDGET_TURNS`. The task ledger meters planner and worker calls, with a reserve for a final assessment. A worker's effective allowance is bounded by its own budget and the task remaining above the reserve. When the task cannot afford another worker, it stops dispatching and settles using the existing lifecycle. Resource-limited endings use the existing timeout status and a budget activity entry. These are soft run budgets (a call already in flight or a final assessment can exceed the threshold); the ledger resets on process restart or terminal-task revival. The initial worker estimate is 50,000 tokens / 10 turns, capped by an explicit intent budget; choose a task budget above this estimate and the 20,000-token / two-turn reserve. Unset means the original behavior is unchanged.
+
+可选运行预算：默认不限制；配置以上环境变量后才启用。额度在任务与子任务间共享，预算耗尽时保存已有结果并收尾。已开始的调用可能超过阈值；进程重启或终态任务重新运行会重置计量。
