@@ -411,7 +411,7 @@ export default function SkillsPage() {
       const msg = (e as Error).message;
       // offer overwrite when the skill already exists
       if (!overwrite && msg.includes("already exists")) {
-        if (window.confirm(`${msg}\n\n${tr("是否覆盖同名技能？", "Overwrite the skill with the same name?")}`)) {
+        if (window.confirm(`${tr("已存在同名技能。", "A skill with this name already exists.")}\n\n${tr("是否覆盖同名技能？", "Overwrite the skill with the same name?")}\n\n${msg}`)) {
           await uploadZip(file, true);
           return;
         }
@@ -965,7 +965,7 @@ export default function SkillsPage() {
                             <span className="tabular-nums text-muted-foreground">{fmtTime(c.ts, locale)}</span>
                             <Badge variant="outline" className="font-normal">{c.agent_key || "—"}</Badge>
                             <span className="ml-auto text-muted-foreground">
-                              {c.task_id > 0 ? `任务 #${c.task_id}` : c.session_id ? tr("对话会话", "Chat session") : "—"}
+                              {c.task_id > 0 ? tr(`任务 #${c.task_id}`, `Task #${c.task_id}`) : c.session_id ? tr("对话会话", "Chat session") : "—"}
                             </span>
                           </div>
                         ))}
@@ -1130,14 +1130,14 @@ export default function SkillsPage() {
                 </div>
                 <div className="grid gap-1.5">
                   <Label className="text-muted-foreground text-xs">{tr("兼容性", "Compatibility")}</Label>
-                  <Input placeholder={tr("需要 sqlmap、python3", "e.g. requires Python 3")} value={newCompat} onChange={(e) => setNewCompat(e.target.value)} />
+                  <Input placeholder={tr("例如：需要 Python 3", "e.g. requires Python 3")} value={newCompat} onChange={(e) => setNewCompat(e.target.value)} />
                 </div>
               </div>
               <div className="flex min-h-0 flex-1 flex-col gap-1.5">
                 <Label htmlFor="sk-inst">{tr("正文", "Content")} <span className="text-muted-foreground text-xs font-normal">{tr("（留空时自动生成模板）", "(leave empty to generate a template)")}</span></Label>
                 <Textarea id="sk-inst"
                   className="min-h-40 flex-1 resize-none font-mono text-sm leading-relaxed"
-                  placeholder={"## How to run\n\n1. Probe for errors first\n2. Distinguish blind injection types\n\nScripts go in the scripts/ directory."}
+                  placeholder={tr("## 使用说明\n\n描述适用场景、所需依赖和预期输出。\n\n脚本可放在 scripts/ 目录。", "## Usage\n\nDescribe use cases, dependencies and expected output.\n\nScripts can go in the scripts/ directory.")}
                   value={newInst} onChange={(e) => setNewInst(e.target.value)} />
               </div>
             </TabsContent>
