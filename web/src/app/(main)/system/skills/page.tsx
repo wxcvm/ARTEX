@@ -47,6 +47,7 @@ import { useUiLocale } from "@/lib/ui-locale.client";
 import { uiText } from "@/lib/ui-locale";
 import { api } from "@/lib/api";
 import { skillLabel, skillSummary } from "@/lib/resource-labels";
+import { skillReading } from "@/lib/skill-reading";
 import type { Agent, SkillItem, MCPServer, SkillCall, MissingSkill } from "@/lib/types";
 
 function fmtTime(ts: string | undefined, locale: string) {
@@ -1037,6 +1038,13 @@ export default function SkillsPage() {
                   <summary className="cursor-pointer font-medium">中文阅读导引 · {skillLabel(selected.skill)}</summary>
                   <p className="mt-2">{skillSummary(selected.skill)}</p>
                   <p className="mt-2 text-xs text-muted-foreground">下方为可编辑的原始文件。导引仅说明技能主题，不替代正文；代码、命令、参数和文件路径保持原样。</p>
+                </details>
+              )}
+              {locale === "zh-CN" && !fileLoading && skillReading(selected.skill, selected.path, fileContent) && (
+                <details className="shrink-0 rounded-md border p-3 text-sm">
+                  <summary className="cursor-pointer font-medium">中文正文阅读版</summary>
+                  <p className="mt-2 text-xs text-muted-foreground">仅供阅读；下方原始文件仍可编辑。原文变化后不显示此版本的译文。</p>
+                  <pre className="mt-2 max-h-80 overflow-auto whitespace-pre-wrap break-words font-sans text-sm leading-6">{skillReading(selected.skill, selected.path, fileContent)}</pre>
                 </details>
               )}
               {fileLoading ? (
