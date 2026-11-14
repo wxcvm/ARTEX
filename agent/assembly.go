@@ -60,6 +60,8 @@ func AugmentTools(ctx context.Context, agentKey string, base []actool.CoreTool) 
 	if ToolResolve != nil {
 		out = ToolResolve(ctx, agentKey, out)
 	}
+	// Optional lexical projection only of already bound and enabled tools.
+	out = applyToolRAG(ctx, agentKey, out, def.Deferred, bm25Score)
 	out, def.FindingGuidance = findingWorkflowTools(agentKey, out)
 	for i, t := range out {
 		out[i] = guardPanic(t)
