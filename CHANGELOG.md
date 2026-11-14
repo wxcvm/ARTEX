@@ -4,6 +4,23 @@ All notable changes to this project are documented in this file. The format is b
 
 ## [Unreleased]
 
+## [0.5.0] - 2026-11-14
+
+### Added
+
+- **Guard hooks on planner and main agent**: both hold `actool.DefaultTools()` (Bash included) but were never given `Guard.Hooks()`, so the intercept rules, human approval and the LLM reviewer never saw their shell calls. They now run behind the same `PreToolUse` gate as workers (`patches/0001`, applied).
+- **Ledger backfill tooling**: `knowledge/tools/backfill_db.py` (idempotent, code-first matching, database backup before writing) and `knowledge/tools/export_docs.py` (regenerates `INDEX.md` / `MAP.md`) close the gap between the 429 POC directories and the ledger.
+
+### Changed
+
+- **Knowledge ledger 448 → 508 entries (FTS 508)**: the 60 extra rows are POC directories that had no ledger row and were unreachable for `kb_search`. `poc_fts` is a standalone FTS5 table, so it is refilled with `DELETE` + `INSERT … SELECT` rather than `rebuild`.
+- `knowledge/MAP.md`: 508 rows / 429 directories / 428 paired / 80 text-only entries / 1 known naming variant.
+
+### Fixed
+
+- `go build ./...` no longer trips over `knowledge/` (the directory is its own module, `knowledge/go.mod`).
+
+
 ## [0.4.2]
 
 ### Added

@@ -7,14 +7,14 @@
 |---|---|
 | poc_dirs | 429 |
 | poc_files | 432 |
-| poc_bytes | 1488773 |
+| poc_bytes | 1488822 |
 | py_files | 162 |
 | py_not_runnable | 44 |
 | py_kind_detail | NOT_PYTHON=4, SYNTAX=40 |
 | sh_files | 65 |
 | duplicate_files | 0 |
-| db_rows | 448 |
-| fts_rows | 448 |
+| db_rows | 508 |
+| fts_rows | 508 |
 
 ## P1（阻断）
 

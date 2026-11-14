@@ -5,6 +5,7 @@ import (
 	"fmt"
 
 	"github.com/Autumn-27/artex/db"
+	"github.com/Autumn-27/artex/guard"
 	"github.com/Autumn-27/artex/intercept"
 	"github.com/Autumn-27/norma/agentcore"
 	"github.com/Autumn-27/norma/llm"
@@ -29,6 +30,7 @@ type MainAgent struct {
 	proxyCACert     string                                 // recording proxy's CA cert path (HTTPS verify)
 	webSearch       WebSearchOpts                          // web_search tool backend selection (off by default)
 	workDir         string                                 // shared work dir (surfaced in prompt as artifact-output target)
+	guard           *guard.Guard                           // optional; nil disables intercept hooks
 	steerWork       func(intentID int64, msg string) error // engine callback: steer a running work (nil = off)
 	nonStreamingFn  func() bool                            // resolver: use non-streaming (Complete) path? (nil = streaming)
 	noaEnabledFn    func() bool                            // resolver: use experimental noa compaction? (nil = off)
@@ -60,6 +62,10 @@ func (m *MainAgent) maxTokens() int {
 func NewMainAgent(prov llm.Provider, model, workDir string, tx *transcript.Store, window, maxTurns int) *MainAgent {
 	return &MainAgent{prov: prov, model: model, workDir: workDir, tx: tx, window: window, maxTurns: maxTurns}
 }
+
+// SetGuard attaches a guard so the main agent's tool calls (it holds
+// actool.DefaultTools, which includes Bash) are gated by the intercept rules too.
+func (m *MainAgent) SetGuard(g *guard.Guard) { m.guard = g }
 
 func (m *MainAgent) SetCompactionWindowResolver(fn func() int) { m.windowFn = fn }
 
@@ -179,6 +185,9 @@ func (m *MainAgent) Chat(ctx context.Context, taskID int64, mainSeg int, as *db.
 		if mainSeg > 0 {
 			opts.SessionID = fmt.Sprintf("exp%d-main-s%d", ts.ID(), mainSeg)
 		}
+	}
+	if m.guard != nil {
+		opts.Hooks = m.guard.Hooks()
 	}
 	// experimental feature: when enabled, noa takes over context compression (archive centralized under <workDir>/noa/<SessionID>, persistent).
 	// the session id follows the same rule as the transcript (segment-aware), keeping archive and resume aligned.

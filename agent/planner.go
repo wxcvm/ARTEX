@@ -8,6 +8,7 @@ import (
 	"sync"
 
 	"github.com/Autumn-27/artex/db"
+	"github.com/Autumn-27/artex/guard"
 	"github.com/Autumn-27/artex/intercept"
 	"github.com/Autumn-27/norma/agentcore"
 	"github.com/Autumn-27/norma/llm"
@@ -28,6 +29,7 @@ type Planner struct {
 	window            int                                    // context window in tokens (for compaction)
 	windowFn          func() int                             // optional dynamic task-chain minimum
 	maxTurns          int                                    // max agent turns per run (0 = unlimited)
+	guard             *guard.Guard                           // optional; nil disables intercept hooks (same hole as ChatAgent)
 	killWork          func(intentID int64) error             // engine callback to terminate a running work (nil = off)
 	steerWork         func(intentID int64, msg string) error // engine callback to steer a running work mid-run (nil = off)
 	proxyAddr         string                                 // recording proxy for WebFetch (empty = direct)
@@ -54,6 +56,11 @@ type Planner struct {
 func NewPlanner(prov llm.Provider, model, workDir string, tx *transcript.Store, window, maxTurns int) *Planner {
 	return &Planner{prov: prov, model: model, workDir: workDir, tx: tx, window: window, maxTurns: maxTurns, todos: map[int64]*actool.TodoStore{}}
 }
+
+// SetGuard attaches a guard (with the user-configured intercept rules) so the planner's
+// own tool calls (it holds actool.DefaultTools, which includes Bash) go through the
+// same PreToolUse gate as the worker. nil keeps the historical behaviour.
+func (p *Planner) SetGuard(g *guard.Guard) { p.guard = g }
 
 func (p *Planner) SetCompactionWindowResolver(fn func() int) { p.windowFn = fn }
 
@@ -466,6 +473,9 @@ func (p *Planner) Plan(ctx context.Context, taskID int64, as *db.AssetStore, ts 
 	if p.tx != nil { // persist raw LLM conversation; one accumulating file per task's planner
 		opts.Transcript = p.tx
 		opts.SessionID = fmt.Sprintf("exp%d-planner", ts.ID())
+	}
+	if p.guard != nil {
+		opts.Hooks = p.guard.Hooks()
 	}
 	// Experimental: when on, noa takes over context compression (archives persist under <workDir>/noa/<SessionID>).
 	noaSession := fmt.Sprintf("exp%d-planner", ts.ID())
