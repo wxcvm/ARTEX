@@ -121,7 +121,7 @@ public static class ArtexSmokeWindow {
     function Assert-ArtexWindowState([bool]$minimized, [string]$action) {
         for ($i = 0; $i -lt 60; $i++) {
             $desktop.Refresh()
-            if ($desktop.HasExited) { throw "Desktop exited after $action" }
+            if ($desktop.HasExited) { throw "Desktop exited after $action (code $($desktop.ExitCode))" }
             if ([ArtexSmokeWindow]::IsWindowVisible($hwnd) -and
                 ([ArtexSmokeWindow]::IsIconic($hwnd) -eq $minimized)) { return }
             Start-Sleep -Milliseconds 100
@@ -133,8 +133,11 @@ public static class ArtexSmokeWindow {
     Assert-ArtexWindowState $true "minimize"
     [ArtexSmokeWindow]::ShowWindowAsync($hwnd, 9) | Out-Null # SW_RESTORE
     Assert-ArtexWindowState $false "restore"
-    if (-not [ArtexSmokeWindow]::PostMessage($hwnd, 0x0010, [IntPtr]::Zero, [IntPtr]::Zero)) {
-        throw "Could not send WM_CLOSE to desktop"
+    # The title-bar X sends WM_SYSCOMMAND/SC_CLOSE. Posting WM_CLOSE
+    # directly is interpreted by WinForms as TaskManagerClosing, not
+    # UserClosing, and intentionally takes the actual shutdown path.
+    if (-not [ArtexSmokeWindow]::PostMessage($hwnd, 0x0112, [IntPtr]0xF060, [IntPtr]::Zero)) {
+        throw "Could not send SC_CLOSE to desktop"
     }
     Assert-ArtexWindowState $true "close button"
     [ArtexSmokeWindow]::ShowWindowAsync($hwnd, 9) | Out-Null

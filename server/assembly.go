@@ -238,6 +238,11 @@ func wireTools(pg *db.DB, domainReg map[string]actool.CoreTool) {
 			log.Printf("[tools] seed %s failed: %v", s.Key, err)
 		}
 	}
+	if agent.Knowledge() != nil {
+		if err := migrateKnowledgeMainBinding(pg); err != nil {
+			log.Printf("[tools] knowledge main-agent binding migration: %v", err)
+		}
+	}
 	if err := seedTaskPurgeIntelTool(pg); err != nil {
 		log.Printf("[tools] %v", err)
 	}
