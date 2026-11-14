@@ -19,6 +19,7 @@ type Input struct {
 	GeneratedAt time.Time
 	AssetCounts map[string]int
 	Findings    []*db.Node
+	Coverage    *db.CoverageLedger
 }
 
 type findingView struct {
@@ -94,6 +95,18 @@ func MarkdownLocalized(in Input, locale string) string {
 		}
 	}
 
+	if c := in.Coverage; c != nil {
+		b.WriteString(tr("## 测试覆盖与待验证事项\n\n", "## Coverage and open checks\n\n"))
+		fmt.Fprintf(&b, tr("- 记录：%d；待验证：%d\n", "- Recorded: %d; open gaps: %d\n"), len(c.Entries), len(c.Gaps))
+		b.WriteString(tr("- 未发现问题不等于目标安全；未检查类别仍未验证。\n", "- No finding does not establish safety; unexamined classes remain unverified.\n"))
+		if c.Completeness != nil && !c.Completeness.Complete {
+			b.WriteString(tr("- 本次任务未正常完成。\n", "- This run did not complete normally.\n"))
+		}
+		for _, g := range c.Gaps {
+			fmt.Fprintf(&b, "- %s\n", g)
+		}
+		b.WriteString("\n")
+	}
 	return b.String()
 }
 

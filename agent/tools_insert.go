@@ -658,7 +658,7 @@ func (t *ToolSet) WorkerTools() []actool.CoreTool {
 		// list_findings stays: check the task's confirmed findings before reporting, to
 		// avoid reporting the same finding twice.
 		t.listFindings(),
-		t.addFinding(), t.recordFact(),
+		t.addFinding(), t.recordFact(), t.recordCoverage(),
 		// asset management (handlers guard nil store internally).
 		// add_company_scope is not given to workers: defining a company's asset scope is
 		// the duty of planning/main-control/Auto; a worker only executes exploration.
