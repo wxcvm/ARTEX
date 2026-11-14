@@ -1445,6 +1445,7 @@ func (t *ToolSet) addFinding() actool.CoreTool {
 // must NOT be stuffed into the asset graph via upsert_asset.
 // factItem is one fact of a record_fact batch/single call.
 type factItem struct {
+	Source     string            `json:"-"` // server-owned provenance for imported observations
 	Summary    string            `json:"summary"`
 	Detail     string            `json:"detail"`
 	Evidence   string            `json:"evidence"`   // one line of key evidence (command + key output lines) supporting the conclusion, for later verification
@@ -1461,6 +1462,9 @@ func (t *ToolSet) recordOneFact(it factItem, defaultIntent int64) (int64, error)
 		return 0, fmt.Errorf("summary must not be empty")
 	}
 	payload := map[string]any{"summary": it.Summary}
+	if it.Source != "" {
+		payload["source"] = it.Source
+	}
 	if it.Detail != "" {
 		payload["detail"] = it.Detail
 	}

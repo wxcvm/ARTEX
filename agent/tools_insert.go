@@ -662,7 +662,7 @@ func (t *ToolSet) WorkerTools() []actool.CoreTool {
 		// asset management (handlers guard nil store internally).
 		// add_company_scope is not given to workers: defining a company's asset scope is
 		// the duty of planning/main-control/Auto; a worker only executes exploration.
-		t.insertAssets(), t.listAssets(),
+		t.insertAssets(), t.listAssets(), t.ingestScanOutput(),
 		// Task credentials (#3): reuse user-declared test accounts, record
 		// self-registered ones so they are not forgotten.
 		t.saveTaskCredential(), t.listTaskCredentials(),
