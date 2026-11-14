@@ -46,6 +46,7 @@ public sealed class MainForm : Form
     public MainForm()
     {
         Text = "ARTEX";
+        ShowInTaskbar = true;
         Icon = System.Drawing.Icon.ExtractAssociatedIcon(Application.ExecutablePath) ?? SystemIcons.Application;
         MinimumSize = new Size(900, 620);
         Size = new Size(1360, 850);
@@ -654,11 +655,9 @@ public sealed class MainForm : Form
     protected override void OnResize(EventArgs e)
     {
         base.OnResize(e);
-        if (WindowState == FormWindowState.Minimized)
-        {
-            if (ready) Hide();
-        }
-        else if (!fullScreen)
+        // Standard Windows minimization keeps the taskbar button visible.
+        // Never hide the main window just because the WebView is ready.
+        if (WindowState != FormWindowState.Minimized && !fullScreen)
         {
             restoreWindowState = WindowState;
         }
@@ -669,7 +668,9 @@ public sealed class MainForm : Form
         if (!exiting && e.CloseReason == CloseReason.UserClosing)
         {
             e.Cancel = true;
-            Hide();
+            // Keep the backend and active tasks running, but retain a normal
+            // taskbar entry even when the notification icon is overflowed.
+            WindowState = FormWindowState.Minimized;
             return;
         }
         base.OnFormClosing(e);

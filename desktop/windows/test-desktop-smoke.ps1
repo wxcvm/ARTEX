@@ -93,6 +93,53 @@ try {
         throw "ARTEX desktop did not load the local UI in WebView2 within 60 seconds. HTTP routes seen: $seen"
     }
     Write-Host "[ARTEX] Native window, health probe and WebView2 navigation passed."
+
+    # Exercise the actual packaged WinForms window, not just the HTTP backend.
+    # A minimized window must retain WS_VISIBLE and be restorable without the tray.
+    Add-Type -TypeDefinition @'
+using System;
+using System.Runtime.InteropServices;
+public static class ArtexSmokeWindow {
+    [DllImport("user32.dll")] public static extern bool ShowWindowAsync(IntPtr hwnd, int command);
+    [DllImport("user32.dll")] public static extern bool IsWindowVisible(IntPtr hwnd);
+    [DllImport("user32.dll")] public static extern bool IsIconic(IntPtr hwnd);
+    [DllImport("user32.dll")] public static extern bool PostMessage(IntPtr hwnd, uint msg, IntPtr wParam, IntPtr lParam);
+}
+'@
+    $hwnd = [IntPtr]::Zero
+    for ($i = 0; $i -lt 60; $i++) {
+        $desktop.Refresh()
+        if ($desktop.HasExited) { throw "Desktop exited before window lifecycle test" }
+        $hwnd = $desktop.MainWindowHandle
+        if ($hwnd -ne [IntPtr]::Zero -and [ArtexSmokeWindow]::IsWindowVisible($hwnd)) { break }
+        Start-Sleep -Milliseconds 100
+    }
+    if ($hwnd -eq [IntPtr]::Zero -or -not [ArtexSmokeWindow]::IsWindowVisible($hwnd)) {
+        throw "Desktop main window not visible"
+    }
+
+    function Assert-ArtexWindowState([bool]$minimized, [string]$action) {
+        for ($i = 0; $i -lt 60; $i++) {
+            $desktop.Refresh()
+            if ($desktop.HasExited) { throw "Desktop exited after $action" }
+            if ([ArtexSmokeWindow]::IsWindowVisible($hwnd) -and
+                ([ArtexSmokeWindow]::IsIconic($hwnd) -eq $minimized)) { return }
+            Start-Sleep -Milliseconds 100
+        }
+        throw "Desktop window did not retain its visible taskbar state after $action"
+    }
+
+    [ArtexSmokeWindow]::ShowWindowAsync($hwnd, 6) | Out-Null # SW_MINIMIZE
+    Assert-ArtexWindowState $true "minimize"
+    [ArtexSmokeWindow]::ShowWindowAsync($hwnd, 9) | Out-Null # SW_RESTORE
+    Assert-ArtexWindowState $false "restore"
+    if (-not [ArtexSmokeWindow]::PostMessage($hwnd, 0x0010, [IntPtr]::Zero, [IntPtr]::Zero)) {
+        throw "Could not send WM_CLOSE to desktop"
+    }
+    Assert-ArtexWindowState $true "close button"
+    [ArtexSmokeWindow]::ShowWindowAsync($hwnd, 9) | Out-Null
+    Assert-ArtexWindowState $false "restore after close"
+    Write-Host "[ARTEX] Minimize, close-to-taskbar and restore passed."
 }
 finally {
     if ($desktop) {
