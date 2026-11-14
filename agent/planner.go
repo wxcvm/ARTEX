@@ -424,9 +424,10 @@ func (p *Planner) Plan(ctx context.Context, taskID int64, as *db.AssetStore, ts 
 	// round's user input (along with situational) as [this round's operating
 	// instruction], so it only makes the final goal judgment and produces no new intents.
 	tc := taskClockFrom(ctx)
-	if tc.Final {
+	if tc.Final && !budgetRoundFrom(ctx).WrapUp {
 		situational += "\n\n[Task endgame wrap-up (special instruction for this round, overriding the normal planning flow above)]: " + resolveTaskTimeoutWrapup("planner")
 	}
+	situational += plannerBudgetBlock(ctx)
 	// This task's work dir <workDir>/tasks/<taskID>; create it first.
 	taskDir := ensureRunDir(p.workDir, taskID, 0)
 	ctx = intercept.WithReviewContext(ctx, taskDir, intercept.ReviewBackground{})

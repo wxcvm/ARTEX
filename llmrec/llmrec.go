@@ -61,6 +61,13 @@ func workerFrom(ctx context.Context) string {
 	return strings.TrimSpace(worker)
 }
 
+type usageSinkContextKey struct{}
+
+// WithUsageSink attaches an optional per-run usage meter.
+func WithUsageSink(ctx context.Context, sink func(llm.Usage)) context.Context {
+	return context.WithValue(ctx, usageSinkContextKey{}, sink)
+}
+
 // Recorder wraps an llm.Provider and records every completion call.
 type Recorder struct {
 	inner llm.Provider
@@ -168,7 +175,7 @@ func (r *Recorder) Stream(ctx context.Context, req llm.CompletionRequest) iter.S
 			if streamErr != nil {
 				status = "error"
 			}
-			r.recordUsage(taskID, expID, worker, usage, int(time.Since(start).Milliseconds()), status)
+			r.recordUsage(ctx, taskID, expID, worker, usage, int(time.Since(start).Milliseconds()), status)
 			if recordBodies {
 				r.record(req, session, taskID, worker, reqBody, capt, start, text, thinking, usage, stopReason, streamErr)
 			}
@@ -303,7 +310,7 @@ func (r *Recorder) Complete(ctx context.Context, req llm.CompletionRequest) (llm
 	if err != nil {
 		status = "error"
 	}
-	r.recordUsage(taskID, expID, worker, usage, int(time.Since(start).Milliseconds()), status)
+	r.recordUsage(ctx, taskID, expID, worker, usage, int(time.Since(start).Milliseconds()), status)
 	if recordBodies {
 		r.record(req, session, taskID, worker, reqBody, capt, start, msg.Text(), thinkingText(msg), usage, stopReason, err)
 	}
@@ -340,12 +347,15 @@ func thinkingText(msg llm.Message) string {
 
 // recordUsage appends one lightweight metering row to llm_usage (no bodies). Skips
 // zero-token calls with no model, which carry nothing worth metering.
-func (r *Recorder) recordUsage(taskID string, expID int64, worker string, usage llm.Usage, latencyMs int, status string) {
-	if r.pg == nil {
-		return
-	}
+func (r *Recorder) recordUsage(ctx context.Context, taskID string, expID int64, worker string, usage llm.Usage, latencyMs int, status string) {
 	if r.model == "" && usage.InputTokens == 0 && usage.OutputTokens == 0 &&
 		usage.CacheReadTokens == 0 && usage.CacheWriteTokens == 0 {
+		return
+	}
+	if sink, _ := ctx.Value(usageSinkContextKey{}).(func(llm.Usage)); sink != nil {
+		sink(usage)
+	}
+	if r.pg == nil {
 		return
 	}
 	err := r.pg.InsertLLMUsage(&db.LLMUsage{

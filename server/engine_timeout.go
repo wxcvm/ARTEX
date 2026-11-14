@@ -73,9 +73,14 @@ func (e *Engine) taskDeadline(t *Task) int64 {
 // stamps a fresh full budget. coordStarted is reset because the coordinator that
 // produced the timeout has already completed (or is in its final return path).
 func (e *Engine) resetTimeoutRevival(taskID string) {
-	e.settling.Delete(taskID)
+	e.resetSettledRun(taskID)
 	e.stamped.Delete(taskID)
 	e.coordStarted.Delete(taskID)
+}
+
+func (e *Engine) resetSettledRun(taskID string) {
+	e.settling.Delete(taskID)
+	e.budgets.Delete(taskID)
 }
 
 // stampFirstRun records first_run_at + deadline_at on the FIRST real run (LLM ready)
@@ -198,10 +203,18 @@ func (e *Engine) coordinateDeadline(ctx context.Context, t *Task, settle func(co
 // settleTask runs the ordered settle sequence after nextDeadlineAction has
 // exclusively claimed it. Do not call without that admission.
 func (e *Engine) settleTask(ctx context.Context, t *Task) {
+	e.settleTaskWithBudget(ctx, t, false)
+}
+
+func (e *Engine) settleTaskWithBudget(ctx context.Context, t *Task, budget bool) {
 	if ctx.Err() != nil || e.IsDeleting(t.ID) {
 		return
 	}
-	log.Printf("[deadline] task %s reached the timeout limit, entering the settle sequence", t.ID)
+	if budget {
+		log.Printf("[budget] task %s reached its run budget, entering settlement", t.ID)
+	} else {
+		log.Printf("[deadline] task %s reached the timeout limit, entering the settle sequence", t.ID)
+	}
 
 	// ④ wait for running workers/planners to drain (running runs enter wrap-up on their own
 	// via the clamped MaxDuration); if not drained within the grace period, hard-cancel the
@@ -220,7 +233,12 @@ func (e *Engine) settleTask(ctx context.Context, t *Task) {
 	}
 
 	// ⑤ one final planner round (task-timeout words, final goal judgment, no new intents).
-	met := e.runFinalPlannerRound(ctx, t)
+	met := false
+	if !budget {
+		met = e.runFinalPlannerRound(ctx, t)
+	} else if open, err := t.Store.HasOpenGoal(); err == nil && open {
+		met = e.runFinalPlannerRoundWithBudget(ctx, t, true)
+	}
 	if ctx.Err() != nil {
 		return // shutdown is not a completed final assessment
 	}
@@ -233,8 +251,11 @@ func (e *Engine) settleTask(ctx context.Context, t *Task) {
 	// normal path already settled done first, the guard (SetTaskStatusGuarded) rejects the
 	// overwrite, preserving the completed semantics.
 	status := "timeout"
-	if met {
+	if met && !budget {
 		status = "done"
+	}
+	if budget {
+		e.emitActivity(t, db.Activity{Worker: "system", Kind: "text", Summary: "Task run budget reached; final assessment ended by resource limit."})
 	}
 	won, err := e.m.SetTaskStatusGuarded(t.ID, status)
 	switch {
@@ -251,6 +272,10 @@ func (e *Engine) settleTask(ctx context.Context, t *Task) {
 // task-timeout planner words (final goal judgment; no new intents). Waits for the
 // LLM to be ready (bounded by ctx) so a completable task isn't mis-judged timeout.
 func (e *Engine) runFinalPlannerRound(ctx context.Context, t *Task) (met bool) {
+	return e.runFinalPlannerRoundWithBudget(ctx, t, false)
+}
+
+func (e *Engine) runFinalPlannerRoundWithBudget(ctx context.Context, t *Task, budget bool) (met bool) {
 	if e.IsDeleting(t.ID) {
 		return false
 	}
@@ -270,13 +295,18 @@ func (e *Engine) runFinalPlannerRound(ctx context.Context, t *Task) (met bool) {
 	// Independent ctx (not wired to execCancel, so a pause/hard cancel cannot interrupt this
 	// final round), with Final injecting the task-timeout words.
 	fctx := e.clockCtx(ctx, t, true)
+	label := "task timeout settle"
+	if budget {
+		fctx = e.budgetRoundCtx(fctx, t, true)
+		label = "task budget settle"
+	}
 	if !e.beginTaskOperation(t.ID) {
 		return false
 	}
 	defer e.decInflight(t.ID)
 	emit := func(r db.Activity) { e.emitActivity(t, r) }
 	e.emitActivity(t, db.Activity{Worker: "planner", Kind: "round",
-		Summary: fmt.Sprintf("task timeout settle · final judgment (round %d)", e.nextPlannerRound(t.ID))})
+		Summary: fmt.Sprintf("%s · final judgment (round %d)", label, e.nextPlannerRound(t.ID))})
 	tTaskID, _ := strconv.ParseInt(t.ID, 10, 64)
 	e.BeginLLMCall(t.ID)
 	met, reason, err := planner.Plan(fctx, tTaskID, e.m.assets, t.Store, t.Goal, t.drainTriggers(), emit)
