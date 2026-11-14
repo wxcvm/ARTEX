@@ -893,6 +893,10 @@ func TestNormalizeURL(t *testing.T) {
 		{"HTTPS://Example.COM/path", "https://example.com/path"},
 		{"http://example.com/", "http://example.com"},
 		{"http://example.com/page", "http://example.com/page"},
+		{"https://alice:secret@Example.com/app?x=1", "https://example.com/app?x=1"},
+		{"https://bob@example.com/", "https://example.com"},
+		{"https://alice:secret@example.com:8443/users/@alice?x=1", "https://example.com:8443/users/@alice?x=1"},
+		{"https://example.com/@me?r=http://a:b@x/", "https://example.com/@me?r=http://a:b@x/"},
 	}
 	for _, tc := range tests {
 		got := normalizeURL(tc.raw)
