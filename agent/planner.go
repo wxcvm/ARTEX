@@ -400,6 +400,7 @@ func (p *Planner) Plan(ctx context.Context, taskID int64, as *db.AssetStore, ts 
 	// situation may be compressed by compaction (planner rounds are usually short — low
 	// risk). situational is spliced into input below.
 	situational := renderTriggers(ts, triggers) + renderGraphOverview(tsx.graphOverviewData())
+	situational += tsx.coverageLedgerBlock()
 	// Task-level deadline / endgame mode (injected via ctx, see taskclock.go). On the
 	// endgame round, the task-timeout planner wrap-up prompt is spliced into this
 	// round's user input (along with situational) as [this round's operating

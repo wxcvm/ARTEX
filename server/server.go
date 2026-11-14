@@ -1914,6 +1914,11 @@ func (s *Server) taskCoverage(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	cov.Enabled = true
+	cov.Ledger, err = as.CoverageLedger(taskID)
+	if err != nil {
+		writeErr(w, 500, err.Error())
+		return
+	}
 	writeJSON(w, 200, cov)
 }
 
@@ -4014,9 +4019,14 @@ func (s *Server) getReport(w http.ResponseWriter, r *http.Request) {
 			counts[ty] = len(ns)
 		}
 	}
+	var ledger *db.CoverageLedger
+	if t.CoverageEnabled && s.m.Assets() != nil {
+		taskID, _ := strconv.ParseInt(t.ID, 10, 64)
+		ledger, _ = s.m.Assets().CoverageLedger(taskID)
+	}
 	md := report.MarkdownLocalized(report.Input{
 		Title: t.Description, Goal: t.Goal, GeneratedAt: time.Now(),
-		AssetCounts: counts, Findings: findings,
+		AssetCounts: counts, Findings: findings, Coverage: ledger,
 	}, report.ReportLocale(r.URL.Query().Get("lang")))
 	w.Header().Set("Content-Type", "text/markdown; charset=utf-8")
 	w.WriteHeader(200)
