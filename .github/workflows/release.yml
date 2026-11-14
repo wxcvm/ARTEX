@@ -2,6 +2,7 @@ name: release
 on:
   push:
     tags: ["v*"]
+    branches: ["release/v*"]
 
 permissions:
   contents: write # required to create the Release
@@ -10,8 +11,24 @@ jobs:
   # ① Frontend static export (once), reused by the cross-compiled platform builds
   frontend:
     runs-on: ubuntu-latest
+    outputs:
+      tag: ${{ steps.version.outputs.tag }}
     steps:
       - uses: actions/checkout@v4
+      - name: Resolve release tag
+        id: version
+        shell: bash
+        run: |
+          tag="${GITHUB_REF_NAME#release/}"
+          if [[ "$GITHUB_REF_TYPE" == branch ]]; then
+            [[ "$tag" =~ ^v[0-9]+\.[0-9]+\.[0-9]+([.-][A-Za-z0-9.-]+)?$ ]]
+            existing="$(git ls-remote --tags origin "refs/tags/$tag" "refs/tags/$tag^{}")"
+            if [[ -n "$existing" ]]; then
+              target="$(printf '%s\n' "$existing" | awk '/\^\{\}$/ { peeled=$1 } !/\^\{\}$/ { direct=$1 } END { print peeled ? peeled : direct }')"
+              test "$target" = "$GITHUB_SHA"
+            fi
+          fi
+          echo "tag=$tag" >> "$GITHUB_OUTPUT"
       - uses: actions/setup-node@v4
         with:
           node-version: "22"
@@ -53,7 +70,7 @@ jobs:
         env:
           ARTEX_TARGET_OS: ${{ matrix.goos }}
           ARTEX_TARGET_ARCH: ${{ matrix.goarch }}
-          ARTEX_BUILD_VERSION: ${{ github.ref_name }}
+          ARTEX_BUILD_VERSION: ${{ needs.frontend.outputs.tag }}
           ARTEX_SKIP_FRONTEND: "1"
           ARTEX_SKIP_NPM_CI: "1"
           # UPX self-extracting ELF binaries crash on some Linux kernels, virtualization
@@ -96,7 +113,7 @@ jobs:
           path: server/webui/dist
       - name: Package native Windows desktop
         shell: pwsh
-        run: ./desktop/windows/package.ps1 -SkipWebBuild -Version "${{ github.ref_name }}"
+        run: ./desktop/windows/package.ps1 -SkipWebBuild -Version "${{ needs.frontend.outputs.tag }}"
       - name: Smoke test release desktop
         shell: pwsh
         timeout-minutes: 3
@@ -107,7 +124,7 @@ jobs:
           path: dist/ARTEX-Windows-Desktop-amd64.zip
       - name: Build Windows desktop installer
         shell: pwsh
-        run: ./desktop/windows/build-installer.ps1 -Version "${{ github.ref_name }}"
+        run: ./desktop/windows/build-installer.ps1 -Version "${{ needs.frontend.outputs.tag }}"
       - name: Smoke test release installer and upgrade
         shell: pwsh
         timeout-minutes: 8
@@ -119,7 +136,7 @@ jobs:
 
   # ④ Collect all zips → create the GitHub Release
   release:
-    needs: [binaries, desktop]
+    needs: [frontend, binaries, desktop]
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -131,7 +148,7 @@ jobs:
       - name: Generate checksums
         working-directory: dist
         env:
-          RELEASE_TAG: ${{ github.ref_name }}
+          RELEASE_TAG: ${{ needs.frontend.outputs.tag }}
         run: |
           version="${RELEASE_TAG#v}"
           for platform in linux-amd64 linux-arm64 darwin-amd64 darwin-arm64 windows-amd64; do
@@ -142,7 +159,7 @@ jobs:
           sha256sum *.zip *.exe > SHA256SUMS
       - name: Extract versioned release notes
         env:
-          RELEASE_TAG: ${{ github.ref_name }}
+          RELEASE_TAG: ${{ needs.frontend.outputs.tag }}
         run: |
           version="${RELEASE_TAG#v}"
           awk -v version="$version" '
@@ -161,6 +178,8 @@ jobs:
             dist/*.zip
             dist/*.exe
             dist/SHA256SUMS
+          tag_name: ${{ needs.frontend.outputs.tag }}
+          target_commitish: ${{ github.sha }}
           generate_release_notes: false
           body_path: RELEASE_NOTES.md
           fail_on_unmatched_files: true
@@ -172,7 +191,7 @@ jobs:
   # job stays skipped unless the repository defines DOCKERHUB_ENABLED (set it to true
   # and provide DOCKERHUB_USERNAME / DOCKERHUB_TOKEN secrets plus DOCKERHUB_IMAGE).
   docker:
-    needs: binaries
+    needs: [frontend, binaries]
     if: ${{ vars.DOCKERHUB_ENABLED == 'true' }}
     runs-on: ubuntu-latest
     steps:
@@ -196,7 +215,7 @@ jobs:
         with:
           images: ${{ vars.DOCKERHUB_IMAGE }}
           tags: |
-            type=ref,event=tag
+            type=raw,value=${{ needs.frontend.outputs.tag }}
             type=raw,value=latest
       - uses: docker/build-push-action@v6
         with:
