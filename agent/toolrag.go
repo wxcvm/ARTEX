@@ -33,6 +33,7 @@ var toolRAGCore = map[string]bool{
 	"ask_operator": true, "prove_goal": true, "goal_met": true, "list_assets": true,
 	// Preserve our fork's knowledge, evidence and handoff workflows.
 	"kb_search": true, "kb_get": true, "get_finding_traffic": true, "bind_finding_traffic": true,
+	"ingest_scan_output": true, "record_coverage": true,
 	"update_finding_report": true, "traffic_search": true, "traffic_get": true, "traffic_blob": true,
 	"add_hint": true, "add_task_hint": true, "list_facts": true,
 }
@@ -183,7 +184,7 @@ func toolRAGKeep(deferred []string) map[string]bool {
 	for n := range toolRAGCore {
 		keep[n] = true
 	}
-	for _, t := range actool.DefaultTools() {
+	for _, t := range append(actool.DefaultTools(), actool.ShellSessionTools()...) {
 		keep[t.Name()] = true
 	}
 	for _, n := range deferred {

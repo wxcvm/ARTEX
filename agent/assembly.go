@@ -17,6 +17,7 @@ import (
 // from history on a resumed session (design doc C2).
 type DeferredInfo struct {
 	FindingGuidance string            // derived from the final permitted tools, including DB overrides
+	KnowledgeGuidance string          // knowledge/skill/import workflow for the actual available tools
 	Deferred        []string          // all MCP tool names (schema withheld)
 	GlobalNames     []string          // MCP names to list in the system-prompt block
 	Unlock          *actool.UnlockSet // shared call-gate; nil when no MCP tools
@@ -63,6 +64,7 @@ func AugmentTools(ctx context.Context, agentKey string, base []actool.CoreTool) 
 	// Optional lexical projection only of already bound and enabled tools.
 	out = applyToolRAG(ctx, agentKey, out, def.Deferred, bm25Score)
 	out, def.FindingGuidance = findingWorkflowTools(agentKey, out)
+	def.KnowledgeGuidance = knowledgeWorkflowGuidance(out)
 	for i, t := range out {
 		out[i] = guardPanic(t)
 	}

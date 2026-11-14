@@ -685,7 +685,7 @@ func (t *ToolSet) WorkerTools() []actool.CoreTool {
 
 // MainAgentTools returns the human-interface tool set.
 func (t *ToolSet) MainAgentTools() []actool.CoreTool {
-	return []actool.CoreTool{
+	return withKB([]actool.CoreTool{
 		t.graphOverview(), t.listFindings(), t.listFacts(), t.nodeDetail(),
 		t.expandDigest(), // cold-digest §6.1
 		t.getWorkerOutput(), t.getWorkerTrace(), t.searchAllWorkerTraces(), t.addHint(), t.addIntent(),
@@ -705,7 +705,7 @@ func (t *ToolSet) MainAgentTools() []actool.CoreTool {
 		// list_untested_assets: query untested assets in this task's scope on demand
 		// (by type + paginated), and decide on supplementary testing yourself.
 		t.listUntestedAssets(),
-	}
+	})
 }
 
 // AllDomainTools returns the union of all domain tools across all agent types,
