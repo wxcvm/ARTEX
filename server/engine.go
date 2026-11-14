@@ -1069,7 +1069,12 @@ func (e *Engine) runIntent(ctx context.Context, t *Task, name string, worker *ag
 	workCtx = intercept.WithTaskContext(workCtx, t.ID, label, taskEmit)
 	workCtx, meter := e.budgetIntent(workCtx, t.ID)
 	if meter != nil {
-		defer func() { meter.Finish(); if e.budgetBlocksClaim(t.ID) { t.Notify() } }()
+		defer func() {
+			meter.Finish()
+			if e.budgetBlocksClaim(t.ID) {
+				t.Notify()
+			}
+		}()
 	}
 	// nudges deliberately sits outside the model_error rerun loop: the idle-turn rerun
 	// cap is a per-intent total, and one rerun round must not reset it back to zero.

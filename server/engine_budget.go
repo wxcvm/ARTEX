@@ -27,6 +27,13 @@ func (e *Engine) budgetStop(ctx context.Context, t *Task) bool {
 	if l == nil || l.State().Dispatch {
 		return false
 	}
+	if e.admitBudgetSettlement(ctx, t, l) {
+		e.settleTaskWithBudget(ctx, t, true)
+	}
+	return true
+}
+
+func (e *Engine) admitBudgetSettlement(ctx context.Context, t *Task, l *agent.BudgetLedger) bool {
 	t.transitionMu.Lock()
 	e.deleteMu.RLock()
 	state := t.lifecycleSnapshot()
@@ -39,10 +46,7 @@ func (e *Engine) budgetStop(ctx context.Context, t *Task) bool {
 	}
 	e.deleteMu.RUnlock()
 	t.transitionMu.Unlock()
-	if admit {
-		e.settleTaskWithBudget(ctx, t, true)
-	}
-	return true
+	return admit
 }
 
 func (e *Engine) budgetRoundCtx(ctx context.Context, t *Task, wrapup bool) context.Context {
