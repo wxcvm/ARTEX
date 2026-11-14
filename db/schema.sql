@@ -1521,3 +1521,17 @@ CREATE TABLE IF NOT EXISTS rsi_lesson_usage (
     shown_at  TIMESTAMPTZ NOT NULL DEFAULT now(),
     PRIMARY KEY (lesson_id, task_id, mode)
 );
+
+-- Current coverage observations, archived with the owning task.
+CREATE TABLE IF NOT EXISTS coverage_ledger (
+ task_id BIGINT NOT NULL REFERENCES tasks(id) ON DELETE CASCADE,
+ surface TEXT NOT NULL,
+ risk_area TEXT NOT NULL,
+ outcome TEXT NOT NULL CHECK (outcome IN ('reported','no_issue_found','ruled_out','not_applicable','needs_follow_up')),
+ evidence TEXT NOT NULL DEFAULT '',
+ reason TEXT NOT NULL DEFAULT '',
+ worker TEXT NOT NULL DEFAULT '',
+ intent_id BIGINT,
+ updated_at TIMESTAMPTZ NOT NULL DEFAULT now(),
+ PRIMARY KEY (task_id,surface,risk_area)
+);

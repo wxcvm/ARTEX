@@ -394,6 +394,7 @@ export const api = {
       tested: number;
       pct: number | null;
       by_type: { type: string; total: number; tested: number }[];
+      ledger?: { entries: unknown[]; gaps: { kind: string; surface?: string; risk_area: string }[]; unexamined: string[]; completeness: { complete: boolean; state: string; caveat: string } };
     }>(`/tasks/${id}/coverage`),
   // Asset coverage graph: every in-scope asset + root-domain/company nodes used for connection, with tested/in_scope.
   taskCoverageGraph: (id: string) => get<CoverageGraphData>(`/tasks/${id}/coverage-graph`),

@@ -114,9 +114,8 @@ func TestBudgetUnsetIsPassthrough(t *testing.T) {
 	}
 	// Without a budget on ctx the planner input and the worker turns are unchanged.
 	ctx := context.Background()
-	situational := plannerSituational(nil, triggerLookup{}, nil, newDataEnvelope())
-	if plannerRoundInput("l", situational, "", "g", "") != plannerRoundInput("l", situational+plannerBudgetBlock(ctx), "", "g", "") {
-		t.Fatal("planner input changed without a budget")
+	if got := plannerBudgetBlock(ctx); got != "" {
+		t.Fatalf("planner input changed without a budget: %q", got)
 	}
 	if got := (&Worker{maxTurns: 40}).turnCap(ctx); got != 40 {
 		t.Fatalf("worker turns without budget = %d, want 40", got)

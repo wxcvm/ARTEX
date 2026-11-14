@@ -283,6 +283,7 @@ type Coverage struct {
 	Tested      int              `json:"tested"`      // tested (approximate)
 	Pct         *float64         `json:"pct"`         // coverage; null when the denominator is 0
 	ByType      []CoverageByType `json:"by_type"`     // total/tested per asset type
+	Ledger      *CoverageLedger  `json:"ledger,omitempty"`
 }
 
 // CoverageEnabled reports whether a task has the asset-coverage feature turned on

@@ -119,6 +119,7 @@ export function OverviewTab({ taskId }: { taskId: string }) {
     tested: number;
     pct: number | null;
     by_type: { type: string; total: number; tested: number }[];
+    ledger?: { entries: unknown[]; gaps: { kind: string; surface?: string; risk_area: string }[]; unexamined: string[]; completeness: { complete: boolean; state: string; caveat: string } };
   } | null>(null);
   // Intent ids currently re-running ("__all__" means the batch); used to disable buttons + spinners.
   const [rerunning, setRerunning] = React.useState<Set<string>>(new Set());
@@ -705,7 +706,7 @@ export function OverviewTab({ taskId }: { taskId: string }) {
         </CardContent>
       </Card>
       <TaskInterceptRulesCard taskId={taskId} />
-      {coverage && coverage.enabled && coverage.scope_rows > 0 && (
+      {coverage && coverage.enabled && (coverage.scope_rows > 0 || !!coverage.ledger) && (
         <Card>
           <CardHeader>
             <CardTitle className="flex items-center gap-2 text-base">
@@ -719,10 +720,18 @@ export function OverviewTab({ taskId }: { taskId: string }) {
                 {coverage.pct != null ? Math.round(coverage.pct * 100) + "%" : "—"}
               </span>
               <span className="text-muted-foreground text-sm">
-                Tested {coverage.tested} / in scope {coverage.denominator}
+                {tr("已测试", "Tested")} {coverage.tested} / {tr("范围内", "in scope")} {coverage.denominator}
               </span>
             </div>
             {coverage.pct != null && <Progress value={Math.round(coverage.pct * 100)} />}
+            {coverage.ledger && (
+              <div className="space-y-1 text-xs text-muted-foreground">
+                <div>{tr("覆盖台账", "Coverage ledger")}: {coverage.ledger.entries.length} {tr("项已记录", "recorded")} · {coverage.ledger.gaps.length} {tr("项待处理", "open gaps")}</div>
+                {coverage.ledger.gaps.slice(0, 10).map((g, i) => (
+                  <div key={i}>{({ unrecorded_risk_class: tr("未检查", "Unexamined"), needs_follow_up: tr("待跟进", "Needs follow-up"), missing_evidence: tr("缺少证据", "Missing evidence"), missing_reason: tr("缺少理由", "Missing reason") } as Record<string, string>)[g.kind] ?? g.kind}: {g.risk_area} {g.surface ?? ""}</div>
+                ))}
+              </div>
+            )}
             {coverage.by_type.length > 0 && (
               <div className="flex flex-wrap gap-1.5 text-xs">
                 {coverage.by_type.map((b) => (
