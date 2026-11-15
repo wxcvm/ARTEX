@@ -91,6 +91,9 @@ func TestPurgeIntelDatabaseRoundTrip(t *testing.T) {
  mux.HandleFunc("GET /api/purge/intel-bridge/overview",s.purgeIntelBridgeOverview)
  mux.HandleFunc("GET /api/purge/intel-bridge/assets",s.purgeIntelBridgeAssets)
  mux.HandleFunc("GET /api/purge/intel-bridge/snapshot",s.purgeIntelBridgeSnapshot)
+ mux.HandleFunc("GET /api/purge/intel-bridge/task",s.purgeIntelBridgeTask)
+ mux.HandleFunc("GET /api/purge/intel-bridge/findings",s.purgeIntelBridgeFindings)
+ mux.HandleFunc("GET /api/purge/intel-bridge/report",s.purgeIntelBridgeReport)
  mux.HandleFunc("GET /api/purge/intel-pairing",s.managePurgeIntelPairing)
  mux.HandleFunc("POST /api/purge/intel-pairing",s.managePurgeIntelPairing)
  mux.HandleFunc("DELETE /api/purge/intel-pairing",s.managePurgeIntelPairing)
@@ -175,6 +178,27 @@ func TestPurgeIntelDatabaseRoundTrip(t *testing.T) {
  if snap.Code!=200||json.Unmarshal(snap.Body.Bytes(),&snapBody)!=nil||snapBody.CompanyID!=id||snapBody.SnapshotID!=first.ID||!snapBody.Analysis.HistoricalOnly||snapBody.Analysis.PortObservations!=1{t.Fatalf("snapshot read failed: %d",snap.Code)}
  if got:=bridgeRead("/api/purge/intel-bridge/snapshot?snapshot=0",fmt.Sprint(id));got.Code!=400{t.Fatal("invalid snapshot accepted")}
  assertAssetsUnchanged()
+ // Isolated task/finding fixture with explicit company attribution.
+ task,err:=d.CreateTaskWithOptions("bridge detail","goal",db.TaskCreateOptions{Name:"paired task",CompanyIDs:[]int64{id}})
+ if err!=nil{t.Fatal(err)}
+ defer d.DeleteTaskCascade(task.ID,true,true)
+ aid,err:=d.Assets().UpsertRootDomain(db.UpsertRootDomainReq{Domain:fmt.Sprintf("bridge-%d.example.test",time.Now().UnixNano()),TaskID:task.ID})
+ if err!=nil{t.Fatal(err)}
+ if _,err=d.Exec("UPDATE assets SET company_id=$1 WHERE id=$2",id,aid);err!=nil{t.Fatal(err)}
+ fid,err:=d.AddFinding(task.ID,0,"test","paired finding","low","summary","evidence","worker",[]int64{aid})
+ if err!=nil{t.Fatal(err)}
+ if _,err=d.Exec("UPDATE findings SET report=$1 WHERE id=$2","fixture report",fid);err!=nil{t.Fatal(err)}
+ td:=bridgeRead(fmt.Sprintf("/api/purge/intel-bridge/task?task=%d",task.ID),fmt.Sprint(id))
+ if td.Code!=200||!strings.Contains(td.Body.String(),"paired task"){t.Fatalf("task detail failed %d %s",td.Code,td.Body.String())}
+ fl:=bridgeRead(fmt.Sprintf("/api/purge/intel-bridge/findings?task=%d",task.ID),fmt.Sprint(id))
+ if fl.Code!=200||!strings.Contains(fl.Body.String(),"paired finding"){t.Fatalf("findings failed %d %s",fl.Code,fl.Body.String())}
+ fr:=bridgeRead(fmt.Sprintf("/api/purge/intel-bridge/report?finding=%d",fid),fmt.Sprint(id))
+ if fr.Code!=200||!strings.Contains(fr.Body.String(),"fixture report"){t.Fatalf("report failed %d %s",fr.Code,fr.Body.String())}
+ if got:=bridgeRead(fmt.Sprintf("/api/purge/intel-bridge/report?finding=%d",fid),fmt.Sprint(id+1));got.Code!=409{t.Fatal("other company accepted")}
+ if _,err=d.Exec("UPDATE assets SET company_id=NULL WHERE id=$1",aid);err!=nil{t.Fatal(err)}
+ if got:=bridgeRead(fmt.Sprintf("/api/purge/intel-bridge/report?finding=%d",fid),fmt.Sprint(id));got.Code!=404{t.Fatal("unattributed report accepted")}
+ if _,err=d.DeleteTaskCascade(task.ID,true,true);err!=nil{t.Fatal(err)}
+ // Original inventory is unchanged after fixture cleanup.
  if got:=admin("DELETE","");got.Code!=200{t.Fatalf("revoke failed: %d",got.Code)}
  if _,ok:=s.authorizePurgeIntelPairing(pairResponse.Token);ok{t.Fatal("revoked pairing accepted")}
  if err:=d.QueryRow("SELECT count(*) FROM purge_intel_snapshots WHERE company_id=$1",id).Scan(&count);err!=nil||count!=1{t.Fatalf("bridge duplicated snapshot: %d %v",count,err)}
@@ -197,6 +221,9 @@ func TestPurgeIntelBridgeCredentialIsolation(t *testing.T) {
  mux.HandleFunc("GET /api/purge/intel-bridge/overview",s.purgeIntelBridgeOverview)
  mux.HandleFunc("GET /api/purge/intel-bridge/assets",s.purgeIntelBridgeAssets)
  mux.HandleFunc("GET /api/purge/intel-bridge/snapshot",s.purgeIntelBridgeSnapshot)
+ mux.HandleFunc("GET /api/purge/intel-bridge/task",s.purgeIntelBridgeTask)
+ mux.HandleFunc("GET /api/purge/intel-bridge/findings",s.purgeIntelBridgeFindings)
+ mux.HandleFunc("GET /api/purge/intel-bridge/report",s.purgeIntelBridgeReport)
  mux.HandleFunc("GET /api/purge/intel-pairing",s.managePurgeIntelPairing)
  mux.HandleFunc("POST /api/purge/intel-pairing",s.managePurgeIntelPairing)
  mux.HandleFunc("DELETE /api/purge/intel-pairing",s.managePurgeIntelPairing)
@@ -217,6 +244,10 @@ func TestPurgeIntelBridgeCredentialIsolation(t *testing.T) {
   {"GET","/api/purge/intel-bridge/status","","12"},
   {"GET","/api/purge/intel-bridge/overview","","12"},
   {"GET","/api/purge/intel-bridge/assets","","12"},
+  {"GET","/api/purge/intel-bridge/task","","12"},
+  {"GET","/api/purge/intel-bridge/findings","listener-test","12"},
+  {"GET","/api/purge/intel-bridge/report","overview-test","12"},
+  {"POST","/api/purge/intel-bridge/report",secret,"12"},
   {"GET","/api/purge/intel-bridge/snapshot","listener-test","12"},
   {"POST","/api/purge/intel-bridge/assets",secret,"12"},
   {"GET","/api/purge/intel-bridge/overview","listener-test","12"},

@@ -3,6 +3,7 @@ package server
 import (
  "crypto/rand"
  "crypto/sha256"
+ "database/sql"
  "crypto/subtle"
  "encoding/hex"
  "encoding/json"
@@ -236,4 +237,79 @@ func (s *Server) purgeIntelBridgeSnapshot(w http.ResponseWriter, r *http.Request
  b,ok:=s.loadPurgeIntelSnapshot(w,r);if !ok{return}
  a:=analyzePurgeIntel(b)
  writeJSON(w,200,map[string]any{"service":"artex","schema_version":1,"company_id":id,"snapshot_id":sid,"analysis":a})
+}
+
+// Restrict report text to findings with exclusively company-owned linked assets,
+// and no other company associated with their originating task. Mixed-company
+// tasks still expose their basic lifecycle in the overview.
+const purgeFindingCompanyWhere = `EXISTS (SELECT 1 FROM assets a WHERE a.company_id=$1 AND f.asset_ids @> jsonb_build_array(a.id))
+ AND NOT EXISTS (SELECT 1 FROM jsonb_array_elements_text(f.asset_ids) x(value)
+ LEFT JOIN assets a ON a.id::text=x.value WHERE a.company_id IS DISTINCT FROM $1)
+ AND NOT EXISTS (SELECT 1 FROM task_scope ts WHERE ts.task_id=f.task_id AND ts.kind='company' AND ts.company_id IS DISTINCT FROM $1)`
+
+func (s *Server) purgeIntelBridgeTask(w http.ResponseWriter,r *http.Request) {
+ id,ok:=s.purgeIntelReadCompany(w,r);if !ok{return}
+ if _,_,ok=s.purgeIntelCompany(w,r);!ok{return}
+ tid,err:=strconv.ParseInt(r.URL.Query().Get("task"),10,64)
+ if err!=nil||tid<=0{writeErr(w,400,"invalid task id");return}
+ var name,status,created,started,completed string
+ var paused,queued,shared bool
+ var assets,findings int64
+ err=s.m.pg.QueryRowContext(r.Context(),`SELECT
+ CASE WHEN EXISTS (SELECT 1 FROM task_scope ts WHERE ts.task_id=t.id AND ts.kind='company' AND ts.company_id IS DISTINCT FROM $1) THEN '' ELSE COALESCE(t.name,'') END,
+ t.status,t.paused,t.queued,t.created_at::text,COALESCE(t.first_run_at::text,''),COALESCE(t.completed_at::text,''),
+ EXISTS (SELECT 1 FROM task_scope ts WHERE ts.task_id=t.id AND ts.kind='company' AND ts.company_id IS DISTINCT FROM $1),
+ (SELECT count(*) FROM assets a WHERE a.company_id=$1 AND t.id=ANY(a.task_ids)),
+ (SELECT count(*) FROM findings f WHERE f.task_id=t.id AND `+purgeFindingCompanyWhere+`)
+ FROM tasks t WHERE t.id=$2 AND t.deleted_at IS NULL AND EXISTS
+ (SELECT 1 FROM task_scope ts WHERE ts.task_id=t.id AND ts.kind='company' AND ts.company_id=$1)`,id,tid).Scan(&name,&status,&paused,&queued,&created,&started,&completed,&shared,&assets,&findings)
+ if err==sql.ErrNoRows{writeErr(w,404,"task unavailable");return}
+ if err!=nil{writeErr(w,503,"task detail unavailable");return}
+ writeJSON(w,200,map[string]any{"service":"artex","schema_version":1,"company_id":id,"task_id":tid,"name":name,
+ "status":status,"paused":paused,"queued":queued,"shared":shared,"created_at":created,"started_at":started,"completed_at":completed,
+ "asset_count":assets,"finding_count":findings})
+}
+
+type purgeBridgeFindingItem struct {
+ ID int64 `json:"id"`
+ Name string `json:"name"`
+ Severity string `json:"severity"`
+ Status string `json:"status"`
+ CreatedAt string `json:"created_at"`
+ HasReport bool `json:"has_report"`
+}
+
+func (s *Server) purgeIntelBridgeFindings(w http.ResponseWriter,r *http.Request) {
+ id,ok:=s.purgeIntelReadCompany(w,r);if !ok{return}
+ if _,_,ok=s.purgeIntelCompany(w,r);!ok{return}
+ var before,tid int64
+ for key,dest:=range map[string]*int64{"before":&before,"task":&tid}{
+  if raw:=r.URL.Query().Get(key);raw!=""{n,err:=strconv.ParseInt(raw,10,64);if err!=nil||n<=0{writeErr(w,400,"invalid finding filter");return};*dest=n}
+ }
+ items:=[]purgeBridgeFindingItem{}
+ rows,err:=s.m.pg.QueryContext(r.Context(),`SELECT f.id,COALESCE(NULLIF(f.name,''),f.vulnclass,''),f.severity,COALESCE(f.status,'pending'),f.created_at::text,COALESCE(f.report,'')<>''
+ FROM findings f WHERE `+purgeFindingCompanyWhere+` AND ($2::bigint=0 OR f.id<$2) AND ($3::bigint=0 OR f.task_id=$3)
+ ORDER BY f.id DESC LIMIT 51`,id,before,tid)
+ if err!=nil{writeErr(w,503,"finding list unavailable");return};defer rows.Close()
+ for rows.Next(){var item purgeBridgeFindingItem;if rows.Scan(&item.ID,&item.Name,&item.Severity,&item.Status,&item.CreatedAt,&item.HasReport)!=nil{writeErr(w,503,"finding list unavailable");return};items=append(items,item)}
+ if rows.Err()!=nil{writeErr(w,503,"finding list unavailable");return}
+ var next int64
+ if len(items)>50{items=items[:50];next=items[49].ID}
+ writeJSON(w,200,map[string]any{"service":"artex","schema_version":1,"company_id":id,"items":items,"next_before":next})
+}
+
+func (s *Server) purgeIntelBridgeReport(w http.ResponseWriter,r *http.Request) {
+ id,ok:=s.purgeIntelReadCompany(w,r);if !ok{return}
+ if _,_,ok=s.purgeIntelCompany(w,r);!ok{return}
+ fid,err:=strconv.ParseInt(r.URL.Query().Get("finding"),10,64)
+ if err!=nil||fid<=0{writeErr(w,400,"invalid finding id");return}
+ var item purgeBridgeFindingItem
+ var report string
+ // Select scope and report in the same statement, avoiding a check/read race.
+ err=s.m.pg.QueryRowContext(r.Context(),`SELECT f.id,COALESCE(NULLIF(f.name,''),f.vulnclass,''),f.severity,COALESCE(f.status,'pending'),f.created_at::text,COALESCE(f.report,'')<>'',COALESCE(f.report,'')
+ FROM findings f WHERE f.id=$2 AND `+purgeFindingCompanyWhere,id,fid).Scan(&item.ID,&item.Name,&item.Severity,&item.Status,&item.CreatedAt,&item.HasReport,&report)
+ if err==sql.ErrNoRows{writeErr(w,404,"finding unavailable");return}
+ if err!=nil{writeErr(w,503,"report unavailable");return}
+ // Reports are stored Markdown; expose them as plain text, never raw traffic.
+ writeJSON(w,200,map[string]any{"service":"artex","schema_version":1,"company_id":id,"finding":item,"report":report})
 }
