@@ -184,3 +184,56 @@ func (s *Server) purgeIntelBridgeOverview(w http.ResponseWriter, r *http.Request
   "task_count":taskCount,"asset_count":assetCount,"linked_finding_count":findingCount,"snapshot_count":snapshotCount,
   "tasks":tasks,"snapshots":snapshots})
 }
+
+
+// Paired company is resolved from the credential, never a query parameter.
+func (s *Server) purgeIntelReadCompany(w http.ResponseWriter, r *http.Request) (int64, bool) {
+ w.Header().Set("Cache-Control", "no-store")
+ id, ok := s.authorizePurgeIntelPairing(r.Header.Get("X-Artex-Purge-Intel-Token"))
+ if !ok { writeErr(w, 401, "Unauthorized"); return 0,false }
+ if r.Header.Get("X-Artex-Purge-Intel-Company") != strconv.FormatInt(id,10) {
+  writeErr(w,409,"receiving company does not match configured company"); return 0,false
+ }
+ r.SetPathValue("id",strconv.FormatInt(id,10))
+ return id,true
+}
+
+func (s *Server) purgeIntelBridgeAssets(w http.ResponseWriter, r *http.Request) {
+ id,ok:=s.purgeIntelReadCompany(w,r); if !ok{return}
+ if _,_,ok=s.purgeIntelCompany(w,r);!ok{return}
+ var before int64
+ if raw:=r.URL.Query().Get("before");raw!="" {
+  n,err:=strconv.ParseInt(raw,10,64);if err!=nil||n<=0{writeErr(w,400,"invalid asset cursor");return};before=n
+ }
+ type item struct {
+  ID int64 `json:"id"`
+  Type string `json:"type"`
+  Domain string `json:"domain"`
+  IP string `json:"ip"`
+  Port int `json:"port"`
+  AppName string `json:"app_name"`
+  ServiceType string `json:"service_type"`
+  LastSeen string `json:"last_seen"`
+ }
+ items:=[]item{}
+ // Do not expose stored auth/params/extra or URLs containing credentials.
+ rows,err:=s.m.pg.QueryContext(r.Context(),`SELECT id,type,COALESCE(domain,''),COALESCE(ip,''),COALESCE(port,0),COALESCE(app_name,''),COALESCE(service_type,''),last_seen::text
+ FROM assets WHERE company_id=$1 AND ($2::bigint=0 OR id<$2) ORDER BY id DESC LIMIT 51`,id,before)
+ if err!=nil{writeErr(w,503,"asset list unavailable");return};defer rows.Close()
+ for rows.Next(){var a item;if rows.Scan(&a.ID,&a.Type,&a.Domain,&a.IP,&a.Port,&a.AppName,&a.ServiceType,&a.LastSeen)!=nil{writeErr(w,503,"asset list unavailable");return};items=append(items,a)}
+ if rows.Err()!=nil{writeErr(w,503,"asset list unavailable");return}
+ var next int64
+ if len(items)>50{items=items[:50];next=items[49].ID}
+ writeJSON(w,200,map[string]any{"service":"artex","schema_version":1,"company_id":id,"items":items,"next_before":next})
+}
+
+func (s *Server) purgeIntelBridgeSnapshot(w http.ResponseWriter, r *http.Request) {
+ id,ok:=s.purgeIntelReadCompany(w,r);if !ok{return}
+ sid,err:=strconv.ParseInt(r.URL.Query().Get("snapshot"),10,64)
+ if err!=nil||sid<=0{writeErr(w,400,"invalid snapshot id");return}
+ r.SetPathValue("snapshot",strconv.FormatInt(sid,10))
+ // Reuse existing snapshot lookup and current company scope validation.
+ b,ok:=s.loadPurgeIntelSnapshot(w,r);if !ok{return}
+ a:=analyzePurgeIntel(b)
+ writeJSON(w,200,map[string]any{"service":"artex","schema_version":1,"company_id":id,"snapshot_id":sid,"analysis":a})
+}

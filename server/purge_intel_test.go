@@ -89,6 +89,8 @@ func TestPurgeIntelDatabaseRoundTrip(t *testing.T) {
  mux.HandleFunc("POST /api/purge/intel-bridge",s.importPurgeIntelBridge)
  mux.HandleFunc("GET /api/purge/intel-bridge/status",s.purgeIntelBridgeStatus)
  mux.HandleFunc("GET /api/purge/intel-bridge/overview",s.purgeIntelBridgeOverview)
+ mux.HandleFunc("GET /api/purge/intel-bridge/assets",s.purgeIntelBridgeAssets)
+ mux.HandleFunc("GET /api/purge/intel-bridge/snapshot",s.purgeIntelBridgeSnapshot)
  mux.HandleFunc("GET /api/purge/intel-pairing",s.managePurgeIntelPairing)
  mux.HandleFunc("POST /api/purge/intel-pairing",s.managePurgeIntelPairing)
  mux.HandleFunc("DELETE /api/purge/intel-pairing",s.managePurgeIntelPairing)
@@ -159,6 +161,19 @@ func TestPurgeIntelDatabaseRoundTrip(t *testing.T) {
  overviewReply:=httptest.NewRecorder();h.ServeHTTP(overviewReply,overviewReq)
  var overview struct{ CompanyID int64 `json:"company_id"`; SnapshotCount int64 `json:"snapshot_count"`; Snapshots []struct{ID int64 `json:"id"`} `json:"snapshots"` }
  if overviewReply.Code!=200||json.Unmarshal(overviewReply.Body.Bytes(),&overview)!=nil||overview.CompanyID!=id||overview.SnapshotCount!=1||len(overview.Snapshots)!=1||overview.Snapshots[0].ID!=first.ID{t.Fatalf("overview failed: %d %s",overviewReply.Code,overviewReply.Body.String())}
+ bridgeRead:=func(path,company string)*httptest.ResponseRecorder{
+  r:=httptest.NewRequest("GET",path,nil);r.Header.Set("X-Artex-Purge-Intel-Token",pairResponse.Token);r.Header.Set("X-Artex-Purge-Intel-Company",company);w:=httptest.NewRecorder();h.ServeHTTP(w,r);return w
+ }
+ assetsReply:=bridgeRead("/api/purge/intel-bridge/assets",fmt.Sprint(id))
+ var assetPage struct{CompanyID int64 `json:"company_id"`;Items []map[string]any `json:"items"`}
+ if assetsReply.Code!=200||json.Unmarshal(assetsReply.Body.Bytes(),&assetPage)!=nil||assetPage.CompanyID!=id||assetPage.Items==nil{t.Fatalf("asset page failed: %d",assetsReply.Code)}
+ for _,a:=range assetPage.Items{for _,key:=range []string{"auth","params","extra","url"}{if _,exists:=a[key];exists{t.Fatal("private asset field exposed")}}}
+ if got:=bridgeRead("/api/purge/intel-bridge/assets?before=-1",fmt.Sprint(id));got.Code!=400{t.Fatal("bad cursor accepted")}
+ if got:=bridgeRead("/api/purge/intel-bridge/assets",fmt.Sprint(id+1));got.Code!=409{t.Fatal("other company accepted")}
+ snap:=bridgeRead(fmt.Sprintf("/api/purge/intel-bridge/snapshot?snapshot=%d",first.ID),fmt.Sprint(id))
+ var snapBody struct{CompanyID int64 `json:"company_id"`;SnapshotID int64 `json:"snapshot_id"`;Analysis purgeIntelAnalysis `json:"analysis"`}
+ if snap.Code!=200||json.Unmarshal(snap.Body.Bytes(),&snapBody)!=nil||snapBody.CompanyID!=id||snapBody.SnapshotID!=first.ID||!snapBody.Analysis.HistoricalOnly||snapBody.Analysis.PortObservations!=1{t.Fatalf("snapshot read failed: %d",snap.Code)}
+ if got:=bridgeRead("/api/purge/intel-bridge/snapshot?snapshot=0",fmt.Sprint(id));got.Code!=400{t.Fatal("invalid snapshot accepted")}
  assertAssetsUnchanged()
  if got:=admin("DELETE","");got.Code!=200{t.Fatalf("revoke failed: %d",got.Code)}
  if _,ok:=s.authorizePurgeIntelPairing(pairResponse.Token);ok{t.Fatal("revoked pairing accepted")}
@@ -180,6 +195,8 @@ func TestPurgeIntelBridgeCredentialIsolation(t *testing.T) {
  mux.HandleFunc("POST /api/purge/intel-bridge",s.importPurgeIntelBridge)
  mux.HandleFunc("GET /api/purge/intel-bridge/status",s.purgeIntelBridgeStatus)
  mux.HandleFunc("GET /api/purge/intel-bridge/overview",s.purgeIntelBridgeOverview)
+ mux.HandleFunc("GET /api/purge/intel-bridge/assets",s.purgeIntelBridgeAssets)
+ mux.HandleFunc("GET /api/purge/intel-bridge/snapshot",s.purgeIntelBridgeSnapshot)
  mux.HandleFunc("GET /api/purge/intel-pairing",s.managePurgeIntelPairing)
  mux.HandleFunc("POST /api/purge/intel-pairing",s.managePurgeIntelPairing)
  mux.HandleFunc("DELETE /api/purge/intel-pairing",s.managePurgeIntelPairing)
@@ -199,6 +216,9 @@ func TestPurgeIntelBridgeCredentialIsolation(t *testing.T) {
   {"GET","/api/purge/intel-bridge/status","listener-test","12"},
   {"GET","/api/purge/intel-bridge/status","","12"},
   {"GET","/api/purge/intel-bridge/overview","","12"},
+  {"GET","/api/purge/intel-bridge/assets","","12"},
+  {"GET","/api/purge/intel-bridge/snapshot","listener-test","12"},
+  {"POST","/api/purge/intel-bridge/assets",secret,"12"},
   {"GET","/api/purge/intel-bridge/overview","listener-test","12"},
   {"POST","/api/purge/intel-bridge/overview",secret,"12"},
   {"POST","/api/purge/intel-bridge/status",secret,"12"},
