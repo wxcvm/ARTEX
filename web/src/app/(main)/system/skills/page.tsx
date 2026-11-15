@@ -46,6 +46,7 @@ import { cn } from "@/lib/utils";
 import { useUiLocale } from "@/lib/ui-locale.client";
 import { uiText } from "@/lib/ui-locale";
 import { skillReading } from "@/lib/skill-reading";
+import { beginFileRead, updateFileEditor, type FileEditorState } from "@/lib/skill-file-editor";
 import { api } from "@/lib/api";
 import { skillLabel, skillSummary } from "@/lib/resource-labels";
 import type { Agent, SkillItem, MCPServer, SkillCall, MissingSkill } from "@/lib/types";
@@ -310,10 +311,13 @@ export default function SkillsPage() {
   const [expanded, setExpanded] = React.useState<Set<string>>(new Set());
 
   // file editor
-  const [fileContent, setFileContent] = React.useState("");
-  const [fileLoading, setFileLoading] = React.useState(false);
-  const [dirty, setDirty] = React.useState(false);
-  const [saving, setSaving] = React.useState(false);
+  const [editor, setEditor] = React.useState<FileEditorState | null>(null);
+  const currentEditor = editor && editor.selection === selected ? editor : null;
+  const fileContent = currentEditor?.content ?? "";
+  const fileLoading = !currentEditor || currentEditor.status === "loading";
+  const fileReady = currentEditor?.status === "ready";
+  const dirty = currentEditor?.dirty ?? false;
+  const saving = currentEditor?.saving ?? false;
 
   // inline create — using a ref to avoid stale closure in onBlur
   const [creating, setCreating] = React.useState<Creating>(null);
@@ -445,22 +449,31 @@ export default function SkillsPage() {
 
   // 最近调用 for the selected skill (detail panel only).
   React.useEffect(() => {
-    if (!selected || selected.path !== null) { setUsageCalls([]); return; }
+    setUsageCalls([]);
+    if (!selected || selected.path !== null) { setUsageLoading(false); return; }
+    let active = true;
     const name = selected.skill;
     setUsageLoading(true);
     api.skillUsage(name, 20)
-      .then((calls) => setUsageCalls(calls))
-      .catch(() => setUsageCalls([]))
-      .finally(() => setUsageLoading(false));
+      .then((calls) => { if (active) setUsageCalls(calls); })
+      .catch(() => { if (active) setUsageCalls([]); })
+      .finally(() => { if (active) setUsageLoading(false); });
+    return () => { active = false; };
   }, [selected]);
 
   React.useEffect(() => {
-    if (!selected || selected.path === null) { setFileContent(""); setDirty(false); return; }
-    setFileLoading(true);
-    api.readSkillFile(selected.skill, selected.path)
-      .then((c) => { setFileContent(c); setDirty(false); })
-      .catch(() => toast.error(tr("读取文件失败", "Failed to read file")))
-      .finally(() => setFileLoading(false));
+    if (!selected || selected.path === null) { setEditor(null); return; }
+    const selection = selected;
+    let active = true;
+    setEditor(beginFileRead(selection));
+    api.readSkillFile(selection.skill, selection.path)
+      .then((content) => {
+        if (active) setEditor((prev) => updateFileEditor(prev, selection, { status: "ready", content }));
+      })
+      .catch(() => {
+        if (active) setEditor((prev) => updateFileEditor(prev, selection, { status: "error" }));
+      });
+    return () => { active = false; };
   }, [selected]);
 
   // ── Expand helpers ────────────────────────────────────────────────────────
@@ -569,15 +582,18 @@ export default function SkillsPage() {
   }
 
   async function saveFile() {
-    if (!selected || selected.path === null) return;
-    setSaving(true);
+    if (!selected || selected.path === null || !fileReady || !dirty || saving) return;
+    const selection = selected;
+    setEditor((prev) => updateFileEditor(prev, selection, { saving: true }));
     try {
-      await api.writeSkillFile(selected.skill, selected.path, fileContent);
-      toast.success(tr("已保存", "Saved"));
-      setDirty(false);
+      await api.writeSkillFile(selection.skill, selection.path, fileContent);
+      toast.success(tr("已保存", "Saved") + ": " + selection.path);
+      setEditor((prev) => updateFileEditor(prev, selection, { dirty: false }));
     } catch (e) {
       toast.error(tr("保存失败：", "Save failed: ") + (e as Error).message);
-    } finally { setSaving(false); }
+    } finally {
+      setEditor((prev) => updateFileEditor(prev, selection, { saving: false }));
+    }
   }
 
   async function toggleSkillMcp(skillName: string, mcpName: string, mcpOn: boolean) {
@@ -1029,7 +1045,7 @@ export default function SkillsPage() {
                 <span className="font-medium text-foreground">{selected.skill}</span>
                 <span>/</span>
                 <span className="font-mono">{selected.path}</span>
-                <Button size="sm" className="ml-auto" onClick={saveFile} disabled={!dirty || saving}>
+                <Button size="sm" className="ml-auto" onClick={saveFile} disabled={!fileReady || !dirty || saving}>
                   {saving ? tr("正在保存…", "Saving…") : tr("保存", "Save")}
                 </Button>
               </div>
@@ -1040,7 +1056,7 @@ export default function SkillsPage() {
                   <p className="mt-2 text-xs text-muted-foreground">下方为可编辑的原始文件。导引仅说明技能主题，不替代正文；代码、命令、参数和文件路径保持原样。</p>
                 </details>
               )}
-              {locale === "zh-CN" && !fileLoading && skillReading(selected.skill, selected.path, fileContent) && (
+              {locale === "zh-CN" && fileReady && skillReading(selected.skill, selected.path, fileContent) && (
                 <details className="shrink-0 rounded-md border p-3 text-sm">
                   <summary className="cursor-pointer font-medium">中文正文阅读版</summary>
                   <p className="mt-2 text-xs text-muted-foreground">仅供阅读；下方原始文件仍可编辑。原文变化后不显示此版本的译文。</p>
@@ -1049,12 +1065,15 @@ export default function SkillsPage() {
               )}
               {fileLoading ? (
                 <p className="text-xs text-muted-foreground">{tr("正在加载…", "Loading…")}</p>
+              ) : !fileReady ? (
+                <p className="text-sm text-destructive" role="alert">{tr("读取文件失败，请重新选择文件。", "Failed to read file. Select the file again.")}</p>
               ) : (
                 <Textarea
                   className="flex-1 resize-none font-mono text-xs"
                   aria-label={tr("原始技能文件正文", "Original skill file content")}
                   value={fileContent}
-                  onChange={(e) => { setFileContent(e.target.value); setDirty(true); }}
+                  disabled={saving}
+                  onChange={(e) => { const content = e.target.value; setEditor((prev) => updateFileEditor(prev, selected, { content, dirty: true })); }}
                 />
               )}
             </div>
