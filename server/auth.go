@@ -231,7 +231,7 @@ func (s *Server) requireAuth(h http.Handler) http.Handler {
 		if (p == "/api/purge/intel-bridge" && r.Method == http.MethodPost) ||
 			(p == "/api/purge/intel-bridge/status" && r.Method == http.MethodGet) {
 			w.Header().Set("Cache-Control", "no-store")
-			if !validPurgeIntelBridgeCredential(r.Header.Get("X-Artex-Purge-Intel-Token")) {
+			if _, ok := s.authorizePurgeIntelPairing(r.Header.Get("X-Artex-Purge-Intel-Token")); !ok {
 				writeErr(w, http.StatusUnauthorized, "Unauthorized")
 				return
 			}
