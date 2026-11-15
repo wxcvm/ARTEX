@@ -21,6 +21,7 @@ type IntelAnalysis = {
   unknown_transport_ports: number; ports_without_observation_time: number; shared_addresses: number;
 };
 type ImportResult = { id: number; names: number; ips: number; historical_only: boolean };
+type Pairing = { source: "saved" | "environment"; configured: boolean; company_id: number; token?: string };
 
 export function PurgeIntelPanel() {
   const locale = useUiLocale();
@@ -34,12 +35,39 @@ export function PurgeIntelPanel() {
   const [result, setResult] = React.useState<ImportResult | null>(null);
   const [busy, setBusy] = React.useState(false);
   const [error, setError] = React.useState("");
+  const [pair, setPair] = React.useState<Pairing | null>(null);
+  const [pairToken, setPairToken] = React.useState("");
+  const [pairBusy, setPairBusy] = React.useState(false);
+  const [pairError, setPairError] = React.useState("");
+  const [pairCopy, setPairCopy] = React.useState(false);
+  const [pairConfirm, setPairConfirm] = React.useState(false);
   React.useEffect(() => {
     let live = true;
     api.companies().then(rows => { if (live) setCompanies(rows); })
       .catch(e => { if (live) setError(String(e.message || e)); });
     return () => { live = false; };
   }, []);
+  React.useEffect(() => {
+    let live = true;
+    http<Pairing>("/purge/intel-pairing").then(p => {
+      if (live) setPair(p);
+    }).catch(e => { if (live) setPairError(String(e.message || e)); });
+    return () => { live = false; };
+  }, []);
+  const updatePair = async (action: "create" | "revoke") => {
+    if (pairBusy || pair?.source === "environment" || (action === "create" && !company)) return;
+    if (pair?.configured && !pairConfirm) return;
+    setPairBusy(true); setPairError(""); setPairCopy(false); setPairToken(""); setPairConfirm(false);
+    try {
+      const p = await http<Pairing>("/purge/intel-pairing", {
+        method: action === "create" ? "POST" : "DELETE",
+        ...(action === "create" ? { body: JSON.stringify({ company_id: Number(company) }) } : {}),
+      });
+      setPair({ source: p.source, configured: p.configured, company_id: p.company_id });
+      setPairToken(p.token || "");
+    } catch (e) { setPairError(e instanceof Error ? e.message : "Pairing failed"); }
+    finally { setPairBusy(false); }
+  };
   const path = "/companies/" + company + "/purge-intel";
   const run = async (action: "import" | "history" | "detail" | "analysis", id?: number) => {
     if (!company || busy) return;
@@ -72,11 +100,35 @@ export function PurgeIntelPanel() {
         <label className="block space-y-1 text-sm">
           <span>{tr("目标公司", "Target company")}</span>
           <select className="w-full rounded-md border bg-background p-2" value={company} disabled={busy}
-            onChange={e => { setCompany(e.target.value); setHistory([]); setDetail(null); setAnalysis(null); setResult(null); setError(""); }}>
+            onChange={e => { setCompany(e.target.value); setHistory([]); setDetail(null); setAnalysis(null); setResult(null); setError(""); setPairConfirm(false); }}>
             <option value="">{tr("请选择公司", "Select company")}</option>
             {companies.map(c => <option key={c.id} value={String(c.id)}>{c.name}</option>)}
           </select>
         </label>
+        <section className="space-y-3 rounded-md border p-3">
+          <h3 className="text-sm font-medium">{tr("Purge 本机配对", "Purge local pairing")}</h3>
+          <p className="text-sm text-muted-foreground">{tr("选择上方目标公司，生成独立令牌。将公司 ID 和令牌复制到 Purge → ARTEX → 配对配置，保存并检测。令牌只显示一次，重置会使旧令牌失效。", "Select the target company and generate a dedicated token. Copy the company ID and token to Purge → ARTEX → Pairing, then save and check. The token is shown once; rotation invalidates the old token.")}</p>
+          {pair && <p role="status" className="text-sm">{pair.configured ? tr(`已配置 · 公司 #${pair.company_id}`, `Configured · Company #${pair.company_id}`) : tr("尚未配对", "Not paired")} {pair.source === "environment" && tr("（宿主环境变量管理）", "(managed by host environment)")}</p>}
+          {pair?.source === "environment" ? <p className="text-sm text-muted-foreground">{tr("请在宿主修改环境变量；页面不会覆盖原有配置。", "Modify the host environment; this page does not override it.")}</p> : <>
+            {pair?.configured && <label className="flex items-center gap-2 text-sm"><input type="checkbox" checked={pairConfirm} disabled={pairBusy} onChange={e => setPairConfirm(e.target.checked)} />{tr("确认替换或撤销已有配对", "Confirm rotation or revocation of the existing pairing")}</label>}
+            <div className="flex flex-wrap gap-2">
+              <Button disabled={pairBusy || !pair || !company || (pair.configured && !pairConfirm)} onClick={() => void updatePair("create")}>{pair?.configured ? tr("重新生成令牌", "Rotate token") : tr("生成配对令牌", "Generate pairing token")}</Button>
+              {pair?.configured && <Button variant="outline" disabled={pairBusy || !pairConfirm} onClick={() => void updatePair("revoke")}>{tr("撤销配对", "Revoke pairing")}</Button>}
+            </div>
+          </>}
+          {pairToken && <div className="space-y-2">
+            <p className="text-sm">{tr("公司 ID", "Company ID")}: {pair?.company_id}</p>
+            <input aria-label={tr("新配对令牌", "New pairing token")} readOnly value={pairToken} className="w-full rounded-md border bg-background p-2 font-mono text-xs" />
+            <div className="flex flex-wrap gap-2">
+              <Button variant="outline" size="sm" onClick={async () => {
+                try { await navigator.clipboard.writeText(pairToken); setPairCopy(true); }
+                catch { setPairError(tr("无法自动复制，请手动复制令牌。", "Clipboard unavailable; copy the token manually.")); }
+              }}>{pairCopy ? tr("已复制", "Copied") : tr("复制令牌", "Copy token")}</Button>
+              <Button variant="outline" size="sm" onClick={() => { setPairToken(""); setPairCopy(false); }}>{tr("隐藏令牌", "Hide token")}</Button>
+            </div>
+          </div>}
+          {pairError && <p role="alert" className="text-sm text-destructive">{pairError}</p>}
+        </section>
         <label className="block space-y-1 text-sm">
           <span>{tr("Purge JSON 清单", "Purge JSON manifest")}</span>
           <textarea className="min-h-36 w-full rounded-md border bg-background p-3 font-mono text-xs"

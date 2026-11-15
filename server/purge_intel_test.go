@@ -87,6 +87,16 @@ func TestPurgeIntelDatabaseRoundTrip(t *testing.T) {
  mux.HandleFunc("GET /api/companies/{id}/purge-intel/{snapshot}",s.getPurgeIntel)
  mux.HandleFunc("GET /api/companies/{id}/purge-intel/{snapshot}/analysis",s.getPurgeIntelAnalysis)
  mux.HandleFunc("POST /api/purge/intel-bridge",s.importPurgeIntelBridge)
+ mux.HandleFunc("GET /api/purge/intel-bridge/status",s.purgeIntelBridgeStatus)
+ mux.HandleFunc("GET /api/purge/intel-bridge/overview",s.purgeIntelBridgeOverview)
+ mux.HandleFunc("GET /api/purge/intel-bridge/assets",s.purgeIntelBridgeAssets)
+ mux.HandleFunc("GET /api/purge/intel-bridge/snapshot",s.purgeIntelBridgeSnapshot)
+ mux.HandleFunc("GET /api/purge/intel-bridge/task",s.purgeIntelBridgeTask)
+ mux.HandleFunc("GET /api/purge/intel-bridge/findings",s.purgeIntelBridgeFindings)
+ mux.HandleFunc("GET /api/purge/intel-bridge/report",s.purgeIntelBridgeReport)
+ mux.HandleFunc("GET /api/purge/intel-pairing",s.managePurgeIntelPairing)
+ mux.HandleFunc("POST /api/purge/intel-pairing",s.managePurgeIntelPairing)
+ mux.HandleFunc("DELETE /api/purge/intel-pairing",s.managePurgeIntelPairing)
  h:=s.requireAuth(mux)
  token,err:=signJWT(s.jwtKey);if err!=nil{t.Fatal(err)}
  path:=fmt.Sprintf("/api/companies/%d/purge-intel",id)
@@ -123,12 +133,85 @@ func TestPurgeIntelDatabaseRoundTrip(t *testing.T) {
   r.Header.Set("X-Artex-Purge-Intel-Company",company)
   w:=httptest.NewRecorder();h.ServeHTTP(w,r);return w
  }
+ statusReq:=httptest.NewRequest("GET","/api/purge/intel-bridge/status",nil)
+ statusReq.Header.Set("X-Artex-Purge-Intel-Token",secret)
+ statusReq.Header.Set("X-Artex-Purge-Intel-Company",fmt.Sprint(id))
+ statusReply:=httptest.NewRecorder();h.ServeHTTP(statusReply,statusReq)
+ if statusReply.Code!=200{t.Fatalf("pair status: %d %s",statusReply.Code,statusReply.Body.String())}
+ var pairing struct{ CompanyID int64 `json:"company_id"`; Paired bool `json:"paired"` }
+ if json.Unmarshal(statusReply.Body.Bytes(),&pairing)!=nil||pairing.CompanyID!=id||!pairing.Paired{t.Fatal("invalid pair status")}
+ if err:=d.QueryRow("SELECT count(*) FROM purge_intel_snapshots WHERE company_id=$1",id).Scan(&count);err!=nil||count!=1{t.Fatal("status modified snapshots")}
  if w=bridge(fmt.Sprint(id+1));w.Code!=409{t.Fatalf("mismatched company: %d",w.Code)}
  if w=bridge(fmt.Sprint(id));w.Code!=200{t.Fatalf("bridge import: %d %s",w.Code,w.Body.String())}
+ t.Setenv("ARTEX_PURGE_INTEL_TOKEN","")
+ t.Setenv("ARTEX_PURGE_INTEL_COMPANY_ID","")
+ admin:=func(method,body string)*httptest.ResponseRecorder{
+  r:=httptest.NewRequest(method,"/api/purge/intel-pairing",strings.NewReader(body))
+  r.Header.Set("Authorization","Bearer "+token)
+  w:=httptest.NewRecorder();h.ServeHTTP(w,r);return w
+ }
+ // Preserve test DB state; this integration fixture uses its own database.
+ t.Cleanup(func(){_ = d.SetSetting(purgeIntelPairingKey,"")})
+ created:=admin("POST",fmt.Sprintf(`{"company_id":%d}`,id))
+ var pairResponse struct{ Token string `json:"token"`; CompanyID int64 `json:"company_id"` }
+ if created.Code!=200||json.Unmarshal(created.Body.Bytes(),&pairResponse)!=nil||len(pairResponse.Token)!=64||pairResponse.CompanyID!=id{t.Fatalf("create pairing failed: %d",created.Code)}
+ stored,_,err:=d.GetSetting(purgeIntelPairingKey);if err!=nil||strings.Contains(stored,pairResponse.Token){t.Fatal("plaintext pairing stored")}
+ if got:=admin("GET","");got.Code!=200||strings.Contains(got.Body.String(),pairResponse.Token)||strings.Contains(got.Body.String(),"digest"){t.Fatal("status exposed secret")}
+ if gotID,ok:=s.authorizePurgeIntelPairing(pairResponse.Token);!ok||gotID!=id{t.Fatal("saved pairing not accepted")}
+ overviewReq:=httptest.NewRequest("GET","/api/purge/intel-bridge/overview",nil)
+ overviewReq.Header.Set("X-Artex-Purge-Intel-Token",pairResponse.Token)
+ overviewReq.Header.Set("X-Artex-Purge-Intel-Company",fmt.Sprint(id))
+ overviewReply:=httptest.NewRecorder();h.ServeHTTP(overviewReply,overviewReq)
+ var overview struct{ CompanyID int64 `json:"company_id"`; SnapshotCount int64 `json:"snapshot_count"`; Snapshots []struct{ID int64 `json:"id"`} `json:"snapshots"` }
+ if overviewReply.Code!=200||json.Unmarshal(overviewReply.Body.Bytes(),&overview)!=nil||overview.CompanyID!=id||overview.SnapshotCount!=1||len(overview.Snapshots)!=1||overview.Snapshots[0].ID!=first.ID{t.Fatalf("overview failed: %d %s",overviewReply.Code,overviewReply.Body.String())}
+ bridgeRead:=func(path,company string)*httptest.ResponseRecorder{
+  r:=httptest.NewRequest("GET",path,nil);r.Header.Set("X-Artex-Purge-Intel-Token",pairResponse.Token);r.Header.Set("X-Artex-Purge-Intel-Company",company);w:=httptest.NewRecorder();h.ServeHTTP(w,r);return w
+ }
+ assetsReply:=bridgeRead("/api/purge/intel-bridge/assets",fmt.Sprint(id))
+ var assetPage struct{CompanyID int64 `json:"company_id"`;Items []map[string]any `json:"items"`}
+ if assetsReply.Code!=200||json.Unmarshal(assetsReply.Body.Bytes(),&assetPage)!=nil||assetPage.CompanyID!=id||assetPage.Items==nil{t.Fatalf("asset page failed: %d",assetsReply.Code)}
+ for _,a:=range assetPage.Items{for _,key:=range []string{"auth","params","extra","url"}{if _,exists:=a[key];exists{t.Fatal("private asset field exposed")}}}
+ if got:=bridgeRead("/api/purge/intel-bridge/assets?before=-1",fmt.Sprint(id));got.Code!=400{t.Fatal("bad cursor accepted")}
+ if got:=bridgeRead("/api/purge/intel-bridge/assets",fmt.Sprint(id+1));got.Code!=409{t.Fatal("other company accepted")}
+ snap:=bridgeRead(fmt.Sprintf("/api/purge/intel-bridge/snapshot?snapshot=%d",first.ID),fmt.Sprint(id))
+ var snapBody struct{CompanyID int64 `json:"company_id"`;SnapshotID int64 `json:"snapshot_id"`;Analysis purgeIntelAnalysis `json:"analysis"`}
+ if snap.Code!=200||json.Unmarshal(snap.Body.Bytes(),&snapBody)!=nil||snapBody.CompanyID!=id||snapBody.SnapshotID!=first.ID||!snapBody.Analysis.HistoricalOnly||snapBody.Analysis.PortObservations!=1{t.Fatalf("snapshot read failed: %d",snap.Code)}
+ if got:=bridgeRead("/api/purge/intel-bridge/snapshot?snapshot=0",fmt.Sprint(id));got.Code!=400{t.Fatal("invalid snapshot accepted")}
+ assertAssetsUnchanged()
+ // Isolated task/finding fixture with explicit company attribution.
+ task,err:=d.CreateTaskWithOptions("bridge detail","goal",db.TaskCreateOptions{Name:"paired task",CompanyIDs:[]int64{id}})
+ if err!=nil{t.Fatal(err)}
+ defer d.DeleteTaskCascade(task.ID,true,true)
+ aid,err:=d.Assets().UpsertRootDomain(db.UpsertRootDomainReq{Domain:fmt.Sprintf("bridge-%d.example.test",time.Now().UnixNano()),TaskID:task.ID})
+ if err!=nil{t.Fatal(err)}
+ if _,err=d.Exec("UPDATE assets SET company_id=$1 WHERE id=$2",id,aid);err!=nil{t.Fatal(err)}
+ fid,err:=d.AddFinding(task.ID,0,"test","paired finding","low","summary","evidence","worker",[]int64{aid})
+ if err!=nil{t.Fatal(err)}
+ if _,err=d.Exec("UPDATE findings SET report=$1 WHERE id=$2","fixture report",fid);err!=nil{t.Fatal(err)}
+ // Task creation deliberately mutates the verified asset database. Use its
+ // own baseline to assert that the bridge detail reads are read-only.
+ beforeDetailAssets:=assetSnapshot()
+ td:=bridgeRead(fmt.Sprintf("/api/purge/intel-bridge/task?task=%d",task.ID),fmt.Sprint(id))
+ if td.Code!=200||!strings.Contains(td.Body.String(),"paired task"){t.Fatalf("task detail failed %d %s",td.Code,td.Body.String())}
+ fl:=bridgeRead(fmt.Sprintf("/api/purge/intel-bridge/findings?task=%d",task.ID),fmt.Sprint(id))
+ if fl.Code!=200||!strings.Contains(fl.Body.String(),"paired finding"){t.Fatalf("findings failed %d %s",fl.Code,fl.Body.String())}
+ fr:=bridgeRead(fmt.Sprintf("/api/purge/intel-bridge/report?finding=%d",fid),fmt.Sprint(id))
+ if fr.Code!=200||!strings.Contains(fr.Body.String(),"fixture report"){t.Fatalf("report failed %d %s",fr.Code,fr.Body.String())}
+ if got:=bridgeRead(fmt.Sprintf("/api/purge/intel-bridge/report?finding=%d",fid),fmt.Sprint(id+1));got.Code!=409{t.Fatal("other company accepted")}
+ if after:=assetSnapshot();after!=beforeDetailAssets{t.Fatal("bridge detail reads changed verified assets")}
+ if _,err=d.Exec("UPDATE assets SET company_id=NULL WHERE id=$1",aid);err!=nil{t.Fatal(err)}
+ if got:=bridgeRead(fmt.Sprintf("/api/purge/intel-bridge/report?finding=%d",fid),fmt.Sprint(id));got.Code!=404{t.Fatal("unattributed report accepted")}
+ if _,err=d.DeleteTaskCascade(task.ID,true,true);err!=nil{t.Fatal(err)}
+ // Fixture creation, reassignment and cascade cleanup are intentional asset
+ // writes. Compare the rejected import against the post-cleanup inventory,
+ // rather than the snapshot before those writes (which also tracks timestamps).
+ beforeRejectedAssets:=assetSnapshot()
+ if got:=admin("DELETE","");got.Code!=200{t.Fatalf("revoke failed: %d",got.Code)}
+ if _,ok:=s.authorizePurgeIntelPairing(pairResponse.Token);ok{t.Fatal("revoked pairing accepted")}
  if err:=d.QueryRow("SELECT count(*) FROM purge_intel_snapshots WHERE company_id=$1",id).Scan(&count);err!=nil||count!=1{t.Fatalf("bridge duplicated snapshot: %d %v",count,err)}
  b.IPs[0].IP="198.51.100.1"
  if w=request("POST",path,b);w.Code!=400{t.Fatal("out-of-scope import accepted")}
- assertAssetsUnchanged()
+ if after:=assetSnapshot();after!=beforeRejectedAssets{t.Fatal("rejected import or pairing revoke changed verified assets")}
 }
 
 func TestPurgeIntelBridgeCredentialIsolation(t *testing.T) {
@@ -141,6 +224,16 @@ func TestPurgeIntelBridgeCredentialIsolation(t *testing.T) {
  s:=&Server{jwtKey:[]byte("01234567890123456789012345678901")}
  mux:=http.NewServeMux()
  mux.HandleFunc("POST /api/purge/intel-bridge",s.importPurgeIntelBridge)
+ mux.HandleFunc("GET /api/purge/intel-bridge/status",s.purgeIntelBridgeStatus)
+ mux.HandleFunc("GET /api/purge/intel-bridge/overview",s.purgeIntelBridgeOverview)
+ mux.HandleFunc("GET /api/purge/intel-bridge/assets",s.purgeIntelBridgeAssets)
+ mux.HandleFunc("GET /api/purge/intel-bridge/snapshot",s.purgeIntelBridgeSnapshot)
+ mux.HandleFunc("GET /api/purge/intel-bridge/task",s.purgeIntelBridgeTask)
+ mux.HandleFunc("GET /api/purge/intel-bridge/findings",s.purgeIntelBridgeFindings)
+ mux.HandleFunc("GET /api/purge/intel-bridge/report",s.purgeIntelBridgeReport)
+ mux.HandleFunc("GET /api/purge/intel-pairing",s.managePurgeIntelPairing)
+ mux.HandleFunc("POST /api/purge/intel-pairing",s.managePurgeIntelPairing)
+ mux.HandleFunc("DELETE /api/purge/intel-pairing",s.managePurgeIntelPairing)
  mux.HandleFunc("POST /api/companies/{id}/purge-intel",s.importPurgeIntel)
  h:=s.requireAuth(mux)
  req:=func(method,path,token,company string)int{
@@ -154,8 +247,27 @@ func TestPurgeIntelBridgeCredentialIsolation(t *testing.T) {
   {"POST","/api/purge/intel-bridge","listener-test","12"},
   {"POST","/api/purge/intel-bridge","overview-test","12"},
   {"GET","/api/purge/intel-bridge",secret,"12"},
+  {"GET","/api/purge/intel-bridge/status","listener-test","12"},
+  {"GET","/api/purge/intel-bridge/status","","12"},
+  {"GET","/api/purge/intel-bridge/overview","","12"},
+  {"GET","/api/purge/intel-bridge/assets","","12"},
+  {"GET","/api/purge/intel-bridge/task","","12"},
+  {"GET","/api/purge/intel-bridge/findings","listener-test","12"},
+  {"GET","/api/purge/intel-bridge/report","overview-test","12"},
+  {"POST","/api/purge/intel-bridge/report",secret,"12"},
+  {"GET","/api/purge/intel-bridge/snapshot","listener-test","12"},
+  {"POST","/api/purge/intel-bridge/assets",secret,"12"},
+  {"GET","/api/purge/intel-bridge/overview","listener-test","12"},
+  {"POST","/api/purge/intel-bridge/overview",secret,"12"},
+  {"POST","/api/purge/intel-bridge/status",secret,"12"},
+  {"GET","/api/purge/intel-pairing",secret,"12"},
+  {"POST","/api/purge/intel-pairing",secret,"12"},
+  {"DELETE","/api/purge/intel-pairing",secret,"12"},
   {"POST","/api/companies/12/purge-intel",secret,"12"},
  } {if got:=req(tc.method,tc.path,tc.token,tc.company);got!=401{t.Fatalf("unexpected authorization %d",got)}}
+ if got:=req("GET","/api/purge/intel-bridge/overview",secret,"13");got!=409{t.Fatalf("overview company mismatch %d",got)}
+ if got:=req("GET","/api/purge/intel-bridge/status",secret,"13");got!=409{t.Fatalf("status company mismatch %d",got)}
+ if got:=req("GET","/api/purge/intel-bridge/status",secret,"12");got!=503{t.Fatalf("status expected DB unavailable, got %d",got)}
  if got:=req("POST","/api/purge/intel-bridge",secret,"13");got!=409{t.Fatalf("company mismatch %d",got)}
  if got:=req("POST","/api/purge/intel-bridge",secret,"12");got!=503{t.Fatalf("expected DB unavailable, got %d",got)}
  t.Setenv("ARTEX_PRIVACY_BRIDGE_TOKEN",secret)
