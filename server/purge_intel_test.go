@@ -87,6 +87,7 @@ func TestPurgeIntelDatabaseRoundTrip(t *testing.T) {
  mux.HandleFunc("GET /api/companies/{id}/purge-intel/{snapshot}",s.getPurgeIntel)
  mux.HandleFunc("GET /api/companies/{id}/purge-intel/{snapshot}/analysis",s.getPurgeIntelAnalysis)
  mux.HandleFunc("POST /api/purge/intel-bridge",s.importPurgeIntelBridge)
+ mux.HandleFunc("GET /api/purge/intel-bridge/status",s.purgeIntelBridgeStatus)
  h:=s.requireAuth(mux)
  token,err:=signJWT(s.jwtKey);if err!=nil{t.Fatal(err)}
  path:=fmt.Sprintf("/api/companies/%d/purge-intel",id)
@@ -123,6 +124,14 @@ func TestPurgeIntelDatabaseRoundTrip(t *testing.T) {
   r.Header.Set("X-Artex-Purge-Intel-Company",company)
   w:=httptest.NewRecorder();h.ServeHTTP(w,r);return w
  }
+ statusReq:=httptest.NewRequest("GET","/api/purge/intel-bridge/status",nil)
+ statusReq.Header.Set("X-Artex-Purge-Intel-Token",secret)
+ statusReq.Header.Set("X-Artex-Purge-Intel-Company",fmt.Sprint(id))
+ statusReply:=httptest.NewRecorder();h.ServeHTTP(statusReply,statusReq)
+ if statusReply.Code!=200{t.Fatalf("pair status: %d %s",statusReply.Code,statusReply.Body.String())}
+ var pairing struct{ CompanyID int64 `json:"company_id"`; Paired bool `json:"paired"` }
+ if json.Unmarshal(statusReply.Body.Bytes(),&pairing)!=nil||pairing.CompanyID!=id||!pairing.Paired{t.Fatal("invalid pair status")}
+ if err:=d.QueryRow("SELECT count(*) FROM purge_intel_snapshots WHERE company_id=$1",id).Scan(&count);err!=nil||count!=1{t.Fatal("status modified snapshots")}
  if w=bridge(fmt.Sprint(id+1));w.Code!=409{t.Fatalf("mismatched company: %d",w.Code)}
  if w=bridge(fmt.Sprint(id));w.Code!=200{t.Fatalf("bridge import: %d %s",w.Code,w.Body.String())}
  if err:=d.QueryRow("SELECT count(*) FROM purge_intel_snapshots WHERE company_id=$1",id).Scan(&count);err!=nil||count!=1{t.Fatalf("bridge duplicated snapshot: %d %v",count,err)}
@@ -141,6 +150,7 @@ func TestPurgeIntelBridgeCredentialIsolation(t *testing.T) {
  s:=&Server{jwtKey:[]byte("01234567890123456789012345678901")}
  mux:=http.NewServeMux()
  mux.HandleFunc("POST /api/purge/intel-bridge",s.importPurgeIntelBridge)
+ mux.HandleFunc("GET /api/purge/intel-bridge/status",s.purgeIntelBridgeStatus)
  mux.HandleFunc("POST /api/companies/{id}/purge-intel",s.importPurgeIntel)
  h:=s.requireAuth(mux)
  req:=func(method,path,token,company string)int{
@@ -154,8 +164,13 @@ func TestPurgeIntelBridgeCredentialIsolation(t *testing.T) {
   {"POST","/api/purge/intel-bridge","listener-test","12"},
   {"POST","/api/purge/intel-bridge","overview-test","12"},
   {"GET","/api/purge/intel-bridge",secret,"12"},
+  {"GET","/api/purge/intel-bridge/status","listener-test","12"},
+  {"GET","/api/purge/intel-bridge/status","","12"},
+  {"POST","/api/purge/intel-bridge/status",secret,"12"},
   {"POST","/api/companies/12/purge-intel",secret,"12"},
  } {if got:=req(tc.method,tc.path,tc.token,tc.company);got!=401{t.Fatalf("unexpected authorization %d",got)}}
+ if got:=req("GET","/api/purge/intel-bridge/status",secret,"13");got!=409{t.Fatalf("status company mismatch %d",got)}
+ if got:=req("GET","/api/purge/intel-bridge/status",secret,"12");got!=503{t.Fatalf("status expected DB unavailable, got %d",got)}
  if got:=req("POST","/api/purge/intel-bridge",secret,"13");got!=409{t.Fatalf("company mismatch %d",got)}
  if got:=req("POST","/api/purge/intel-bridge",secret,"12");got!=503{t.Fatalf("expected DB unavailable, got %d",got)}
  t.Setenv("ARTEX_PRIVACY_BRIDGE_TOKEN",secret)

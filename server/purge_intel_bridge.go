@@ -35,3 +35,23 @@ func (s *Server) importPurgeIntelBridge(w http.ResponseWriter,r *http.Request) {
  r.SetPathValue("id",strconv.FormatInt(id,10))
  s.importPurgeIntel(w,r)
 }
+
+// Read-only pair check; no snapshot creation and no company scope contents returned.
+func (s *Server) purgeIntelBridgeStatus(w http.ResponseWriter, r *http.Request) {
+ w.Header().Set("Cache-Control", "no-store")
+ id, ok := purgeIntelBridgeCompany()
+ if !ok || !validPurgeIntelBridgeCredential(r.Header.Get("X-Artex-Purge-Intel-Token")) {
+  writeErr(w, http.StatusUnauthorized, "Unauthorized")
+  return
+ }
+ if r.Header.Get("X-Artex-Purge-Intel-Company") != strconv.FormatInt(id, 10) {
+  writeErr(w, http.StatusConflict, "receiving company does not match configured company")
+  return
+ }
+ r.SetPathValue("id", strconv.FormatInt(id, 10))
+ _, scope, ok := s.purgeIntelCompany(w, r)
+ if !ok { return }
+ writeJSON(w, http.StatusOK, map[string]any{
+  "service": "artex", "schema_version": 1, "company_id": id, "scope_count": len(scope), "paired": true,
+ })
+}

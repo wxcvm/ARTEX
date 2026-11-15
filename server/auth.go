@@ -228,7 +228,8 @@ func (s *Server) requireAuth(h http.Handler) http.Handler {
 			return
 		}
 		// The write bridge is bound to one company and cannot use privacy tokens.
-		if p == "/api/purge/intel-bridge" && r.Method == http.MethodPost {
+		if (p == "/api/purge/intel-bridge" && r.Method == http.MethodPost) ||
+			(p == "/api/purge/intel-bridge/status" && r.Method == http.MethodGet) {
 			w.Header().Set("Cache-Control", "no-store")
 			if !validPurgeIntelBridgeCredential(r.Header.Get("X-Artex-Purge-Intel-Token")) {
 				writeErr(w, http.StatusUnauthorized, "Unauthorized")
