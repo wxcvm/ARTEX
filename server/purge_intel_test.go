@@ -188,6 +188,9 @@ func TestPurgeIntelDatabaseRoundTrip(t *testing.T) {
  fid,err:=d.AddFinding(task.ID,0,"test","paired finding","low","summary","evidence","worker",[]int64{aid})
  if err!=nil{t.Fatal(err)}
  if _,err=d.Exec("UPDATE findings SET report=$1 WHERE id=$2","fixture report",fid);err!=nil{t.Fatal(err)}
+ // Task creation deliberately mutates the verified asset database. Use its
+ // own baseline to assert that the bridge detail reads are read-only.
+ beforeDetailAssets:=assetSnapshot()
  td:=bridgeRead(fmt.Sprintf("/api/purge/intel-bridge/task?task=%d",task.ID),fmt.Sprint(id))
  if td.Code!=200||!strings.Contains(td.Body.String(),"paired task"){t.Fatalf("task detail failed %d %s",td.Code,td.Body.String())}
  fl:=bridgeRead(fmt.Sprintf("/api/purge/intel-bridge/findings?task=%d",task.ID),fmt.Sprint(id))
@@ -195,16 +198,20 @@ func TestPurgeIntelDatabaseRoundTrip(t *testing.T) {
  fr:=bridgeRead(fmt.Sprintf("/api/purge/intel-bridge/report?finding=%d",fid),fmt.Sprint(id))
  if fr.Code!=200||!strings.Contains(fr.Body.String(),"fixture report"){t.Fatalf("report failed %d %s",fr.Code,fr.Body.String())}
  if got:=bridgeRead(fmt.Sprintf("/api/purge/intel-bridge/report?finding=%d",fid),fmt.Sprint(id+1));got.Code!=409{t.Fatal("other company accepted")}
+ if after:=assetSnapshot();after!=beforeDetailAssets{t.Fatal("bridge detail reads changed verified assets")}
  if _,err=d.Exec("UPDATE assets SET company_id=NULL WHERE id=$1",aid);err!=nil{t.Fatal(err)}
  if got:=bridgeRead(fmt.Sprintf("/api/purge/intel-bridge/report?finding=%d",fid),fmt.Sprint(id));got.Code!=404{t.Fatal("unattributed report accepted")}
  if _,err=d.DeleteTaskCascade(task.ID,true,true);err!=nil{t.Fatal(err)}
- // Original inventory is unchanged after fixture cleanup.
+ // Fixture creation, reassignment and cascade cleanup are intentional asset
+ // writes. Compare the rejected import against the post-cleanup inventory,
+ // rather than the snapshot before those writes (which also tracks timestamps).
+ beforeRejectedAssets:=assetSnapshot()
  if got:=admin("DELETE","");got.Code!=200{t.Fatalf("revoke failed: %d",got.Code)}
  if _,ok:=s.authorizePurgeIntelPairing(pairResponse.Token);ok{t.Fatal("revoked pairing accepted")}
  if err:=d.QueryRow("SELECT count(*) FROM purge_intel_snapshots WHERE company_id=$1",id).Scan(&count);err!=nil||count!=1{t.Fatalf("bridge duplicated snapshot: %d %v",count,err)}
  b.IPs[0].IP="198.51.100.1"
  if w=request("POST",path,b);w.Code!=400{t.Fatal("out-of-scope import accepted")}
- assertAssetsUnchanged()
+ if after:=assetSnapshot();after!=beforeRejectedAssets{t.Fatal("rejected import or pairing revoke changed verified assets")}
 }
 
 func TestPurgeIntelBridgeCredentialIsolation(t *testing.T) {
