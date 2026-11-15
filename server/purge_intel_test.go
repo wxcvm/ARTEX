@@ -88,6 +88,7 @@ func TestPurgeIntelDatabaseRoundTrip(t *testing.T) {
  mux.HandleFunc("GET /api/companies/{id}/purge-intel/{snapshot}/analysis",s.getPurgeIntelAnalysis)
  mux.HandleFunc("POST /api/purge/intel-bridge",s.importPurgeIntelBridge)
  mux.HandleFunc("GET /api/purge/intel-bridge/status",s.purgeIntelBridgeStatus)
+ mux.HandleFunc("GET /api/purge/intel-bridge/overview",s.purgeIntelBridgeOverview)
  mux.HandleFunc("GET /api/purge/intel-pairing",s.managePurgeIntelPairing)
  mux.HandleFunc("POST /api/purge/intel-pairing",s.managePurgeIntelPairing)
  mux.HandleFunc("DELETE /api/purge/intel-pairing",s.managePurgeIntelPairing)
@@ -152,6 +153,13 @@ func TestPurgeIntelDatabaseRoundTrip(t *testing.T) {
  stored,_,err:=d.GetSetting(purgeIntelPairingKey);if err!=nil||strings.Contains(stored,pairResponse.Token){t.Fatal("plaintext pairing stored")}
  if got:=admin("GET","");got.Code!=200||strings.Contains(got.Body.String(),pairResponse.Token)||strings.Contains(got.Body.String(),"digest"){t.Fatal("status exposed secret")}
  if gotID,ok:=s.authorizePurgeIntelPairing(pairResponse.Token);!ok||gotID!=id{t.Fatal("saved pairing not accepted")}
+ overviewReq:=httptest.NewRequest("GET","/api/purge/intel-bridge/overview",nil)
+ overviewReq.Header.Set("X-Artex-Purge-Intel-Token",pairResponse.Token)
+ overviewReq.Header.Set("X-Artex-Purge-Intel-Company",fmt.Sprint(id))
+ overviewReply:=httptest.NewRecorder();h.ServeHTTP(overviewReply,overviewReq)
+ var overview struct{ CompanyID int64 `json:"company_id"`; SnapshotCount int64 `json:"snapshot_count"`; Snapshots []struct{ID int64 `json:"id"`} `json:"snapshots"` }
+ if overviewReply.Code!=200||json.Unmarshal(overviewReply.Body.Bytes(),&overview)!=nil||overview.CompanyID!=id||overview.SnapshotCount!=1||len(overview.Snapshots)!=1||overview.Snapshots[0].ID!=first.ID{t.Fatalf("overview failed: %d %s",overviewReply.Code,overviewReply.Body.String())}
+ assertAssetsUnchanged()
  if got:=admin("DELETE","");got.Code!=200{t.Fatalf("revoke failed: %d",got.Code)}
  if _,ok:=s.authorizePurgeIntelPairing(pairResponse.Token);ok{t.Fatal("revoked pairing accepted")}
  if err:=d.QueryRow("SELECT count(*) FROM purge_intel_snapshots WHERE company_id=$1",id).Scan(&count);err!=nil||count!=1{t.Fatalf("bridge duplicated snapshot: %d %v",count,err)}
@@ -171,6 +179,7 @@ func TestPurgeIntelBridgeCredentialIsolation(t *testing.T) {
  mux:=http.NewServeMux()
  mux.HandleFunc("POST /api/purge/intel-bridge",s.importPurgeIntelBridge)
  mux.HandleFunc("GET /api/purge/intel-bridge/status",s.purgeIntelBridgeStatus)
+ mux.HandleFunc("GET /api/purge/intel-bridge/overview",s.purgeIntelBridgeOverview)
  mux.HandleFunc("GET /api/purge/intel-pairing",s.managePurgeIntelPairing)
  mux.HandleFunc("POST /api/purge/intel-pairing",s.managePurgeIntelPairing)
  mux.HandleFunc("DELETE /api/purge/intel-pairing",s.managePurgeIntelPairing)
@@ -189,12 +198,16 @@ func TestPurgeIntelBridgeCredentialIsolation(t *testing.T) {
   {"GET","/api/purge/intel-bridge",secret,"12"},
   {"GET","/api/purge/intel-bridge/status","listener-test","12"},
   {"GET","/api/purge/intel-bridge/status","","12"},
+  {"GET","/api/purge/intel-bridge/overview","","12"},
+  {"GET","/api/purge/intel-bridge/overview","listener-test","12"},
+  {"POST","/api/purge/intel-bridge/overview",secret,"12"},
   {"POST","/api/purge/intel-bridge/status",secret,"12"},
   {"GET","/api/purge/intel-pairing",secret,"12"},
   {"POST","/api/purge/intel-pairing",secret,"12"},
   {"DELETE","/api/purge/intel-pairing",secret,"12"},
   {"POST","/api/companies/12/purge-intel",secret,"12"},
  } {if got:=req(tc.method,tc.path,tc.token,tc.company);got!=401{t.Fatalf("unexpected authorization %d",got)}}
+ if got:=req("GET","/api/purge/intel-bridge/overview",secret,"13");got!=409{t.Fatalf("overview company mismatch %d",got)}
  if got:=req("GET","/api/purge/intel-bridge/status",secret,"13");got!=409{t.Fatalf("status company mismatch %d",got)}
  if got:=req("GET","/api/purge/intel-bridge/status",secret,"12");got!=503{t.Fatalf("status expected DB unavailable, got %d",got)}
  if got:=req("POST","/api/purge/intel-bridge",secret,"13");got!=409{t.Fatalf("company mismatch %d",got)}

@@ -780,6 +780,7 @@ func (s *Server) Handler() http.Handler {
 	mux.HandleFunc("POST /api/companies/{id}/purge-intel", s.importPurgeIntel)
 	mux.HandleFunc("POST /api/purge/intel-bridge", s.importPurgeIntelBridge)
 	mux.HandleFunc("GET /api/purge/intel-bridge/status", s.purgeIntelBridgeStatus)
+	mux.HandleFunc("GET /api/purge/intel-bridge/overview", s.purgeIntelBridgeOverview)
 	mux.HandleFunc("GET /api/purge/intel-pairing", s.managePurgeIntelPairing)
 	mux.HandleFunc("POST /api/purge/intel-pairing", s.managePurgeIntelPairing)
 	mux.HandleFunc("DELETE /api/purge/intel-pairing", s.managePurgeIntelPairing)

@@ -137,3 +137,50 @@ func (s *Server) purgeIntelBridgeStatus(w http.ResponseWriter, r *http.Request) 
   "service": "artex", "schema_version": 1, "company_id": id, "scope_count": len(scope), "paired": true,
  })
 }
+
+// Company-bound, read-only overview. Task metadata is deliberately limited
+// to identifiers/status; no cross-company targets, prompts or evidence bodies.
+func (s *Server) purgeIntelBridgeOverview(w http.ResponseWriter, r *http.Request) {
+ w.Header().Set("Cache-Control", "no-store")
+ id, ok := s.authorizePurgeIntelPairing(r.Header.Get("X-Artex-Purge-Intel-Token"))
+ if !ok { writeErr(w, 401, "Unauthorized"); return }
+ if r.Header.Get("X-Artex-Purge-Intel-Company") != strconv.FormatInt(id, 10) {
+  writeErr(w, 409, "receiving company does not match configured company"); return
+ }
+ r.SetPathValue("id", strconv.FormatInt(id, 10))
+ _, _, ok = s.purgeIntelCompany(w, r)
+ if !ok { return }
+ pg := s.m.pg
+ type taskItem struct {
+  ID int64 `json:"id"`
+  Status string `json:"status"`
+  Paused bool `json:"paused"`
+  Queued bool `json:"queued"`
+ }
+ type snapshotItem struct {
+  ID int64 `json:"id"`
+  ReceivedAt string `json:"received_at"`
+ }
+ tasks := []taskItem{}
+ snapshots := []snapshotItem{}
+ var taskCount, assetCount, findingCount, snapshotCount int64
+ const taskWhere = `t.deleted_at IS NULL AND EXISTS (SELECT 1 FROM task_scope ts WHERE ts.task_id=t.id AND ts.kind='company' AND ts.company_id=$1)`
+ if err := pg.QueryRowContext(r.Context(), `SELECT count(*) FROM tasks t WHERE `+taskWhere,id).Scan(&taskCount); err != nil { writeErr(w,503,"task overview unavailable"); return }
+ rows, err := pg.QueryContext(r.Context(), `SELECT t.id,t.status,t.paused,t.queued FROM tasks t WHERE `+taskWhere+` ORDER BY t.id DESC LIMIT 50`,id)
+ if err != nil { writeErr(w,503,"task overview unavailable"); return }
+ for rows.Next() { var item taskItem; if rows.Scan(&item.ID,&item.Status,&item.Paused,&item.Queued)!=nil { rows.Close(); writeErr(w,503,"task overview unavailable"); return }; tasks=append(tasks,item) }
+ err=rows.Err(); rows.Close()
+ if err!=nil { writeErr(w,503,"task overview unavailable"); return }
+ if err=pg.QueryRowContext(r.Context(), `SELECT count(*) FROM assets WHERE company_id=$1`,id).Scan(&assetCount); err!=nil { writeErr(w,503,"asset overview unavailable"); return }
+ // Existing company asset attribution, not all findings of a multi-company task.
+ if err=pg.QueryRowContext(r.Context(), `SELECT count(*) FROM findings f WHERE EXISTS (SELECT 1 FROM assets a WHERE a.company_id=$1 AND f.asset_ids @> jsonb_build_array(a.id))`,id).Scan(&findingCount); err!=nil { writeErr(w,503,"finding overview unavailable"); return }
+ if err=pg.QueryRowContext(r.Context(), `SELECT count(*) FROM purge_intel_snapshots WHERE company_id=$1`,id).Scan(&snapshotCount); err!=nil { writeErr(w,503,"snapshot overview unavailable"); return }
+ rows,err=pg.QueryContext(r.Context(),`SELECT id,received_at::text FROM purge_intel_snapshots WHERE company_id=$1 ORDER BY received_at DESC,id DESC LIMIT 20`,id)
+ if err!=nil { writeErr(w,503,"snapshot overview unavailable"); return }
+ defer rows.Close()
+ for rows.Next() { var item snapshotItem; if rows.Scan(&item.ID,&item.ReceivedAt)!=nil { writeErr(w,503,"snapshot overview unavailable"); return }; snapshots=append(snapshots,item) }
+ if rows.Err()!=nil { writeErr(w,503,"snapshot overview unavailable"); return }
+ writeJSON(w,200,map[string]any{"service":"artex","schema_version":1,"company_id":id,
+  "task_count":taskCount,"asset_count":assetCount,"linked_finding_count":findingCount,"snapshot_count":snapshotCount,
+  "tasks":tasks,"snapshots":snapshots})
+}
