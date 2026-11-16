@@ -1279,6 +1279,7 @@ CREATE TABLE IF NOT EXISTS report_templates (
 );
 
 ALTER TABLE report_templates ADD COLUMN IF NOT EXISTS logo BYTEA;
+ALTER TABLE report_templates ADD COLUMN IF NOT EXISTS sections JSONB NOT NULL DEFAULT '[]'::jsonb;
 
 CREATE TABLE IF NOT EXISTS knowledge_documents (
     id TEXT PRIMARY KEY,

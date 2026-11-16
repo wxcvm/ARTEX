@@ -74,3 +74,23 @@ func templateFooter(t *db.ReportTemplate) string {
 	_ = xml.EscapeText(&escaped, []byte(t.Footer))
 	return strings.Replace(professionalFooter,"ARTEX  |  ",escaped.String()+"  |  ",1)
 }
+
+// Custom sections are literal user-authored paragraphs, not generated findings.
+// The normal report body and evidence appendices are always retained.
+func writeTemplateSections(body *bytes.Buffer,t *db.ReportTemplate,position string)error{
+	if t==nil{return nil}
+	paragraph:=func(style,text string)error{
+		body.WriteString("<w:p><w:pPr><w:pStyle w:val=\""+style+"\"/></w:pPr><w:r><w:t xml:space=\"preserve\">")
+		if err:=xml.EscapeText(body,[]byte(text));err!=nil{return err}
+		body.WriteString("</w:t></w:r></w:p>")
+		return nil
+	}
+	for _,section:=range t.Sections{
+		if section.Position!=position{continue}
+		if err:=paragraph("Heading1",section.Title);err!=nil{return err}
+		for _,line:=range strings.Split(strings.ReplaceAll(section.Body,"\r\n","\n"),"\n"){
+			if err:=paragraph("Normal",line);err!=nil{return err}
+		}
+	}
+	return nil
+}

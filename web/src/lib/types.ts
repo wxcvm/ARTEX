@@ -1751,6 +1751,11 @@ export interface ReleaseUpdate {
   assets: {name:string;size:number;url:string}[];
 }
 
+export interface ReportSection {
+  title: string;
+  body: string;
+  position: "before" | "after";
+}
 export interface ReportTemplateInput {
   name: string;
   brand: string;
@@ -1760,6 +1765,7 @@ export interface ReportTemplateInput {
   author: string;
   confidentiality: string;
   footer: string;
+  sections?: ReportSection[];
 }
 export interface ReportTemplate extends ReportTemplateInput {
   id: string;

@@ -4,12 +4,13 @@ import * as React from "react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
+import { Textarea } from "@/components/ui/textarea";
 import { api } from "@/lib/api";
-import type { ReportTemplate, ReportTemplateInput } from "@/lib/types";
+import type { ReportTemplate, ReportTemplateInput, ReportSection } from "@/lib/types";
 import { useUiLocale } from "@/lib/ui-locale.client";
 import { uiText } from "@/lib/ui-locale";
 
-const empty=():ReportTemplateInput=>({name:"",brand:"",cover_title:"",subtitle:"",prepared_for:"",author:"",confidentiality:"",footer:""});
+const empty=():ReportTemplateInput=>({name:"",brand:"",cover_title:"",subtitle:"",prepared_for:"",author:"",confidentiality:"",footer:"",sections:[]});
 
 export function ReportTemplateSelect({value,onChange}:{value:string;onChange:(v:string)=>void}){
   const locale=useUiLocale();
@@ -74,7 +75,11 @@ export function ReportTemplateManager(){
     finally{setBusy(false);}
   }
   const hasLogo=items.find(x=>x.id===id)?.has_logo;
-  const fields:{key:keyof ReportTemplateInput;zh:string;en:string}[]=[
+  function updateSection(index:number,patch:Partial<ReportSection>){
+    if(!draft)return;
+    setDraft({...draft,sections:(draft.sections??[]).map((section,i)=>i===index?{...section,...patch}:section)});
+  }
+  const fields:{key:keyof Omit<ReportTemplateInput,"sections">;zh:string;en:string}[]=[
     {key:"name",zh:"模板名称",en:"Template name"},
     {key:"brand",zh:"品牌 / 机构",en:"Brand / organization"},
     {key:"cover_title",zh:"封面标题",en:"Cover title"},
@@ -102,8 +107,16 @@ export function ReportTemplateManager(){
         {draft&&<div className="space-y-2">
           {fields.map(field=><label key={field.key} className="block space-y-1 text-xs">{t(field.zh,field.en)}<Input disabled={busy} value={draft[field.key]} onChange={e=>setDraft({...draft,[field.key]:e.target.value})}/></label>)}
           <p className="text-xs text-muted-foreground">{t("除模板名称外均可留空；封面标题留空时使用报告原始标题。","All fields except the name are optional. An empty cover title uses the original report title.")}</p>
+          <div className="space-y-2 rounded-md border p-3">
+            <div className="flex flex-wrap items-center gap-2"><p className="flex-1 text-sm font-medium">{t("自定义报告章节","Custom report sections")}</p><Button size="sm" variant="outline" disabled={busy} onClick={()=>setDraft({...draft,sections:[...(draft.sections??[]),{title:"",body:"",position:"before"}]})}>{t("添加章节","Add section")}</Button></div>
+            <p className="text-xs text-muted-foreground">{t("可添加方法论、标准、人员或修复建议等自定义正文。章节按此顺序嵌入 Word，原始报告和证据不会被替换。","Add methodology, standards, personnel or remediation notes. Sections appear in this order in Word; original report and evidence are retained.")}</p>
+            {(draft.sections??[]).map((section,i)=><div key={i} className="space-y-2 rounded-md border p-2">
+              <div className="flex flex-wrap items-center gap-2"><Input className="flex-1" aria-label={t("章节标题","Section title")} placeholder={t("章节标题","Section title")} disabled={busy} value={section.title} onChange={e=>updateSection(i,{title:e.target.value})}/><select aria-label={t("章节位置","Section position")} className="rounded-md border bg-background p-2 text-xs" disabled={busy} value={section.position} onChange={e=>updateSection(i,{position:e.target.value as ReportSection["position"]})}><option value="before">{t("报告正文前","Before report body")}</option><option value="after">{t("报告正文后","After report body")}</option></select><Button size="sm" variant="ghost" disabled={busy} onClick={()=>setDraft({...draft,sections:(draft.sections??[]).filter((_,j)=>j!==i)})}>{t("移除","Remove")}</Button></div>
+              <Textarea aria-label={t("章节正文","Section content")} placeholder={t("章节正文","Section content")} disabled={busy} value={section.body} onChange={e=>updateSection(i,{body:e.target.value})}/>
+            </div>)}
+          </div>
           <div className="flex flex-wrap gap-2">
-            <Button size="sm" disabled={busy||!draft.name.trim()} onClick={()=>void save()}>{t("保存","Save")}</Button>
+            <Button size="sm" disabled={busy||!draft.name.trim()||(draft.sections??[]).some(s=>!s.title.trim()||!s.body.trim())} onClick={()=>void save()}>{t("保存","Save")}</Button>
             {id&&(confirm?<><Button size="sm" variant="destructive" disabled={busy} onClick={()=>void remove()}>{t("确认删除","Confirm deletion")}</Button><Button size="sm" variant="ghost" onClick={()=>setConfirm(false)}>{t("取消","Cancel")}</Button></>:<Button size="sm" variant="ghost" disabled={busy} onClick={()=>setConfirm(true)}>{t("删除","Delete")}</Button>)}
           </div>
         </div>}
