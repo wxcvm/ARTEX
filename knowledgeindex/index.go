@@ -129,6 +129,8 @@ func Split(text string)[]db.KnowledgeVector{
 // Build indexes a saved document. If edited during embedding, it fails rather
 // than publishing vectors for an obsolete revision.
 func Build(ctx context.Context,pg *db.DB,taskID int64,docID string,c Config)(int,error){
+	c,err:=c.Normalize()
+	if err!=nil{return 0,err}
 	if !c.Enabled{return 0,errors.New("enable local embedding first")}
 	doc,err:=pg.GetKnowledgeDocument(ctx,taskID,false,docID)
 	if err!=nil{return 0,err}
