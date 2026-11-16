@@ -65,9 +65,9 @@ func scopedKnowledgeSearch(pg *db.DB, bundled *kb.KB, taskID int64, agentKey str
 			}
 			if pg!=nil {
 				sources=append(sources,"documents")
-				page,err:=pg.ListKnowledgeDocuments(ctx,taskID,true,a.Q,"",0)
+				matches,err:=pg.SearchKnowledgeDocuments(ctx,taskID,a.Q,a.Limit)
 				if err!=nil{failures["documents"]="document search failed"}else{
-					for _,doc:=range page.Items {
+					for _,doc:=range matches {
 						scope:="global";if doc.TaskID!=""{scope="task"}
 						documents=append(documents,scopedKnowledgeHit{DocumentID:doc.ID,Title:doc.Title,Category:doc.Category,Snippet:doc.Content,Scope:scope,SourceFilename:doc.SourceFilename,Match:"keyword"})
 					}

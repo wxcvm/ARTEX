@@ -119,3 +119,30 @@ func TestScopedKnowledgeToolResolution(t *testing.T) {
 	res,err=call(tools["kb_get"],map[string]any{"id":id})
 	if err!=nil||res.IsError||!strings.Contains(res.Flatten(),`"scope":"bundled"`){t.Fatal("legacy read failed",err,res.Flatten())}
 }
+
+
+func TestRankedKnowledgeDocumentSearch(t *testing.T){
+	s,f,_:=trafficEvidenceServer(t)
+	pg:=s.m.pg
+	ctx:=context.Background()
+	finding,err:=pg.GetFinding(f.FindingID)
+	if err!=nil||finding==nil||finding.TaskID==nil{t.Fatal("missing task",err)}
+	tid:=*finding.TaskID
+	key:="ranking-"+strconv.FormatInt(tid,10)
+	save:=func(title,body string)db.KnowledgeDocument{
+		t.Helper()
+		doc,err:=pg.SaveKnowledgeDocument(ctx,tid,"",db.KnowledgeDocument{Title:title,Content:body})
+		if err!=nil{t.Fatal(err)}
+		return doc
+	}
+	exact:=save(key+" 部署指南","some reference")
+	multi:=save("部署 notes",key+" intervening 指南")
+	_ = multi
+	partial:=save("unrelated",key)
+	hits,err:=pg.SearchKnowledgeDocuments(ctx,tid,key+" 部署指南",10)
+	if err!=nil||len(hits)!=1||hits[0].ID!=exact.ID{t.Fatal("phrase match",hits,err)}
+	// Two terms can appear in separate fields and need not be adjacent.
+	hits,err=pg.SearchKnowledgeDocuments(ctx,tid,key+" 部署",10)
+	if err!=nil||len(hits)!=2||hits[0].ID!=exact.ID||hits[1].ID!=multi.ID{t.Fatal("ranked terms",hits,err)}
+	for _,hit:=range hits{if hit.ID==partial.ID{t.Fatal("partial term matched")}}
+}
