@@ -117,9 +117,9 @@ export function LayoutControls() {
             <Label className="font-medium text-xs">{t("界面语言（已适配页面）", "Interface language (supported pages)")}</Label>
             <Select value={locale} onValueChange={value => setUiLocale(parseUiLocale(value))}>
               <SelectTrigger size="sm" className="w-full text-xs" aria-label={t("界面语言", "Interface language")}><SelectValue /></SelectTrigger>
-              <SelectContent><SelectItem value="zh-CN">简体中文</SelectItem><SelectItem value="en">English</SelectItem></SelectContent>
+              <SelectContent><SelectItem value="zh-CN">简体中文</SelectItem><SelectItem value="zh-TW">繁體中文（預覽）</SelectItem><SelectItem value="en">English</SelectItem></SelectContent>
             </Select>
-            <p className="text-muted-foreground text-xs">{t("已适配导航、登录、布局、系统设置、工作区及知识库；其他页面仍在迁移。", "Applies to navigation, sign-in, layout, system settings, workspace and knowledge base; other pages are being migrated.")}</p>
+            <p className="text-muted-foreground text-xs">{locale === "zh-TW" ? t("繁体中文目前覆盖导航、登录、布局和报告页面；其他页面暂用简体中文。", "Traditional Chinese currently covers navigation, sign-in, layout and report pages.") : t("已适配导航、登录、布局、系统设置、工作区及知识库；其他页面仍在迁移。", "Applies to navigation, sign-in, layout, system settings, workspace and knowledge base; other pages are being migrated.")}</p>
           </div>
           <div className="space-y-3 **:data-[slot=toggle-group]:w-full **:data-[slot=toggle-group-item]:flex-1 **:data-[slot=toggle-group-item]:text-xs">
             <div className="space-y-1">

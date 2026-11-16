@@ -106,7 +106,7 @@ export default function LoginPage() {
       {/* Right panel */}
       <div className="flex w-full items-center justify-center bg-background p-8 lg:w-2/3">
         <div className="w-full max-w-md space-y-10 py-24 lg:py-32">
-          <div className="flex justify-end"><Button type="button" variant="ghost" onClick={() => setUiLocale(locale === "en" ? "zh-CN" : "en")}>{locale === "en" ? "简体中文" : "English"}</Button></div>
+          <div className="flex justify-end"><Button type="button" variant="ghost" onClick={() => setUiLocale(locale === "zh-CN" ? "zh-TW" : locale === "zh-TW" ? "en" : "zh-CN")}>{locale === "zh-CN" ? "繁體中文" : locale === "zh-TW" ? "English" : "简体中文"}</Button></div>
           <div className="space-y-4 text-center">
             <h2 className="text-2xl font-medium tracking-tight">{t("登录", "Sign in")}</h2>
             <p className="mx-auto max-w-xl text-muted-foreground">{t("欢迎回来，输入密码继续使用 ARTEX", "Welcome back — enter your password to continue using ARTEX")}</p>
