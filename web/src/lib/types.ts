@@ -1756,6 +1756,8 @@ export interface ReportSection {
   body: string;
   position: "before" | "after";
 }
+export interface ReportPerson { name: string; role: string; contact: string }
+export interface ReportMetadata { project: string; version: string; personnel?: ReportPerson[] | null; standards?: string[] | null }
 export interface ReportTemplateInput {
   name: string;
   brand: string;
@@ -1766,6 +1768,7 @@ export interface ReportTemplateInput {
   confidentiality: string;
   footer: string;
   sections?: ReportSection[];
+  metadata?: ReportMetadata | null;
 }
 export interface ReportTemplate extends ReportTemplateInput {
   id: string;

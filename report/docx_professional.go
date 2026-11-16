@@ -46,6 +46,9 @@ func writeProfessionalFrontMatter(body *bytes.Buffer, markdown, locale string, t
 		return err
 	}
 	if template != nil {
+		if m:=template.Metadata;m!=nil{
+			for _,field:=range []struct{label,value string}{{reportMetadataText(locale,"项目","專案","Project"),m.Project},{reportMetadataText(locale,"版本","版本","Version"),m.Version}}{if field.value!=""{if err:=paragraph("CoverNote",field.label+": "+field.value);err!=nil{return err}}}
+		}
 		for _, field := range []struct{label,value string}{
 			{reportText(locale,"委托方","Prepared for"),template.PreparedFor},
 			{reportText(locale,"报告编制","Prepared by"),template.Author},
@@ -94,3 +97,38 @@ func writeTemplateSections(body *bytes.Buffer,t *db.ReportTemplate,position stri
 	}
 	return nil
 }
+
+// Personnel and standards are explicitly supplied by the report author.
+// They are not an assertion of certification, test completion or compliance.
+func writeTemplateMetadata(body *bytes.Buffer,t *db.ReportTemplate,locale string)error{
+	if t==nil||t.Metadata==nil{return nil}
+	m:=t.Metadata
+	paragraph:=func(style,text string)error{
+		body.WriteString("<w:p><w:pPr><w:pStyle w:val=\""+style+"\"/></w:pPr><w:r><w:t xml:space=\"preserve\">")
+		if err:=xml.EscapeText(body,[]byte(text));err!=nil{return err}
+		body.WriteString("</w:t></w:r></w:p>")
+		return nil
+	}
+	if len(m.Personnel)>0{
+		if err:=paragraph("Heading1",reportMetadataText(locale,"项目人员","專案人員","Project personnel"));err!=nil{return err}
+		for _,p:=range m.Personnel{
+			line:=p.Name
+			if p.Role!=""{line+=" — "+p.Role}
+			if p.Contact!=""{line+=" ("+p.Contact+")"}
+			if err:=paragraph("Normal",line);err!=nil{return err}
+		}
+	}
+	hasStandards:=false
+	for _,s:=range m.Standards{
+		if s==""{continue}
+		if !hasStandards{
+			if err:=paragraph("Heading1",reportMetadataText(locale,"参考标准","參考標準","Reference standards"));err!=nil{return err}
+			if err:=paragraph("Normal",reportMetadataText(locale,"以下为报告作者指定的参考标准，不代表合规认证。","以下為報告作者指定的參考標準，不代表合規認證。","References specified by the report author; not a certification of compliance."));err!=nil{return err}
+			hasStandards=true
+		}
+		if err:=paragraph("Normal",s);err!=nil{return err}
+	}
+	return nil
+}
+
+func reportMetadataText(locale,zh,tw,en string)string{if locale=="zh-TW"{return tw};return reportText(locale,zh,en)}
