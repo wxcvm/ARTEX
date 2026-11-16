@@ -272,10 +272,11 @@ export const api = {
       : post<KnowledgeDocument>(`/knowledge/documents?${new URLSearchParams(task ? {task} : {})}`, doc),
   deleteKnowledgeDocument: (id: string, task?: string) =>
     del<{ok: boolean}>(`/knowledge/documents/${encodeURIComponent(id)}?${new URLSearchParams(task ? {task} : {})}`),
-  uploadKnowledgeDocument: async (file: File, category: string, task?: string) => {
+  uploadKnowledgeDocument: async (file: File, category: string, task?: string,ocr?:{forceOCR:boolean;ocrLanguage:string}) => {
     const data = new FormData();
     data.append("file", file);
     data.append("category", category);
+    if(ocr){data.append("force_ocr",String(ocr.forceOCR));data.append("ocr_language",ocr.ocrLanguage);}
     const token = getToken();
     const r = await fetch(`/api/knowledge/documents/upload?${new URLSearchParams(task ? {task} : {})}`, {
       method: "POST", body: data, headers: token ? {Authorization: `Bearer ${token}`} : {},

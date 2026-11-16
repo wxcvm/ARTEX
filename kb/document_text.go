@@ -22,7 +22,16 @@ func ExtractDocumentText(filename string, raw []byte) (string,error) {
 	return ExtractDocumentTextContext(context.Background(),filename,raw)
 }
 
+type PDFOptions struct {
+	ForceOCR bool
+	OCRLanguage string
+}
+
 func ExtractDocumentTextContext(ctx context.Context,filename string,raw []byte)(string,error){
+	return ExtractDocumentTextWithOptions(ctx,filename,raw,PDFOptions{})
+}
+
+func ExtractDocumentTextWithOptions(ctx context.Context,filename string,raw []byte,opts PDFOptions)(string,error){
 	var text string
 	switch strings.ToLower(filepath.Ext(filename)) {
 	case ".txt",".md",".csv",".json":
@@ -71,7 +80,7 @@ func ExtractDocumentTextContext(ctx context.Context,filename string,raw []byte)(
 		if !found{return "",errors.New("Word document has no main text part")}
 	case ".pdf":
 		var err error
-		text,err=extractPDFText(ctx,raw)
+		text,err=extractPDFText(ctx,raw,opts)
 		if err!=nil{return "",err}
 	default:
 		return "",errors.New("supported formats: TXT, Markdown, CSV, JSON, DOCX, PDF")
