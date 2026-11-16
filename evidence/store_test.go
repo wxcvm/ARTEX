@@ -331,3 +331,31 @@ func TestEvidenceGCGraceAndActiveRestore(t *testing.T) {
 		t.Fatal("accepted tampered snapshot")
 	}
 }
+
+
+func TestHAREvidencePageAttributionSurvivesHotCleanup(t *testing.T) {
+	s, in, _ := evidenceFixture(t)
+	ctx := context.Background()
+	// Synthetic saved traffic only; no browser or network request.
+	raw := []byte(`{"log":{"pages":[{"id":"private-page","title":"private-title"}],"entries":[{"pageref":"private-page","startedDateTime":"2026-11-16T10:00:00Z","request":{"method":"GET","url":"https://fixture.local/har","headers":[],"bodySize":0},"response":{"status":200,"headers":[],"content":{"size":2,"text":"OK"}}}]}}`)
+	result,err := s.Traffic.ImportHAR(ctx,raw)
+	if err != nil || result.Imported != 1 { t.Fatalf("import: %+v %v",result,err) }
+	rows,total,err := s.Traffic.Page(traffic.PageQuery{Host:"fixture.local",RespMin:-1,RespMax:-1},0,10)
+	if err != nil || total != 1 || len(rows)!=1 { t.Fatalf("traffic: %+v %v",rows,err) }
+	r,err := s.Record(ctx,in,[]db.TrafficRef{{TrafficID:rows[0].ID,Role:"supporting"}})
+	if err != nil { t.Fatal(err) }
+	if len(r.Traffic.Bindings)!=1 { t.Fatalf("bindings: %+v",r.Traffic) }
+	b := r.Traffic.Bindings[0]
+	if b.Snapshot.HARPageState!="unique" || b.Snapshot.HARPageOrdinal!=1 { t.Fatalf("snapshot: %+v",b.Snapshot) }
+	if b.Snapshot.ID != db.TrafficSnapshotID(b.Snapshot) { t.Fatal("snapshot hash mismatch") }
+	withoutPage := b.Snapshot
+	withoutPage.HARPageState,withoutPage.HARPageOrdinal = "",0
+	if db.TrafficSnapshotID(withoutPage)==b.Snapshot.ID { t.Fatal("page attribution not covered by hash") }
+	if _,err := s.Traffic.DeleteHost("fixture.local"); err != nil { t.Fatal(err) }
+	if err := s.WithBinding(ctx,r.FindingID,b.ID,func(saved db.FindingTrafficBinding) error {
+		if saved.Snapshot.HARPageState!="unique" || saved.Snapshot.HARPageOrdinal!=1 || saved.Snapshot.ID!=b.Snapshot.ID {
+			t.Fatalf("lost attribution: %+v",saved.Snapshot)
+		}
+		return nil
+	}); err != nil { t.Fatal(err) }
+}

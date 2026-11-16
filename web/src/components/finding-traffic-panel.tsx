@@ -156,6 +156,14 @@ export function FindingTrafficPanel({
                     {b.snapshot.method} · {b.snapshot.status === 0 ? tr("状态未观测", "Status unobserved") : b.snapshot.status}
                     {b.snapshot.source_traffic_id.startsWith("har-") ? " · HAR" : ""}
                   </Badge>
+                  {b.snapshot.source_traffic_id.startsWith("har-") && (
+                    <span className="text-xs text-muted-foreground">{b.snapshot.har_page_state === "unique"
+                      ? tr("HAR 页面 #" + b.snapshot.har_page_ordinal, "HAR page #" + b.snapshot.har_page_ordinal)
+                      : b.snapshot.har_page_state === "missing" ? tr("未提供页面引用", "No page reference")
+                      : b.snapshot.har_page_state === "ambiguous" ? tr("页面引用歧义", "Ambiguous page reference")
+                      : b.snapshot.har_page_state === "unknown" ? tr("未知页面引用", "Unknown page reference")
+                      : tr("页面归属未观测", "Page attribution unobserved")}</span>
+                  )}
                   <span className="text-xs text-muted-foreground">{tr("证据", "Evidence")} #{b.id}</span>
                 </div>
                 <Button
