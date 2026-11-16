@@ -1263,6 +1263,21 @@ CREATE TABLE IF NOT EXISTS knowledge_documents (
 );
 CREATE INDEX IF NOT EXISTS idx_knowledge_documents_scope ON knowledge_documents(task_id, updated_at DESC, id);
 
+-- Derived local semantic index. Document deletion/archival removes its vectors;
+-- edits invalidate old revisions and restored documents can be reindexed.
+CREATE TABLE IF NOT EXISTS knowledge_vectors (
+    document_id TEXT NOT NULL REFERENCES knowledge_documents(id) ON DELETE CASCADE,
+    chunk_number INTEGER NOT NULL,
+    char_offset INTEGER NOT NULL,
+    snippet TEXT NOT NULL,
+    document_version TIMESTAMPTZ NOT NULL,
+    index_key TEXT NOT NULL,
+    embedding JSONB NOT NULL,
+    PRIMARY KEY(document_id, chunk_number)
+);
+CREATE INDEX IF NOT EXISTS idx_knowledge_vectors_config ON knowledge_vectors(index_key, document_id);
+
+
 -- Retrieval history records provenance, never document body or embeddings.
 CREATE TABLE IF NOT EXISTS knowledge_retrievals (
     id TEXT PRIMARY KEY,

@@ -53,6 +53,8 @@ import type {
   KnowledgeDocument,
   KnowledgeDocumentPage,
   KnowledgeRetrieval,
+  KnowledgeEmbeddingConfig,
+  KnowledgeIndexStatus,
   FindingReproductionStep,
   FindingTrafficDetail,
   IntentAsset,
@@ -248,6 +250,16 @@ export const api = {
   knowledgeSearch: (query: string) => get<{ hits: { id: number; title: string; snippet?: string; category?: string; verified: boolean }[] | null; degraded: boolean }>(`/knowledge?q=${encodeURIComponent(query)}`),
   knowledgeDocuments: (task: string | undefined, includeGlobal: boolean, q = "", category = "", offset = 0): Promise<KnowledgeDocumentPage> =>
     MOCK ? Promise.resolve({items: [], has_more: false}) : get<KnowledgeDocumentPage>(`/knowledge/documents?${new URLSearchParams({ ...(task ? { task } : {}), include_global: String(includeGlobal), q, category, offset: String(offset) })}`),
+  knowledgeEmbedding: (): Promise<KnowledgeEmbeddingConfig> =>
+    MOCK ? Promise.resolve({enabled:false,base_url:"",model:""}) : get<KnowledgeEmbeddingConfig>("/knowledge/embedding"),
+  saveKnowledgeEmbedding: (config: KnowledgeEmbeddingConfig) =>
+    put<KnowledgeEmbeddingConfig>("/knowledge/embedding", config),
+  testKnowledgeEmbedding: (config: KnowledgeEmbeddingConfig) =>
+    post<{ok:boolean;dimension?:number;error?:string}>("/knowledge/embedding/test", config),
+  knowledgeIndex: (id: string, task?: string) =>
+    get<KnowledgeIndexStatus>(`/knowledge/documents/${encodeURIComponent(id)}/index?${new URLSearchParams(task ? {task} : {})}`),
+  buildKnowledgeIndex: (id: string, task?: string) =>
+    post<KnowledgeIndexStatus>(`/knowledge/documents/${encodeURIComponent(id)}/index?${new URLSearchParams(task ? {task} : {})}`, {}),
   knowledgeRetrievals: (task?: string): Promise<KnowledgeRetrieval[]> =>
     MOCK ? Promise.resolve([]) : get<KnowledgeRetrieval[]>(`/knowledge/retrievals?${new URLSearchParams(task ? {task} : {})}`),
   knowledgeDocument: (id: string, task?: string, includeGlobal = false) =>

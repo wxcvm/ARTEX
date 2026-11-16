@@ -8,6 +8,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { api } from "@/lib/api";
+import { KnowledgeEmbeddingSettings, KnowledgeIndexControl } from "@/components/knowledge-embedding-settings";
 import type { KnowledgeDocument, KnowledgeRetrieval } from "@/lib/types";
 import { useUiLocale } from "@/lib/ui-locale.client";
 import { uiText } from "@/lib/ui-locale";
@@ -37,6 +38,7 @@ export function KnowledgeDocumentLibrary({taskId}: {taskId?: string}) {
   const [history,setHistory] = React.useState<KnowledgeRetrieval[] | null>(null);
   const [historyBusy,setHistoryBusy] = React.useState(false);
   const [historyError,setHistoryError] = React.useState("");
+  const [embeddingRevision,setEmbeddingRevision] = React.useState(0);
   const input = React.useRef<HTMLInputElement>(null);
   const request = React.useRef(0);
 
@@ -106,6 +108,7 @@ export function KnowledgeDocumentLibrary({taskId}: {taskId?: string}) {
       <CardDescription>{taskId?tr("仅属于此任务的资料随任务归档。可同时检索全局文档；全局资料在此只读。","Task documents follow the task archive. Optionally search global documents; global entries are read-only here."):tr("管理自有资料，与内置只读知识库分开保存。本地检索，不需要模型或外部服务。","Manage your documents separately from the bundled library. Local search requires no model or external service.")}</CardDescription>
     </CardHeader>
     <CardContent className="space-y-4">
+      {!taskId&&<KnowledgeEmbeddingSettings onSaved={()=>setEmbeddingRevision(n=>n+1)}/>}
       <form className="flex flex-wrap gap-2" onSubmit={e=>{e.preventDefault();clearSelection();setOffset(0);setFilters({q:query.trim(),category:category.trim()});}}>
         <Input className="min-w-[160px] flex-1" aria-label={tr("搜索文档","Search documents")} placeholder={tr("搜索标题、分类或正文","Title, category or text")} value={query} onChange={e=>setQuery(e.target.value)} disabled={busy}/>
         <Input className="w-36" aria-label={tr("分类筛选","Category filter")} placeholder={tr("分类（可选）","Category (optional)")} value={category} onChange={e=>setCategory(e.target.value)} disabled={busy}/>
@@ -143,6 +146,7 @@ export function KnowledgeDocumentLibrary({taskId}: {taskId?: string}) {
           {canEdit&&<div className="flex flex-wrap gap-2"><Button variant="outline" size="sm" disabled={busy} onClick={()=>{setDeleting(false);setDraft({id:selected.id,title:selected.title,category:selected.category,content:selected.content??""});}}>{tr("编辑","Edit")}</Button>
             {!deleting?<Button variant="ghost" size="sm" disabled={busy} onClick={()=>setDeleting(true)}>{tr("删除","Delete")}</Button>:<><Button variant="destructive" size="sm" disabled={busy} onClick={()=>void remove()}>{tr("确认删除","Confirm deletion")}</Button><Button variant="outline" size="sm" disabled={busy} onClick={()=>setDeleting(false)}>{tr("取消","Cancel")}</Button></>}
           </div>}
+          {canEdit&&<KnowledgeIndexControl key={selected.id+":"+selected.updated_at+":"+embeddingRevision} documentId={selected.id} taskId={taskId}/>}
           <pre className="max-h-[65vh] overflow-auto whitespace-pre-wrap break-words text-sm leading-6">{selected.content}</pre>
         </article>:<p className="text-sm text-muted-foreground">{tr("选择文档查看正文，或创建新资料。","Select a document to view its text, or create one.")}</p>}
       </div>
