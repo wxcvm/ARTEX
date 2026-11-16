@@ -2328,6 +2328,14 @@ func (s *Server) findingsExport(w http.ResponseWriter, r *http.Request) {
 	case "md-single":
 		setDownload("text/markdown; charset=utf-8", "findings-"+stamp+".md")
 		_, _ = w.Write([]byte(report.FindingsMarkdownLocalized(fs, now, report.ReportLocale(q.Get("lang")))))
+	case "docx":
+		payload, err := report.DOCX(report.FindingsMarkdownLocalized(fs, now, report.ReportLocale(q.Get("lang"))))
+		if err != nil {
+			writeErr(w, 500, "failed to generate Word report")
+			return
+		}
+		setDownload(report.DOCXContentType, "findings-"+stamp+".docx")
+		_, _ = w.Write(payload)
 	case "md-zip":
 		path := filepath.Join(stage, "findings.zip")
 		if err := buildFindingsEvidenceZip(path, fs, stage, now, report.ReportLocale(q.Get("lang"))); err != nil {
@@ -4021,7 +4029,56 @@ func (s *Server) getReport(w http.ResponseWriter, r *http.Request) {
 		writeErr(w, 404, "no active task")
 		return
 	}
-	findings, _ := t.Store.ListByKind(db.KindFinding, 1000) // pure vulnerabilities (facts are a separate KindFact and never enter the report)
+	scope := r.URL.Query().Get("scope")
+	if scope != "" && scope != "all" && scope != "confirmed" {
+		writeErr(w, 400, "invalid report scope")
+		return
+	}
+	taskID, err := strconv.ParseInt(t.ID, 10, 64)
+	if err != nil {
+		writeErr(w, 500, "invalid report task")
+		return
+	}
+	if taskID <= 0 {
+		writeErr(w, 500, "invalid report task")
+		return
+	}
+	findings, err := t.Store.ListByKind(db.KindFinding, 1000) // pure vulnerabilities (facts are a separate KindFact and never enter the report)
+	if err != nil {
+		writeErr(w, 500, "failed to read report findings")
+		return
+	}
+	// Reuse the standalone finding rows and the existing evidence export snapshot.
+	// Only graph nodes belonging to this task may contribute to its report.
+	rows, err := s.m.pg.ListFindingsForExport(db.FindingFilter{TaskID: t.ID}, nil)
+	if err != nil {
+		writeErr(w, 500, "failed to read report finding details")
+		return
+	}
+	graphNodes := make(map[int64]bool, len(findings))
+	for _, n := range findings {
+		graphNodes[n.ID] = true
+	}
+	meta := make(map[int64]db.FindingMeta)
+	details := make(map[int64]*db.DBFinding)
+	var included []*db.DBFinding
+	for _, f := range rows {
+		if f.NodeID == nil || !graphNodes[*f.NodeID] {
+			continue
+		}
+		meta[*f.NodeID] = db.FindingMeta{ID: f.ID, Status: f.Status}
+		if scope == "confirmed" && f.Status != db.FindingConfirmed {
+			continue
+		}
+		details[*f.NodeID] = f
+		included = append(included, f)
+	}
+	if len(included) > 0 {
+		if err := s.evidenceStore().StageFindingsExport(r.Context(), included, "", false); err != nil {
+			evidenceError(w, err)
+			return
+		}
+	}
 	counts := map[string]int{}
 	for _, ty := range []string{"root_domain", "ip", "subdomain", "app", "service", "endpoint"} {
 		ns, _ := s.m.Assets().QueryByType(ty, 100000, 0)
@@ -4031,13 +4088,24 @@ func (s *Server) getReport(w http.ResponseWriter, r *http.Request) {
 	}
 	var ledger *db.CoverageLedger
 	if t.CoverageEnabled && s.m.Assets() != nil {
-		taskID, _ := strconv.ParseInt(t.ID, 10, 64)
 		ledger, _ = s.m.Assets().CoverageLedger(taskID)
 	}
 	md := report.MarkdownLocalized(report.Input{
 		Title: t.Description, Goal: t.Goal, GeneratedAt: time.Now(),
 		AssetCounts: counts, Findings: findings, Coverage: ledger,
+		FindingMeta: meta, FindingDetails: details, ConfirmedOnly: scope == "confirmed",
 	}, report.ReportLocale(r.URL.Query().Get("lang")))
+	if r.URL.Query().Get("format") == "docx" {
+		data, err := report.DOCX(md)
+		if err != nil {
+			writeErr(w, 500, "failed to generate Word report")
+			return
+		}
+		w.Header().Set("Content-Type", report.DOCXContentType)
+		w.Header().Set("Content-Disposition", `attachment; filename="task-report.docx"`)
+		_, _ = w.Write(data)
+		return
+	}
 	w.Header().Set("Content-Type", "text/markdown; charset=utf-8")
 	w.WriteHeader(200)
 	_, _ = w.Write([]byte(md))

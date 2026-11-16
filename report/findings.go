@@ -208,17 +208,22 @@ func findingTrafficMarkdown(f *db.DBFinding, attachments bool) string {
 }
 
 func findingTrafficMarkdownLocalized(f *db.DBFinding, attachments bool, locale string) string {
+	return findingTrafficMarkdownSection(f, attachments, locale, "##")
+}
+
+func findingTrafficMarkdownSection(f *db.DBFinding, attachments bool, locale, heading string) string {
 	tr := func(zh, en string) string { return reportText(locale, zh, en) }
 	stale := f.Report != "" && f.EvidenceVersion != f.ReportEvidenceVersion
 	if len(f.TrafficBindings) == 0 && !stale {
 		return ""
 	}
 	var out strings.Builder
-	out.WriteString(tr("\n## 关联流量证据\n\n", "\n## Related Traffic Evidence\n\n"))
+	fmt.Fprintf(&out, "\n%s %s\n\n", heading, tr("关联流量证据", "Related Traffic Evidence"))
 	fmt.Fprintf(&out, tr("证据版本：%d；关联数量：%d。\n\n", "Evidence version: %d; bindings: %d.\n\n"), f.EvidenceVersion, len(f.TrafficBindings))
 	if stale {
 		out.WriteString(tr("证据已变更，详细报告需要更新。\n\n", "The evidence has changed; the detailed report needs updating.\n\n"))
 	}
+	out.WriteString(tr("以下按保存的证据顺序展示；排序和说明不代表自动推断的复现步骤。\n\n", "The following records use the saved evidence order; ordering and notes are not inferred reproduction steps.\n\n"))
 	for i, b := range f.TrafficBindings {
 		fmt.Fprintf(&out, tr("%d. **证据 #%d · %s** — `%s %s`，状态码 %d\n", "%d. **Evidence #%d · %s** — `%s %s`, status %d\n"), i+1, b.ID, b.Role, b.Snapshot.Method, strings.ReplaceAll(b.Snapshot.URL, "`", "%60"), b.Snapshot.Status)
 		if b.Note != "" {

@@ -582,7 +582,7 @@ export const api = {
   // exportFindings triggers the findings page export and downloads the file. scope=selected
   // sends ids (a finding_id list); scope=filtered sends the current filters (the FindingQuery filter fields); scope=all ignores filters.
   exportFindings: async (opts: {
-    format: "md-single" | "md-zip" | "csv" | "json" | "sarif";
+    format: "md-single" | "md-zip" | "csv" | "json" | "sarif" | "docx";
     locale?: "zh-CN" | "en";
     scope: "filtered" | "all" | "selected";
     filters?: Omit<FindingQuery, "page" | "pageSize">;
@@ -886,16 +886,34 @@ export const api = {
     ).then((r) => ({ ...r, deliveries: arr(r.deliveries) }));
   },
   notifyRetryDelivery: (id: number) => post<{ ok: boolean }>(`/notify/deliveries/${id}/retry`),
-  report: async (task?: string, locale: "zh-CN" | "en" = "zh-CN") => {
+  report: async (task?: string, locale: "zh-CN" | "en" = "zh-CN", scope: "all" | "confirmed" = "all") => {
     if (MOCK) return taskOutcomeScenarioReport(task ?? "") ?? mockReport(task);
     const token = getToken();
-    const params = new URLSearchParams({ lang: locale });
+    const params = new URLSearchParams({ lang: locale, scope });
     if (task) params.set("task", task);
     const r = await fetch(`/api/report?${params}`, {
       headers: token ? { Authorization: `Bearer ${token}` } : {},
     });
     if (!r.ok) throw new Error(`report: ${r.status}`);
     return r.text();
+  },
+  reportDOCX: async (task: string, locale: "zh-CN" | "en" = "zh-CN", scope: "all" | "confirmed" = "all") => {
+    const token = getToken();
+    const params = new URLSearchParams({ task, lang: locale, format: "docx", scope });
+    const r = await fetch(`/api/report?${params}`, {
+      headers: token ? { Authorization: `Bearer ${token}` } : {},
+    });
+    if (!r.ok) throw new Error(`report: ${r.status}`);
+    if (!r.headers.get("Content-Type")?.includes("wordprocessingml.document")) throw new Error("Unexpected report format");
+    const blob = await r.blob();
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = downloadFilename(r.headers.get("Content-Disposition") ?? "", "task-report.docx");
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    setTimeout(() => URL.revokeObjectURL(url), 1000);
   },
   chatMentions: (kind: string, query: string, signal?: AbortSignal, cursor = "") =>
     http<{ items: ChatMention[]; next_cursor?: string }>(
