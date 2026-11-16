@@ -81,3 +81,19 @@ func TestLogSinkConcurrentPublicationPreservesSequence(t *testing.T) {
 		}
 	}
 }
+
+func TestLogSinkRestoredHistoryPreservesOrderAndLiveCursor(t *testing.T){
+	s:=&logSinkT{cap:20,subs:map[chan LogLine]struct{}{},dbCh:make(chan dbWriteReq,20)}
+	ch,unsub:=s.subscribe();defer unsub()
+	s.add(LogLine{Text:"startup1"});s.add(LogLine{Text:"startup2"})
+	s.prependRestored([]LogLine{{DBID:10,Text:"old1"},{DBID:11,Text:"old2"}})
+	lines,cursor:=s.recent(0,20)
+	if cursor!=2||len(lines)!=4{t.Fatalf("replay=%+v cursor=%d",lines,cursor)}
+	for i,want:=range []int64{-2,-1,1,2}{if lines[i].Seq!=want{t.Fatalf("seq[%d]=%d want %d",i,lines[i].Seq,want)}}
+	for _,want:=range []int64{1,2}{
+		if got:=<-ch;got.Seq!=want{t.Fatalf("subscriber seq=%d",got.Seq)}
+		if got:=<-s.dbCh;got.seq!=want{t.Fatalf("DB cursor=%d",got.seq)}
+	}
+	lines,_=s.recent(-2,20);if len(lines)!=3||lines[0].Seq!=-1{t.Fatalf("historical cursor=%+v",lines)}
+	lines,_=s.recent(1,20);if len(lines)!=1||lines[0].Seq!=2{t.Fatalf("live cursor=%+v",lines)}
+}

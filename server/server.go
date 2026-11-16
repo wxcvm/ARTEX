@@ -3139,27 +3139,32 @@ func (s *Server) getLogsHistory(w http.ResponseWriter, r *http.Request) {
 // streamLogs is the live SSE tail of the backend log: replays history after
 // ?since=<seq>, then pushes each new line.
 func (s *Server) streamLogs(w http.ResponseWriter, r *http.Request) {
+	streamLogsFromSink(w,r,logSink)
+}
+
+func streamLogsFromSink(w http.ResponseWriter,r *http.Request,sink *logSinkT) {
 	flusher, ok := w.(http.Flusher)
 	if !ok {
 		writeErr(w, 500, "streaming unsupported")
 		return
 	}
 	since := int64(atoiDefault(r.URL.Query().Get("since"), 0))
+	if last:=r.Header.Get("Last-Event-ID");last!=""{if n,err:=strconv.ParseInt(last,10,64);err==nil{since=n}}
 	w.Header().Set("Content-Type", "text/event-stream")
 	w.Header().Set("Cache-Control", "no-cache")
 	w.Header().Set("Connection", "keep-alive")
 	w.Header().Set("X-Accel-Buffering", "no")
 
-	ch, unsub := logSink.subscribe()
+	ch, unsub := sink.subscribe()
 	defer unsub()
-	send := func(l LogLine) {
-		b, _ := json.Marshal(l)
-		fmt.Fprintf(w, "data: %s\n\n", b)
-		flusher.Flush()
+	send := func(l LogLine) bool {
+		b,err:=json.Marshal(l);if err!=nil{return false}
+		if _,err=fmt.Fprintf(w,"id: %d\ndata: %s\n\n",l.Seq,b);err!=nil{return false}
+		flusher.Flush();return true
 	}
-	lines, cursor := logSink.recent(since, 1000)
+	lines, cursor := sink.recent(since, sink.cap)
 	for _, l := range lines {
-		send(l)
+		if !send(l){return}
 	}
 	if cursor > since {
 		since = cursor
@@ -3181,9 +3186,9 @@ func (s *Server) streamLogs(w http.ResponseWriter, r *http.Request) {
 				continue
 			}
 			since = l.Seq
-			send(l)
+			if !send(l){return}
 		case <-ping.C:
-			fmt.Fprint(w, ": ping\n\n")
+			if _,err:=fmt.Fprint(w, ": ping\n\n");err!=nil{return}
 			flusher.Flush()
 		}
 	}
