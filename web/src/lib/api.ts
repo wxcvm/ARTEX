@@ -49,6 +49,7 @@ import type {
   FindingStatus,
   FindingsPage,
   FindingTraffic,
+  FindingScreenshot,
   FindingTrafficDetail,
   IntentAsset,
   InterceptApprovalFilter,
@@ -616,6 +617,38 @@ export const api = {
     get<Finding>(
       `/exploration/findings/${id}${contextTaskId ? `?context_task=${encodeURIComponent(contextTaskId)}` : ""}`,
     ),
+  findingScreenshots: (id: string, contextTask?: string): Promise<FindingScreenshot[]> =>
+    MOCK ? Promise.resolve([]) : get<FindingScreenshot[]>(
+      `/exploration/findings/${encodeURIComponent(id)}/screenshots${contextTask ? `?context_task=${encodeURIComponent(contextTask)}` : ""}`,
+    ),
+  uploadFindingScreenshot: async (id: string, file: File, caption: string, bindingId: string, contextTask?: string) => {
+    const form = new FormData();
+    form.append("image", file);
+    form.append("caption", caption);
+    if (bindingId) form.append("binding_id", bindingId);
+    const token = getToken();
+    const r = await fetch(`/api/exploration/findings/${encodeURIComponent(id)}/screenshots${contextTask ? `?context_task=${encodeURIComponent(contextTask)}` : ""}`, {
+      method: "POST", body: form, headers: token ? { Authorization: `Bearer ${token}` } : {},
+    });
+    if (!r.ok) {
+      const error = await r.json().catch(() => ({}));
+      throw new Error(error.error || `Upload failed: ${r.status}`);
+    }
+    return r.json() as Promise<FindingScreenshot>;
+  },
+  readFindingScreenshot: async (id: string, screenshotId: string, contextTask?: string) => {
+    const token = getToken();
+    const r = await fetch(`/api/exploration/findings/${encodeURIComponent(id)}/screenshots/${encodeURIComponent(screenshotId)}${contextTask ? `?context_task=${encodeURIComponent(contextTask)}` : ""}`, {
+      headers: token ? { Authorization: `Bearer ${token}` } : {},
+    });
+    if (!r.ok) throw new Error(`Image request failed: ${r.status}`);
+    if (!["image/png", "image/jpeg"].includes(r.headers.get("Content-Type") ?? "")) throw new Error("Unexpected screenshot format");
+    return r.blob();
+  },
+  editFindingScreenshot: (id: string, screenshotId: string, caption: string, contextTask?: string) =>
+    patch<{ ok: boolean }>(`/exploration/findings/${encodeURIComponent(id)}/screenshots/${encodeURIComponent(screenshotId)}${contextTask ? `?context_task=${encodeURIComponent(contextTask)}` : ""}`, { caption }),
+  deleteFindingScreenshot: (id: string, screenshotId: string, contextTask?: string) =>
+    del<{ ok: boolean }>(`/exploration/findings/${encodeURIComponent(id)}/screenshots/${encodeURIComponent(screenshotId)}${contextTask ? `?context_task=${encodeURIComponent(contextTask)}` : ""}`),
   findingTraffic: (id: string, contextTask?: string) =>
     get<FindingTraffic>(
       `/exploration/findings/${id}/traffic${contextTask ? `?context_task=${encodeURIComponent(contextTask)}` : ""}`,
