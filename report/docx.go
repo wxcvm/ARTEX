@@ -60,6 +60,7 @@ func DOCXWithTemplate(markdown string, findings []*db.DBFinding, locale, layout 
 		if err := writeProfessionalFrontMatter(&body, markdown, locale, template); err != nil {
 			return nil, err
 		}
+		if err:=writeTemplateSections(&body,template,"before");err!=nil{return nil,err}
 	}
 	inCode := false
 	for _, line := range strings.Split(strings.ReplaceAll(markdown, "\r\n", "\n"), "\n") {
@@ -87,6 +88,7 @@ func DOCXWithTemplate(markdown string, findings []*db.DBFinding, locale, layout 
 		}
 		body.WriteString("</w:t></w:r></w:p>")
 	}
+	if professional{if err:=writeTemplateSections(&body,template,"after");err!=nil{return nil,err}}
 	media, relationships, err := appendDOCXScreenshots(&body, findings, locale)
 	if err != nil {
 		return nil, err

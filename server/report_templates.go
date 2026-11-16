@@ -32,12 +32,20 @@ func validReportTemplate(t *db.ReportTemplate)bool{
 		if len(*p)>4096||strings.ContainsRune(*p,0){return false}
 		for _,r:=range *p{if r<32&&r!='\t'&&r!='\n'&&r!='\r'{return false}}
 	}
+	for i:=range t.Sections{
+		section:=&t.Sections[i]
+		section.Title=strings.TrimSpace(section.Title)
+		section.Body=strings.TrimSpace(section.Body)
+		if section.Position!="before"&&section.Position!="after"{return false}
+		if section.Title==""||len(section.Title)>4096||section.Body==""{return false}
+		for _,r:=range section.Title+section.Body{if r<32&&r!='\t'&&r!='\n'&&r!='\r'{return false}}
+	}
 	return t.Name!=""
 }
 func(s *Server) saveReportTemplate(w http.ResponseWriter,r *http.Request){
 	pg:=s.pg(w);if pg==nil{return}
 	var t db.ReportTemplate
-	if err:=json.NewDecoder(http.MaxBytesReader(w,r.Body,128<<10)).Decode(&t);err!=nil||!validReportTemplate(&t){writeErr(w,400,"invalid report template; name required");return}
+	if err:=json.NewDecoder(http.MaxBytesReader(w,r.Body,128<<10)).Decode(&t);err!=nil||!validReportTemplate(&t){writeErr(w,400,"invalid report template; name and valid custom sections required");return}
 	item,err:=pg.SaveReportTemplate(r.Context(),r.PathValue("template"),t)
 	if errors.Is(err,db.ErrReportTemplateNotFound){writeErr(w,404,"report template not found");return}
 	if err!=nil{writeErr(w,500,"could not save report template");return}

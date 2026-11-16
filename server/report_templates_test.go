@@ -91,3 +91,31 @@ func TestReportTemplateLogoLifecycle(t *testing.T){
 	if err!=nil{t.Fatal(err)}
 	for _,entry:=range z.File{if strings.Contains(entry.Name,"report-logo"){t.Fatal("removed logo still exported")}}
 }
+
+func TestReportTemplateCustomSections(t *testing.T){
+	s,f,req:=trafficEvidenceServer(t)
+	finding,err:=s.m.pg.GetFinding(f.FindingID)
+	if err!=nil||finding==nil||finding.TaskID==nil{t.Fatal("missing task",err)}
+	base:="/api/report/templates"
+	if w:=req("POST",base,`{"name":"bad","sections":[{"title":"bad","body":"text","position":"middle"}]}`);w.Code!=400{t.Fatal(w.Code,w.Body)}
+	w:=req("POST",base,`{"name":"Section fixture","sections":[{"title":"Fixture methodology <&>","body":"Method paragraph 1\nMethod paragraph 2","position":"before"},{"title":"Fixture scope","body":"Scope paragraph","position":"before"},{"title":"Fixture conclusion","body":"Conclusion paragraph","position":"after"}]}`)
+	var tmpl db.ReportTemplate
+	if err:=json.Unmarshal(w.Body.Bytes(),&tmpl);w.Code!=200||err!=nil||len(tmpl.Sections)!=3{t.Fatal(w.Code,w.Body,err)}
+	defer s.m.pg.DeleteReportTemplate(t.Context(),tmpl.ID)
+	path:=base+"/"+tmpl.ID
+	w=req("PUT",path,`{"name":"Edited section fixture"}`)
+	if err:=json.Unmarshal(w.Body.Bytes(),&tmpl);w.Code!=200||err!=nil||len(tmpl.Sections)!=3{t.Fatal("omitted sections lost",w.Code,w.Body,err)}
+	export:=fmt.Sprintf("/api/report?task=%d&format=docx&template=%s",*finding.TaskID,tmpl.ID)
+	w=req("GET",export,"")
+	if w.Code!=200{t.Fatal(w.Code,w.Body)}
+	z,err:=zip.NewReader(bytes.NewReader(w.Body.Bytes()),int64(w.Body.Len()))
+	if err!=nil{t.Fatal(err)}
+	var document string
+	for _,entry:=range z.File{if entry.Name=="word/document.xml"{r,err:=entry.Open();if err!=nil{t.Fatal(err)};raw,err:=io.ReadAll(r);r.Close();if err!=nil{t.Fatal(err)};document=string(raw);dec:=xml.NewDecoder(bytes.NewReader(raw));for{if _,err:=dec.Token();err==io.EOF{break}else if err!=nil{t.Fatal(err)}}}}
+	prev:=-1
+	for _,want:=range []string{"Fixture methodology &lt;&amp;&gt;","Method paragraph 1","Method paragraph 2","Fixture scope","Scope paragraph","任务目标","Fixture conclusion","Conclusion paragraph"}{
+		pos:=strings.Index(document,want);if pos<=prev{t.Fatalf("missing or out of order %q",want)};prev=pos
+	}
+	w=req("PUT",path,`{"name":"Clear sections","sections":[]}`)
+	if err:=json.Unmarshal(w.Body.Bytes(),&tmpl);w.Code!=200||err!=nil||len(tmpl.Sections)!=0{t.Fatal(w.Code,w.Body,err)}
+}
