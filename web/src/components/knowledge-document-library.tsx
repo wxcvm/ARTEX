@@ -38,6 +38,8 @@ export function KnowledgeDocumentLibrary({taskId}: {taskId?: string}) {
   const stopUpload=React.useRef(false);
   React.useEffect(()=>()=>{stopUpload.current=true;},[]);
   const [uploadCategory,setUploadCategory] = React.useState("");
+  const [forceOCR,setForceOCR]=React.useState(false);
+  const [ocrLanguage,setOCRLanguage]=React.useState("eng");
   const [deleting,setDeleting] = React.useState(false);
   const [history,setHistory] = React.useState<KnowledgeRetrieval[] | null>(null);
   const [historyBusy,setHistoryBusy] = React.useState(false);
@@ -98,7 +100,7 @@ export function KnowledgeDocumentLibrary({taskId}: {taskId?: string}) {
         const file=pending[i];
         setUploadProgress((i+1)+"/"+pending.length+" · "+file.name);
         try{
-          last=await api.uploadKnowledgeDocument(file,uploadCategory,taskId);
+          last=await api.uploadKnowledgeDocument(file,uploadCategory,taskId,{forceOCR,ocrLanguage});
           count++;
         }catch(e){
           failed.push(file);
@@ -141,7 +143,12 @@ export function KnowledgeDocumentLibrary({taskId}: {taskId?: string}) {
         <Input className="w-36" aria-label={tr("上传分类","Upload category")} placeholder={tr("分类（可选）","Category (optional)")} value={uploadCategory} onChange={e=>setUploadCategory(e.target.value)} disabled={busy}/>
         <Button variant="outline" disabled={!files.length||busy} onClick={()=>void upload()}><UploadIcon/>{tr("导入","Import")}{files.length>0?" ("+files.length+")":""}</Button>
         {busy&&files.length>0&&<Button variant="ghost" size="sm" onClick={()=>{stopUpload.current=true;}}>{tr("停止后续导入","Stop after current file")}</Button>}
-        <p className="w-full text-xs text-muted-foreground">TXT / MD / CSV / JSON / DOCX / PDF · {tr("单文件最大 8 MiB，文本最大 4 MiB；PDF 需要本机 pdftotext，扫描件不支持 OCR","8 MiB per file, 4 MiB extracted text; PDF needs local pdftotext, no OCR")}</p>
+        <p className="w-full text-xs text-muted-foreground">TXT / MD / CSV / JSON / DOCX / PDF · {tr("单文件最大 8 MiB，文本最大 4 MiB；PDF 需要本机 Poppler；扫描件自动尝试本机 Tesseract","8 MiB per file, 4 MiB extracted text; PDF needs local Poppler; scanned files try local Tesseract")}</p>
+        <div className="flex w-full flex-wrap items-center gap-3 text-xs">
+          <label className="flex items-center gap-2"><input type="checkbox" checked={forceOCR} disabled={busy} onChange={e=>setForceOCR(e.target.checked)}/>{tr("PDF 强制 OCR（混合或扫描文档）","Force PDF OCR (mixed or scanned documents)")}</label>
+          <label className="flex items-center gap-2">{tr("OCR 语言","OCR language")}<select className="rounded-md border bg-background p-1" value={ocrLanguage} disabled={busy} onChange={e=>setOCRLanguage(e.target.value)}><option value="eng">English</option><option value="chi_sim+eng">简体中文 + English</option><option value="chi_tra+eng">繁體中文 + English</option></select></label>
+        </div>
+        <p className="w-full text-xs text-muted-foreground">{tr("OCR 需要本机 pdfinfo、pdftoppm、Tesseract 及所选语言包，识别结果可能有误；不上传至外部服务。","OCR requires local pdfinfo, pdftoppm, Tesseract and the selected language packs. Recognition may contain errors; no external upload.")}</p>
         {uploadProgress&&<p role="status" className="w-full text-xs">{uploadProgress}</p>}
         {uploadErrors.length>0&&<div role="alert" className="w-full space-y-1 text-xs text-destructive">{uploadErrors.map((msg,i)=><p key={i}>{msg}</p>)}</div>}
       </div>

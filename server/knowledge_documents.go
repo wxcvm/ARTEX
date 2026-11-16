@@ -100,7 +100,7 @@ func (s *Server) uploadKnowledgeDocument(w http.ResponseWriter,r *http.Request){
 	raw,err:=io.ReadAll(io.LimitReader(f,(8<<20)+1))
 	if err!=nil||len(raw)>8<<20{writeErr(w,400,"upload exceeds 8 MiB");return}
 	name:=filepath.Base(strings.ReplaceAll(h.Filename,"\\","/"))
-	content,err:=kb.ExtractDocumentTextContext(r.Context(),name,raw)
+	content,err:=kb.ExtractDocumentTextWithOptions(r.Context(),name,raw,kb.PDFOptions{ForceOCR:r.FormValue("force_ocr")=="true",OCRLanguage:r.FormValue("ocr_language")})
 	if err!=nil{writeErr(w,400,err.Error());return}
 	doc:=db.KnowledgeDocument{Title:strings.TrimSuffix(name,filepath.Ext(name)),Category:r.FormValue("category"),Content:content,SourceFilename:name}
 	if !validKnowledgeDocument(&doc){writeErr(w,400,"invalid document metadata");return}

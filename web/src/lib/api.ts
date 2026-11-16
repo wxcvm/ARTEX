@@ -272,10 +272,11 @@ export const api = {
       : post<KnowledgeDocument>(`/knowledge/documents?${new URLSearchParams(task ? {task} : {})}`, doc),
   deleteKnowledgeDocument: (id: string, task?: string) =>
     del<{ok: boolean}>(`/knowledge/documents/${encodeURIComponent(id)}?${new URLSearchParams(task ? {task} : {})}`),
-  uploadKnowledgeDocument: async (file: File, category: string, task?: string) => {
+  uploadKnowledgeDocument: async (file: File, category: string, task?: string,ocr?:{forceOCR:boolean;ocrLanguage:string}) => {
     const data = new FormData();
     data.append("file", file);
     data.append("category", category);
+    if(ocr){data.append("force_ocr",String(ocr.forceOCR));data.append("ocr_language",ocr.ocrLanguage);}
     const token = getToken();
     const r = await fetch(`/api/knowledge/documents/upload?${new URLSearchParams(task ? {task} : {})}`, {
       method: "POST", body: data, headers: token ? {Authorization: `Bearer ${token}`} : {},
@@ -636,6 +637,7 @@ export const api = {
     const blob=await r.blob();const url=URL.createObjectURL(blob);
     const a=document.createElement("a");a.href=url;a.download=downloadFilename(r.headers.get("Content-Disposition")??"",`task-report.${format}`);document.body.appendChild(a);a.click();a.remove();window.setTimeout(()=>URL.revokeObjectURL(url),1000);
   },
+  setReportTemplateLogo: (id:string,file?:File) => http<import("./types").ReportTemplate>(`/report/templates/${encodeURIComponent(id)}/logo`,file?{method:"PUT",body:file,headers:{"Content-Type":"application/octet-stream"}}:{method:"DELETE"}),
   reportTemplates: () => get<import("./types").ReportTemplate[]>("/report/templates"),
   saveReportTemplate: (data: import("./types").ReportTemplateInput, id?: string) => id ? put<import("./types").ReportTemplate>(`/report/templates/${encodeURIComponent(id)}`, data) : post<import("./types").ReportTemplate>("/report/templates", data),
   deleteReportTemplate: (id: string) => del<{ok:boolean}>(`/report/templates/${encodeURIComponent(id)}`),

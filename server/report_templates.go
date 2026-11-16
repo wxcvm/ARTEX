@@ -3,10 +3,12 @@ package server
 import (
 	"encoding/json"
 	"errors"
+	"io"
 	"net/http"
 	"strings"
 
 	"github.com/Autumn-27/artex/db"
+	"github.com/Autumn-27/artex/report"
 )
 
 func(s *Server) registerReportTemplates(mux *http.ServeMux){
@@ -15,6 +17,8 @@ func(s *Server) registerReportTemplates(mux *http.ServeMux){
 	mux.HandleFunc("POST "+base,s.saveReportTemplate)
 	mux.HandleFunc("PUT "+base+"/{template}",s.saveReportTemplate)
 	mux.HandleFunc("DELETE "+base+"/{template}",s.deleteReportTemplate)
+	mux.HandleFunc("PUT "+base+"/{template}/logo",s.updateReportTemplateLogo)
+	mux.HandleFunc("DELETE "+base+"/{template}/logo",s.updateReportTemplateLogo)
 }
 func(s *Server) listReportTemplates(w http.ResponseWriter,r *http.Request){
 	pg:=s.pg(w);if pg==nil{return}
@@ -54,4 +58,19 @@ func(s *Server) resolveReportTemplate(w http.ResponseWriter,r *http.Request)(*db
 	if errors.Is(err,db.ErrReportTemplateNotFound){writeErr(w,404,"report template not found");return nil,false}
 	if err!=nil{writeErr(w,500,"could not read report template");return nil,false}
 	return &t,true
+}
+
+func(s *Server) updateReportTemplateLogo(w http.ResponseWriter,r *http.Request){
+	pg:=s.pg(w);if pg==nil{return}
+	var logo []byte
+	if r.Method==http.MethodPut{
+		var err error
+		logo,err=io.ReadAll(http.MaxBytesReader(w,r.Body,report.MaxReportLogoBytes))
+		if err!=nil{writeErr(w,400,"logo exceeds 2 MiB or could not be read");return}
+		if err=report.ValidateReportLogo(logo);err!=nil{writeErr(w,400,err.Error());return}
+	}
+	item,err:=pg.SetReportTemplateLogo(r.Context(),r.PathValue("template"),logo)
+	if errors.Is(err,db.ErrReportTemplateNotFound){writeErr(w,404,"report template not found");return}
+	if err!=nil{writeErr(w,500,"could not save report logo");return}
+	writeJSON(w,200,item)
 }

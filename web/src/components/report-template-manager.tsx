@@ -64,6 +64,16 @@ export function ReportTemplateManager(){
     catch(e){setError((e as Error).message);}
     finally{setBusy(false);}
   }
+  async function changeLogo(file?: File){
+    if(!id||busy)return;
+    setBusy(true);setError("");
+    try{
+      const item=await api.setReportTemplateLogo(id,file);
+      setItems(old=>old.map(x=>x.id===item.id?item:x));
+    }catch(e){setError((e as Error).message);}
+    finally{setBusy(false);}
+  }
+  const hasLogo=items.find(x=>x.id===id)?.has_logo;
   const fields:{key:keyof ReportTemplateInput;zh:string;en:string}[]=[
     {key:"name",zh:"模板名称",en:"Template name"},
     {key:"brand",zh:"品牌 / 机构",en:"Brand / organization"},
@@ -96,6 +106,12 @@ export function ReportTemplateManager(){
             <Button size="sm" disabled={busy||!draft.name.trim()} onClick={()=>void save()}>{t("保存","Save")}</Button>
             {id&&(confirm?<><Button size="sm" variant="destructive" disabled={busy} onClick={()=>void remove()}>{t("确认删除","Confirm deletion")}</Button><Button size="sm" variant="ghost" onClick={()=>setConfirm(false)}>{t("取消","Cancel")}</Button></>:<Button size="sm" variant="ghost" disabled={busy} onClick={()=>setConfirm(true)}>{t("删除","Delete")}</Button>)}
           </div>
+        </div>}
+        {id&&draft&&<div className="space-y-2 rounded-md border p-3">
+          <p className="text-sm font-medium">{t("报告品牌 Logo","Report brand logo")} · {hasLogo?t("已设置","Configured"):t("未设置","Not configured")}</p>
+          <p className="text-xs text-muted-foreground">{t("PNG / JPEG，最大 2 MiB。图片嵌入 Word 封面，历史报告不受修改影响。","PNG / JPEG, up to 2 MiB. Embedded in the Word cover; saved reports are unchanged.")}</p>
+          <Input type="file" accept="image/png,image/jpeg" disabled={busy} onChange={e=>{const file=e.target.files?.[0];e.target.value="";if(file)void changeLogo(file);}}/>
+          {hasLogo&&<Button size="sm" variant="outline" disabled={busy} onClick={()=>void changeLogo()}>{t("移除 Logo","Remove logo")}</Button>}
         </div>}
         {error&&<p role="alert" className="text-xs text-destructive">{error}</p>}
       </>}

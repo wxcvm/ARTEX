@@ -7,6 +7,8 @@ import (
 	"encoding/xml"
 	"fmt"
 	"io"
+	"image"
+	"image/png"
 	"strings"
 	"testing"
 
@@ -54,4 +56,38 @@ func TestReusableReportTemplateExports(t *testing.T){
 	}
 	if w=req("DELETE",path,"");w.Code!=200{t.Fatal(w.Code,w.Body)}
 	if w=req("GET",fmt.Sprintf("/api/report?task=%d&format=docx&template=%s",*finding.TaskID,tmpl.ID),"");w.Code!=404{t.Fatal("deleted template silently accepted",w.Code)}
+}
+
+func TestReportTemplateLogoLifecycle(t *testing.T){
+	s,f,req:=trafficEvidenceServer(t)
+	finding,err:=s.m.pg.GetFinding(f.FindingID)
+	if err!=nil||finding==nil||finding.TaskID==nil{t.Fatal("missing fixture task",err)}
+	w:=req("POST","/api/report/templates",`{"name":"Logo fixture"}`)
+	var tmpl db.ReportTemplate
+	if err:=json.Unmarshal(w.Body.Bytes(),&tmpl);w.Code!=200||err!=nil{t.Fatal(w.Code,w.Body,err)}
+	defer s.m.pg.DeleteReportTemplate(t.Context(),tmpl.ID)
+	path:="/api/report/templates/"+tmpl.ID
+	if w=req("PUT",path+"/logo","not an image");w.Code!=400{t.Fatal(w.Code,w.Body)}
+	var img bytes.Buffer
+	if err:=png.Encode(&img,image.NewRGBA(image.Rect(0,0,24,12)));err!=nil{t.Fatal(err)}
+	if w=req("PUT",path+"/logo",img.String());w.Code!=200||!strings.Contains(w.Body.String(),`"has_logo":true`){t.Fatal(w.Code,w.Body)}
+	if w=req("PUT",path,`{"name":"Edited logo fixture"}`);w.Code!=200||!strings.Contains(w.Body.String(),`"has_logo":true`){t.Fatal("text edit removed logo",w.Code,w.Body)}
+	export:=fmt.Sprintf("/api/report?task=%d&format=docx&template=%s",*finding.TaskID,tmpl.ID)
+	w=req("GET",export,"")
+	if w.Code!=200{t.Fatal(w.Code,w.Body)}
+	z,err:=zip.NewReader(bytes.NewReader(w.Body.Bytes()),int64(w.Body.Len()))
+	if err!=nil{t.Fatal(err)}
+	parts:=map[string][]byte{}
+	for _,entry:=range z.File{
+		r,err:=entry.Open();if err!=nil{t.Fatal(err)}
+		raw,err:=io.ReadAll(r);r.Close();if err!=nil{t.Fatal(err)}
+		parts[entry.Name]=raw
+	}
+	if !bytes.Equal(parts["word/media/report-logo.png"],img.Bytes())||!bytes.Contains(parts["word/document.xml"],[]byte(`r:embed="rIdLogo"`))||!bytes.Contains(parts["word/_rels/document.xml.rels"],[]byte("media/report-logo.png")){t.Fatal("logo not embedded")}
+	if w=req("DELETE",path+"/logo","");w.Code!=200||!strings.Contains(w.Body.String(),`"has_logo":false`){t.Fatal(w.Code,w.Body)}
+	w=req("GET",export,"")
+	if w.Code!=200{t.Fatal(w.Code,w.Body)}
+	z,err=zip.NewReader(bytes.NewReader(w.Body.Bytes()),int64(w.Body.Len()))
+	if err!=nil{t.Fatal(err)}
+	for _,entry:=range z.File{if strings.Contains(entry.Name,"report-logo"){t.Fatal("removed logo still exported")}}
 }
