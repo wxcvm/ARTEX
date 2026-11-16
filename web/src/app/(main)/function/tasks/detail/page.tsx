@@ -52,6 +52,7 @@ import { GraphTab } from "./_tabs/graph-tab";
 import { InterceptTab } from "./_tabs/intercept-tab";
 import { OverviewTab } from "./_tabs/overview-tab";
 import { ReportTab } from "./_tabs/report-tab";
+import { KnowledgeDocumentLibrary } from "@/components/knowledge-document-library";
 import { RetestsTab } from "./_tabs/retests-tab";
 import { SessionsTab } from "./_tabs/sessions-tab";
 
@@ -66,6 +67,7 @@ const TABS = [
   { value: "credentials", label: "测试凭据", en: "Test credentials" },
   { value: "coverage", label: "资产覆盖", en: "Asset coverage" },
   { value: "intercept", label: "操作审批", en: "Approvals" },
+  { value: "knowledge", label: "知识", en: "Knowledge" },
   { value: "report", label: "报告", en: "Report" },
 ];
 
@@ -462,6 +464,9 @@ function TaskDetailInner() {
         </TabsContent>
         <TabsContent value="intercept" className="mt-0">
           <InterceptTab taskId={id} />
+        </TabsContent>
+        <TabsContent value="knowledge" className="mt-0">
+          <KnowledgeDocumentLibrary key={id} taskId={id} />
         </TabsContent>
         <TabsContent value="report" className="mt-0">
           <ReportTab key={id} taskId={id} />

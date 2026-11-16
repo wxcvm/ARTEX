@@ -6,6 +6,7 @@ import { Input } from "@/components/ui/input";
 import { useUiLocale } from "@/lib/ui-locale.client";
 import { uiText } from "@/lib/ui-locale";
 import { api } from "@/lib/api";
+import { KnowledgeDocumentLibrary } from "@/components/knowledge-document-library";
 import { knowledgeCategory, knowledgeKind, knowledgeCategorySummary } from "@/lib/resource-labels";
 
 export default function KnowledgePage() {
@@ -30,7 +31,9 @@ export default function KnowledgePage() {
     catch (e) { if (ticket === sequence.current) setError((e as Error).message); }
     finally { if (ticket === sequence.current) setBusy(false); }
   }
-  return <main className="mx-auto w-full max-w-5xl space-y-5 p-4 sm:p-8"><h1 className="text-2xl font-semibold">{t("浏览知识库", "Knowledge base")}</h1>
+  return <main className="mx-auto w-full max-w-5xl space-y-5 p-4 sm:p-8"><h1 className="text-2xl font-semibold">{t("知识库", "Knowledge base")}</h1>
+    <KnowledgeDocumentLibrary />
+    <h2 className="text-xl font-semibold">{t("内置知识资料", "Bundled knowledge")}</h2>
     <p className="text-sm text-muted-foreground">{t("只读搜索和查看材料，不需要模型，不会自动执行内容。材料原有的验证标记不代表 ARTEX 已独立复核。", "Read-only search and viewing; no model or automatic execution. Source verification marks do not imply independent verification by ARTEX.")}</p>
     <form className="flex gap-2" onSubmit={e => { e.preventDefault(); void search(); }}><Input aria-label={t("知识库关键词", "Knowledge search keywords")} placeholder={t("输入关键词，例如 Windows、认证、PostgreSQL", "Enter keywords, e.g. Windows, authentication, PostgreSQL")} value={query} onChange={e => setQuery(e.target.value)} /><Button disabled={busy || !query.trim()}>{t("搜索资料", "Search")}</Button></form>
     {error && <p role="alert" className="rounded-lg border p-3 text-sm">{error}</p>}

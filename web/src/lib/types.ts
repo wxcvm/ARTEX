@@ -1697,3 +1697,18 @@ export interface InterceptExecution {
   seq: number;
   items: Activity[];
 }
+
+export interface KnowledgeDocument {
+  id: string;
+  task_id?: string;
+  title: string;
+  category: string;
+  content?: string;
+  source_filename?: string;
+  created_at: string;
+  updated_at: string;
+}
+export interface KnowledgeDocumentPage {
+  items: KnowledgeDocument[];
+  has_more: boolean;
+}
