@@ -146,6 +146,7 @@ export function FindingTrafficPanel({
                   </Badge>
                   <Badge variant="secondary">
                     {b.snapshot.method} · {b.snapshot.status === 0 ? tr("状态未观测", "Status unobserved") : b.snapshot.status}
+                    {b.snapshot.source_traffic_id.startsWith("har-") ? " · HAR" : ""}
                   </Badge>
                   <span className="text-xs text-muted-foreground">{tr("证据", "Evidence")} #{b.id}</span>
                 </div>

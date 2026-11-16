@@ -21,6 +21,7 @@ import {
 import { toast } from "sonner";
 
 import { HttpCodeBlock } from "@/components/http-code-block";
+import { HarInspectionPanel } from "@/components/har-inspection-panel";
 import { LinkTrafficDialog } from "@/components/link-traffic-dialog";
 import {
   AlertDialog,
@@ -374,6 +375,8 @@ export default function TrafficPage() {
         </div>
       </header>
 
+      <HarInspectionPanel onImported={() => { setPage(0); setReloadTick((tick) => tick + 1); }} />
+
       {/* Toolbar */}
       <div className="flex min-w-0 flex-wrap items-center gap-2 rounded-xl border border-border/70 bg-card/90 p-3 shadow-sm sm:p-4">
         <Popover open={pickerOpen} onOpenChange={setPickerOpen}>
@@ -716,6 +719,7 @@ export default function TrafficPage() {
                         }}
                       >
                         <CopyIcon className="size-3 shrink-0" />
+                        {e.id.startsWith("har-") && <span className="shrink-0 text-[10px] text-muted-foreground">HAR</span>}
                         <span className="truncate">{e.id}</span>
                       </Button>
                     </TableCell>
@@ -773,6 +777,7 @@ export default function TrafficPage() {
                     onClick={() => void copyTrafficID(selected.id)}
                   >
                     <CopyIcon className="size-3" />
+                    {selected.id.startsWith("har-") && <span className="shrink-0 text-[10px] text-muted-foreground">HAR</span>}
                     <span className="max-w-32 truncate">{selected.id}</span>
                   </Button>
                   <span className="ml-auto text-xs text-muted-foreground tabular-nums">{fmtTime(selected.ts)}</span>
