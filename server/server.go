@@ -492,7 +492,7 @@ func (s *Server) applyLLM(cfg agent.Config) error {
 	// readiness (Ready()/llm_configured) is reported from s.llmOn, set below.
 
 	tx := transcript.NewStore(filepath.Join(s.m.dir, "transcripts"))
-	win := cfg.CompactionWindow()
+	win := poolCompactionWindow(prov, cfg.CompactionWindow())
 	// chat stays the GLOBAL fallback since one ChatAgent serves many agent keys — its
 	// per-agent binding is resolved at Chat time (runConversationSync →
 	// chatAgentForProfile). The main-agent has no global instance: each task builds its
@@ -643,7 +643,8 @@ func (s *Server) chatAgentForProfile(id int64) *agent.ChatAgent {
 		return nil
 	}
 	tx := transcript.NewStore(filepath.Join(s.m.dir, "transcripts"))
-	ca := agent.NewChatAgent(s.poolForBinding(id, prov, cfg), cfg.Model, s.m.dir, tx, cfg.CompactionWindow())
+	boundProvider := s.poolForBinding(id, prov, cfg)
+	ca := agent.NewChatAgent(boundProvider, cfg.Model, s.m.dir, tx, poolCompactionWindow(boundProvider, cfg.CompactionWindow()))
 	ca.SetProxy(s.m.ProxyAddr(), s.m.ProxyCACert())
 	ca.SetWebSearch(s.m.WebSearchOpts())
 	ca.SetGuard(s.chatGuard())
