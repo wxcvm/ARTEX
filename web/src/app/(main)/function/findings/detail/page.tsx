@@ -17,6 +17,7 @@ import { FindingReportExportButton } from "@/components/finding-report-export-bu
 import { FindingRetestPanel } from "@/components/finding-retest-panel";
 import { FindingTrafficPanel } from "@/components/finding-traffic-panel";
 import { FindingScreenshotPanel } from "@/components/finding-screenshot-panel";
+import { FindingReproductionPanel } from "@/components/finding-reproduction-panel";
 import { Markdown } from "@/components/markdown";
 import { StatusBadge } from "@/components/status-badge";
 import { Alert, AlertDescription } from "@/components/ui/alert";
@@ -205,6 +206,12 @@ function FindingDetailInner() {
               />
               <FindingScreenshotPanel
                 key={`screenshots:${id}:${contextTaskId}`}
+                findingId={id}
+                contextTask={contextTaskId || undefined}
+                readOnly={finding.inherited}
+              />
+              <FindingReproductionPanel
+                key={`reproduction:${id}:${contextTaskId}`}
                 findingId={id}
                 contextTask={contextTaskId || undefined}
                 readOnly={finding.inherited}

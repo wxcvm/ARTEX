@@ -50,6 +50,7 @@ import type {
   FindingsPage,
   FindingTraffic,
   FindingScreenshot,
+  FindingReproductionStep,
   FindingTrafficDetail,
   IntentAsset,
   InterceptApprovalFilter,
@@ -617,6 +618,12 @@ export const api = {
     get<Finding>(
       `/exploration/findings/${id}${contextTaskId ? `?context_task=${encodeURIComponent(contextTaskId)}` : ""}`,
     ),
+  findingReproduction: (id: string, contextTask?: string): Promise<FindingReproductionStep[]> =>
+    MOCK ? Promise.resolve([]) : get<FindingReproductionStep[]>(
+      `/exploration/findings/${encodeURIComponent(id)}/reproduction${contextTask ? `?context_task=${encodeURIComponent(contextTask)}` : ""}`,
+    ),
+  saveFindingReproduction: (id: string, steps: FindingReproductionStep[], contextTask?: string) =>
+    put<FindingReproductionStep[]>(`/exploration/findings/${encodeURIComponent(id)}/reproduction${contextTask ? `?context_task=${encodeURIComponent(contextTask)}` : ""}`, { steps }),
   findingScreenshots: (id: string, contextTask?: string): Promise<FindingScreenshot[]> =>
     MOCK ? Promise.resolve([]) : get<FindingScreenshot[]>(
       `/exploration/findings/${encodeURIComponent(id)}/screenshots${contextTask ? `?context_task=${encodeURIComponent(contextTask)}` : ""}`,

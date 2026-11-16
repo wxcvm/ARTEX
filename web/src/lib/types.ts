@@ -1624,6 +1624,12 @@ export interface InterceptDetail extends InterceptApprovalRow {
   audit: InterceptAudit | null;
 }
 
+export interface FindingReproductionStep {
+  title: string;
+  observation: string;
+  binding_id?: string;
+}
+
 export interface FindingScreenshot {
   id: string;
   binding_id?: string;
