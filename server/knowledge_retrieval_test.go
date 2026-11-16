@@ -15,7 +15,7 @@ import (
 )
 
 func TestScopedKnowledgeToolResolution(t *testing.T) {
-	s,f,_:=trafficEvidenceServer(t)
+	s,f,req:=trafficEvidenceServer(t)
 	pg:=s.m.pg
 	finding,err:=pg.GetFinding(f.FindingID)
 	if err!=nil||finding==nil||finding.TaskID==nil{t.Fatal("missing task",err)}
@@ -64,6 +64,17 @@ func TestScopedKnowledgeToolResolution(t *testing.T) {
 	}
 	search(taskTools,[]string{global.ID,local.ID},[]string{foreign.ID})
 	search(chatTools,[]string{global.ID},[]string{local.ID,foreign.ID})
+	for _,tc:=range []struct{path string;want []string;exclude []string}{
+		{"/api/knowledge/retrievals?task="+strconv.FormatInt(tid,10),[]string{key,global.ID,local.ID},[]string{foreign.ID}},
+		{"/api/knowledge/retrievals",[]string{key,global.ID},[]string{local.ID,foreign.ID}},
+		{"/api/knowledge/retrievals?task="+other.ID,nil,[]string{key,local.ID,global.ID}},
+	}{
+		w:=req("GET",tc.path,"")
+		if w.Code!=200{t.Fatal(w.Code,w.Body)}
+		for _,id:=range tc.want{if !strings.Contains(w.Body.String(),id){t.Fatal("missing history",id,w.Body)}}
+		for _,id:=range tc.exclude{if strings.Contains(w.Body.String(),id){t.Fatal("history leaked",id,w.Body)}}
+	}
+	defer pg.Exec("DELETE FROM knowledge_retrievals WHERE task_id IS NULL AND query=$1",key)
 	res,err:=call(taskTools["kb_get"],map[string]any{"document_id":local.ID})
 	if err!=nil||res.IsError{t.Fatal(err,res.Flatten())}
 	var page struct{Content string `json:"content"`;Next int `json:"next_offset"`;Scope string `json:"scope"`}
