@@ -1721,3 +1721,14 @@ export interface KnowledgeRetrieval {
   degraded: boolean;
   created_at: string;
 }
+
+export interface KnowledgeEmbeddingConfig {
+  enabled: boolean;
+  base_url: string;
+  model: string;
+}
+export interface KnowledgeIndexStatus {
+  enabled: boolean;
+  chunks: number;
+  model: string;
+}
