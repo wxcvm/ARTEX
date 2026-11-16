@@ -128,7 +128,7 @@ func TestFindingScreenshotAPI(t *testing.T) {
 		t.Fatal("missing finding task", err)
 	}
 	for _, export := range []string{
-		fmt.Sprintf("/api/report?task=%d&scope=all&format=docx", *finding.TaskID),
+		fmt.Sprintf("/api/report?task=%d&scope=all&format=docx&layout=professional", *finding.TaskID),
 		fmt.Sprintf("/api/exploration/findings/export?scope=selected&ids=%d&format=docx", f.FindingID),
 		fmt.Sprintf("/api/exploration/findings/export?scope=selected&ids=%d&format=md-zip", f.FindingID),
 	} {
