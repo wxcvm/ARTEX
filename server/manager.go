@@ -70,6 +70,9 @@ type Task struct {
 	Guard                *guard.Guard           `json:"-"`
 	notify               chan struct{}
 	lifecycleMu          sync.RWMutex
+	// activityMu serializes this task's activity insert and publish, so a
+	// higher cursor cannot become visible before an earlier activity commits.
+	activityMu           sync.Mutex
 	// transitionMu serializes pause commit/rollback, clock updates, and timeout
 	// admission for this task. Never acquire it while holding taskStateMu or mu.
 	transitionMu         sync.Mutex
