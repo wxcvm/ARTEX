@@ -500,3 +500,45 @@ func TestFindingTrafficUTF8SegmentsAndInheritedWrites(t *testing.T) {
 		}
 	}
 }
+
+func TestTaskReportIncludesLinkedEvidence(t *testing.T) {
+	s, f, req := trafficEvidenceServer(t)
+	seedServerEvidenceFlow(t, s, "task-report", []byte("local fixture"))
+	_, err := s.evidenceStore().Bind(t.Context(), f.FindingID, []db.TrafficRef{{TrafficID: "task-report", Role: "supporting", Note: "saved fixture note"}})
+	if err != nil {
+		t.Fatal(err)
+	}
+	finding, err := s.m.pg.GetFinding(f.FindingID)
+	if err != nil || finding.TaskID == nil {
+		t.Fatal("missing task", err)
+	}
+	path := fmt.Sprintf("/api/report?task=%d&scope=all&lang=en", *finding.TaskID)
+	w := req("GET", path, "")
+	if w.Code != 200 || !strings.Contains(w.Body.String(), "saved fixture note") || !strings.Contains(w.Body.String(), "Related Traffic Evidence") {
+		t.Fatal(w.Code, w.Body)
+	}
+	word := req("GET", path+"&format=docx", "")
+	if word.Code != 200 {
+		t.Fatal(word.Code, word.Body)
+	}
+	z, err := zip.NewReader(bytes.NewReader(word.Body.Bytes()), int64(word.Body.Len()))
+	if err != nil {
+		t.Fatal(err)
+	}
+	for _, entry := range z.File {
+		if entry.Name != "word/document.xml" {
+			continue
+		}
+		r, err := entry.Open()
+		if err != nil {
+			t.Fatal(err)
+		}
+		b, err := io.ReadAll(r)
+		r.Close()
+		if err != nil || !strings.Contains(string(b), "saved fixture note") {
+			t.Fatal("missing Word evidence", err)
+		}
+		return
+	}
+	t.Fatal("missing Word document")
+}

@@ -14,14 +14,15 @@ import (
 
 // Input bundles what the report needs.
 type Input struct {
-	Title       string
-	Goal        string
-	GeneratedAt time.Time
-	AssetCounts map[string]int
-	Findings    []*db.Node
-	Coverage      *db.CoverageLedger
-	FindingMeta   map[int64]db.FindingMeta // authoritative standalone finding status
-	ConfirmedOnly bool
+	Title          string
+	Goal           string
+	GeneratedAt    time.Time
+	AssetCounts    map[string]int
+	Findings       []*db.Node
+	Coverage       *db.CoverageLedger
+	FindingMeta    map[int64]db.FindingMeta // authoritative standalone finding status
+	FindingDetails map[int64]*db.DBFinding // existing report and linked evidence, keyed by node
+	ConfirmedOnly  bool
 }
 
 type findingView struct {
@@ -31,6 +32,7 @@ type findingView struct {
 	Summary   string
 	PoC       string
 	Status    string
+	Detail    *db.DBFinding
 }
 
 func parseFinding(n *db.Node) findingView {
@@ -67,6 +69,7 @@ func MarkdownLocalized(in Input, locale string) string {
 	for _, n := range in.Findings {
 		f := parseFinding(n)
 		f.Status = in.FindingMeta[n.ID].Status
+		f.Detail = in.FindingDetails[n.ID]
 		if f.Status == db.FindingConfirmed {
 			confirmed++
 		}
@@ -114,6 +117,9 @@ func MarkdownLocalized(in Input, locale string) string {
 			fmt.Fprintf(&b, "%s\n\n", nz(f.Summary, ""))
 			if f.PoC != "" {
 				fmt.Fprintf(&b, tr("**PoC / 证据：**\n\n```\n%s\n```\n\n", "**PoC / Evidence:**\n\n```\n%s\n```\n\n"), f.PoC)
+			}
+			if f.Detail != nil {
+				b.WriteString(findingTrafficMarkdownSection(f.Detail, false, locale, "####"))
 			}
 		}
 	}

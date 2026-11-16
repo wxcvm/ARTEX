@@ -80,3 +80,33 @@ func TestTaskReportFindingScope(t *testing.T) {
 		}
 	}
 }
+
+func TestTaskReportLinkedEvidence(t *testing.T) {
+	in := Input{
+		Findings: []*db.Node{
+			{ID: 1, Payload: json.RawMessage(`{"name":"included sample","severity":"high"}`)},
+			{ID: 2, Payload: json.RawMessage(`{"name":"excluded sample","severity":"low"}`)},
+		},
+		FindingMeta: map[int64]db.FindingMeta{
+			1: {Status: db.FindingConfirmed},
+			2: {Status: db.FindingPending},
+		},
+		ConfirmedOnly: true,
+		FindingDetails: map[int64]*db.DBFinding{
+			1: {ID: 11, EvidenceVersion: 2, ReportEvidenceVersion: 1, Report: "previous report", TrafficBindings: []db.FindingTrafficBinding{
+				{ID: 9, Role: "baseline", Note: "first saved note", Snapshot: db.TrafficEvidenceSnapshot{Method: "GET", URL: "http://example.test/", Status: 200}},
+				{ID: 8, Role: "supporting", Note: "second saved note"},
+			}},
+			2: {ID: 12, TrafficBindings: []db.FindingTrafficBinding{{ID: 10, Note: "excluded evidence"}}},
+		},
+	}
+	md := MarkdownLocalized(in, "en")
+	for _, want := range []string{"#### Related Traffic Evidence", "Evidence #9", "first saved note", "second saved note", "The evidence has changed", "not inferred reproduction steps"} {
+		if !strings.Contains(md, want) {
+			t.Fatalf("missing %q", want)
+		}
+	}
+	if strings.Contains(md, "excluded evidence") || strings.Index(md, "first saved note") > strings.Index(md, "second saved note") {
+		t.Fatal("wrong evidence scope or order")
+	}
+}

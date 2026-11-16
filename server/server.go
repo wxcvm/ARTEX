@@ -4039,15 +4039,45 @@ func (s *Server) getReport(w http.ResponseWriter, r *http.Request) {
 		writeErr(w, 500, "invalid report task")
 		return
 	}
-	meta, err := s.m.pg.FindingMetaByNodeID(taskID)
-	if err != nil {
-		writeErr(w, 500, "failed to read finding status")
+	if taskID <= 0 {
+		writeErr(w, 500, "invalid report task")
 		return
 	}
 	findings, err := t.Store.ListByKind(db.KindFinding, 1000) // pure vulnerabilities (facts are a separate KindFact and never enter the report)
 	if err != nil {
 		writeErr(w, 500, "failed to read report findings")
 		return
+	}
+	// Reuse the standalone finding rows and the existing evidence export snapshot.
+	// Only graph nodes belonging to this task may contribute to its report.
+	rows, err := s.m.pg.ListFindingsForExport(db.FindingFilter{TaskID: t.ID}, nil)
+	if err != nil {
+		writeErr(w, 500, "failed to read report finding details")
+		return
+	}
+	graphNodes := make(map[int64]bool, len(findings))
+	for _, n := range findings {
+		graphNodes[n.ID] = true
+	}
+	meta := make(map[int64]db.FindingMeta)
+	details := make(map[int64]*db.DBFinding)
+	var included []*db.DBFinding
+	for _, f := range rows {
+		if f.NodeID == nil || !graphNodes[*f.NodeID] {
+			continue
+		}
+		meta[*f.NodeID] = db.FindingMeta{ID: f.ID, Status: f.Status}
+		if scope == "confirmed" && f.Status != db.FindingConfirmed {
+			continue
+		}
+		details[*f.NodeID] = f
+		included = append(included, f)
+	}
+	if len(included) > 0 {
+		if err := s.evidenceStore().StageFindingsExport(r.Context(), included, "", false); err != nil {
+			evidenceError(w, err)
+			return
+		}
 	}
 	counts := map[string]int{}
 	for _, ty := range []string{"root_domain", "ip", "subdomain", "app", "service", "endpoint"} {
@@ -4063,7 +4093,7 @@ func (s *Server) getReport(w http.ResponseWriter, r *http.Request) {
 	md := report.MarkdownLocalized(report.Input{
 		Title: t.Description, Goal: t.Goal, GeneratedAt: time.Now(),
 		AssetCounts: counts, Findings: findings, Coverage: ledger,
-		FindingMeta: meta, ConfirmedOnly: scope == "confirmed",
+		FindingMeta: meta, FindingDetails: details, ConfirmedOnly: scope == "confirmed",
 	}, report.ReportLocale(r.URL.Query().Get("lang")))
 	if r.URL.Query().Get("format") == "docx" {
 		data, err := report.DOCX(md)
