@@ -439,6 +439,11 @@ func (s *Server) pgSendConversationMessage(w http.ResponseWriter, r *http.Reques
 	}
 	if _, err := pg.AppendConvActivity(c.ID, ua); err != nil {
 		log.Printf("[conv %d] append user msg failed: %v", c.ID, err)
+		s.chatMu.Lock()
+		delete(s.chatBusy, busyKey)
+		s.chatMu.Unlock()
+		writeErr(w, 503, "Could not save the user message; no turn was started")
+		return
 	}
 	if c.Title == "" || c.Title == "New conversation" {
 		title := firstLine(msg, 40)

@@ -3922,7 +3922,11 @@ func (s *Server) chat(w http.ResponseWriter, r *http.Request) {
 	// renders attachment cards.
 	humanTurn := userActivityWithAttachments("mainagent", req.Message, req.Attachments)
 	humanTurn.MainSeg = segPtr
-	s.engine.emitActivity(t, humanTurn)
+	if saved := s.engine.emitActivity(t, humanTurn); saved.ID <= 0 {
+		s.finishTaskChat(t.ID, cancel)
+		writeErr(w, 503, "Could not save the user message; no turn was started")
+		return
+	}
 	var ma *agent.MainAgent
 	if s.taskRuntimeAvailable(t, "mainagent") {
 		ma = s.agentsForTask(t).main
