@@ -346,7 +346,7 @@ func TestFindingTrafficArchiveV3RoundTripAndRetry(t *testing.T) {
 		t.Fatal(err)
 	}
 	// Force a database error after validated body installation; then retry normally.
-	if _, err = s.m.pg.Exec(`CREATE FUNCTION fail_evidence_restore_test() RETURNS trigger LANGUAGE plpgsql AS $ BEGIN RAISE EXCEPTION 'restore fixture failure'; END $`); err != nil {
+	if _, err = s.m.pg.Exec(`CREATE FUNCTION fail_evidence_restore_test() RETURNS trigger LANGUAGE plpgsql AS $$ BEGIN RAISE EXCEPTION 'restore fixture failure'; END $$`); err != nil {
 		t.Fatal(err)
 	}
 	if _, err = s.m.pg.Exec(`CREATE TRIGGER fail_evidence_restore_test BEFORE INSERT ON finding_traffic_bindings FOR EACH ROW EXECUTE FUNCTION fail_evidence_restore_test()`); err != nil {
