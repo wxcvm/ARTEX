@@ -120,6 +120,8 @@ func MarkdownLocalized(in Input, locale string) string {
 			}
 			if f.Detail != nil {
 				b.WriteString(findingTrafficMarkdownSection(f.Detail, false, locale, "####"))
+				b.WriteString(findingScreenshotsMarkdown(f.Detail, false, locale, "####"))
+				b.WriteString(findingReproductionMarkdown(f.Detail, locale, "####"))
 			}
 		}
 	}

@@ -45,6 +45,15 @@ func writeFindingsZipEntries(zw *zip.Writer, findings []*db.DBFinding, stage str
 		if _, err = io.WriteString(w, report.SingleFindingMarkdownLocalized(f, now, locale)); err != nil {
 			return err
 		}
+		for i, shot := range f.Screenshots {
+			w, err := zw.Create(report.ScreenshotPath(f.ID, i, shot.MIME))
+			if err != nil {
+				return err
+			}
+			if _, err := w.Write(shot.Image); err != nil {
+				return err
+			}
+		}
 		for _, b := range f.TrafficBindings {
 			prefix := fmt.Sprintf("evidence/%d/%d/", f.ID, b.ID)
 			w, err := zw.Create(prefix + "manifest.json")

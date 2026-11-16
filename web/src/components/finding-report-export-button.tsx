@@ -45,10 +45,30 @@ export function FindingReportExportButton({ findingId, contextTask }: { findingI
     }
   }
 
+  async function exportWord() {
+    if (busy.current) return;
+    busy.current = true;
+    setLoading(true);
+    try {
+      await api.exportFindings({ format: "docx", scope: "selected", ids: [findingId], locale });
+      toast.success(tr("Word 报告已导出", "Word report exported"));
+    } catch (error) {
+      toast.error(tr("导出失败：", "Export failed: ") + (error instanceof Error ? error.message : tr("请重试", "Please retry")));
+    } finally {
+      busy.current = false;
+      setLoading(false);
+    }
+  }
+
   return (
+    <>
     <Button variant="outline" size="sm" onClick={() => void exportMarkdown()} disabled={loading}>
       {loading ? <Loader2Icon className="animate-spin" /> : <DownloadIcon />}
       {tr("导出 Markdown", "Export Markdown")}
     </Button>
+    <Button variant="outline" size="sm" onClick={() => void exportWord()} disabled={loading}>
+      <DownloadIcon /> {tr("导出 Word", "Export Word")}
+    </Button>
+    </>
   );
 }

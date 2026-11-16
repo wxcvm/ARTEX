@@ -16,6 +16,8 @@ import { CopyButton } from "@/components/copy-button";
 import { FindingReportExportButton } from "@/components/finding-report-export-button";
 import { FindingRetestPanel } from "@/components/finding-retest-panel";
 import { FindingTrafficPanel } from "@/components/finding-traffic-panel";
+import { FindingScreenshotPanel } from "@/components/finding-screenshot-panel";
+import { FindingReproductionPanel } from "@/components/finding-reproduction-panel";
 import { Markdown } from "@/components/markdown";
 import { StatusBadge } from "@/components/status-badge";
 import { Alert, AlertDescription } from "@/components/ui/alert";
@@ -201,6 +203,18 @@ function FindingDetailInner() {
                 contextTask={contextTaskId || undefined}
                 readOnly={finding.inherited}
                 onChanged={load}
+              />
+              <FindingScreenshotPanel
+                key={`screenshots:${id}:${contextTaskId}`}
+                findingId={id}
+                contextTask={contextTaskId || undefined}
+                readOnly={finding.inherited}
+              />
+              <FindingReproductionPanel
+                key={`reproduction:${id}:${contextTaskId}`}
+                findingId={id}
+                contextTask={contextTaskId || undefined}
+                readOnly={finding.inherited}
               />
               {/* Below evidence: detailed report (rendered Markdown) */}
               <Card>
