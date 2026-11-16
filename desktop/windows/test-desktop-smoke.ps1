@@ -18,6 +18,7 @@ try {
     # database, and verifies that WebView2 actually navigates to the UI.
     $server = Start-ThreadJob -ArgumentList $requestLog -ScriptBlock {
         param($file)
+        $ErrorActionPreference = "Stop"
         $listener = [System.Net.Sockets.TcpListener]::new([System.Net.IPAddress]::Loopback, 8787)
         $listener.Start()
         try {
@@ -53,6 +54,14 @@ try {
                     $headerBytes = [Text.Encoding]::UTF8.GetBytes($head)
                     $stream.Write($headerBytes, 0, $headerBytes.Length)
                     $stream.Write($bytes, 0, $bytes.Length)
+                } catch {
+                    # Chromium may open an idle speculative connection or close
+                    # a socket before sending a request. A single client must
+                    # not terminate the fixture (ReadLine has a 1s timeout).
+                    $cause = $_.Exception
+                    while ($cause.InnerException) { $cause = $cause.InnerException }
+                    if ($cause -is [System.IO.IOException] -or $cause -is [System.Net.Sockets.SocketException]) { continue }
+                    throw
                 } finally {
                     $client.Dispose()
                 }
@@ -65,7 +74,7 @@ try {
     $serverReady = $false
     for ($i = 0; $i -lt 40; $i++) {
         if ($server.State -eq "Failed") {
-            throw "Local HTTP fixture failed: $($server.ChildJobs[0].JobStateInfo.Reason)"
+            throw "Local HTTP fixture failed: $($server.JobStateInfo.Reason)"
         }
         try {
             $health = Invoke-RestMethod "http://127.0.0.1:8787/api/health" -TimeoutSec 1
@@ -75,9 +84,24 @@ try {
     }
     if (-not $serverReady) { throw "Local HTTP fixture did not start" }
 
+    # Regression: a speculative idle connection must not kill the fixture.
+    # Verify a real health request still succeeds after its read timeout.
+    $idleClient = [System.Net.Sockets.TcpClient]::new()
+    try {
+        $idleClient.Connect("127.0.0.1", 8787)
+        Start-Sleep -Milliseconds 1500
+    } finally { $idleClient.Dispose() }
+    if ($server.State -ne "Running") { throw "Local HTTP fixture died on an idle connection: $($server.JobStateInfo.Reason)" }
+    $health = Invoke-RestMethod "http://127.0.0.1:8787/api/health" -TimeoutSec 5
+    if ($health.service -ne "artex") { throw "Local HTTP fixture health failed after idle connection" }
+    Write-Host "[ARTEX] HTTP fixture survives idle browser connections."
+
     $desktop = Start-Process -FilePath $program -WorkingDirectory (Split-Path $program) -PassThru
     $navigated = $false
     for ($i = 0; $i -lt 240; $i++) {
+        if ($server.State -ne "Running") {
+            throw "Local HTTP fixture stopped before WebView2 navigation: $($server.State); $($server.JobStateInfo.Reason)"
+        }
         $desktop.Refresh()
         if ($desktop.HasExited) {
             throw "ARTEX desktop exited before navigating (code $($desktop.ExitCode))"
