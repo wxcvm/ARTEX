@@ -294,21 +294,31 @@ func isUnsupportedVersion(err error) bool {
 
 // Tools lists the server's tools and adapts them to CoreTools.
 func (c *Client) Tools(ctx context.Context) ([]actool.CoreTool, error) {
-	raw, err := c.call(ctx, "tools/list", map[string]any{})
-	if err != nil {
-		return nil, err
+	out := make([]actool.CoreTool, 0)
+	params := map[string]any{}
+	seenCursors := map[string]bool{}
+	seenNames := map[string]bool{}
+	for {
+		if err := ctx.Err(); err != nil { return nil, err }
+		raw, err := c.call(ctx, "tools/list", params)
+		if err != nil { return nil, err }
+		var res struct {
+			Tools []remoteTool `json:"tools"`
+			NextCursor *string `json:"nextCursor"`
+		}
+		if err := json.Unmarshal(raw, &res); err != nil { return nil, err }
+		if res.Tools == nil { return nil, errors.New("mcp: tools/list response missing tools array") }
+		for _, rt := range res.Tools {
+			if rt.Name == "" || seenNames[rt.Name] { return nil, errors.New("mcp: tools/list contains an empty or duplicate tool name") }
+			seenNames[rt.Name] = true
+			out = append(out, c.wrap(rt))
+		}
+		if res.NextCursor == nil { return out, nil }
+		cursor := *res.NextCursor
+		if seenCursors[cursor] { return nil, errors.New("mcp: tools/list repeated pagination cursor") }
+		seenCursors[cursor] = true
+		params = map[string]any{"cursor": cursor}
 	}
-	var res struct {
-		Tools []remoteTool `json:"tools"`
-	}
-	if err := json.Unmarshal(raw, &res); err != nil {
-		return nil, err
-	}
-	out := make([]actool.CoreTool, 0, len(res.Tools))
-	for _, rt := range res.Tools {
-		out = append(out, c.wrap(rt))
-	}
-	return out, nil
 }
 
 type remoteTool struct {

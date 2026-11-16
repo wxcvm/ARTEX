@@ -980,6 +980,27 @@ func (d *DB) SaveMCPTools(serverID int64, tools []MCPTool) error {
 		return err
 	}
 	defer tx.Rollback()
+	if err := replaceMCPToolsTx(tx, serverID, tools); err != nil {
+		return err
+	}
+	return tx.Commit()
+}
+
+// SaveMCPDiscovery commits a complete catalog and its success state together.
+func (d *DB) SaveMCPDiscovery(serverID int64, tools []MCPTool) error {
+	tx, err := d.Begin()
+	if err != nil { return err }
+	defer tx.Rollback()
+	res, err := tx.Exec(`UPDATE mcp_servers SET last_connect_at=now(),last_connect_ok=true,last_connect_err=NULL WHERE id=$1`,serverID)
+	if err != nil { return err }
+	n, err := res.RowsAffected()
+	if err != nil { return err }
+	if n != 1 { return sql.ErrNoRows }
+	if err := replaceMCPToolsTx(tx, serverID, tools); err != nil { return err }
+	return tx.Commit()
+}
+
+func replaceMCPToolsTx(tx *sql.Tx, serverID int64, tools []MCPTool) error {
 	if _, err := tx.Exec(`DELETE FROM mcp_tools_cache WHERE server_id=$1`, serverID); err != nil {
 		return err
 	}
@@ -989,7 +1010,7 @@ ON CONFLICT (server_id, tool_name) DO UPDATE SET description=EXCLUDED.descriptio
 			return err
 		}
 	}
-	return tx.Commit()
+	return nil
 }
 
 // UpdateMCPHealth records the outcome of one connect attempt. The WHERE clause
