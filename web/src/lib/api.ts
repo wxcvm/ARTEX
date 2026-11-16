@@ -627,7 +627,7 @@ export const api = {
     get<FindingStats>(`/exploration/findings/stats?${findingFilterParams(q).toString()}`),
   taskReportLibrary: (q="",format="",offset=0) => get<import("./types").TaskReportLibraryItem[]>(`/report/library?${new URLSearchParams({q,format,offset:String(offset)})}`),
   taskReportSnapshots: (task:string,offset=0) => get<import("./types").TaskReportSnapshot[]>(`/report/snapshots?${new URLSearchParams({task,offset:String(offset)})}`),
-  saveTaskReportSnapshot: (task:string,format:"md"|"docx",scope:"all"|"confirmed",locale:string,layout:"simple"|"professional",template:string,name:string) => post<import("./types").TaskReportSnapshot>(`/report/snapshots?${new URLSearchParams({task,format,scope,lang:locale==="zh-TW"?"zh-CN":locale,layout,template,name})}`,{}),
+  saveTaskReportSnapshot: (task:string,format:"md"|"docx",scope:"all"|"confirmed",locale:string,layout:"simple"|"professional",template:string,name:string) => post<import("./types").TaskReportSnapshot>(`/report/snapshots?${new URLSearchParams({task,format,scope,lang:locale,layout,template,name})}`,{}),
   deleteTaskReportSnapshot: (task:string,id:string) => del<{ok:boolean}>(`/report/snapshots/${encodeURIComponent(id)}?${new URLSearchParams({task})}`),
   downloadTaskReportSnapshot: async(task:string,id:string,format:"md"|"docx") => {
     const token=getToken();
@@ -650,7 +650,7 @@ export const api = {
     filters?: Omit<FindingQuery, "page" | "pageSize">;
     ids?: string[];
   }) => {
-    const p = new URLSearchParams({ format: opts.format, scope: opts.scope, lang: opts.locale === "en" ? "en" : "zh-CN" });
+    const p = new URLSearchParams({ format: opts.format, scope: opts.scope, lang: opts.locale ?? "zh-CN" });
     if (opts.format === "docx" && opts.layout) p.set("layout", opts.layout);
     if (opts.format === "docx" && opts.template) p.set("template",opts.template);
     if (opts.scope === "selected") {
@@ -993,7 +993,7 @@ export const api = {
   report: async (task?: string, locale: "zh-CN" | "zh-TW" | "en" = "zh-CN", scope: "all" | "confirmed" = "all") => {
     if (MOCK) return taskOutcomeScenarioReport(task ?? "") ?? mockReport(task);
     const token = getToken();
-    const params = new URLSearchParams({ lang: locale === "en" ? "en" : "zh-CN", scope });
+    const params = new URLSearchParams({ lang: locale, scope });
     if (task) params.set("task", task);
     const r = await fetch(`/api/report?${params}`, {
       headers: token ? { Authorization: `Bearer ${token}` } : {},
@@ -1003,7 +1003,7 @@ export const api = {
   },
   reportDOCX: async (task: string, locale: "zh-CN" | "zh-TW" | "en" = "zh-CN", scope: "all" | "confirmed" = "all", layout: "simple" | "professional" = "professional", template?: string) => {
     const token = getToken();
-    const params = new URLSearchParams({ task, lang: locale === "en" ? "en" : "zh-CN", format: "docx", scope, layout });
+    const params = new URLSearchParams({ task, lang: locale, format: "docx", scope, layout });
     if(template) params.set("template",template);
     const r = await fetch(`/api/report?${params}`, {
       headers: token ? { Authorization: `Bearer ${token}` } : {},

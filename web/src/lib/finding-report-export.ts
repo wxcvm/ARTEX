@@ -50,7 +50,7 @@ export function findingReportFilename(finding: Finding): string {
 }
 
 export function buildFindingReportMarkdown({ finding, lineage, traffic, packets, retests }: FindingReportData, locale: "zh-CN" | "zh-TW" | "en" = "zh-CN"): string {
-  const tr = (zh: string, en: string) => locale === "en" ? en : zh;
+  const tr = (zh: string, en: string) => locale === "en" ? en : locale === "zh-TW" ? traditionalReportLabels[zh] ?? zh : zh;
   const lines = [
     "# " + inline(finding.name || finding.vulnclass || tr("未命名漏洞", "Untitled finding")), "",
     tr("- 漏洞 ID：", "- Finding ID: ") + inline(finding.id),
@@ -104,3 +104,47 @@ export function buildFindingReportMarkdown({ finding, lineage, traffic, packets,
     ...lineage.edges.map((edge) => "- " + inline(edge.src) + " → " + inline(edge.rel) + " → " + inline(edge.dst)));
   return lines.join("\n").trimEnd() + "\n";
 }
+
+// Translate only generated labels, not the saved findings or traffic payloads.
+const traditionalReportLabels: Record<string, string> = {
+  "未命名漏洞": "未命名漏洞",
+  "- 漏洞 ID：": "- 漏洞 ID：",
+  "- 类型：": "- 類型：",
+  "未分类": "未分類",
+  "- 严重程度：": "- 嚴重程度：",
+  "- 状态：": "- 狀態：",
+  "- 发现时间：": "- 發現時間：",
+  "- 任务：": "- 任務：",
+  "未知": "未知",
+  "- 来源任务：": "- 來源任務：",
+  "- 继承漏洞：是": "- 繼承漏洞：是",
+  "- 资产：": "- 資產：",
+  "；": "；",
+  "## 漏洞摘要": "## 漏洞摘要",
+  "（暂无）": "（暫無）",
+  "## 证据 / PoC": "## 證據 / PoC",
+  "## 详细报告": "## 詳細報告",
+  "**注意：** 证据已发生变更，详细报告可能尚未更新。": "**注意：** 證據已發生變更，詳細報告可能尚未更新。",
+  "## 关联 HTTP 流量证据": "## 關聯 HTTP 流量證據",
+  "- 流量 ID：": "- 流量 ID：",
+  "- 状态码：": "- 狀態碼：",
+  "- 说明：": "- 說明：",
+  "无": "無",
+  "**请求头**": "**請求標頭**",
+  "**请求正文**": "**請求內文**",
+  "（二进制正文未展开）": "（二進位內文未展開）",
+  "（空）": "（空）",
+  "（预览已截断，请在 ARTEX 中下载原始流量）": "（預覽已截斷，請在 ARTEX 中下載原始流量）",
+  "**响应头**": "**回應標頭**",
+  "**响应正文**": "**回應內文**",
+  "## 复测记录": "## 複測記錄",
+  "- 时间：": "- 時間：",
+  "- 结论：": "- 結論：",
+  "未给出": "未給出",
+  "**备注**": "**備註**",
+  "**摘要**": "**摘要**",
+  "**证据**": "**證據**",
+  "**错误**": "**錯誤**",
+  "## 漏洞溯源": "## 漏洞溯源",
+  "### 溯源关系": "### 溯源關係"
+};
