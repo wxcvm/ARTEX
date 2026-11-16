@@ -1,11 +1,14 @@
 package server
 
 import (
+	"archive/zip"
 	"bytes"
 	"encoding/json"
+	"fmt"
 	"image"
 	"image/color"
 	"image/png"
+	"io"
 	"mime/multipart"
 	"net/http/httptest"
 	"strings"
@@ -81,6 +84,54 @@ func TestFindingScreenshotAPI(t *testing.T) {
 	}
 	if w = req("GET", base, ""); !strings.Contains(w.Body.String(), "edited note") {
 		t.Fatal(w.Body)
+	}
+	finding, err := s.m.pg.GetFinding(f.FindingID)
+	if err != nil || finding.TaskID == nil {
+		t.Fatal("missing finding task", err)
+	}
+	for _, export := range []string{
+		fmt.Sprintf("/api/report?task=%d&scope=all&format=docx", *finding.TaskID),
+		fmt.Sprintf("/api/exploration/findings/export?scope=selected&ids=%d&format=docx", f.FindingID),
+		fmt.Sprintf("/api/exploration/findings/export?scope=selected&ids=%d&format=md-zip", f.FindingID),
+	} {
+		w = req("GET", export, "")
+		if w.Code != 200 {
+			t.Fatal(export, w.Code, w.Body)
+		}
+		z, err := zip.NewReader(bytes.NewReader(w.Body.Bytes()), int64(w.Body.Len()))
+		if err != nil {
+			t.Fatal(err)
+		}
+		foundImage, foundCaption := false, false
+		for _, entry := range z.File {
+			if strings.HasSuffix(entry.Name, ".png") {
+				r, err := entry.Open()
+				if err != nil {
+					t.Fatal(err)
+				}
+				_, err = png.Decode(r)
+				r.Close()
+				if err != nil {
+					t.Fatal(err)
+				}
+				foundImage = true
+			}
+			if entry.Name == "word/document.xml" || strings.HasSuffix(entry.Name, ".md") {
+				r, err := entry.Open()
+				if err != nil {
+					t.Fatal(err)
+				}
+				raw, err := io.ReadAll(r)
+				r.Close()
+				if err != nil {
+					t.Fatal(err)
+				}
+				foundCaption = foundCaption || strings.Contains(string(raw), "edited note")
+			}
+		}
+		if !foundImage || !foundCaption {
+			t.Fatal("export omitted screenshot or caption", export)
+		}
 	}
 	if w = req("DELETE", path, ""); w.Code != 200 {
 		t.Fatal(w.Code, w.Body)

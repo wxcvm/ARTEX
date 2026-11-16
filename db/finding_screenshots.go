@@ -131,3 +131,43 @@ func restoreFindingScreenshotsTx(tx *sql.Tx, snapshot *TaskArchiveSnapshot) erro
 	}
 	return insertArchiveRows(tx, "finding_screenshots", snapshot.Tables["finding_screenshots"])
 }
+
+type FindingScreenshotData struct {
+	FindingScreenshot
+	Image []byte `json:"-"`
+}
+
+// LoadFindingScreenshots reads only findings selected for the report.
+func (d *DB) LoadFindingScreenshots(ctx context.Context, findings []*DBFinding, includeImages bool) error {
+	if len(findings) == 0 {
+		return nil
+	}
+	return d.WithEvidenceTx(ctx, func(tx *sql.Tx) error {
+		for _, f := range findings {
+			query := `SELECT ` + screenshotCols + `, NULL::bytea FROM finding_screenshots WHERE finding_id=$1 ORDER BY created_at,id`
+			if includeImages {
+				query = `SELECT ` + screenshotCols + `, image FROM finding_screenshots WHERE finding_id=$1 ORDER BY created_at,id`
+			}
+			rows, err := tx.QueryContext(ctx, query, f.ID)
+			if err != nil {
+				return err
+			}
+			var shots []FindingScreenshotData
+			for rows.Next() {
+				var shot FindingScreenshotData
+				if err := rows.Scan(&shot.ID, &shot.BindingID, &shot.Caption, &shot.MIME, &shot.CreatedAt, &shot.Image); err != nil {
+					rows.Close()
+					return err
+				}
+				shots = append(shots, shot)
+			}
+			err = rows.Err()
+			rows.Close()
+			if err != nil {
+				return err
+			}
+			f.Screenshots = shots
+		}
+		return nil
+	})
+}

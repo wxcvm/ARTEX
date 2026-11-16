@@ -92,6 +92,7 @@ func FindingsMarkdownLocalized(fs []*db.DBFinding, generatedAt time.Time, locale
 			b.WriteString("\n\n")
 		}
 		b.WriteString(findingTrafficMarkdownLocalized(f, false, locale))
+		b.WriteString(findingScreenshotsMarkdown(f, false, locale, "####"))
 		b.WriteString("---\n\n")
 	}
 	return b.String()
@@ -128,6 +129,7 @@ func SingleFindingMarkdownLocalized(f *db.DBFinding, generatedAt time.Time, loca
 		b.WriteString("\n")
 	}
 	b.WriteString(findingTrafficMarkdownLocalized(f, true, locale))
+	b.WriteString(findingScreenshotsMarkdown(f, true, locale, "##"))
 	return b.String()
 }
 

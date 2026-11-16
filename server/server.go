@@ -2318,6 +2318,12 @@ func (s *Server) findingsExport(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 	}
+	if format == "docx" || format == "md-zip" || format == "md-single" {
+		if err := s.m.pg.LoadFindingScreenshots(r.Context(), fs, format != "md-single"); err != nil {
+			writeErr(w, 500, "failed to read screenshot evidence")
+			return
+		}
+	}
 	now := time.Now()
 	stamp := now.Format("20060102-150405")
 	setDownload := func(contentType, filename string) {
@@ -2330,7 +2336,7 @@ func (s *Server) findingsExport(w http.ResponseWriter, r *http.Request) {
 		setDownload("text/markdown; charset=utf-8", "findings-"+stamp+".md")
 		_, _ = w.Write([]byte(report.FindingsMarkdownLocalized(fs, now, report.ReportLocale(q.Get("lang")))))
 	case "docx":
-		payload, err := report.DOCX(report.FindingsMarkdownLocalized(fs, now, report.ReportLocale(q.Get("lang"))))
+		payload, err := report.DOCXWithScreenshots(report.FindingsMarkdownLocalized(fs, now, report.ReportLocale(q.Get("lang"))), fs, report.ReportLocale(q.Get("lang")))
 		if err != nil {
 			writeErr(w, 500, "failed to generate Word report")
 			return
@@ -4080,6 +4086,10 @@ func (s *Server) getReport(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 	}
+	if err := s.m.pg.LoadFindingScreenshots(r.Context(), included, r.URL.Query().Get("format") == "docx"); err != nil {
+		writeErr(w, 500, "failed to read screenshot evidence")
+		return
+	}
 	counts := map[string]int{}
 	for _, ty := range []string{"root_domain", "ip", "subdomain", "app", "service", "endpoint"} {
 		ns, _ := s.m.Assets().QueryByType(ty, 100000, 0)
@@ -4097,7 +4107,7 @@ func (s *Server) getReport(w http.ResponseWriter, r *http.Request) {
 		FindingMeta: meta, FindingDetails: details, ConfirmedOnly: scope == "confirmed",
 	}, report.ReportLocale(r.URL.Query().Get("lang")))
 	if r.URL.Query().Get("format") == "docx" {
-		data, err := report.DOCX(md)
+		data, err := report.DOCXWithScreenshots(md, included, report.ReportLocale(r.URL.Query().Get("lang")))
 		if err != nil {
 			writeErr(w, 500, "failed to generate Word report")
 			return
