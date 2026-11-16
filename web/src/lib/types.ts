@@ -1740,3 +1740,13 @@ export interface KnowledgeIndexCandidatePage {
   next: string;
   model: string;
 }
+
+export interface ReleaseUpdate {
+  current: string;
+  latest: string;
+  comparable: boolean;
+  has_update: boolean;
+  release_url: string;
+  published_at: string;
+  assets: {name:string;size:number;url:string}[];
+}

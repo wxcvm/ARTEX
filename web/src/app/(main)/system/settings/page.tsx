@@ -14,6 +14,7 @@ import { Switch } from "@/components/ui/switch";
 import { useUiLocale } from "@/lib/ui-locale.client";
 import { uiText } from "@/lib/ui-locale";
 import { api } from "@/lib/api";
+import { ReleaseUpdateCard } from "./_components/release-update-card";
 import { CHAT_SEND_MODE_OPTIONS, type ChatSendMode, setChatSendMode, useChatSendMode } from "@/lib/chat-send-mode";
 import type { Settings } from "@/lib/types";
 
@@ -272,6 +273,7 @@ export default function SystemSettingsPage() {
           balance-fill by content height. Card spacing uses mb rather than gap — in a multi-column layout
           column-gap only covers the gaps between columns; row spacing must come from the children. */}
       <div className="columns-1 gap-4 xl:columns-2 xl:gap-5">
+        <ReleaseUpdateCard />
         <Card className="mb-4 min-w-0 break-inside-avoid rounded-xl border-border/70 bg-card/90 shadow-sm xl:mb-5">
           <CardHeader>
             <CardTitle className="flex items-center gap-2 text-base">
