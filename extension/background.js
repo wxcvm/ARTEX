@@ -228,7 +228,12 @@ chrome.debugger.onDetach.addListener((source) => {
     session.requests.clear();
     session.lastError = "debugger detached (DevTools opened?)";
     chrome.action.setBadgeText({ text: "" });
-    void Promise.allSettled([...pendingResponses]).then(() => flush());
+    void Promise.allSettled([...pendingResponses]).then(async () => {
+      await flush();
+      // A successful upload must not erase why capture unexpectedly ended.
+      if (!session.lastError) session.lastError = "debugger detached (DevTools opened?)";
+      await saveState();
+    });
   }
 });
 
