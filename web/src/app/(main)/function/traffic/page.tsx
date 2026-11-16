@@ -21,6 +21,7 @@ import {
 import { toast } from "sonner";
 
 import { HttpCodeBlock } from "@/components/http-code-block";
+import { HarInspectionPanel } from "@/components/har-inspection-panel";
 import { LinkTrafficDialog } from "@/components/link-traffic-dialog";
 import {
   AlertDialog,
@@ -373,6 +374,8 @@ export default function TrafficPage() {
           </span>
         </div>
       </header>
+
+      <HarInspectionPanel />
 
       {/* Toolbar */}
       <div className="flex min-w-0 flex-wrap items-center gap-2 rounded-xl border border-border/70 bg-card/90 p-3 shadow-sm sm:p-4">
