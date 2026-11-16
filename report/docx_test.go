@@ -11,7 +11,7 @@ import (
 
 func TestDOCX(t *testing.T) {
 	fence := strings.Repeat(string(rune(96)), 3)
-	md := "# 安全测试报告\n## Findings\n### 1. Example\n" + fence + "\n# literal <tag> & value\n" + fence + "\n## Coverage\n"
+	md := "# 安全测试报告\n## Findings\n### 1. Example\n#### Linked evidence\n" + fence + "\n# literal <tag> & value\n" + fence + "\n## Coverage\n"
 	data, err := DOCX(md)
 	if err != nil {
 		t.Fatal(err)
@@ -46,7 +46,7 @@ func TestDOCX(t *testing.T) {
 			t.Fatalf("missing %s", name)
 		}
 	}
-	for _, want := range []string{"安全测试报告", "Findings", "1. Example", "# literal &lt;tag&gt; &amp; value", "Coverage", "w:val=\"Heading1\"", "w:val=\"Code\""} {
+	for _, want := range []string{"安全测试报告", "Findings", "1. Example", "# literal &lt;tag&gt; &amp; value", "Coverage", "Linked evidence", "w:val=\"Heading1\"", "w:val=\"Heading3\"", "w:val=\"Code\""} {
 		if !strings.Contains(parts["word/document.xml"], want) {
 			t.Fatalf("missing %q", want)
 		}
