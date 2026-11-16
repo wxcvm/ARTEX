@@ -2328,6 +2328,14 @@ func (s *Server) findingsExport(w http.ResponseWriter, r *http.Request) {
 	case "md-single":
 		setDownload("text/markdown; charset=utf-8", "findings-"+stamp+".md")
 		_, _ = w.Write([]byte(report.FindingsMarkdownLocalized(fs, now, report.ReportLocale(q.Get("lang")))))
+	case "docx":
+		payload, err := report.DOCX(report.FindingsMarkdownLocalized(fs, now, report.ReportLocale(q.Get("lang"))))
+		if err != nil {
+			writeErr(w, 500, "failed to generate Word report")
+			return
+		}
+		setDownload(report.DOCXContentType, "findings-"+stamp+".docx")
+		_, _ = w.Write(payload)
 	case "md-zip":
 		path := filepath.Join(stage, "findings.zip")
 		if err := buildFindingsEvidenceZip(path, fs, stage, now, report.ReportLocale(q.Get("lang"))); err != nil {

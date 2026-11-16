@@ -582,7 +582,7 @@ export const api = {
   // exportFindings triggers the findings page export and downloads the file. scope=selected
   // sends ids (a finding_id list); scope=filtered sends the current filters (the FindingQuery filter fields); scope=all ignores filters.
   exportFindings: async (opts: {
-    format: "md-single" | "md-zip" | "csv" | "json" | "sarif";
+    format: "md-single" | "md-zip" | "csv" | "json" | "sarif" | "docx";
     locale?: "zh-CN" | "en";
     scope: "filtered" | "all" | "selected";
     filters?: Omit<FindingQuery, "page" | "pageSize">;

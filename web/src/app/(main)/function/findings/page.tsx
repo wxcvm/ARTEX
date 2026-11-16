@@ -258,7 +258,7 @@ export default function FindingsPage() {
   // Export dialog state: scope (current filter / all / selected) × format (Markdown / CSV / JSON / SARIF).
   const [exportOpen, setExportOpen] = React.useState(false);
   const [exportScope, setExportScope] = React.useState<"filtered" | "all" | "selected">("filtered");
-  const [exportFormat, setExportFormat] = React.useState<"md-single" | "md-zip" | "csv" | "json" | "sarif">("md-single");
+  const [exportFormat, setExportFormat] = React.useState<"md-single" | "md-zip" | "csv" | "json" | "sarif" | "docx">("md-single");
   const [exporting, setExporting] = React.useState(false);
 
   const toggleSelected = React.useCallback((id: string, checked: boolean) => {
@@ -1242,6 +1242,9 @@ export default function FindingsPage() {
                 </label>
                 <label htmlFor="export-format-md-zip" className="flex items-center gap-2 text-sm">
                   <RadioGroupItem id="export-format-md-zip" value="md-zip" /> Markdown per finding (one .md per vulnerability, packaged as .zip)
+                </label>
+                <label htmlFor="export-format-docx" className="flex items-center gap-2 text-sm">
+                  <RadioGroupItem id="export-format-docx" value="docx" /> {tr("Word 汇总报告（.docx）", "Word summary report (.docx)")}
                 </label>
                 <label htmlFor="export-format-csv" className="flex items-center gap-2 text-sm">
                   <RadioGroupItem id="export-format-csv" value="csv" /> CSV table (.csv)

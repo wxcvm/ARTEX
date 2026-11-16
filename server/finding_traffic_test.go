@@ -201,6 +201,32 @@ func TestFindingTrafficAPIAndExport(t *testing.T) {
 	if w.Code != 200 {
 		t.Fatal(w.Code, w.Body)
 	}
+	word := req("GET", fmt.Sprintf("/api/exploration/findings/export?format=docx&scope=selected&ids=%d", f.FindingID), "")
+	if word.Code != 200 || !strings.Contains(word.Header().Get("Content-Type"), "wordprocessingml.document") {
+		t.Fatal("Word export", word.Code, word.Header())
+	}
+	wordArchive, err := zip.NewReader(bytes.NewReader(word.Body.Bytes()), int64(word.Body.Len()))
+	if err != nil {
+		t.Fatal(err)
+	}
+	var document string
+	for _, entry := range wordArchive.File {
+		if entry.Name == "word/document.xml" {
+			r, err := entry.Open()
+			if err != nil {
+				t.Fatal(err)
+			}
+			data, err := io.ReadAll(r)
+			r.Close()
+			if err != nil {
+				t.Fatal(err)
+			}
+			document = string(data)
+		}
+	}
+	if document == "" || !strings.Contains(document, "漏洞发现汇总报告") {
+		t.Fatal("missing Word report document")
+	}
 	archive, err := zip.NewReader(bytes.NewReader(w.Body.Bytes()), int64(w.Body.Len()))
 	if err != nil {
 		t.Fatal(err)
