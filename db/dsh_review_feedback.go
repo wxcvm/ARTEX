@@ -33,6 +33,7 @@ type DSHReviewImportResult struct {
     Imported int `json:"imported"`
     Missing int `json:"missing"`
     TaskMismatch int `json:"task_mismatch"`
+    SkippedNotNewer int `json:"skipped_not_newer"`
 }
 
 type DSHReviewRow struct {
@@ -100,7 +101,7 @@ func (d *DB) ImportDSHReviewFeedback(input DSHReviewFeedback) (DSHReviewImportRe
             result.TaskMismatch++
             continue
         }
-        _, err = tx.Exec(`INSERT INTO finding_dsh_reviews(
+        res, err := tx.Exec(`INSERT INTO finding_dsh_reviews(
             finding_id, dsh_engagement, source_task_id, inspected_evidence_version,
             review_status, note, source_updated_at)
             VALUES ($1,$2,$3,$4,$5,$6,$7)
@@ -109,10 +110,16 @@ func (d *DB) ImportDSHReviewFeedback(input DSHReviewFeedback) (DSHReviewImportRe
                 inspected_evidence_version=excluded.inspected_evidence_version,
                 review_status=excluded.review_status, note=excluded.note,
                 source_updated_at=excluded.source_updated_at, imported_at=now()
-            WHERE finding_dsh_reviews.source_updated_at <= excluded.source_updated_at`,
+            WHERE finding_dsh_reviews.source_updated_at < excluded.source_updated_at`,
             item.FindingID, input.Engagement, item.TaskID, item.EvidenceVersion,
             item.Status, item.Note, item.UpdatedAt)
         if err != nil { return result, err }
+        n, err := res.RowsAffected()
+        if err != nil { return result, err }
+        if n == 0 {
+            result.SkippedNotNewer++
+            continue
+        }
         result.Imported++
     }
     if err := tx.Commit(); err != nil { return result, err }
