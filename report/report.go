@@ -19,7 +19,9 @@ type Input struct {
 	GeneratedAt time.Time
 	AssetCounts map[string]int
 	Findings    []*db.Node
-	Coverage    *db.CoverageLedger
+	Coverage      *db.CoverageLedger
+	FindingMeta   map[int64]db.FindingMeta // authoritative standalone finding status
+	ConfirmedOnly bool
 }
 
 type findingView struct {
@@ -28,6 +30,7 @@ type findingView struct {
 	Severity  string
 	Summary   string
 	PoC       string
+	Status    string
 }
 
 func parseFinding(n *db.Node) findingView {
@@ -41,7 +44,7 @@ func parseFinding(n *db.Node) findingView {
 		} `json:"evidence"`
 	}
 	_ = json.Unmarshal(n.Payload, &p)
-	return findingView{p.VulnClass, p.Name, p.Severity, p.Summary, p.Evidence.PoC}
+	return findingView{VulnClass: p.VulnClass, Name: p.Name, Severity: p.Severity, Summary: p.Summary, PoC: p.Evidence.PoC}
 }
 
 var sevRank = map[string]int{"critical": 0, "high": 1, "medium": 2, "low": 3, "": 4}
@@ -59,9 +62,28 @@ func MarkdownLocalized(in Input, locale string) string {
 	fmt.Fprintf(&b, tr("- **任务目标**：%s\n", "- **Task goal**: %s\n"), nz(in.Goal, tr("（未指定）", "(unspecified)")))
 	fmt.Fprintf(&b, tr("- **生成时间**：%s\n\n", "- **Generated at**: %s\n\n"), in.GeneratedAt.Format("2006-01-02 15:04:05"))
 
+	fs := make([]findingView, 0, len(in.Findings))
+	confirmed := 0
+	for _, n := range in.Findings {
+		f := parseFinding(n)
+		f.Status = in.FindingMeta[n.ID].Status
+		if f.Status == db.FindingConfirmed {
+			confirmed++
+		}
+		if !in.ConfirmedOnly || f.Status == db.FindingConfirmed {
+			fs = append(fs, f)
+		}
+	}
+
 	// summary
 	b.WriteString(tr("## 摘要\n\n", "## Summary\n\n"))
-	fmt.Fprintf(&b, tr("- 已确认发现：**%d**\n", "- Confirmed findings: **%d**\n"), len(in.Findings))
+	fmt.Fprintf(&b, tr("- 已确认发现：**%d**\n", "- Confirmed findings: **%d**\n"), confirmed)
+	fmt.Fprintf(&b, tr("- 本报告收录：**%d**\n", "- Findings included: **%d**\n"), len(fs))
+	if in.ConfirmedOnly {
+		b.WriteString(tr("- 收录范围：仅已确认\n", "- Scope: confirmed only\n"))
+	} else {
+		b.WriteString(tr("- 收录范围：全部发现（包含待确认及其他状态）\n", "- Scope: all findings (including unconfirmed and other states)\n"))
+	}
 	b.WriteString(tr("- 资产：", "- Assets: "))
 	var types []string
 	for t := range in.AssetCounts {
@@ -78,16 +100,17 @@ func MarkdownLocalized(in Input, locale string) string {
 
 	// findings
 	b.WriteString(tr("## 发现结果\n\n", "## Findings\n\n"))
-	if len(in.Findings) == 0 {
-		b.WriteString(tr("_本次未确认漏洞；这不代表不存在安全问题。_\n\n", "_No vulnerabilities confirmed this time._\n\n"))
-	} else {
-		fs := make([]findingView, 0, len(in.Findings))
-		for _, n := range in.Findings {
-			fs = append(fs, parseFinding(n))
+	if len(fs) == 0 {
+		if in.ConfirmedOnly {
+			b.WriteString(tr("_当前没有已确认漏洞；这不代表不存在安全问题。_\n\n", "_No confirmed vulnerabilities at present; this does not establish safety._\n\n"))
+		} else {
+			b.WriteString(tr("_当前没有发现记录；这不代表不存在安全问题。_\n\n", "_No finding records at present; this does not establish safety._\n\n"))
 		}
+	} else {
 		sort.SliceStable(fs, func(i, j int) bool { return sevRank[fs[i].Severity] < sevRank[fs[j].Severity] })
 		for i, f := range fs {
 			fmt.Fprintf(&b, "### %d. [%s] %s\n\n", i+1, reportSeverity(locale, nz(f.Severity, "info")), nz(f.Name, nz(f.VulnClass, tr("未分类", "Uncategorized"))))
+			fmt.Fprintf(&b, tr("- 状态：%s\n\n", "- Status: %s\n\n"), taskFindingStatus(locale, f.Status))
 			fmt.Fprintf(&b, "%s\n\n", nz(f.Summary, ""))
 			if f.PoC != "" {
 				fmt.Fprintf(&b, tr("**PoC / 证据：**\n\n```\n%s\n```\n\n", "**PoC / Evidence:**\n\n```\n%s\n```\n\n"), f.PoC)
@@ -150,4 +173,21 @@ func reportAssetLabel(locale, value string) string {
 		return label
 	}
 	return value
+}
+
+// taskFindingStatus does not guess a triage state when metadata is absent.
+func taskFindingStatus(locale, status string) string {
+	if !db.ValidFindingStatus(status) {
+		return reportText(locale, "未知", "Unknown")
+	}
+	if locale == "en" {
+		return status
+	}
+	return map[string]string{
+		db.FindingPending: "待确认", db.FindingInProgress: "处理中",
+		db.FindingConfirmed: "已确认", db.FindingResolved: "已解决",
+		db.FindingFixed: "已修复", db.FindingFalsePositive: "误报",
+		db.FindingIgnored: "已忽略", db.FindingDuplicate: "重复",
+		db.FindingRiskAccepted: "风险已接受",
+	}[status]
 }

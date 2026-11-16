@@ -46,3 +46,37 @@ func TestLocalizedFindingExportsPreserveEvidence(t *testing.T) {
 		}
 	}
 }
+
+func TestTaskReportFindingScope(t *testing.T) {
+	in := Input{
+		Findings: []*db.Node{
+			{ID: 1, Payload: json.RawMessage(`{"name":"confirmed sample","severity":"high"}`)},
+			{ID: 2, Payload: json.RawMessage(`{"name":"pending sample","severity":"low"}`)},
+			{ID: 3, Payload: json.RawMessage(`{"name":"false positive sample","severity":"medium"}`)},
+			{ID: 4, Payload: json.RawMessage(`{"name":"unknown sample","severity":"low"}`)},
+		},
+		FindingMeta: map[int64]db.FindingMeta{
+			1: {Status: db.FindingConfirmed},
+			2: {Status: db.FindingPending},
+			3: {Status: db.FindingFalsePositive},
+		},
+	}
+	all := MarkdownLocalized(in, "en")
+	for _, want := range []string{"Confirmed findings: **1**", "Findings included: **4**", "confirmed sample", "pending sample", "false positive sample", "unknown sample", "Status: Unknown"} {
+		if !strings.Contains(all, want) {
+			t.Fatalf("all report missing %q", want)
+		}
+	}
+	in.ConfirmedOnly = true
+	for _, locale := range []string{"en", "zh-CN"} {
+		md := MarkdownLocalized(in, locale)
+		if !strings.Contains(md, "confirmed sample") {
+			t.Fatal("confirmed finding missing")
+		}
+		for _, excluded := range []string{"pending sample", "false positive sample", "unknown sample"} {
+			if strings.Contains(md, excluded) {
+				t.Fatalf("confirmed report includes %q", excluded)
+			}
+		}
+	}
+}

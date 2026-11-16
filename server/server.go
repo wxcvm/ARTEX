@@ -4029,6 +4029,21 @@ func (s *Server) getReport(w http.ResponseWriter, r *http.Request) {
 		writeErr(w, 404, "no active task")
 		return
 	}
+	scope := r.URL.Query().Get("scope")
+	if scope != "" && scope != "all" && scope != "confirmed" {
+		writeErr(w, 400, "invalid report scope")
+		return
+	}
+	taskID, err := strconv.ParseInt(t.ID, 10, 64)
+	if err != nil {
+		writeErr(w, 500, "invalid report task")
+		return
+	}
+	meta, err := s.m.pg.FindingMetaByNodeID(taskID)
+	if err != nil {
+		writeErr(w, 500, "failed to read finding status")
+		return
+	}
 	findings, err := t.Store.ListByKind(db.KindFinding, 1000) // pure vulnerabilities (facts are a separate KindFact and never enter the report)
 	if err != nil {
 		writeErr(w, 500, "failed to read report findings")
@@ -4043,12 +4058,12 @@ func (s *Server) getReport(w http.ResponseWriter, r *http.Request) {
 	}
 	var ledger *db.CoverageLedger
 	if t.CoverageEnabled && s.m.Assets() != nil {
-		taskID, _ := strconv.ParseInt(t.ID, 10, 64)
 		ledger, _ = s.m.Assets().CoverageLedger(taskID)
 	}
 	md := report.MarkdownLocalized(report.Input{
 		Title: t.Description, Goal: t.Goal, GeneratedAt: time.Now(),
 		AssetCounts: counts, Findings: findings, Coverage: ledger,
+		FindingMeta: meta, ConfirmedOnly: scope == "confirmed",
 	}, report.ReportLocale(r.URL.Query().Get("lang")))
 	if r.URL.Query().Get("format") == "docx" {
 		data, err := report.DOCX(md)

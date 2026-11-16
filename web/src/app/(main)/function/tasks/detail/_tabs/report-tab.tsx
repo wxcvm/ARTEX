@@ -19,7 +19,8 @@ export function ReportTab({ taskId }: { taskId: string }) {
   const locale = useUiLocale();
   const tr = (zh: string, en: string) => uiText(locale, zh, en);
   const [report, setReport] = React.useState<string>("");
-  const reportKey = `${taskId}:${locale}`;
+  const [scope, setScope] = React.useState<"confirmed" | "all">("confirmed");
+  const reportKey = `${taskId}:${locale}:${scope}`;
   const [reportTaskId, setReportTaskId] = React.useState(reportKey);
   // When the task changes, never display the previous task's report.
   const currentReport = reportTaskId === reportKey ? report : "";
@@ -35,7 +36,7 @@ export function ReportTab({ taskId }: { taskId: string }) {
     let active = true;
     setLoading(true);
     api
-      .report(taskId, locale)
+      .report(taskId, locale, scope)
       .then((text) => {
         if (active) {
           setReport(text);
@@ -56,7 +57,7 @@ export function ReportTab({ taskId }: { taskId: string }) {
     return () => {
       active = false;
     };
-  }, [taskId, locale, reportKey, refresh]);
+  }, [taskId, locale, scope, reportKey, refresh]);
 
   React.useEffect(() => {
     setCopied(false);
@@ -78,7 +79,7 @@ export function ReportTab({ taskId }: { taskId: string }) {
     if (exporting || loading || currentError || !currentReport) return;
     setExporting(true);
     try {
-      await api.reportDOCX(taskId, locale);
+      await api.reportDOCX(taskId, locale, scope);
       toast.success(tr("Word 报告已导出", "Word report exported"));
     } catch (cause) {
       toast.error(tr("导出失败：", "Export failed: ") + (cause instanceof Error ? cause.message : tr("请重试", "Please retry")));
@@ -123,6 +124,10 @@ export function ReportTab({ taskId }: { taskId: string }) {
           <p className="mt-1 text-xs text-muted-foreground">{tr("Markdown 报告 · 可滚动阅读、复制原文", "Markdown report · scroll to read or copy the original")}</p>
         </div>
         <div className="flex flex-wrap items-center gap-2">
+          <select aria-label={tr("报告收录范围", "Report scope")} value={scope} onChange={(e) => setScope(e.target.value === "all" ? "all" : "confirmed")} className="h-8 rounded-md border bg-background px-2 text-sm">
+            <option value="confirmed">{tr("仅已确认", "Confirmed only")}</option>
+            <option value="all">{tr("全部发现", "All findings")}</option>
+          </select>
           <Button size="sm" variant="outline" disabled={loading} onClick={() => setRefresh((n) => n + 1)}>
             <RefreshCwIcon className={loading ? "animate-spin" : ""} /> {currentError ? tr("重试加载", "Retry") : tr("刷新报告", "Refresh report")}
           </Button>

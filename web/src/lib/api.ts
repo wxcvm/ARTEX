@@ -886,10 +886,10 @@ export const api = {
     ).then((r) => ({ ...r, deliveries: arr(r.deliveries) }));
   },
   notifyRetryDelivery: (id: number) => post<{ ok: boolean }>(`/notify/deliveries/${id}/retry`),
-  report: async (task?: string, locale: "zh-CN" | "en" = "zh-CN") => {
+  report: async (task?: string, locale: "zh-CN" | "en" = "zh-CN", scope: "all" | "confirmed" = "all") => {
     if (MOCK) return taskOutcomeScenarioReport(task ?? "") ?? mockReport(task);
     const token = getToken();
-    const params = new URLSearchParams({ lang: locale });
+    const params = new URLSearchParams({ lang: locale, scope });
     if (task) params.set("task", task);
     const r = await fetch(`/api/report?${params}`, {
       headers: token ? { Authorization: `Bearer ${token}` } : {},
@@ -897,9 +897,9 @@ export const api = {
     if (!r.ok) throw new Error(`report: ${r.status}`);
     return r.text();
   },
-  reportDOCX: async (task: string, locale: "zh-CN" | "en" = "zh-CN") => {
+  reportDOCX: async (task: string, locale: "zh-CN" | "en" = "zh-CN", scope: "all" | "confirmed" = "all") => {
     const token = getToken();
-    const params = new URLSearchParams({ task, lang: locale, format: "docx" });
+    const params = new URLSearchParams({ task, lang: locale, format: "docx", scope });
     const r = await fetch(`/api/report?${params}`, {
       headers: token ? { Authorization: `Bearer ${token}` } : {},
     });
