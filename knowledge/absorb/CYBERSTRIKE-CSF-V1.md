@@ -29,3 +29,8 @@ The manifest test checks all nine unique IDs, source metadata and searchable tex
 ## Scope
 
 Nine reviewed reference documents are the first delivery, not a claim of complete CyberStrike knowledge absorption. No automatic CWE/severity mapping, active testing instructions, or wholesale upstream copy is included. Expand the catalog after source and duplication review.
+
+
+## 智能体检索验收
+
+CSF 分类或子分类编号（如 `GV.SC`、`PR.AA-05`）作为查询词时，匹配标题首编号的参考文档优先于只在标题中提及编号的资料；仍需满足原有全部检索词匹配，普通任务资料仍保留在结果中。验收通过现有 `kb_search` / `kb_get` 调用检查首包 9 条参考的编号、大小写、框架组合词和中文关键词检索，以及全局文档 UUID、来源路径及固定上游版本。测试只使用本地参考数据，不调用模型、外部检索或目标网络；实际模型选择和回答质量仍需独立实验。
