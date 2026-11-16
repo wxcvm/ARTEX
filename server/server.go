@@ -872,6 +872,7 @@ func (s *Server) Handler() http.Handler {
 	mux.HandleFunc("POST /api/settings/web-search/test", s.testWebSearch)
 	mux.HandleFunc("GET /api/report", s.getReport)
 	s.registerReportTemplates(mux)
+	s.registerReportSnapshots(mux)
 	mux.HandleFunc("GET /api/chat/mentions", s.searchChatMentions)
 	mux.HandleFunc("POST /api/chat", s.chat)
 	mux.HandleFunc("POST /api/chat/upload", s.chatUpload) // upload method 1: files land in uploads/ under the conversation/task work dir
@@ -4042,6 +4043,8 @@ func (s *Server) fallbackChat(t *Task, msg string) string {
 }
 
 func (s *Server) getReport(w http.ResponseWriter, r *http.Request) {
+	if r.Method=="POST" && r.URL.Query().Get("task")=="" {writeErr(w,400,"task is required");return}
+	if r.Method=="POST" && r.URL.Query().Get("format")!="md" && r.URL.Query().Get("format")!="docx" {writeErr(w,400,"invalid snapshot format");return}
 	t := s.m.ResolveTask(r.URL.Query().Get("task"))
 	if t == nil {
 		writeErr(w, 404, "no active task")
@@ -4130,11 +4133,13 @@ func (s *Server) getReport(w http.ResponseWriter, r *http.Request) {
 			writeErr(w, 500, "failed to generate Word report")
 			return
 		}
+		if r.Method=="POST" {s.saveGeneratedReport(w,r,taskID,data,template);return}
 		w.Header().Set("Content-Type", report.DOCXContentType)
 		w.Header().Set("Content-Disposition", `attachment; filename="task-report.docx"`)
 		_, _ = w.Write(data)
 		return
 	}
+	if r.Method=="POST" {s.saveGeneratedReport(w,r,taskID,[]byte(md),nil);return}
 	w.Header().Set("Content-Type", "text/markdown; charset=utf-8")
 	w.WriteHeader(200)
 	_, _ = w.Write([]byte(md))

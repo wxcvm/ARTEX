@@ -1251,6 +1251,19 @@ CREATE INDEX IF NOT EXISTS idx_finding_screenshots_order ON finding_screenshots(
 
 -- Explicit human-authored observations, optionally linked to captured traffic.
 -- User-managed knowledge documents are separate from the bundled read-only SQLite library.
+CREATE TABLE IF NOT EXISTS task_report_snapshots (
+    id TEXT PRIMARY KEY,
+    task_id BIGINT NOT NULL REFERENCES tasks(id) ON DELETE CASCADE,
+    name TEXT NOT NULL,
+    format TEXT NOT NULL CHECK (format IN ('md','docx')),
+    scope TEXT NOT NULL,
+    locale TEXT NOT NULL,
+    template_name TEXT NOT NULL DEFAULT '',
+    payload BYTEA NOT NULL,
+    created_at TIMESTAMPTZ NOT NULL DEFAULT now()
+);
+CREATE INDEX IF NOT EXISTS idx_task_report_snapshots_task ON task_report_snapshots(task_id, created_at DESC,id);
+
 CREATE TABLE IF NOT EXISTS report_templates (
     id TEXT PRIMARY KEY,
     name TEXT NOT NULL,
