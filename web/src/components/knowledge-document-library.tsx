@@ -8,7 +8,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { api } from "@/lib/api";
-import { KnowledgeEmbeddingSettings, KnowledgeIndexControl } from "@/components/knowledge-embedding-settings";
+import { KnowledgeEmbeddingSettings, KnowledgeIndexControl, KnowledgeBatchIndex } from "@/components/knowledge-embedding-settings";
 import type { KnowledgeDocument, KnowledgeRetrieval } from "@/lib/types";
 import { useUiLocale } from "@/lib/ui-locale.client";
 import { uiText } from "@/lib/ui-locale";
@@ -32,7 +32,11 @@ export function KnowledgeDocumentLibrary({taskId}: {taskId?: string}) {
   const [revision,setRevision] = React.useState(0);
   const [selected,setSelected] = React.useState<KnowledgeDocument | null>(null);
   const [draft,setDraft] = React.useState<Draft | null>(null);
-  const [file,setFile] = React.useState<File | null>(null);
+  const [files,setFiles] = React.useState<File[]>([]);
+  const [uploadProgress,setUploadProgress] = React.useState("");
+  const [uploadErrors,setUploadErrors] = React.useState<string[]>([]);
+  const stopUpload=React.useRef(false);
+  React.useEffect(()=>()=>{stopUpload.current=true;},[]);
   const [uploadCategory,setUploadCategory] = React.useState("");
   const [deleting,setDeleting] = React.useState(false);
   const [history,setHistory] = React.useState<KnowledgeRetrieval[] | null>(null);
@@ -82,15 +86,31 @@ export function KnowledgeDocumentLibrary({taskId}: {taskId?: string}) {
     finally{setBusy(false);}
   }
   async function upload(){
-    if(!file||busy)return;
-    setBusy(true);setError("");
+    if(!files.length||busy)return;
+    setBusy(true);setError("");setUploadErrors([]);stopUpload.current=false;
+    let count=0;
+    const failed:File[]=[];
+    let last:KnowledgeDocument|null=null;
+    const pending=[...files];
     try{
-      const doc=await api.uploadKnowledgeDocument(file,uploadCategory,taskId);
-      clearSelection();setSelected(doc);setFile(null);
+      for(let i=0;i<pending.length;i++){
+        if(stopUpload.current){failed.push(...pending.slice(i));break;}
+        const file=pending[i];
+        setUploadProgress((i+1)+"/"+pending.length+" · "+file.name);
+        try{
+          last=await api.uploadKnowledgeDocument(file,uploadCategory,taskId);
+          count++;
+        }catch(e){
+          failed.push(file);
+          setUploadErrors(old=>[...old,file.name+": "+(e as Error).message]);
+        }
+      }
+      setFiles(failed);
       if(input.current)input.current.value="";
-      refresh();toast.success(tr("文档已导入","Document imported"));
-    }catch(e){setError((e as Error).message);}
-    finally{setBusy(false);}
+      if(last){clearSelection();setSelected(last);refresh();}
+      setUploadProgress(tr("已导入 ","Imported ")+count+"/"+pending.length+(failed.length?tr("；未完成 ","; remaining ")+failed.length:""));
+      if(count>0)toast.success(tr("已导入文档：","Documents imported: ")+count);
+    }finally{setBusy(false);}
   }
   async function remove(){
     if(!selected||!canEdit||busy)return;
@@ -117,11 +137,15 @@ export function KnowledgeDocumentLibrary({taskId}: {taskId?: string}) {
         <Button type="button" variant="outline" disabled={busy} onClick={()=>{clearSelection();setDraft(blank());}}><PlusIcon/>{tr("新建","New document")}</Button>
       </form>
       <div className="flex flex-wrap items-center gap-2 rounded-md border p-3">
-        <input ref={input} type="file" accept=".txt,.md,.csv,.json,.docx" disabled={busy} aria-label={tr("上传知识文档","Upload knowledge document")} className="min-w-0 flex-1 text-sm" onChange={e=>setFile(e.target.files?.[0]??null)}/>
+        <input ref={input} type="file" multiple accept=".txt,.md,.csv,.json,.docx,.pdf" disabled={busy} aria-label={tr("上传知识文档","Upload knowledge documents")} className="min-w-0 flex-1 text-sm" onChange={e=>{setFiles(Array.from(e.target.files??[]));setUploadErrors([]);setUploadProgress("");}}/>
         <Input className="w-36" aria-label={tr("上传分类","Upload category")} placeholder={tr("分类（可选）","Category (optional)")} value={uploadCategory} onChange={e=>setUploadCategory(e.target.value)} disabled={busy}/>
-        <Button variant="outline" disabled={!file||busy} onClick={()=>void upload()}><UploadIcon/>{tr("导入","Import")}</Button>
-        <p className="w-full text-xs text-muted-foreground">TXT / MD / CSV / JSON / DOCX · {tr("文件最大 8 MiB，抽取文本最大 4 MiB","8 MiB file, 4 MiB extracted text")}</p>
+        <Button variant="outline" disabled={!files.length||busy} onClick={()=>void upload()}><UploadIcon/>{tr("导入","Import")}{files.length>0?" ("+files.length+")":""}</Button>
+        {busy&&files.length>0&&<Button variant="ghost" size="sm" onClick={()=>{stopUpload.current=true;}}>{tr("停止后续导入","Stop after current file")}</Button>}
+        <p className="w-full text-xs text-muted-foreground">TXT / MD / CSV / JSON / DOCX / PDF · {tr("单文件最大 8 MiB，文本最大 4 MiB；PDF 需要本机 pdftotext，扫描件不支持 OCR","8 MiB per file, 4 MiB extracted text; PDF needs local pdftotext, no OCR")}</p>
+        {uploadProgress&&<p role="status" className="w-full text-xs">{uploadProgress}</p>}
+        {uploadErrors.length>0&&<div role="alert" className="w-full space-y-1 text-xs text-destructive">{uploadErrors.map((msg,i)=><p key={i}>{msg}</p>)}</div>}
       </div>
+      <KnowledgeBatchIndex taskId={taskId} configRevision={embeddingRevision} onComplete={()=>{setEmbeddingRevision(n=>n+1);refresh();}}/>
       {error&&<p role="alert" className="text-sm text-destructive">{error}</p>}
       <div className="grid gap-4 lg:grid-cols-[minmax(220px,1fr)_2fr]">
         <div className="space-y-2">

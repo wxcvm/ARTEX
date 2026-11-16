@@ -89,3 +89,47 @@ FROM knowledge_vectors v JOIN knowledge_documents d ON d.id=v.document_id WHERE 
 	if limit>0&&len(out)>limit{out=out[:limit]}
 	return out,nil
 }
+
+
+type KnowledgeIndexCandidate struct {
+	ID string `json:"id"`
+	Title string `json:"title"`
+}
+
+// ListPendingKnowledgeIndexes pages only the requested scope, excluding
+// documents already indexed for their current revision and model.
+func (d *DB) ListPendingKnowledgeIndexes(ctx context.Context,taskID int64,key,after string)([]KnowledgeIndexCandidate,error){
+	rows,err:=d.QueryContext(ctx,`SELECT d.id,d.title FROM knowledge_documents d
+WHERE d.task_id IS NOT DISTINCT FROM NULLIF($1::bigint,0) AND d.id>$3
+AND NOT EXISTS(SELECT 1 FROM knowledge_vectors v WHERE v.document_id=d.id AND v.index_key=$2 AND v.document_version=d.updated_at)
+ORDER BY d.id LIMIT 50`,taskID,key,after)
+	if err!=nil{return nil,err}
+	defer rows.Close()
+	out:=[]KnowledgeIndexCandidate{}
+	for rows.Next(){
+		var item KnowledgeIndexCandidate
+		if err:=rows.Scan(&item.ID,&item.Title);err!=nil{return nil,err}
+		out=append(out,item)
+	}
+	return out,rows.Err()
+}
+
+// ReusableKnowledgeVectors returns previous chunks for the same document and
+// model, including old revisions. Exact text equality makes reuse independent
+// of chunk position; a forced rebuild bypasses this cache.
+func (d *DB) ReusableKnowledgeVectors(ctx context.Context,taskID int64,docID,key string)(map[string][]float32,error){
+	rows,err:=d.QueryContext(ctx,`SELECT v.snippet,v.embedding FROM knowledge_vectors v JOIN knowledge_documents d ON d.id=v.document_id
+WHERE d.id=$3 AND d.task_id IS NOT DISTINCT FROM NULLIF($1::bigint,0) AND v.index_key=$2`,taskID,key,docID)
+	if err!=nil{return nil,err}
+	defer rows.Close()
+	out:=map[string][]float32{}
+	for rows.Next(){
+		var snippet string
+		var raw []byte
+		var vector []float32
+		if err:=rows.Scan(&snippet,&raw);err!=nil{return nil,err}
+		if err:=json.Unmarshal(raw,&vector);err!=nil{return nil,err}
+		if len(vector)>0{out[snippet]=vector}
+	}
+	return out,rows.Err()
+}

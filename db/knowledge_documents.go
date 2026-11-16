@@ -3,7 +3,9 @@ package db
 import (
 	"context"
 	"database/sql"
+	"encoding/json"
 	"errors"
+	"strings"
 	"time"
 
 	"github.com/google/uuid"
@@ -102,4 +104,37 @@ func restoreKnowledgeDocumentsTx(tx *sql.Tx,snapshot *TaskArchiveSnapshot) error
 		if !ok||tid!=snapshot.TaskID{return errors.New("archived knowledge document belongs to another scope")}
 	}
 	return insertArchiveRows(tx,"knowledge_documents",raw)
+}
+
+
+// SearchKnowledgeDocuments ranks exact title/phrase matches first, then
+// documents containing every query term (in any order). The UI's literal
+// substring filter remains unchanged. Only snippets are returned.
+func (d *DB) SearchKnowledgeDocuments(ctx context.Context,taskID int64,q string,limit int)([]KnowledgeDocument,error){
+	q=strings.TrimSpace(q)
+	words:=strings.Fields(q)
+	if len(words)==0||limit<=0{return []KnowledgeDocument{},nil}
+	raw,err:=json.Marshal(words)
+	if err!=nil{return nil,err}
+	rows,err:=d.QueryContext(ctx,`WITH terms AS (SELECT DISTINCT lower(value) AS term FROM jsonb_array_elements_text($4::jsonb))
+SELECT id,COALESCE(task_id::text,''),title,category,
+substring(content from greatest(COALESCE(NULLIF(strpos(lower(content),lower($3)),0),
+(SELECT min(NULLIF(strpos(lower(content),term),0)) FROM terms),1)-80,1) for 240),
+source_filename,created_at,updated_at
+FROM knowledge_documents WHERE `+knowledgeScope+`
+AND NOT EXISTS(SELECT 1 FROM terms WHERE strpos(lower(title),term)=0 AND strpos(lower(category),term)=0 AND strpos(lower(content),term)=0)
+ORDER BY CASE WHEN lower(title)=lower($3) THEN 0
+WHEN strpos(lower(title),lower($3))>0 THEN 1
+WHEN strpos(lower(category),lower($3))>0 THEN 2
+WHEN strpos(lower(content),lower($3))>0 THEN 3 ELSE 4 END,
+CASE WHEN task_id IS NOT NULL THEN 0 ELSE 1 END,updated_at DESC,id LIMIT $5`,taskID,true,q,string(raw),limit)
+	if err!=nil{return nil,err}
+	defer rows.Close()
+	out:=[]KnowledgeDocument{}
+	for rows.Next(){
+		doc,err:=scanKnowledgeDocument(rows)
+		if err!=nil{return nil,err}
+		out=append(out,doc)
+	}
+	return out,rows.Err()
 }

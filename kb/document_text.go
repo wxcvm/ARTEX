@@ -3,6 +3,7 @@ package kb
 import (
 	"archive/zip"
 	"bytes"
+	"context"
 	"encoding/xml"
 	"errors"
 	"io"
@@ -18,6 +19,10 @@ const DocumentTextLimit = 4 << 20
 // ExtractDocumentText reads local documents without executing them or contacting
 // any service. Only the main Word document part is read; macros are never run.
 func ExtractDocumentText(filename string, raw []byte) (string,error) {
+	return ExtractDocumentTextContext(context.Background(),filename,raw)
+}
+
+func ExtractDocumentTextContext(ctx context.Context,filename string,raw []byte)(string,error){
 	var text string
 	switch strings.ToLower(filepath.Ext(filename)) {
 	case ".txt",".md",".csv",".json":
@@ -64,8 +69,12 @@ func ExtractDocumentText(filename string, raw []byte) (string,error) {
 			text=b.String()
 		}
 		if !found{return "",errors.New("Word document has no main text part")}
+	case ".pdf":
+		var err error
+		text,err=extractPDFText(ctx,raw)
+		if err!=nil{return "",err}
 	default:
-		return "",errors.New("supported formats: TXT, Markdown, CSV, JSON, DOCX")
+		return "",errors.New("supported formats: TXT, Markdown, CSV, JSON, DOCX, PDF")
 	}
 	if strings.TrimSpace(text)==""||strings.ContainsRune(text,0){return "",errors.New("document is empty or contains NUL")}
 	if len(text)>DocumentTextLimit{return "",errors.New("document text exceeds 4 MiB")}
