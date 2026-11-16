@@ -106,7 +106,7 @@ export default function LoginPage() {
       {/* Right panel */}
       <div className="flex w-full items-center justify-center bg-background p-8 lg:w-2/3">
         <div className="w-full max-w-md space-y-10 py-24 lg:py-32">
-          <div className="flex justify-end"><Button type="button" variant="ghost" onClick={() => setUiLocale(locale === "en" ? "zh-CN" : "en")}>{locale === "en" ? "简体中文" : "English"}</Button></div>
+          <div className="flex justify-end"><Button type="button" variant="ghost" onClick={() => setUiLocale(locale === "zh-CN" ? "zh-TW" : locale === "zh-TW" ? "en" : "zh-CN")}>{locale === "zh-CN" ? "繁體中文" : locale === "zh-TW" ? "English" : "简体中文"}</Button></div>
           <div className="space-y-4 text-center">
             <h2 className="text-2xl font-medium tracking-tight">{t("登录", "Sign in")}</h2>
             <p className="mx-auto max-w-xl text-muted-foreground">{t("欢迎回来，输入密码继续使用 ARTEX", "Welcome back — enter your password to continue using ARTEX")}</p>
@@ -146,7 +146,7 @@ export default function LoginPage() {
                 </button>
               </Label>
             </div>
-            {error && <p className="text-sm text-destructive">{locale === "en" ? error : ({ "Unable to connect to the backend service": "无法连接后端服务", "Please read and agree to the Terms of Use first": "请先阅读并同意使用条款", "Incorrect username or password": "用户名或密码错误" } as Record<string, string>)[error] ?? error}</p>}
+            {error && <p className="text-sm text-destructive">{({ "Unable to connect to the backend service": t("无法连接后端服务", "Unable to connect to the backend service"), "Please read and agree to the Terms of Use first": t("请先阅读并同意使用条款", "Please read and agree to the Terms of Use first"), "Incorrect username or password": t("用户名或密码错误", "Incorrect username or password") } as Record<string, string>)[error] ?? error}</p>}
             <Button type="submit" className="w-full" disabled={loading || !password || !agreed}>
               {loading ? t("正在登录…", "Signing in...") : t("登录", "Sign in")}
             </Button>

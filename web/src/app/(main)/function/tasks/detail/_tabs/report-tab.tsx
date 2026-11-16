@@ -52,7 +52,7 @@ export function ReportTab({ taskId }: { taskId: string }) {
       .catch((cause) => {
         if (active) {
           setErrorTaskId(reportKey);
-          setError(cause instanceof Error ? cause.message : "报告请求失败");
+          setError(cause instanceof Error ? cause.message : uiText(locale, "报告请求失败", "Report request failed"));
         }
       })
       .finally(() => {

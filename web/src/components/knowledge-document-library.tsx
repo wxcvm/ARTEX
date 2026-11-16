@@ -145,7 +145,7 @@ export function KnowledgeDocumentLibrary({taskId}: {taskId?: string}) {
         {uploadProgress&&<p role="status" className="w-full text-xs">{uploadProgress}</p>}
         {uploadErrors.length>0&&<div role="alert" className="w-full space-y-1 text-xs text-destructive">{uploadErrors.map((msg,i)=><p key={i}>{msg}</p>)}</div>}
       </div>
-      <KnowledgeBatchIndex taskId={taskId} configRevision={embeddingRevision} onComplete={()=>{setEmbeddingRevision(n=>n+1);refresh();}}/>
+      <KnowledgeBatchIndex key={taskId??"global"} taskId={taskId} configRevision={embeddingRevision} onComplete={()=>{setEmbeddingRevision(n=>n+1);refresh();}}/>
       {error&&<p role="alert" className="text-sm text-destructive">{error}</p>}
       <div className="grid gap-4 lg:grid-cols-[minmax(220px,1fr)_2fr]">
         <div className="space-y-2">

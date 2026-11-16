@@ -645,7 +645,7 @@ export const api = {
     format: "md-single" | "md-zip" | "csv" | "json" | "sarif" | "docx";
     layout?: "simple" | "professional";
     template?: string;
-    locale?: "zh-CN" | "en";
+    locale?: "zh-CN" | "zh-TW" | "en";
     scope: "filtered" | "all" | "selected";
     filters?: Omit<FindingQuery, "page" | "pageSize">;
     ids?: string[];
@@ -990,7 +990,7 @@ export const api = {
     ).then((r) => ({ ...r, deliveries: arr(r.deliveries) }));
   },
   notifyRetryDelivery: (id: number) => post<{ ok: boolean }>(`/notify/deliveries/${id}/retry`),
-  report: async (task?: string, locale: "zh-CN" | "en" = "zh-CN", scope: "all" | "confirmed" = "all") => {
+  report: async (task?: string, locale: "zh-CN" | "zh-TW" | "en" = "zh-CN", scope: "all" | "confirmed" = "all") => {
     if (MOCK) return taskOutcomeScenarioReport(task ?? "") ?? mockReport(task);
     const token = getToken();
     const params = new URLSearchParams({ lang: locale, scope });
@@ -1001,7 +1001,7 @@ export const api = {
     if (!r.ok) throw new Error(`report: ${r.status}`);
     return r.text();
   },
-  reportDOCX: async (task: string, locale: "zh-CN" | "en" = "zh-CN", scope: "all" | "confirmed" = "all", layout: "simple" | "professional" = "professional", template?: string) => {
+  reportDOCX: async (task: string, locale: "zh-CN" | "zh-TW" | "en" = "zh-CN", scope: "all" | "confirmed" = "all", layout: "simple" | "professional" = "professional", template?: string) => {
     const token = getToken();
     const params = new URLSearchParams({ task, lang: locale, format: "docx", scope, layout });
     if(template) params.set("template",template);

@@ -85,7 +85,7 @@ type RuleForm = {
 const defaultForm = (): RuleForm => ({ enabled: true, kind: "fuzzy_domain", pattern: "", note: "" });
 
 // Light frontend validation (matching the backend: only exact_ip / cidr get format checks, the rest is left to the backend).
-function frontValidate(form: RuleForm, locale: "zh-CN" | "en"): string | null {
+function frontValidate(form: RuleForm, locale: "zh-CN" | "zh-TW" | "en"): string | null {
   const p = form.pattern.trim();
   if (!p) return uiText(locale, "匹配内容不能为空", "Pattern cannot be empty");
   if (form.kind === "cidr" && !/^[0-9a-fA-F:.]+\/\d{1,3}$/.test(p)) {

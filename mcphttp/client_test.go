@@ -233,3 +233,70 @@ func TestStreamableClientVersionRejectionForms(t *testing.T) {
 		})
 	}
 }
+
+func TestToolsListPagination(t *testing.T) {
+	for _, mode := range []string{"complete", "later-error", "cursor-loop", "duplicate-name", "missing-array"} {
+		t.Run(mode, func(t *testing.T) {
+			srv := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+				var req rpcRequest
+				if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
+					http.Error(w, "bad request", 400)
+					return
+				}
+				w.Header().Set("Content-Type", "application/json")
+				var result any
+				switch req.Method {
+				case "initialize":
+					result = map[string]any{"protocolVersion":"2025-06-18","capabilities":map[string]any{},"serverInfo":map[string]any{"name":"test","version":"1"}}
+				case "notifications/initialized":
+					w.WriteHeader(http.StatusAccepted)
+					return
+				case "tools/list":
+					params, _ := req.Params.(map[string]any)
+					cursor, _ := params["cursor"].(string)
+					switch cursor {
+					case "":
+						result = map[string]any{"tools":[]any{map[string]any{"name":"first"}},"nextCursor":"page2"}
+					case "page2":
+						switch mode {
+						case "later-error":
+							http.Error(w,"unavailable",503)
+							return
+						case "cursor-loop":
+							result = map[string]any{"tools":[]any{},"nextCursor":"page2"}
+						case "duplicate-name":
+							result = map[string]any{"tools":[]any{map[string]any{"name":"first"}}}
+						case "missing-array":
+							result = map[string]any{"nextCursor":"page3"}
+						default:
+							result = map[string]any{"tools":[]any{},"nextCursor":"page3"}
+						}
+					case "page3":
+						result = map[string]any{"tools":[]any{map[string]any{"name":"last"}}}
+					default:
+						http.Error(w,"unexpected cursor",400)
+						return
+					}
+				default:
+					http.NotFound(w,r)
+					return
+				}
+				_ = json.NewEncoder(w).Encode(map[string]any{"jsonrpc":"2.0","id":req.ID,"result":result})
+			}))
+			defer srv.Close()
+			ctx,cancel := context.WithTimeout(context.Background(),5*time.Second)
+			defer cancel()
+			c,err := New(ctx,"test",srv.URL,nil,false,1)
+			if err != nil { t.Fatal(err) }
+			defer c.Close()
+			tools,err := c.Tools(ctx)
+			if mode == "complete" {
+				if err != nil || len(tools) != 2 || tools[0].Name() != ToolName("test","first") || tools[1].Name() != ToolName("test","last") {
+					t.Fatalf("complete list: %v %v",tools,err)
+				}
+			} else if err == nil || tools != nil {
+				t.Fatalf("partial or invalid catalog accepted: %v %v",tools,err)
+			}
+		})
+	}
+}

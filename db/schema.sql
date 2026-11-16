@@ -1625,3 +1625,12 @@ CREATE TABLE IF NOT EXISTS coverage_ledger (
  updated_at TIMESTAMPTZ NOT NULL DEFAULT now(),
  PRIMARY KEY (task_id,surface,risk_area)
 );
+
+-- Account activity audit: fixed action/result values, never request bodies or credentials.
+CREATE TABLE IF NOT EXISTS account_audit (
+    id BIGSERIAL PRIMARY KEY,
+    created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
+    action TEXT NOT NULL,
+    result TEXT NOT NULL
+);
+CREATE INDEX IF NOT EXISTS idx_account_audit_action ON account_audit(action, id DESC);
