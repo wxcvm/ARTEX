@@ -146,3 +146,58 @@ func TestRankedKnowledgeDocumentSearch(t *testing.T){
 	if err!=nil||len(hits)!=2||hits[0].ID!=exact.ID||hits[1].ID!=multi.ID{t.Fatal("ranked terms",hits,err)}
 	for _,hit:=range hits{if hit.ID==partial.ID{t.Fatal("partial term matched")}}
 }
+
+
+// Exercise the shipped reference material through the same scoped tools
+// exposed to the agent, not merely the manifest or the database insert.
+func TestCyberStrikeReferenceToolRetrieval(t *testing.T) {
+	s,f,_:=trafficEvidenceServer(t)
+	pg:=s.m.pg
+	ctx:=context.Background()
+	finding,err:=pg.GetFinding(f.FindingID)
+	if err!=nil||finding==nil||finding.TaskID==nil{t.Fatal("missing task",err)}
+	tid:=*finding.TaskID
+	if err:=pg.SeedCyberStrikeReferencePack();err!=nil{t.Fatal(err)}
+	// A task-owned document mentions the same code but is not the
+	// canonical code-titled reference. It must still be searchable.
+	decoy,err:=pg.SaveKnowledgeDocument(ctx,tid,"",db.KnowledgeDocument{Title:"NIST CSF PR.AA-05 project notes",Content:"A project note about PR.AA-05, not the reference.",Category:"fixture"})
+	if err!=nil{t.Fatal(err)}
+	tools:=names(agent.ScopedKnowledgeTools(pg,tid,"cyberstrike-reference-fixture"))
+	call:=func(name string,args map[string]any)string{
+		t.Helper()
+		raw,err:=json.Marshal(args)
+		if err!=nil{t.Fatal(err)}
+		tool:=tools[name]
+		if tool==nil{t.Fatal("missing tool",name)}
+		res,err:=tool.Call(ctx,raw,nil)
+		if err!=nil||res.IsError{t.Fatal(name,err,res.Flatten())}
+		return res.Flatten()
+	}
+	type hit struct{ DocumentID string `json:"document_id"`; Title string `json:"title"`; Scope string `json:"scope"`; SourceFilename string `json:"source_filename"` }
+	search:=func(q string,limit int)[]hit{
+		t.Helper()
+		var out struct{Hits []hit `json:"hits"`}
+		if err:=json.Unmarshal([]byte(call("kb_search",map[string]any{"q":q,"limit":limit})),&out);err!=nil{t.Fatal(err)}
+		return out.Hits
+	}
+	for _,tc:=range []struct{q,code string}{
+		{"ID.AM-01","ID.AM-01"},{"ID.RA-01","ID.RA-01"},{"pr.aa-05","PR.AA-05"},
+		{"NIST CSF PR.AA-05","PR.AA-05"},{"PR.DS-11","PR.DS-11"},{"PR.PS-02","PR.PS-02"},
+		{"DE.CM-01","DE.CM-01"},{"RS.AN","RS.AN"},{"RC.RP","RC.RP"},{"GV.SC","GV.SC"},
+		{"最小权限","PR.AA-05"},{"软件生命周期","PR.PS-02"},
+	}{
+		hits:=search(tc.q,1)
+		if len(hits)!=1||hits[0].Scope!="global"||!strings.HasPrefix(hits[0].Title,tc.code+" ")||hits[0].DocumentID==""||!strings.HasPrefix(hits[0].SourceFilename,".cyberstrike/skill/NIST/CSF_v2.0/"){
+			t.Fatalf("query %q: %+v",tc.q,hits)
+		}
+		var doc struct{Content string `json:"content"`; Scope string `json:"scope"`; SourceFilename string `json:"source_filename"`}
+		if err:=json.Unmarshal([]byte(call("kb_get",map[string]any{"document_id":hits[0].DocumentID})),&doc);err!=nil{t.Fatal(err)}
+		if doc.Scope!="global"||doc.SourceFilename!=hits[0].SourceFilename||!strings.Contains(doc.Content,"9303b210ab82bd6362d7ad7fbd2b2c8f2e335450")||!strings.Contains(doc.Content,"Reference only"){
+			t.Fatalf("missing reference provenance for %q: %+v",tc.q,doc)
+		}
+	}
+	hits:=search("NIST CSF PR.AA-05",8)
+	seenDecoy:=false
+	for _,h:=range hits{if h.DocumentID==decoy.ID{seenDecoy=true}}
+	if !seenDecoy{t.Fatal("ordinary task document no longer searchable")}
+}
