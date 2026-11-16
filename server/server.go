@@ -680,9 +680,9 @@ func (s *Server) Handler() http.Handler {
 
 	// Auth routes — exempt from JWT check (handled in requireAuth)
 	mux.HandleFunc("GET /api/auth/status", s.authStatus)
-	mux.HandleFunc("POST /api/auth/init", s.authInit)
-	mux.HandleFunc("POST /api/auth/login", s.authLogin)
-	mux.HandleFunc("POST /api/auth/change-password", s.authChangePassword)
+	mux.HandleFunc("POST /api/auth/init", s.auditAccountAction("initialize_password", s.authInit))
+	mux.HandleFunc("POST /api/auth/login", s.auditAccountAction("login", s.authLogin))
+	mux.HandleFunc("POST /api/auth/change-password", s.auditAccountAction("change_password", s.authChangePassword))
 
 	mux.HandleFunc("GET /api/health", s.health)
 	mux.HandleFunc("GET /api/update/check", s.checkReleaseUpdate)
@@ -700,6 +700,7 @@ func (s *Server) Handler() http.Handler {
 	mux.HandleFunc("GET /api/stats", s.stats)
 	mux.HandleFunc("GET /api/logs", s.getLogs)
 	mux.HandleFunc("GET /api/logs/history", s.getLogsHistory)
+	mux.HandleFunc("GET /api/logs/account-audit", s.getAccountAudit)
 	mux.HandleFunc("GET /api/logs/stream", s.streamLogs)
 
 	mux.HandleFunc("GET /api/tasks", s.listTasks)
