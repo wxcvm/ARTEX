@@ -4,6 +4,7 @@ import { useUiLocale } from "@/lib/ui-locale.client";
 import { uiText } from "@/lib/ui-locale";
 
 import * as React from "react";
+import { latestRunBoundary } from "@/lib/activity-merge";
 import {
   CheckIcon,
   ChevronDown,
@@ -362,8 +363,10 @@ function ToolBlock({
   getDetail,
   showWorker,
   focused = false,
+  pending = false,
 }: {
   group: Extract<Group, { type: "tool" }>;
+  pending?: boolean;
   getDetail: (seq: number) => Promise<string>;
   showWorker?: boolean;
   focused?: boolean;
@@ -380,9 +383,10 @@ function ToolBlock({
   const { use, result } = group;
   const toolName = use?.tool || result?.tool || "Tool";
   const ToolIcon = toolName === "Bash" ? Terminal : Wrench;
-  const running = !result;
+  const running = !result && pending;
+  const missing = !result && !pending;
   const ok = !!result && !result.is_error;
-  const statusTone = running
+  const statusTone = running || missing
     ? "text-muted-foreground"
     : ok
       ? "text-emerald-600 dark:text-emerald-400"
@@ -391,7 +395,7 @@ function ToolBlock({
     use && use.summary.startsWith(toolName) ? use.summary.slice(toolName.length).trimStart() : (use?.summary ?? "");
   const cmd = toolInputText(toolName, rawCmd);
   // status only — the full result lives behind the expand ([Output]), not previewed inline
-  const statusText = running ? tr("运行中…", "Running…") : ok ? "✓" : tr("✕ 失败", "✕ Failed");
+  const statusText = running ? tr("运行中…", "Running…") : missing ? tr("无已记录结果", "No recorded result") : ok ? "✓" : tr("✕ 失败", "✕ Failed");
 
   // key over the seqs we'd load; changes when the result (or command) arrives.
   const detailKey = `${use?.seq ?? ""}:${result?.seq ?? ""}`;
@@ -686,18 +690,21 @@ function AnswerBlock({ step, getDetail }: { step: Activity; getDetail: (seq: num
 // view actually mixes agents.
 function ExecView({
   activity,
+  live,
   taskId,
   chat,
   fetchDetail,
   focusedSeq,
 }: {
   activity: Activity[];
+  live?: boolean;
   taskId?: string;
   chat?: boolean;
   fetchDetail?: (seq: number) => Promise<string>;
   focusedSeq?: number;
 }) {
   const showWorker = new Set(activity.map((a) => a.worker)).size > 1;
+  const boundary = latestRunBoundary(activity);
   // default detail fetcher: the task-scoped activity endpoint. The chat page passes
   // its own (conversation-scoped) fetcher instead.
   const getDetail = React.useCallback(
@@ -723,6 +730,7 @@ function ExecView({
             group={g}
             getDetail={getDetail}
             showWorker={showWorker}
+            pending={!!live && !!g.use && g.use.seq > boundary}
             focused={focusedSeq != null && g.use?.seq === focusedSeq}
           />
         ) : g.type === "intercept" ? (
@@ -769,7 +777,7 @@ export function Transcript({
   }, [focusedSeq]);
   return (
     <div ref={transcriptRef} className="flex flex-col gap-1" style={focusPadding ? { paddingBlock: focusPadding } : undefined}>
-      <ExecView activity={activity} taskId={taskId} chat={chat} fetchDetail={fetchDetail} focusedSeq={focusedSeq} />
+      <ExecView activity={activity} live={live} taskId={taskId} chat={chat} fetchDetail={fetchDetail} focusedSeq={focusedSeq} />
       {live && (
         <div className="flex items-center gap-2 pl-2 pt-1 text-xs text-muted-foreground">
           <span className="flex gap-1">

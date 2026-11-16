@@ -16,33 +16,34 @@ import (
 // A private temporary input file provides seekable input on Windows builds
 // that cannot read a PDF from stdin. It is removed on every exit path.
 // No shell or external service is involved.
-// Scanned/image-only PDFs need OCR, which is not performed here.
-func extractPDFText(ctx context.Context,raw []byte)(string,error){
+// Image-only PDFs fall back to optional local OCR.
+func extractPDFText(ctx context.Context,raw []byte,opts PDFOptions)(string,error){
 	header:=raw
 	if len(header)>1024{header=header[:1024]}
 	if !bytes.Contains(header,[]byte("%PDF-")){return "",errors.New("invalid PDF header")}
-	path,err:=exec.LookPath("pdftotext")
-	if err!=nil{return "",errors.New("PDF text import requires local pdftotext (Poppler) on PATH")}
-	ctx,cancel:=context.WithTimeout(ctx,30*time.Second)
-	defer cancel()
 	dir,err:=os.MkdirTemp("","artex-pdf-")
 	if err!=nil{return "",fmt.Errorf("create local PDF workspace: %w",err)}
 	defer os.RemoveAll(dir)
 	input:=filepath.Join(dir,"document.pdf")
 	if err=os.WriteFile(input,raw,0600);err!=nil{return "",fmt.Errorf("write local PDF input: %w",err)}
-	cmd:=exec.CommandContext(ctx,path,"-enc","UTF-8","-layout",input,"-")
+	if opts.ForceOCR{return extractPDFOCR(ctx,dir,input,opts.OCRLanguage)}
+	path,err:=exec.LookPath("pdftotext")
+	if err!=nil{return "",errors.New("PDF text import requires local pdftotext (Poppler) on PATH; force OCR is also available")}
+	textCtx,cancel:=context.WithTimeout(ctx,30*time.Second)
+	defer cancel()
+	cmd:=exec.CommandContext(textCtx,path,"-enc","UTF-8","-layout",input,"-")
 	var output limitedPDFText
 	cmd.Stdout=&output
 	var diagnostic limitedPDFText
 	cmd.Stderr=&diagnostic
 	if err:=cmd.Run();err!=nil{
 		if output.overflow{return "",errors.New("PDF extracted text exceeds 4 MiB")}
-		if ctx.Err()!=nil{return "",ctx.Err()}
+		if textCtx.Err()!=nil{return "",textCtx.Err()}
 		return "",fmt.Errorf("PDF text extraction failed: %w (%s)",err,strings.TrimSpace(diagnostic.buf.String()[:min(diagnostic.buf.Len(),512)]))
 	}
 	if output.overflow{return "",errors.New("PDF extracted text exceeds 4 MiB")}
 	text:=strings.TrimSpace(output.buf.String())
-	if text==""{return "",errors.New("PDF contains no extractable text; scanned documents require OCR")}
+	if text==""{return extractPDFOCR(ctx,dir,input,opts.OCRLanguage)}
 	return text,nil
 }
 

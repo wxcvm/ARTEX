@@ -47,7 +47,7 @@ const FINDING_STATUSES: FindingStatus[] = [
   "risk_accepted",
 ];
 
-function fmtTime(ts: string, locale: "zh-CN" | "en") {
+function fmtTime(ts: string, locale: "zh-CN" | "zh-TW" | "en") {
   return new Date(ts).toLocaleString(locale);
 }
 

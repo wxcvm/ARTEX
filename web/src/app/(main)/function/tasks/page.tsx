@@ -1571,7 +1571,7 @@ const ARCHIVE_PROCESSING_STATES = new Set<TaskArchiveState>([
 
 const ARCHIVE_FAILED_STATES = new Set<TaskArchiveState>(["archive_failed", "restore_failed", "delete_failed"]);
 
-function archiveStateLabel(state: TaskArchiveState, locale: "zh-CN" | "en" = "zh-CN"): string {
+function archiveStateLabel(state: TaskArchiveState, locale: "zh-CN" | "zh-TW" | "en" = "zh-CN"): string {
   const labels: Record<TaskArchiveState, string> = {
     archive_queued: "Archive queued",
     archiving: "Archiving",
@@ -1605,7 +1605,7 @@ function formatArchiveBytes(bytes: number): string {
   return `${bytes} B`;
 }
 
-function archiveCompressionLabel(archive: TaskArchive, locale: "zh-CN" | "en"): string {
+function archiveCompressionLabel(archive: TaskArchive, locale: "zh-CN" | "zh-TW" | "en"): string {
   if (archive.original_size <= 0 || archive.compressed_size <= 0) return "—";
   const saved = Math.max(0, 100 - (archive.compressed_size / archive.original_size) * 100);
   return uiText(locale, `${formatArchiveBytes(archive.compressed_size)} · 节省 ${saved.toFixed(0)}%`, `${formatArchiveBytes(archive.compressed_size)} · saves ${saved.toFixed(0)}%`);
@@ -1615,7 +1615,7 @@ function archiveDataTotal(archive: TaskArchive): number {
   return Object.values(archive.data_counts).reduce((sum, value) => sum + (Number(value) || 0), 0);
 }
 
-function archiveDate(value: string | undefined, locale: "zh-CN" | "en"): string {
+function archiveDate(value: string | undefined, locale: "zh-CN" | "zh-TW" | "en"): string {
   if (!value) return "—";
   const date = new Date(value);
   if (Number.isNaN(date.getTime())) return "—";

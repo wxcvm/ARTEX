@@ -7,6 +7,7 @@ import * as React from "react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { sseUrl } from "@/lib/api";
+import { AccountAuditPanel } from "./account-audit-panel";
 import { MOCK } from "@/lib/mock/enabled";
 import type { LogLine } from "@/lib/types";
 import { cn } from "@/lib/utils";
@@ -183,6 +184,7 @@ export default function LogsPage() {
           {MOCK ? tr("演示数据", "Demo data") : connection === "connected" ? tr("实时连接", "Live connection") : connection === "connecting" ? tr("正在连接", "Connecting") : tr("连接中断 · 自动重试", "Disconnected · retrying")}
         </span>
       </header>
+      <AccountAuditPanel />
       <div className="flex min-w-0 flex-1 flex-col overflow-hidden rounded-xl border border-border/70 bg-card/90 shadow-sm">
         <div className="flex flex-wrap items-center gap-2 border-b border-border/60 px-4 py-4 sm:px-5">
           <Input

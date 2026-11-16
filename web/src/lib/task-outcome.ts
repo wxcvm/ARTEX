@@ -22,7 +22,7 @@ export function taskOutcomePresentation(
   task: Lifecycle,
   outcome: TaskOutcome | null,
   requestError = "",
-  locale: "zh-CN" | "en" = "en",
+  locale: "zh-CN" | "zh-TW" | "en" = "en",
 ): TaskOutcomePresentation {
   const tr = (zh: string, en: string) => locale === "en" ? en : zh;
   if (requestError) {

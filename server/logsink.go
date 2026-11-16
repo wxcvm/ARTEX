@@ -137,27 +137,26 @@ func (s *logSinkT) add(l LogLine) {
 	if len(s.ring) > s.cap {
 		s.ring = s.ring[len(s.ring)-s.cap:]
 	}
-	ch := s.dbCh
-	subs := make([]chan LogLine, 0, len(s.subs))
-	for sub := range s.subs {
-		subs = append(subs, sub)
-	}
-	s.mu.Unlock()
-
-	// Async DB write (non-blocking; drops if channel is full under extreme load).
-	if ch != nil {
+	// Keep sequence assignment and non-blocking publication under the same lock.
+	// Unsubscribe closes channels under this lock too: a copied subscriber list
+	// would race with close and can panic the process.
+	if s.dbCh != nil {
 		select {
-		case ch <- dbWriteReq{seq: l.Seq, ll: l}:
+		case s.dbCh <- dbWriteReq{seq: l.Seq, ll: l}:
 		default:
 		}
 	}
-
-	for _, sub := range subs {
+	for sub := range s.subs {
 		select {
 		case sub <- l:
 		default:
+			// Disconnect only the slow reader. It can replay the retained ring
+			// on reconnect, instead of silently skipping an unknown interval.
+			delete(s.subs, sub)
+			close(sub)
 		}
 	}
+	s.mu.Unlock()
 }
 
 // recent returns ring lines with Seq > since (capped to limit), and the latest seq.
@@ -188,9 +187,11 @@ func (s *logSinkT) subscribe() (<-chan LogLine, func()) {
 	return ch, func() {
 		once.Do(func() {
 			s.mu.Lock()
-			delete(s.subs, ch)
+			if _, ok := s.subs[ch]; ok {
+				delete(s.subs, ch)
+				close(ch)
+			}
 			s.mu.Unlock()
-			close(ch)
 		})
 	}
 }

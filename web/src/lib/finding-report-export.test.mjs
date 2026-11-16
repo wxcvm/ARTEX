@@ -81,3 +81,12 @@ test("localized standalone export changes headings but preserves report and evid
     assert.ok(md.includes("Header: one"));
   }
 });
+
+test("traditional Chinese report labels do not change saved evidence", () => {
+  const data = sample();
+  const md = buildFindingReportMarkdown(data, "zh-TW");
+  for (const label of ["## 詳細報告", "## 關聯 HTTP 流量證據", "## 複測記錄", "二進位內文未展開"]) assert.ok(md.includes(label), label);
+  assert.ok(md.includes(data.finding.report));
+  assert.ok(md.includes(data.finding.evidence));
+  assert.ok(md.includes("Header: one"));
+});

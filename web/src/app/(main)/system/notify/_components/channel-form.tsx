@@ -77,7 +77,7 @@ const notificationEnglish: Record<string, string> = {
   "邮件": "Email",
   "留空用内置默认模板。变量：{{.Title}} {{.Batch}} {{.Count}} {{.HomeURL}} {{.SentAt}}，以及 range .Items 下的 .Name/.VulnClass/.Severity/.Summary/.Assets/.DetailURL/.StatusLabel。插入字符串请用 {{json .Xxx}} 而不是 {{.Xxx}}，否则标题里的引号会破坏 JSON。": "Empty uses the built-in template. Variables: {{.Title}} {{.Batch}} {{.Count}} {{.HomeURL}} {{.SentAt}}, and .Name/.VulnClass/.Severity/.Summary/.Assets/.DetailURL/.StatusLabel inside range .Items. Insert strings using {{json .Xxx}} rather than {{.Xxx}} to keep quotes from breaking JSON."
 };
-export function notificationText(value: string, locale: "zh-CN" | "en") { return locale === "en" ? notificationEnglish[value] ?? value : value; }
+export function notificationText(value: string, locale: "zh-CN" | "zh-TW" | "en") { return locale === "en" ? notificationEnglish[value] ?? value : value; }
 
 export function ConfigField({
   def,
