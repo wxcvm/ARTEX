@@ -1248,6 +1248,16 @@ CREATE TABLE IF NOT EXISTS finding_screenshots (
 );
 CREATE INDEX IF NOT EXISTS idx_finding_screenshots_order ON finding_screenshots(finding_id, created_at, id);
 
+-- Explicit human-authored observations, optionally linked to captured traffic.
+CREATE TABLE IF NOT EXISTS finding_reproduction_steps (
+    finding_id BIGINT NOT NULL REFERENCES findings(id) ON DELETE CASCADE,
+    position INTEGER NOT NULL,
+    title TEXT NOT NULL,
+    observation TEXT NOT NULL DEFAULT '',
+    binding_id BIGINT REFERENCES finding_traffic_bindings(id) ON DELETE SET NULL,
+    PRIMARY KEY (finding_id, position)
+);
+
 -- =====================================================================
 -- M. Backend log persistence
 -- =====================================================================

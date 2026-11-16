@@ -137,8 +137,8 @@ type FindingScreenshotData struct {
 	Image []byte `json:"-"`
 }
 
-// LoadFindingScreenshots reads only findings selected for the report.
-func (d *DB) LoadFindingScreenshots(ctx context.Context, findings []*DBFinding, includeImages bool) error {
+// LoadFindingReportEvidence reads only findings selected for the report.
+func (d *DB) LoadFindingReportEvidence(ctx context.Context, findings []*DBFinding, includeImages bool) error {
 	if len(findings) == 0 {
 		return nil
 	}
@@ -167,6 +167,11 @@ func (d *DB) LoadFindingScreenshots(ctx context.Context, findings []*DBFinding, 
 				return err
 			}
 			f.Screenshots = shots
+			steps, err := listFindingReproduction(ctx, tx, f.ID)
+			if err != nil {
+				return err
+			}
+			f.ReproductionSteps = steps
 		}
 		return nil
 	})

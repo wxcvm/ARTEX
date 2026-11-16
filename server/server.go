@@ -815,6 +815,7 @@ func (s *Server) Handler() http.Handler {
 	mux.HandleFunc("GET /api/exploration/findings/dsh-reviews", s.listDSHReviewFeedback)
 	s.registerFindingTraffic(mux)
 	s.registerFindingScreenshots(mux)
+	s.registerFindingReproduction(mux)
 	mux.HandleFunc("GET /api/exploration/findings/{id}", s.getFinding)
 	mux.HandleFunc("GET /api/exploration/findings/{id}/lineage", s.findingLineage)
 	mux.HandleFunc("POST /api/exploration/findings/{id}/deepen", s.deepenFinding)
@@ -2319,7 +2320,7 @@ func (s *Server) findingsExport(w http.ResponseWriter, r *http.Request) {
 		}
 	}
 	if format == "docx" || format == "md-zip" || format == "md-single" {
-		if err := s.m.pg.LoadFindingScreenshots(r.Context(), fs, format != "md-single"); err != nil {
+		if err := s.m.pg.LoadFindingReportEvidence(r.Context(), fs, format != "md-single"); err != nil {
 			writeErr(w, 500, "failed to read screenshot evidence")
 			return
 		}
@@ -4086,7 +4087,7 @@ func (s *Server) getReport(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 	}
-	if err := s.m.pg.LoadFindingScreenshots(r.Context(), included, r.URL.Query().Get("format") == "docx"); err != nil {
+	if err := s.m.pg.LoadFindingReportEvidence(r.Context(), included, r.URL.Query().Get("format") == "docx"); err != nil {
 		writeErr(w, 500, "failed to read screenshot evidence")
 		return
 	}

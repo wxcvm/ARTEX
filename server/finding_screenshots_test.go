@@ -85,6 +85,23 @@ func TestFindingScreenshotAPI(t *testing.T) {
 	if w = req("GET", base, ""); !strings.Contains(w.Body.String(), "edited note") {
 		t.Fatal(w.Body)
 	}
+	reproductionPath := fmt.Sprintf("/api/exploration/findings/%d/reproduction", f.FindingID)
+	stepsJSON, err := json.Marshal(map[string]any{"steps": []db.FindingReproductionStep{
+		{Title: "Recorded fixture step", Observation: "Observed fixture response", BindingID: i64s(list.Bindings[0].ID)},
+		{Title: "Recorded follow-up"},
+	}})
+	if err != nil {
+		t.Fatal(err)
+	}
+	if w = req("PUT", reproductionPath, string(stepsJSON)); w.Code != 200 || !strings.Contains(w.Body.String(), "Recorded fixture step") {
+		t.Fatal(w.Code, w.Body)
+	}
+	if w = req("PUT", reproductionPath, `{"steps":[{"title":"invalid binding","binding_id":"999999999999999"}]}`); w.Code == 200 {
+		t.Fatal("accepted nonexistent binding")
+	}
+	if w = req("GET", reproductionPath, ""); w.Code != 200 || !strings.Contains(w.Body.String(), "Recorded fixture step") {
+		t.Fatal("failed replacement changed saved steps", w.Code, w.Body)
+	}
 	finding, err := s.m.pg.GetFinding(f.FindingID)
 	if err != nil || finding.TaskID == nil {
 		t.Fatal("missing finding task", err)
@@ -102,7 +119,7 @@ func TestFindingScreenshotAPI(t *testing.T) {
 		if err != nil {
 			t.Fatal(err)
 		}
-		foundImage, foundCaption := false, false
+		foundImage, foundCaption, foundStep := false, false, false
 		for _, entry := range z.File {
 			if strings.HasSuffix(entry.Name, ".png") {
 				r, err := entry.Open()
@@ -127,9 +144,10 @@ func TestFindingScreenshotAPI(t *testing.T) {
 					t.Fatal(err)
 				}
 				foundCaption = foundCaption || strings.Contains(string(raw), "edited note")
+				foundStep = foundStep || strings.Contains(string(raw), "Recorded fixture step")
 			}
 		}
-		if !foundImage || !foundCaption {
+		if !foundImage || !foundCaption || !foundStep {
 			t.Fatal("export omitted screenshot or caption", export)
 		}
 	}

@@ -293,6 +293,9 @@ func TestFindingTrafficArchiveV3RoundTripAndRetry(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
+	if err := s.m.pg.ReplaceFindingReproduction(ctx, f.FindingID, []db.FindingReproductionStep{{Title:"Archive fixture step", Observation:"Saved observation", BindingID:i64s(bindingID)}}); err != nil {
+		t.Fatal(err)
+	}
 	finding, err := s.m.pg.GetFinding(f.FindingID)
 	if err != nil {
 		t.Fatal(err)
@@ -394,6 +397,10 @@ func TestFindingTrafficArchiveV3RoundTripAndRetry(t *testing.T) {
 	mime, raw, err := s.m.pg.ReadFindingScreenshot(ctx, f.FindingID, screenshot.ID)
 	if err != nil || mime != "image/png" || !bytes.Equal(raw, screenshotImage.Bytes()) {
 		t.Fatal("screenshot image not restored", mime, err)
+	}
+	steps, err := s.m.pg.ListFindingReproduction(ctx, f.FindingID)
+	if err != nil || len(steps) != 1 || steps[0].Title != "Archive fixture step" || steps[0].BindingID != i64s(bindingID) {
+		t.Fatal("reproduction record not restored", steps, err)
 	}
 	// The read tool enforces task visibility too.
 	result, err := s.toolGetFindingTraffic().Call(agent.WithRunInfo(ctx, agent.RunInfo{TaskID: sid}), json.RawMessage(fmt.Sprintf(`{"finding_id":"%d"}`, f.FindingID)), nil)
