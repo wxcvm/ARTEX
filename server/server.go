@@ -40,6 +40,9 @@ var BuildVersion = "dev"
 // Server exposes the ARTEX backend over a JSON HTTP API for the shadcn/ui
 // frontend.
 type Server struct {
+	knowledgeBatchMu sync.Mutex
+	knowledgeBatches map[int64]*knowledgeBatchJob
+
 	m      *Manager
 	engine *Engine
 	ctx    context.Context
