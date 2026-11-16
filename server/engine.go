@@ -1022,7 +1022,11 @@ func (e *Engine) workerLoop(ctx context.Context, t *Task, name string) {
 // runIntent. Returns false when nothing was claimable. The pool worker loop is its
 // only caller.
 func (e *Engine) runWorkerStep(ctx context.Context, t *Task, name string, worker *agent.Worker) bool {
-	intent := e.claimNext(t, name)
+	intent, err := e.claimNext(t, name)
+	if err != nil {
+		log.Printf("[worker %s] task %s could not claim next intent: %v", name, t.ID, err)
+		return false
+	}
 	if intent == nil {
 		return false
 	}
@@ -1311,12 +1315,19 @@ func sleepCtx(ctx context.Context, d time.Duration) (done bool) {
 	}
 }
 
-func (e *Engine) claimNext(t *Task, name string) *db.Node {
-	fr, _ := t.Store.Frontier(20)
+func (e *Engine) claimNext(t *Task, name string) (*db.Node, error) {
+	fr, err := t.Store.Frontier(20)
+	if err != nil {
+		return nil, fmt.Errorf("list open intents: %w", err)
+	}
 	for _, in := range fr {
-		if ok, _ := t.Store.ClaimIntent(in.ID, name); ok {
-			return in
+		claimed, err := t.Store.ClaimIntent(in.ID, name)
+		if err != nil {
+			return nil, fmt.Errorf("claim intent %d: %w", in.ID, err)
+		}
+		if claimed {
+			return in, nil
 		}
 	}
-	return nil
+	return nil, nil
 }
