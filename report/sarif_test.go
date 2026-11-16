@@ -84,6 +84,7 @@ func TestFindingsSARIFStableTriageAndSafeEvidence(t *testing.T) {
 					EvidenceVersion int64 `json:"evidenceVersion"`
 					ReportEvidenceVersion int64 `json:"reportEvidenceVersion"`
 					ReportStale bool `json:"reportStale"`
+					ReportAvailable bool `json:"reportAvailable"`
 				} `json:"properties"`
 			} `json:"results"`
 		} `json:"runs"`
@@ -102,10 +103,10 @@ func TestFindingsSARIFStableTriageAndSafeEvidence(t *testing.T) {
 		t.Fatalf("unreviewed finding misclassified: %+v", r.Results[1])
 	}
 	if r.Results[1].Properties.TrafficCount != 2 || r.Results[1].Properties.EvidenceVersion != 5 ||
-		r.Results[1].Properties.ReportEvidenceVersion != 4 || !r.Results[1].Properties.ReportStale {
+		r.Results[1].Properties.ReportEvidenceVersion != 4 || !r.Results[1].Properties.ReportStale || !r.Results[1].Properties.ReportAvailable {
 		t.Fatalf("stale report linkage missing: %+v", r.Results[1].Properties)
 	}
-	if r.Results[0].Properties.ReportStale || r.Results[0].Properties.TrafficCount != 1 {
+	if r.Results[0].Properties.ReportStale || r.Results[0].Properties.ReportAvailable || r.Results[0].Properties.TrafficCount != 1 {
 		t.Fatalf("finding without detailed report must not be flagged stale: %+v", r.Results[0].Properties)
 	}
 	last := r.Results[2]
@@ -117,4 +118,19 @@ func TestFindingsSARIFStableTriageAndSafeEvidence(t *testing.T) {
 	if r.Results[1].RuleID != last.RuleID || r.Results[0].RuleID == last.RuleID {
 		t.Fatal("rule IDs must be stable within a class and different across classes")
 	}
+}
+
+func TestFindingsSARIFReportAvailability(t *testing.T) {
+	out, err := FindingsSARIF([]*db.DBFinding{
+		{ID: 1, Name: "Current", Report: "PRIVATE", EvidenceVersion: 2, ReportEvidenceVersion: 2},
+		{ID: 2, Name: "Blank", Report: "  ", EvidenceVersion: 2, ReportEvidenceVersion: 1},
+	})
+	if err != nil { t.Fatal(err) }
+	var doc sarifLog
+	if err := json.Unmarshal(out, &doc); err != nil { t.Fatal(err) }
+	for _, r := range doc.Runs[0].Results {
+		p := r.Properties
+		if p.ReportStale || p.ReportAvailable != (p.FindingID == 1) { t.Fatalf("unexpected report metadata: %+v", p) }
+	}
+	if strings.Contains(string(out), "PRIVATE") { t.Fatal("report content exported") }
 }
