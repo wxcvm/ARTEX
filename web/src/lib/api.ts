@@ -50,6 +50,8 @@ import type {
   FindingsPage,
   FindingTraffic,
   FindingScreenshot,
+  KnowledgeDocument,
+  KnowledgeDocumentPage,
   FindingReproductionStep,
   FindingTrafficDetail,
   IntentAsset,
@@ -243,6 +245,29 @@ function interceptPageQuery(page: number, size: number, filter: InterceptApprova
 
 export const api = {
   knowledgeSearch: (query: string) => get<{ hits: { id: number; title: string; snippet?: string; category?: string; verified: boolean }[] | null; degraded: boolean }>(`/knowledge?q=${encodeURIComponent(query)}`),
+  knowledgeDocuments: (task: string | undefined, includeGlobal: boolean, q = "", category = "", offset = 0): Promise<KnowledgeDocumentPage> =>
+    MOCK ? Promise.resolve({items: [], has_more: false}) : get<KnowledgeDocumentPage>(`/knowledge/documents?${new URLSearchParams({ ...(task ? { task } : {}), include_global: String(includeGlobal), q, category, offset: String(offset) })}`),
+  knowledgeDocument: (id: string, task?: string, includeGlobal = false) =>
+    get<KnowledgeDocument>(`/knowledge/documents/${encodeURIComponent(id)}?${new URLSearchParams({ ...(task ? { task } : {}), include_global: String(includeGlobal) })}`),
+  saveKnowledgeDocument: (doc: Pick<KnowledgeDocument, "title" | "category" | "content">, task?: string, id?: string) =>
+    id ? put<KnowledgeDocument>(`/knowledge/documents/${encodeURIComponent(id)}?${new URLSearchParams(task ? {task} : {})}`, doc)
+      : post<KnowledgeDocument>(`/knowledge/documents?${new URLSearchParams(task ? {task} : {})}`, doc),
+  deleteKnowledgeDocument: (id: string, task?: string) =>
+    del<{ok: boolean}>(`/knowledge/documents/${encodeURIComponent(id)}?${new URLSearchParams(task ? {task} : {})}`),
+  uploadKnowledgeDocument: async (file: File, category: string, task?: string) => {
+    const data = new FormData();
+    data.append("file", file);
+    data.append("category", category);
+    const token = getToken();
+    const r = await fetch(`/api/knowledge/documents/upload?${new URLSearchParams(task ? {task} : {})}`, {
+      method: "POST", body: data, headers: token ? {Authorization: `Bearer ${token}`} : {},
+    });
+    if (!r.ok) {
+      const error = await r.json().catch(() => ({}));
+      throw new Error(error.error || `Upload failed: ${r.status}`);
+    }
+    return r.json() as Promise<KnowledgeDocument>;
+  },
   knowledgeEntry: (id: number) => get<{ id: number; title: string; category?: string; kind?: string; usage?: string; content: string; verified: boolean }>(`/knowledge?id=${id}`),
   // Backend application version (injected via ldflags at release, default "dev").
   health: () => get<{ ok: boolean; service: string; version: string }>("/health"),

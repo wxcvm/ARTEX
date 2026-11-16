@@ -16,6 +16,7 @@
 | [OpenTelemetry Go](https://github.com/open-telemetry/opentelemetry-go) / [文档](https://opentelemetry.io/docs/languages/go/) | `4aafbd5466847ad42e0d837f36d34cd8186190aa` | 已核查；仅供参考 | 调用关联与耗时观测；现有调用账本与证据是事实来源，遥测不是证据存储。后续可选 exporter，失败不得阻塞任务。 | 后续 exporter 不可用与关联 ID 测试；成本中，版本升级与标签基数需要约束。 |
 | [Promptfoo](https://github.com/promptfoo/promptfoo) / [测试用例文档](https://www.promptfoo.dev/docs/configuration/test-cases/) | `06778a39b27cb63345c23872d19503da012636cf` | 已核查；固定输入、断言、重复运行方法已采用 | 扩展既有 benchmark 目录，新建独立确定性工程 runner；不调用真实模型、不混入 L3 分数。 | 10 个 loopback HTTP 用例 + 生命周期 + UI 断言，20 次重复，逐证据 SHA256；成本低，无新增 Python 包。 |
 | [CAI](https://github.com/aliasrobotics/cai) | `6dc79257777f5f1c9500b4d2319935d34a47412e` | 已核查；仅历史参考 | 仓库已归档、停止维护；不成为新核心依赖。 | 无移植，无运行依赖；若后续考虑其中模块，重新审查维护状态。 |
+| [AntiFox](https://github.com/AntiFox-AI/antifox) | `070f798bf590667bc2a0a13c687dd87d8a4413bf` | 2026-11-16 源码对照；部分设计已实现于专题 PR | `db/knowledge.go`、`knowledge/{service,extract,chunk,embed}.go`、`server/knowledge.go` 与全局/任务 UI；采用文档管理和作用域设计，保留 ARTEX 内置 SQLite KB。自有文档使用现有 PostgreSQL、字面关键词检索和 Go 原生 DOCX 文本提取，纳入任务归档。未移植 pgvector、外部 Embedding、Python 解析器或 agent 检索日志；相关功能仍待独立评估。 | AGPL-3.0 来源；独立实现，未复制源码。测试包含作用域隔离、CRUD、字面查询、上传与归档往返；整合 CI 待验收。 |
 
 以上 SHA 是本次 `git ls-remote <repository> HEAD` 固定的源码快照；网页文档为核查日阅读版本，不声称网页内容与源码提交严格同版。项目声明与 ARTEX 实测分开记录。
 

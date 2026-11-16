@@ -686,6 +686,7 @@ func (s *Server) Handler() http.Handler {
 
 	mux.HandleFunc("GET /api/health", s.health)
 	mux.HandleFunc("GET /api/knowledge", s.onboardingKnowledge)
+	s.registerKnowledgeDocuments(mux)
 	mux.HandleFunc("GET /api/privacy/exposure", s.exposureStatus)
 	mux.HandleFunc("GET /api/privacy/overview", s.privacyOverview)
 	mux.HandleFunc("GET /api/privacy/storage-permissions", s.storagePermissions)

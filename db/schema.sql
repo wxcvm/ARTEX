@@ -1250,6 +1250,19 @@ ALTER TABLE finding_screenshots ADD COLUMN IF NOT EXISTS position INTEGER;
 CREATE INDEX IF NOT EXISTS idx_finding_screenshots_order ON finding_screenshots(finding_id, created_at, id);
 
 -- Explicit human-authored observations, optionally linked to captured traffic.
+-- User-managed knowledge documents are separate from the bundled read-only SQLite library.
+CREATE TABLE IF NOT EXISTS knowledge_documents (
+    id TEXT PRIMARY KEY,
+    task_id BIGINT REFERENCES tasks(id) ON DELETE CASCADE,
+    title TEXT NOT NULL,
+    category TEXT NOT NULL DEFAULT '',
+    content TEXT NOT NULL,
+    source_filename TEXT NOT NULL DEFAULT '',
+    created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
+    updated_at TIMESTAMPTZ NOT NULL DEFAULT now()
+);
+CREATE INDEX IF NOT EXISTS idx_knowledge_documents_scope ON knowledge_documents(task_id, updated_at DESC, id);
+
 CREATE TABLE IF NOT EXISTS finding_reproduction_steps (
     finding_id BIGINT NOT NULL REFERENCES findings(id) ON DELETE CASCADE,
     position INTEGER NOT NULL,

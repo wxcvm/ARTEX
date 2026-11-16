@@ -90,6 +90,7 @@ WHERE relation.source_task_id=$1 LIMIT 1`, taskID).Scan(&dependent)
 	}{
 		{`DELETE FROM task_relations WHERE task_id=$1 OR source_task_id=$1`, []any{taskID}},
 		{`DELETE FROM task_asset_links WHERE task_id=$1`, []any{taskID}},
+		{`DELETE FROM knowledge_documents WHERE task_id=$1`, []any{taskID}},
 		{`DELETE FROM task_llm_profiles WHERE task_id=$1`, []any{taskID}},
 		{`DELETE FROM task_scope WHERE task_id=$1`, []any{taskID}},
 		{`DELETE FROM coverage_ledger WHERE task_id=$1`, []any{taskID}},
@@ -282,6 +283,9 @@ WHERE archive.id=$1 FOR UPDATE OF archive,task`, archiveID).Scan(&taskID, &expID
 	if err := restoreFindingReproductionTx(tx, snapshot); err != nil {
 		return nil, fmt.Errorf("restore finding reproduction: %w", err)
 	}
+	if err := restoreKnowledgeDocumentsTx(tx, snapshot); err != nil {
+		return nil, fmt.Errorf("restore knowledge documents: %w", err)
+	}
 	if streamedLLMRecords != "" {
 		count, err := insertArchiveJSONSequenceRows(tx, "llm_records", llmRecords)
 		if err != nil {
@@ -396,7 +400,7 @@ func insertArchiveRows(tx *sql.Tx, table string, raw json.RawMessage) error {
 		"task_constraints": true, "activity": true, "task_asset_links": true, "findings": true,
 		"llm_records": true, "llm_usage": true, "skill_usage": true, "tool_usage": true,
 		"side_question_sessions": true, "side_question_requests": true,
-		"coverage_ledger": true, "finding_screenshots": true, "finding_reproduction_steps": true,
+		"coverage_ledger": true, "finding_screenshots": true, "finding_reproduction_steps": true, "knowledge_documents": true,
 	}
 	if !allowed[table] {
 		return fmt.Errorf("archive restore table %q is not allowed", table)
