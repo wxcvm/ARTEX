@@ -9,7 +9,7 @@ export function uiText(locale: UiLocale, zh: string, en: string): string {
 }
 const englishNavigation: Record<string, string> = {
   dashboard: "Overview", chat: "Chat", tasks: "Tasks", findings: "Findings",
-  traffic: "Traffic records", commands: "Tool execution", "llm-records": "Model records",
+  reports: "Report center", traffic: "Traffic records", commands: "Tool execution", "llm-records": "Model records",
   assets: "Assets", sync: "Asset sync", workspace: "Workspace",
   welcome: "Getting started / Setup", knowledge: "Knowledge base", llm: "Model configuration",
   agents: "Agents", mcp: "MCP servers", skills: "Skills", tools: "Tool management",

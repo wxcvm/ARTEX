@@ -625,6 +625,7 @@ export const api = {
     get<FindingAssetTree>(`/exploration/findings/asset-tree?${findingFilterParams(q).toString()}`),
   findingStats: (q: Omit<FindingQuery, "page" | "pageSize"> = {}) =>
     get<FindingStats>(`/exploration/findings/stats?${findingFilterParams(q).toString()}`),
+  taskReportLibrary: (q="",format="",offset=0) => get<import("./types").TaskReportLibraryItem[]>(`/report/library?${new URLSearchParams({q,format,offset:String(offset)})}`),
   taskReportSnapshots: (task:string,offset=0) => get<import("./types").TaskReportSnapshot[]>(`/report/snapshots?${new URLSearchParams({task,offset:String(offset)})}`),
   saveTaskReportSnapshot: (task:string,format:"md"|"docx",scope:"all"|"confirmed",locale:string,layout:"simple"|"professional",template:string,name:string) => post<import("./types").TaskReportSnapshot>(`/report/snapshots?${new URLSearchParams({task,format,scope,lang:locale,layout,template,name})}`,{}),
   deleteTaskReportSnapshot: (task:string,id:string) => del<{ok:boolean}>(`/report/snapshots/${encodeURIComponent(id)}?${new URLSearchParams({task})}`),

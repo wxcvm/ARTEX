@@ -1777,3 +1777,8 @@ export interface TaskReportSnapshot {
   size:number;
   created_at:string;
 }
+
+export interface TaskReportLibraryItem extends TaskReportSnapshot {
+  task_id:string;
+  task_name:string;
+}

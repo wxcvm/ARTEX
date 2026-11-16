@@ -74,3 +74,30 @@ func restoreTaskReportSnapshotsTx(tx *sql.Tx,snapshot *TaskArchiveSnapshot)error
 	}
 	return insertArchiveRows(tx,"task_report_snapshots",raw)
 }
+
+
+// Global list returns metadata only. Archived tasks have their reports in
+// their archive package until restore; payloads are never loaded by this query.
+type TaskReportLibraryItem struct {
+	TaskReportSnapshot
+	TaskID string `json:"task_id"`
+	TaskName string `json:"task_name"`
+}
+func(d *DB) ListTaskReportLibrary(ctx context.Context,q,format string,offset int)([]TaskReportLibraryItem,error){
+	rows,err:=d.QueryContext(ctx,`SELECT r.id,r.name,r.format,r.scope,r.locale,r.template_name,octet_length(r.payload),r.created_at,
+r.task_id::text,COALESCE(NULLIF(t.name,''),t.description)
+FROM task_report_snapshots r JOIN tasks t ON t.id=r.task_id
+WHERE ($1='' OR strpos(lower(r.name),lower($1))>0 OR strpos(lower(r.template_name),lower($1))>0
+OR strpos(lower(t.name),lower($1))>0 OR strpos(lower(t.description),lower($1))>0 OR t.id::text=$1)
+AND ($2='' OR r.format=$2) ORDER BY r.created_at DESC,r.id LIMIT 50 OFFSET $3`,q,format,offset)
+	if err!=nil{return nil,err}
+	defer rows.Close()
+	out:=[]TaskReportLibraryItem{}
+	for rows.Next(){
+		var item TaskReportLibraryItem
+		err:=rows.Scan(&item.ID,&item.Name,&item.Format,&item.Scope,&item.Locale,&item.TemplateName,&item.Size,&item.CreatedAt,&item.TaskID,&item.TaskName)
+		if err!=nil{return nil,err}
+		out=append(out,item)
+	}
+	return out,rows.Err()
+}

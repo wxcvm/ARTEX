@@ -11,6 +11,7 @@ import (
 )
 func(s *Server) registerReportSnapshots(mux *http.ServeMux){
 	const base="/api/report/snapshots"
+	mux.HandleFunc("GET /api/report/library",s.listReportLibrary)
 	mux.HandleFunc("GET "+base,s.listReportSnapshots)
 	mux.HandleFunc("POST "+base,s.getReport)
 	mux.HandleFunc("GET "+base+"/{snapshot}",s.downloadReportSnapshot)
@@ -59,4 +60,15 @@ func(s *Server) deleteReportSnapshot(w http.ResponseWriter,r *http.Request){
 	if errors.Is(err,db.ErrReportSnapshotNotFound){writeErr(w,404,"report snapshot not found");return}
 	if err!=nil{knowledgeDocumentError(w,err);return}
 	writeJSON(w,200,map[string]bool{"ok":true})
+}
+
+func(s *Server) listReportLibrary(w http.ResponseWriter,r *http.Request){
+	pg:=s.pg(w);if pg==nil{return}
+	q:=r.URL.Query()
+	format:=q.Get("format")
+	if format!=""&&format!="md"&&format!="docx"{writeErr(w,400,"invalid report format");return}
+	offset:=atoiDefault(q.Get("offset"),0);if offset<0{offset=0}
+	items,err:=pg.ListTaskReportLibrary(r.Context(),strings.TrimSpace(q.Get("q")),format,offset)
+	if err!=nil{writeErr(w,500,"could not list report library");return}
+	writeJSON(w,200,items)
 }
