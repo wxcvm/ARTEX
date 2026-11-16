@@ -24,6 +24,7 @@ type EvidenceExchange struct {
 	ReqLen, RespLen              int64
 	ReqHash, RespHash            string
 	Request, Response            io.Reader
+	HARPage *HARPageAttribution
 }
 
 func (t *Traffic) ReadEvidence(ctx context.Context, ids []string, consume func(EvidenceExchange) error) error {
@@ -50,9 +51,12 @@ func (t *Traffic) readEvidence(id string, consume func(EvidenceExchange) error) 
 		Scan(&e.TS, &e.URL, &e.Method, &e.Status, &e.ContentType, &e.ReqLen, &e.RespLen, &legacy); err != nil {
 		return err
 	}
+	page, err := t.readHARPage(id)
+	if err != nil { return err }
+	e.HARPage = page
 	var req, resp []byte
 	var reqBlob, respBlob sql.NullString
-	err := t.db.QueryRow(`SELECT req_head,req_body,req_blob,resp_head,resp_body,resp_blob FROM exchange_bodies WHERE id=?`, id).
+	err = t.db.QueryRow(`SELECT req_head,req_body,req_blob,resp_head,resp_body,resp_blob FROM exchange_bodies WHERE id=?`, id).
 		Scan(&e.ReqHead, &req, &reqBlob, &e.RespHead, &resp, &respBlob)
 	if errors.Is(err, sql.ErrNoRows) && legacy != "" {
 		if !filepath.IsLocal(legacy) {
@@ -123,4 +127,15 @@ func splitLegacyEvidence(r io.Reader) (string, io.Reader, error) {
 			return "", nil, err
 		}
 	}
+}
+
+
+// readHARPage returns nil for live captures and older imports without provenance.
+func (t *Traffic) readHARPage(id string) (*HARPageAttribution, error) {
+	var p HARPageAttribution
+	err := t.db.QueryRow(`SELECT state,ordinal FROM har_page_attribution WHERE exchange_id=?`, id).Scan(&p.State,&p.Ordinal)
+	if errors.Is(err, sql.ErrNoRows) { return nil,nil }
+	if err != nil { return nil,err }
+	if !p.valid() { return nil,errors.New("invalid stored HAR page attribution") }
+	return &p,nil
 }

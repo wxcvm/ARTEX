@@ -26,6 +26,50 @@ type HARImportResult struct {
 	Reasons map[string]int `json:"reasons"`
 }
 
+// HARPageAttribution is file-local provenance, not a browser session or identity.
+// Ordinal is one-based in log.pages and set only for a unique reference.
+type HARPageAttribution struct {
+	State string `json:"state"`
+	Ordinal int `json:"ordinal,omitempty"`
+}
+
+func (p HARPageAttribution) valid() bool {
+	switch p.State {
+	case "unique":
+		return p.Ordinal > 0
+	case "missing", "unknown", "ambiguous":
+		return p.Ordinal == 0
+	default:
+		return false
+	}
+}
+
+// Duplicate page IDs are ambiguous. Malformed optional metadata never prevents
+// importing the independently valid HTTP exchange.
+func harPageIndex(raw json.RawMessage) map[string]int {
+	var pages []json.RawMessage
+	index := map[string]int{}
+	if json.Unmarshal(raw, &pages) != nil { return index }
+	for i, item := range pages {
+		var page struct { ID string `json:"id"` }
+		if json.Unmarshal(item, &page) != nil || strings.TrimSpace(page.ID) == "" { continue }
+		if _, exists := index[page.ID]; exists { index[page.ID] = -1 } else { index[page.ID] = i+1 }
+	}
+	return index
+}
+
+func harPageReference(raw json.RawMessage, index map[string]int) HARPageAttribution {
+	if len(raw) == 0 || string(raw) == "null" { return HARPageAttribution{State:"missing"} }
+	var id string
+	if json.Unmarshal(raw, &id) != nil { return HARPageAttribution{State:"unknown"} }
+	if id == "" { return HARPageAttribution{State:"missing"} }
+	switch ordinal := index[id]; {
+	case ordinal > 0: return HARPageAttribution{State:"unique", Ordinal:ordinal}
+	case ordinal < 0: return HARPageAttribution{State:"ambiguous"}
+	default: return HARPageAttribution{State:"unknown"}
+	}
+}
+
 type harHeader struct {
 	Name string `json:"name"`
 	Value string `json:"value"`
@@ -38,6 +82,7 @@ type harContent struct {
 }
 type harEntry struct {
 	StartedDateTime string `json:"startedDateTime"`
+	PageRef json.RawMessage `json:"pageref"`
 	Request *struct {
 		Method string `json:"method"`
 		URL string `json:"url"`
@@ -60,6 +105,8 @@ type harCapture struct {
 	request, response []byte
 	status int
 	ts int64
+	pageRef json.RawMessage
+	page HARPageAttribution
 }
 
 // ImportHAR consumes saved records only. It never requests recorded URLs.
@@ -68,6 +115,7 @@ func (t *Traffic) ImportHAR(ctx context.Context, raw []byte) (HARImportResult, e
 	var doc struct {
 		Log *struct {
 			Entries []json.RawMessage `json:"entries"`
+			Pages json.RawMessage `json:"pages"`
 		} `json:"log"`
 	}
 	if err := json.Unmarshal(bytes.TrimPrefix(raw, []byte{0xef, 0xbb, 0xbf}), &doc); err != nil || doc.Log == nil || doc.Log.Entries == nil {
@@ -75,6 +123,7 @@ func (t *Traffic) ImportHAR(ctx context.Context, raw []byte) (HARImportResult, e
 	}
 	result := HARImportResult{Entries:len(doc.Log.Entries), Reasons:map[string]int{}}
 	digest := sha256.Sum256(raw)
+	pages := harPageIndex(doc.Log.Pages)
 	for i, item := range doc.Log.Entries {
 		if ctx.Err() != nil {
 			result.Unprocessed = result.Entries-i
@@ -86,6 +135,7 @@ func (t *Traffic) ImportHAR(ctx context.Context, raw []byte) (HARImportResult, e
 			result.Reasons[reason]++
 			continue
 		}
+		c.page = harPageReference(c.pageRef, pages)
 		duplicate, err := t.storeHARCapture(fmt.Sprintf("har-%x-%d", digest, i), c)
 		switch {
 		case err != nil:
@@ -157,7 +207,7 @@ func parseHARCapture(raw json.RawMessage) (harCapture,string) {
 		url:r.URL,host:u.Hostname(),method:r.Method,path:db.TemplatePath(u.EscapedPath()),
 		reqHead:fmt.Sprintf("%s %s %s\n%s",r.Method,u.RequestURI(),reqVersion,reqHeaders),
 		respHead:fmt.Sprintf("%s %d\n%s",respVersion,p.Status,respHeaders),
-		reqType:reqType,respType:respType,request:reqBody,response:respBody,status:p.Status,ts:at.Unix(),
+		reqType:reqType,respType:respType,request:reqBody,response:respBody,status:p.Status,ts:at.Unix(),pageRef:e.PageRef,
 	},""
 }
 
@@ -201,5 +251,5 @@ func (t *Traffic) storeHARCapture(id string,c harCapture) (bool,error) {
 	if (len(c.request)>maxInlineBody && req.hash=="") || (len(c.response)>maxInlineBody && resp.hash=="") {
 		return false,errors.New("HAR body storage incomplete")
 	}
-	return false,t.insertExchange(id,c.ts,c.host,c.method,c.path,c.url,c.status,c.respType,len(c.request),len(c.response),c.reqHead,req,c.respHead,resp)
+	return false,t.insertExchangeWithPage(id,c.ts,c.host,c.method,c.path,c.url,c.status,c.respType,len(c.request),len(c.response),c.reqHead,req,c.respHead,resp,&c.page)
 }

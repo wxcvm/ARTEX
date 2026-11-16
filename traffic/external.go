@@ -72,6 +72,10 @@ func (t *Traffic) RecordExternal(e ExternalExchange) error {
 // FTS entry inside one transaction. record() and RecordExternal share it so
 // both capture paths stay byte-identical in storage layout.
 func (t *Traffic) insertExchange(id string, ts int64, host, method, urlTemplate, rawURL string, status int, contentType string, reqLen, respLen int, reqHead string, reqB storedBody, respHead string, respB storedBody) error {
+	return t.insertExchangeWithPage(id, ts, host, method, urlTemplate, rawURL, status, contentType, reqLen, respLen, reqHead, reqB, respHead, respB, nil)
+}
+
+func (t *Traffic) insertExchangeWithPage(id string, ts int64, host, method, urlTemplate, rawURL string, status int, contentType string, reqLen, respLen int, reqHead string, reqB storedBody, respHead string, respB storedBody, page *HARPageAttribution) error {
 	tx, err := t.db.Begin()
 	if err != nil {
 		return fmt.Errorf("beginning transaction: %w", err)
@@ -108,6 +112,13 @@ VALUES(?,?,?,?,?,?,?)`,
 		idx := strings.Join([]string{rawURL, reqHead, reqB.index, respHead, respB.index}, "\n")
 		if _, err := tx.Exec(`INSERT INTO ex_fts(rowid,content) VALUES(?,?)`, rowid, idx); err != nil {
 			return fmt.Errorf("writing full-text index: %w", err)
+		}
+	}
+
+	if page != nil {
+		if !page.valid() { return fmt.Errorf("invalid HAR page attribution") }
+		if _, err := tx.Exec(`INSERT INTO har_page_attribution(exchange_id,state,ordinal) VALUES(?,?,?)`, id, page.State, page.Ordinal); err != nil {
+			return fmt.Errorf("writing HAR page attribution: %w", err)
 		}
 	}
 
