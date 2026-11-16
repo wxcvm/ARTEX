@@ -23,6 +23,8 @@ type Input struct {
 	FindingMeta    map[int64]db.FindingMeta // authoritative standalone finding status
 	FindingDetails map[int64]*db.DBFinding // existing report and linked evidence, keyed by node
 	ConfirmedOnly  bool
+	ToolUsage []db.ReportToolUsage
+	ToolUsageUnavailable bool
 }
 
 type findingView struct {
@@ -110,6 +112,8 @@ func MarkdownLocalized(in Input, locale string) string {
 	b.WriteString("\n\n")
 
 	writeFindingSummary(&b, fs, locale)
+
+	writeReportToolUsage(&b,in.ToolUsage,in.ToolUsageUnavailable,locale)
 
 	// findings
 	b.WriteString(tr("## 发现结果\n\n", "## Findings\n\n"))

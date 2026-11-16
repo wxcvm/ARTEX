@@ -4130,10 +4130,12 @@ func (s *Server) getReport(w http.ResponseWriter, r *http.Request) {
 	if t.CoverageEnabled && s.m.Assets() != nil {
 		ledger, _ = s.m.Assets().CoverageLedger(taskID)
 	}
+	toolUsage, toolUsageErr := s.m.pg.ReportToolUsages(r.Context(), t.ExpID)
 	md := report.MarkdownLocalized(report.Input{
 		Title: t.Description, Goal: t.Goal, GeneratedAt: time.Now(),
 		AssetCounts: counts, Findings: findings, Coverage: ledger,
 		FindingMeta: meta, FindingDetails: details, ConfirmedOnly: scope == "confirmed",
+		ToolUsage: toolUsage, ToolUsageUnavailable: toolUsageErr != nil,
 	}, report.ReportLocale(r.URL.Query().Get("lang")))
 	if r.URL.Query().Get("format") == "docx" {
 		layout := r.URL.Query().Get("layout")
