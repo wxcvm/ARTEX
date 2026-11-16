@@ -53,7 +53,13 @@ func (s *Server) buildKnowledgeIndex(w http.ResponseWriter,r *http.Request){
 	c,err:=knowledgeindex.Load(s.m.pg)
 	if err!=nil{writeErr(w,500,"failed to read embedding settings");return}
 	if !c.Enabled{writeErr(w,400,"enable local embedding first");return}
-	n,err:=knowledgeindex.Build(r.Context(),s.m.pg,taskID,r.PathValue("document"),c)
+	var result knowledgeindex.BuildResult
+	if r.URL.Query().Get("incremental")=="true"{
+		result,err=knowledgeindex.BuildIncremental(r.Context(),s.m.pg,taskID,r.PathValue("document"),c)
+	}else{
+		result.Chunks,err=knowledgeindex.Build(r.Context(),s.m.pg,taskID,r.PathValue("document"),c)
+		result.Embedded=result.Chunks
+	}
 	if err!=nil{
 		switch {
 		case errors.Is(err,db.ErrKnowledgeIndexStale):writeErr(w,409,err.Error())
@@ -62,5 +68,17 @@ func (s *Server) buildKnowledgeIndex(w http.ResponseWriter,r *http.Request){
 		}
 		return
 	}
-	writeJSON(w,200,map[string]any{"enabled":true,"chunks":n,"model":c.Model})
+	writeJSON(w,200,map[string]any{"enabled":true,"chunks":result.Chunks,"model":c.Model,"reused":result.Reused,"embedded":result.Embedded,"skipped":result.Skipped})
+}
+
+func (s *Server) listPendingKnowledgeIndexes(w http.ResponseWriter,r *http.Request){
+	taskID,ok:=s.knowledgeDocumentTask(w,r);if !ok{return}
+	c,err:=knowledgeindex.Load(s.m.pg)
+	if err!=nil{writeErr(w,500,"failed to read embedding settings");return}
+	if !c.Enabled{writeErr(w,400,"enable local embedding first");return}
+	items,err:=s.m.pg.ListPendingKnowledgeIndexes(r.Context(),taskID,c.Key(),r.URL.Query().Get("after"))
+	if err!=nil{knowledgeDocumentError(w,err);return}
+	next:=""
+	if len(items)==50{next=items[len(items)-1].ID}
+	writeJSON(w,200,map[string]any{"items":items,"next":next,"model":c.Model})
 }

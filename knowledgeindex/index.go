@@ -129,29 +129,70 @@ func Split(text string)[]db.KnowledgeVector{
 // Build indexes a saved document. If edited during embedding, it fails rather
 // than publishing vectors for an obsolete revision.
 func Build(ctx context.Context,pg *db.DB,taskID int64,docID string,c Config)(int,error){
+	result,err:=build(ctx,pg,taskID,docID,c,true)
+	return result.Chunks,err
+}
+
+// BuildResult distinguishes cached chunks from actual model requests.
+type BuildResult struct {
+	Chunks int `json:"chunks"`
+	Reused int `json:"reused"`
+	Embedded int `json:"embedded"`
+	Skipped bool `json:"skipped"`
+}
+
+func BuildIncremental(ctx context.Context,pg *db.DB,taskID int64,docID string,c Config)(BuildResult,error){
+	return build(ctx,pg,taskID,docID,c,false)
+}
+
+func build(ctx context.Context,pg *db.DB,taskID int64,docID string,c Config,force bool)(BuildResult,error){
+	var result BuildResult
 	c,err:=c.Normalize()
-	if err!=nil{return 0,err}
-	if !c.Enabled{return 0,errors.New("enable local embedding first")}
+	if err!=nil{return result,err}
+	if !c.Enabled{return result,errors.New("enable local embedding first")}
 	doc,err:=pg.GetKnowledgeDocument(ctx,taskID,false,docID)
-	if err!=nil{return 0,err}
+	if err!=nil{return result,err}
 	chunks:=Split(doc.Content)
-	if len(chunks)==0{return 0,errors.New("document has no text")}
+	if len(chunks)==0{return result,errors.New("document has no text")}
+	result.Chunks=len(chunks)
 	dim:=0
-	for start:=0;start<len(chunks);start+=batchSize{
-		end:=start+batchSize
-		if end>len(chunks){end=len(chunks)}
-		inputs:=make([]string,end-start)
-		for i:=start;i<end;i++{inputs[i-start]=chunks[i].Snippet}
-		vectors,err:=Embed(ctx,c,inputs)
-		if err!=nil{return 0,err}
-		for i,v:=range vectors{
+	if !force{
+		count,err:=pg.KnowledgeVectorCount(ctx,taskID,docID,c.Key())
+		if err!=nil{return result,err}
+		if count==len(chunks){
+			result.Skipped=true
+			result.Reused=count
+			return result,nil
+		}
+		cached,err:=pg.ReusableKnowledgeVectors(ctx,taskID,docID,c.Key())
+		if err!=nil{return result,err}
+		for i:=range chunks{
+			v:=cached[chunks[i].Snippet]
+			if len(v)==0{continue}
 			if dim==0{dim=len(v)}
-			if len(v)!=dim{return 0,errors.New("embedding dimensions changed during indexing")}
-			chunks[start+i].Embedding=v
+			if len(v)!=dim{return result,errors.New("cached embedding dimensions differ; force rebuild")}
+			chunks[i].Embedding=v
+			result.Reused++
 		}
 	}
-	if err=pg.ReplaceKnowledgeVectors(ctx,taskID,doc.ID,c.Key(),doc.UpdatedAt,chunks);err!=nil{return 0,err}
-	return len(chunks),nil
+	var pending []int
+	for i:=range chunks{if chunks[i].Embedding==nil{pending=append(pending,i)}}
+	for start:=0;start<len(pending);start+=batchSize{
+		end:=start+batchSize
+		if end>len(pending){end=len(pending)}
+		inputs:=make([]string,end-start)
+		for i,j:=range pending[start:end]{inputs[i]=chunks[j].Snippet}
+		vectors,err:=Embed(ctx,c,inputs)
+		if err!=nil{return result,err}
+		for i,v:=range vectors{
+			if dim==0{dim=len(v)}
+			if len(v)!=dim{return result,errors.New("embedding dimensions changed; force rebuild")}
+			chunks[pending[start+i]].Embedding=v
+			result.Embedded++
+		}
+	}
+	if err=pg.ReplaceKnowledgeVectors(ctx,taskID,doc.ID,c.Key(),doc.UpdatedAt,chunks);err!=nil{return result,err}
+	return result,nil
 }
 
 // Search makes no model call unless current-scope indexed documents exist.
