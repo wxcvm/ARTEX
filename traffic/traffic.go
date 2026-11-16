@@ -67,6 +67,11 @@ CREATE TABLE IF NOT EXISTS exchange_bodies (
   resp_blob TEXT
 );
 
+CREATE TABLE IF NOT EXISTS har_page_attribution (
+  exchange_id TEXT PRIMARY KEY,
+  state TEXT NOT NULL,
+  ordinal INTEGER NOT NULL
+);
 CREATE TABLE IF NOT EXISTS blob_refs (
   hash        TEXT NOT NULL,
   exchange_id TEXT NOT NULL,
@@ -1191,6 +1196,9 @@ func (t *Traffic) deleteWhere(tx *sql.Tx, where string, args ...any) (int64, err
 	}
 	if _, err := tx.Exec(`DELETE FROM blob_refs WHERE exchange_id IN (SELECT id FROM exchanges WHERE `+where+`)`, args...); err != nil {
 		return 0, fmt.Errorf("delete blob references: %w", err)
+	}
+	if _, err := tx.Exec(`DELETE FROM har_page_attribution WHERE exchange_id IN (SELECT id FROM exchanges WHERE `+where+`)`, args...); err != nil {
+		return 0, fmt.Errorf("delete HAR page attribution: %w", err)
 	}
 	res, err := tx.Exec(`DELETE FROM exchanges WHERE `+where, args...)
 	if err != nil {
