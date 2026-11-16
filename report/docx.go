@@ -32,14 +32,19 @@ func DOCXWithScreenshots(markdown string, findings []*db.DBFinding, locale strin
 
 // DOCXWithLayout supports built-in simple and professional report layouts.
 func DOCXWithLayout(markdown string, findings []*db.DBFinding, locale, layout string) ([]byte, error) {
+	return DOCXWithTemplate(markdown, findings, locale, layout, nil)
+}
+
+// DOCXWithTemplate applies presentation settings without altering findings or evidence.
+func DOCXWithTemplate(markdown string, findings []*db.DBFinding, locale, layout string, template *db.ReportTemplate) ([]byte, error) {
 	if layout != "" && layout != "simple" && layout != "professional" {
 		return nil, fmt.Errorf("unknown Word report layout: %s", layout)
 	}
-	professional := layout == "professional"
+	professional := layout == "professional" || template != nil
 	var body bytes.Buffer
 	body.WriteString("<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?><w:document xmlns:w=\"" + wordNS + "\" xmlns:r=\"http://schemas.openxmlformats.org/officeDocument/2006/relationships\" xmlns:wp=\"http://schemas.openxmlformats.org/drawingml/2006/wordprocessingDrawing\" xmlns:a=\"http://schemas.openxmlformats.org/drawingml/2006/main\" xmlns:pic=\"http://schemas.openxmlformats.org/drawingml/2006/picture\"><w:body>")
 	if professional {
-		if err := writeProfessionalFrontMatter(&body, markdown, locale); err != nil {
+		if err := writeProfessionalFrontMatter(&body, markdown, locale, template); err != nil {
 			return nil, err
 		}
 	}
@@ -96,7 +101,7 @@ func DOCXWithLayout(markdown string, findings []*db.DBFinding, locale, layout st
 		{"word/styles.xml", styles},
 	}
 	if professional {
-		parts = append(parts, struct{ name, data string }{"word/footer1.xml", professionalFooter}, struct{ name, data string }{"word/settings.xml", professionalSettings})
+		parts = append(parts, struct{ name, data string }{"word/footer1.xml", templateFooter(template)}, struct{ name, data string }{"word/settings.xml", professionalSettings})
 	}
 	for _, part := range parts {
 		w, err := z.Create(part.name)

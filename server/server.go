@@ -871,6 +871,7 @@ func (s *Server) Handler() http.Handler {
 	mux.HandleFunc("POST /api/notify/deliveries/{id}/retry", s.notifyRetryDelivery)
 	mux.HandleFunc("POST /api/settings/web-search/test", s.testWebSearch)
 	mux.HandleFunc("GET /api/report", s.getReport)
+	s.registerReportTemplates(mux)
 	mux.HandleFunc("GET /api/chat/mentions", s.searchChatMentions)
 	mux.HandleFunc("POST /api/chat", s.chat)
 	mux.HandleFunc("POST /api/chat/upload", s.chatUpload) // upload method 1: files land in uploads/ under the conversation/task work dir
@@ -2344,7 +2345,9 @@ func (s *Server) findingsExport(w http.ResponseWriter, r *http.Request) {
 			writeErr(w, 400, "invalid Word report layout")
 			return
 		}
-		payload, err := report.DOCXWithLayout(report.FindingsMarkdownLocalized(fs, now, report.ReportLocale(q.Get("lang"))), fs, report.ReportLocale(q.Get("lang")), layout)
+		template, ok := s.resolveReportTemplate(w,r)
+		if !ok{return}
+		payload, err := report.DOCXWithTemplate(report.FindingsMarkdownLocalized(fs, now, report.ReportLocale(q.Get("lang"))), fs, report.ReportLocale(q.Get("lang")), layout, template)
 		if err != nil {
 			writeErr(w, 500, "failed to generate Word report")
 			return
@@ -4120,7 +4123,9 @@ func (s *Server) getReport(w http.ResponseWriter, r *http.Request) {
 			writeErr(w, 400, "invalid Word report layout")
 			return
 		}
-		data, err := report.DOCXWithLayout(md, included, report.ReportLocale(r.URL.Query().Get("lang")), layout)
+		template, ok := s.resolveReportTemplate(w,r)
+		if !ok{return}
+		data, err := report.DOCXWithTemplate(md, included, report.ReportLocale(r.URL.Query().Get("lang")), layout, template)
 		if err != nil {
 			writeErr(w, 500, "failed to generate Word report")
 			return
