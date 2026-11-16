@@ -119,3 +119,27 @@ func TestReportTemplateCustomSections(t *testing.T){
 	w=req("PUT",path,`{"name":"Clear sections","sections":[]}`)
 	if err:=json.Unmarshal(w.Body.Bytes(),&tmpl);w.Code!=200||err!=nil||len(tmpl.Sections)!=0{t.Fatal(w.Code,w.Body,err)}
 }
+
+func TestReportTemplateProjectMetadata(t *testing.T){
+ s,f,req:=trafficEvidenceServer(t)
+ finding,err:=s.m.pg.GetFinding(f.FindingID)
+ if err!=nil||finding==nil||finding.TaskID==nil{t.Fatal("missing fixture task",err)}
+ base:="/api/report/templates"
+ if w:=req("POST",base,`{"name":"bad","metadata":{"personnel":[{"name":""}]}}`);w.Code!=400{t.Fatal(w.Code,w.Body)}
+ w:=req("POST",base,`{"name":"Metadata fixture","metadata":{"project":"Project <&>","version":"2.1","personnel":[{"name":"Alice","role":"Reviewer","contact":"fixture@example.test"}],"standards":["Reference A","Reference B"]}}`)
+ var tmpl db.ReportTemplate
+ if err:=json.Unmarshal(w.Body.Bytes(),&tmpl);w.Code!=200||err!=nil||tmpl.Metadata==nil||len(tmpl.Metadata.Personnel)!=1{t.Fatal(w.Code,w.Body,err)}
+ defer s.m.pg.DeleteReportTemplate(t.Context(),tmpl.ID)
+ path:=base+"/"+tmpl.ID
+ w=req("PUT",path,`{"name":"Edited metadata fixture"}`)
+ if err:=json.Unmarshal(w.Body.Bytes(),&tmpl);w.Code!=200||err!=nil||tmpl.Metadata==nil||tmpl.Metadata.Project!="Project <&>"{t.Fatal("metadata lost",w.Code,w.Body,err)}
+ export:=fmt.Sprintf("/api/report?task=%d&format=docx&lang=zh-TW&template=%s",*finding.TaskID,tmpl.ID)
+ w=req("GET",export,"")
+ if w.Code!=200{t.Fatal(w.Code,w.Body)}
+ z,err:=zip.NewReader(bytes.NewReader(w.Body.Bytes()),int64(w.Body.Len()));if err!=nil{t.Fatal(err)}
+ var document string
+ for _,entry:=range z.File{if entry.Name=="word/document.xml"{r,err:=entry.Open();if err!=nil{t.Fatal(err)};raw,err:=io.ReadAll(r);r.Close();if err!=nil{t.Fatal(err)};document=string(raw)}}
+ for _,want:=range []string{"專案: Project &lt;&amp;&gt;","版本: 2.1","專案人員","Alice","Reviewer","fixture@example.test","參考標準","Reference A","Reference B","不代表合規認證"}{if !strings.Contains(document,want){t.Fatalf("missing %q",want)}}
+ w=req("PUT",path,`{"name":"Clear metadata","metadata":{}}`)
+ if err:=json.Unmarshal(w.Body.Bytes(),&tmpl);w.Code!=200||err!=nil||tmpl.Metadata==nil||tmpl.Metadata.Project!=""||len(tmpl.Metadata.Personnel)!=0{t.Fatal(w.Code,w.Body,err)}
+}

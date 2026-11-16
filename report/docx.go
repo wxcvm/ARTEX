@@ -60,6 +60,7 @@ func DOCXWithTemplate(markdown string, findings []*db.DBFinding, locale, layout 
 		if err := writeProfessionalFrontMatter(&body, markdown, locale, template); err != nil {
 			return nil, err
 		}
+		if err:=writeTemplateMetadata(&body,template,locale);err!=nil{return nil,err}
 		if err:=writeTemplateSections(&body,template,"before");err!=nil{return nil,err}
 	}
 	inCode := false

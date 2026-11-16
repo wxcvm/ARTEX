@@ -40,6 +40,20 @@ func validReportTemplate(t *db.ReportTemplate)bool{
 		if section.Title==""||len(section.Title)>4096||section.Body==""{return false}
 		for _,r:=range section.Title+section.Body{if r<32&&r!='\t'&&r!='\n'&&r!='\r'{return false}}
 	}
+	if m:=t.Metadata;m!=nil{
+		fields:=[]*string{&m.Project,&m.Version}
+		for i:=range m.Personnel{
+			p:=&m.Personnel[i]
+			if strings.TrimSpace(p.Name)==""{return false}
+			fields=append(fields,&p.Name,&p.Role,&p.Contact)
+		}
+		for i:=range m.Standards{fields=append(fields,&m.Standards[i])}
+		for _,p:=range fields{
+			*p=strings.TrimSpace(*p)
+			if len(*p)>4096{return false}
+			for _,r:=range *p{if r<32&&r!='\t'&&r!='\n'&&r!='\r'{return false}}
+		}
+	}
 	return t.Name!=""
 }
 func(s *Server) saveReportTemplate(w http.ResponseWriter,r *http.Request){
