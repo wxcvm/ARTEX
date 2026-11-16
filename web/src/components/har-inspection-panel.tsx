@@ -88,6 +88,12 @@ export function HarInspectionPanel({ onImported }: { onImported?: () => void }) 
     [tr("含重复头字段的条目", "Entries with repeated header names"), summary.entriesWithDuplicateHeaders],
     [tr("已记录带时区的时间", "Recorded time with timezone"), summary.captureTimePresent],
     [tr("捕获时间未知", "Capture time unknown"), summary.captureTimeUnknown],
+    [tr("声明的页面", "Declared pages"), summary.declaredPages],
+    [tr("无效页面记录", "Invalid page records"), summary.invalidPages],
+    [tr("唯一页面归属", "Unique page attribution"), summary.entriesWithKnownPage],
+    [tr("未知页面引用", "Unknown page reference"), summary.entriesWithUnknownPage],
+    [tr("歧义页面引用", "Ambiguous page reference"), summary.entriesWithAmbiguousPage],
+    [tr("未提供页面引用", "No page reference"), summary.entriesWithoutPage],
   ] : [];
 
   return (
@@ -113,7 +119,7 @@ export function HarInspectionPanel({ onImported }: { onImported?: () => void }) 
             ))}
           </dl>
           <p className="text-xs text-muted-foreground">
-            {tr("除全部与无效条目外，统计仅覆盖 HTTP(S) 条目。正文未内嵌不等于空响应；编码标记不证明正文完整；重复头字段可能在普通键值映射中丢失。这里仅检查记录，不代表导入或漏洞结论。", "Except for all and invalid entries, counts cover HTTP(S) entries only. Missing embedded text is not an empty response; an encoding marker does not prove completeness; repeated headers may be lost in a flat map. This is an inspection, not an import or vulnerability conclusion.")}
+            {tr("除全部与无效条目外，统计仅覆盖 HTTP(S) 条目。正文未内嵌不等于空响应；编码标记不证明正文完整；重复头字段可能在普通键值映射中丢失。页面统计来自 HAR 的 pages/pageref；唯一归属仅表示文件内引用匹配，不证明真实浏览器会话或账号身份。这里仅检查记录，不代表导入或漏洞结论。", "Except for all and invalid entries, counts cover HTTP(S) entries only. Missing embedded text is not an empty response; an encoding marker does not prove completeness; repeated headers may be lost in a flat map. Page counts come from HAR pages/pageref; a unique match only establishes an in-file reference, not an actual browser session or account identity. This is an inspection, not an import or vulnerability conclusion.")}
           </p>
           <div className="flex flex-wrap items-center gap-2">
             <Button size="sm" disabled={busy || !selectedFile || summary.httpEntries === 0} onClick={() => void importFile()}>

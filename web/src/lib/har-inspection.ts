@@ -14,6 +14,12 @@ export type HarInspection = {
   entriesWithDuplicateHeaders: number;
   captureTimePresent: number;
   captureTimeUnknown: number;
+  declaredPages: number;
+  invalidPages: number;
+  entriesWithKnownPage: number;
+  entriesWithUnknownPage: number;
+  entriesWithAmbiguousPage: number;
+  entriesWithoutPage: number;
 };
 
 function object(value: unknown): Record<string, unknown> | null {
@@ -54,14 +60,27 @@ function hasCaptureTime(value: unknown): boolean {
 }
 
 export function inspectHar(value: unknown): HarInspection {
-  const entries = object(object(value)?.log)?.entries;
+  const log = object(object(value)?.log);
+  const entries = log?.entries;
   if (!Array.isArray(entries)) throw new Error("Invalid HAR: log.entries must be an array");
+  // Page IDs are used only for local linkage; no titles, URLs or IDs leave this function.
+  const pages = Array.isArray(log?.pages) ? log.pages : [];
+  const pageCounts = new Map<string, number>();
+  let invalidPages = 0;
+  for (const item of pages) {
+    const id = object(item)?.id;
+    if (typeof id !== "string" || !id.trim()) { invalidPages++; continue; }
+    pageCounts.set(id, (pageCounts.get(id) ?? 0) + 1);
+  }
   const result: HarInspection = {
     entries: entries.length, httpEntries: 0, invalidEntries: 0,
     observedStatus: 0, unobservedStatus: 0, invalidStatus: 0,
     responseTextPresent: 0, responseTextNotEmbedded: 0, encodedResponseText: 0,
     requestPostDataNotEmbedded: 0, entriesWithDuplicateHeaders: 0,
     captureTimePresent: 0, captureTimeUnknown: 0,
+    declaredPages: pages.length, invalidPages,
+    entriesWithKnownPage: 0, entriesWithUnknownPage: 0,
+    entriesWithAmbiguousPage: 0, entriesWithoutPage: 0,
   };
 
   for (const item of entries) {
@@ -72,6 +91,15 @@ export function inspectHar(value: unknown): HarInspection {
       continue;
     }
     result.httpEntries++;
+    const pageRef = entry?.pageref;
+    if (pageRef == null || pageRef === "") result.entriesWithoutPage++;
+    else if (typeof pageRef !== "string" || !pageRef.trim()) result.entriesWithUnknownPage++;
+    else {
+      const count = pageCounts.get(pageRef) ?? 0;
+      if (count === 1) result.entriesWithKnownPage++;
+      else if (count > 1) result.entriesWithAmbiguousPage++;
+      else result.entriesWithUnknownPage++;
+    }
     const response = object(entry?.response);
     const status = response?.status;
     if (status == null || status === 0) result.unobservedStatus++;
