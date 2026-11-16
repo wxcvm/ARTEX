@@ -44,6 +44,7 @@ import { Tabs, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Textarea } from "@/components/ui/textarea";
 import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
 import { api } from "@/lib/api";
+import { ReportTemplateSelect } from "@/components/report-template-manager";
 import { getLocalStorageValue, setLocalStorageValue } from "@/lib/local-storage.client";
 import { statusMeta } from "@/lib/status";
 import type {
@@ -260,6 +261,7 @@ export default function FindingsPage() {
   const [exportScope, setExportScope] = React.useState<"filtered" | "all" | "selected">("filtered");
   const [exportFormat, setExportFormat] = React.useState<"md-single" | "md-zip" | "csv" | "json" | "sarif" | "docx">("md-single");
   const [exportLayout, setExportLayout] = React.useState<"simple" | "professional">("professional");
+  const [exportTemplate,setExportTemplate] = React.useState("");
   const [exporting, setExporting] = React.useState(false);
 
   const toggleSelected = React.useCallback((id: string, checked: boolean) => {
@@ -295,6 +297,7 @@ export default function FindingsPage() {
         locale,
         format: exportFormat,
         layout: exportLayout,
+        template: exportLayout==="professional"?exportTemplate:undefined,
         scope: exportScope,
         filters: { severity, status, vulnclass, task, query, sort },
         ids: [...selectedIds],
@@ -1262,6 +1265,7 @@ export default function FindingsPage() {
                 <option value="professional">{tr("专业版（封面与目录）", "Professional (cover and contents)")}</option>
                 <option value="simple">{tr("简洁版", "Simple")}</option>
               </select>}
+              {exportFormat==="docx"&&exportLayout==="professional"&&<ReportTemplateSelect value={exportTemplate} onChange={setExportTemplate}/>}
             </div>
           </div>
 

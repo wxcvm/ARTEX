@@ -11,3 +11,10 @@ test("status presentation follows the locale without changing existing semantics
   assert.equal(statusMeta("task", "running").label, "Running");
   assert.equal(statusMeta("task", "running").tone, "blue");
 });
+
+test("Traditional Chinese status labels preserve state and unknown keys", () => {
+  assert.equal(statusLabel("task", "running", "zh-TW"), "執行中");
+  assert.equal(statusLabel("finding", "fixed", "zh-TW"), "已修復");
+  assert.equal(statusLabel("task", "constructor", "zh-TW"), "constructor");
+  assert.equal(statusMeta("task", "running").tone, "blue");
+});

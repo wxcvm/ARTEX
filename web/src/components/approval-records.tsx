@@ -55,7 +55,7 @@ function source(row: InterceptApprovalRow) {
   return row.reason?.startsWith("[model]") ? "model" : "unknown";
 }
 
-function originLabel(row: InterceptApprovalRow, locale: "zh-CN" | "en") {
+function originLabel(row: InterceptApprovalRow, locale: "zh-CN" | "zh-TW" | "en") {
   if (row.task_id) return row.task_id;
   if (row.conversation_id) return uiText(locale, `会话 #${row.conversation_id}`, `Conversation #${row.conversation_id}`);
   return "—";

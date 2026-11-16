@@ -1,7 +1,10 @@
 package report
 
 import (
+	"archive/zip"
+	"bytes"
 	"encoding/json"
+	"io"
 	"strings"
 	"testing"
 	"time"
@@ -109,4 +112,22 @@ func TestTaskReportLinkedEvidence(t *testing.T) {
 	if strings.Contains(md, "excluded evidence") || strings.Index(md, "first saved note") > strings.Index(md, "second saved note") {
 		t.Fatal("wrong evidence scope or order")
 	}
+}
+
+func TestTraditionalReportPreservesOriginalEvidence(t *testing.T) {
+	if ReportLocale("zh-TW") != "zh-TW" { t.Fatal("locale lost") }
+	f := &db.DBFinding{ID: 1, Name: "原始发现", Severity: "high", Status: "confirmed", Evidence: "原始证据", Report: "原始详细报告"}
+	md := SingleFindingMarkdownLocalized(f, time.Unix(0,0), "zh-TW")
+	for _, want := range []string{"## 詳細報告", "## 證據", "原始证据", "原始详细报告", "原始发现"} {
+		if !strings.Contains(md,want) { t.Fatalf("missing %q",want) }
+	}
+	in:=Input{Title:"原始任务",Goal:"原始目标",AssetCounts:map[string]int{"app":1}}
+	task:=MarkdownLocalized(in,"zh-TW")
+	for _,want:=range []string{"安全測試報告","任務目標","應用","原始任务","原始目标"} {if !strings.Contains(task,want){t.Fatalf("missing %q",want)}}
+	data,err:=DOCXWithLayout(task,nil,"zh-TW","professional")
+	if err!=nil{t.Fatal(err)}
+	z,err:=zip.NewReader(bytes.NewReader(data),int64(len(data)))
+	if err!=nil{t.Fatal(err)}
+	for _,file:=range z.File{if file.Name=="word/document.xml"{r,err:=file.Open();if err!=nil{t.Fatal(err)};raw,err:=io.ReadAll(r);r.Close();if err!=nil{t.Fatal(err)};for _,want:=range []string{"目錄","頁碼","安全測試報告","原始任务"}{if !strings.Contains(string(raw),want){t.Fatalf("docx missing %q",want)}};return}}
+	t.Fatal("missing document.xml")
 }

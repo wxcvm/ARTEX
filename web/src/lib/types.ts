@@ -1750,3 +1750,36 @@ export interface ReleaseUpdate {
   published_at: string;
   assets: {name:string;size:number;url:string}[];
 }
+
+export interface ReportTemplateInput {
+  name: string;
+  brand: string;
+  cover_title: string;
+  subtitle: string;
+  prepared_for: string;
+  author: string;
+  confidentiality: string;
+  footer: string;
+}
+export interface ReportTemplate extends ReportTemplateInput {
+  id: string;
+  has_logo: boolean;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface TaskReportSnapshot {
+  id:string;
+  name:string;
+  format:"md"|"docx";
+  scope:"all"|"confirmed";
+  locale:string;
+  template_name:string;
+  size:number;
+  created_at:string;
+}
+
+export interface TaskReportLibraryItem extends TaskReportSnapshot {
+  task_id:string;
+  task_name:string;
+}

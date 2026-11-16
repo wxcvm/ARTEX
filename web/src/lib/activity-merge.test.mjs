@@ -1,4 +1,4 @@
-import { mergeActivities } from "./activity-merge.ts";
+import { mergeActivities, latestRunBoundary } from "./activity-merge.ts";
 import assert from "node:assert/strict";
 import test from "node:test";
 
@@ -51,4 +51,12 @@ test("merging does not mutate either response and keeps distinct IDs", () => {
   );
   assert.equal(first.length, 1);
   assert.equal(second.length, 2);
+});
+
+test("tool calls before a newer turn or terminal result are not live", () => {
+  const rows = [activity(10,"user"),activity(11),activity(12,"result"),activity(13,"user"),activity(14)];
+  assert.equal(latestRunBoundary(rows),13);
+  assert.equal(latestRunBoundary([activity(15,"round"),activity(16)]),15);
+  assert.equal(latestRunBoundary([activity(14),activity(12,"result")]),12);
+  assert.equal(latestRunBoundary([activity(10)]),0);
 });

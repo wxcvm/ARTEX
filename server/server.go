@@ -40,6 +40,9 @@ var BuildVersion = "dev"
 // Server exposes the ARTEX backend over a JSON HTTP API for the shadcn/ui
 // frontend.
 type Server struct {
+	knowledgeBatchMu sync.Mutex
+	knowledgeBatches map[int64]*knowledgeBatchJob
+
 	m      *Manager
 	engine *Engine
 	ctx    context.Context
@@ -683,9 +686,9 @@ func (s *Server) Handler() http.Handler {
 
 	// Auth routes — exempt from JWT check (handled in requireAuth)
 	mux.HandleFunc("GET /api/auth/status", s.authStatus)
-	mux.HandleFunc("POST /api/auth/init", s.authInit)
-	mux.HandleFunc("POST /api/auth/login", s.authLogin)
-	mux.HandleFunc("POST /api/auth/change-password", s.authChangePassword)
+	mux.HandleFunc("POST /api/auth/init", s.auditAccountAction("initialize_password", s.authInit))
+	mux.HandleFunc("POST /api/auth/login", s.auditAccountAction("login", s.authLogin))
+	mux.HandleFunc("POST /api/auth/change-password", s.auditAccountAction("change_password", s.authChangePassword))
 
 	mux.HandleFunc("GET /api/health", s.health)
 	mux.HandleFunc("GET /api/update/check", s.checkReleaseUpdate)
@@ -703,6 +706,7 @@ func (s *Server) Handler() http.Handler {
 	mux.HandleFunc("GET /api/stats", s.stats)
 	mux.HandleFunc("GET /api/logs", s.getLogs)
 	mux.HandleFunc("GET /api/logs/history", s.getLogsHistory)
+	mux.HandleFunc("GET /api/logs/account-audit", s.getAccountAudit)
 	mux.HandleFunc("GET /api/logs/stream", s.streamLogs)
 
 	mux.HandleFunc("GET /api/tasks", s.listTasks)
@@ -876,6 +880,8 @@ func (s *Server) Handler() http.Handler {
 	mux.HandleFunc("POST /api/notify/deliveries/{id}/retry", s.notifyRetryDelivery)
 	mux.HandleFunc("POST /api/settings/web-search/test", s.testWebSearch)
 	mux.HandleFunc("GET /api/report", s.getReport)
+	s.registerReportTemplates(mux)
+	s.registerReportSnapshots(mux)
 	mux.HandleFunc("GET /api/chat/mentions", s.searchChatMentions)
 	mux.HandleFunc("POST /api/chat", s.chat)
 	mux.HandleFunc("POST /api/chat/upload", s.chatUpload) // upload method 1: files land in uploads/ under the conversation/task work dir
@@ -2349,7 +2355,9 @@ func (s *Server) findingsExport(w http.ResponseWriter, r *http.Request) {
 			writeErr(w, 400, "invalid Word report layout")
 			return
 		}
-		payload, err := report.DOCXWithLayout(report.FindingsMarkdownLocalized(fs, now, report.ReportLocale(q.Get("lang"))), fs, report.ReportLocale(q.Get("lang")), layout)
+		template, ok := s.resolveReportTemplate(w,r)
+		if !ok{return}
+		payload, err := report.DOCXWithTemplate(report.FindingsMarkdownLocalized(fs, now, report.ReportLocale(q.Get("lang"))), fs, report.ReportLocale(q.Get("lang")), layout, template)
 		if err != nil {
 			writeErr(w, 500, "failed to generate Word report")
 			return
@@ -3927,7 +3935,11 @@ func (s *Server) chat(w http.ResponseWriter, r *http.Request) {
 	// renders attachment cards.
 	humanTurn := userActivityWithAttachments("mainagent", req.Message, req.Attachments)
 	humanTurn.MainSeg = segPtr
-	s.engine.emitActivity(t, humanTurn)
+	if saved := s.engine.emitActivity(t, humanTurn); saved.ID <= 0 {
+		s.finishTaskChat(t.ID, cancel)
+		writeErr(w, 503, "Could not save the user message; no turn was started")
+		return
+	}
 	var ma *agent.MainAgent
 	if s.taskRuntimeAvailable(t, "mainagent") {
 		ma = s.agentsForTask(t).main
@@ -4046,6 +4058,8 @@ func (s *Server) fallbackChat(t *Task, msg string) string {
 }
 
 func (s *Server) getReport(w http.ResponseWriter, r *http.Request) {
+	if r.Method=="POST" {if _,ok:=s.reportSnapshotTask(w,r);!ok{return}}
+	if r.Method=="POST" && r.URL.Query().Get("format")!="md" && r.URL.Query().Get("format")!="docx" {writeErr(w,400,"invalid snapshot format");return}
 	t := s.m.ResolveTask(r.URL.Query().Get("task"))
 	if t == nil {
 		writeErr(w, 404, "no active task")
@@ -4127,16 +4141,20 @@ func (s *Server) getReport(w http.ResponseWriter, r *http.Request) {
 			writeErr(w, 400, "invalid Word report layout")
 			return
 		}
-		data, err := report.DOCXWithLayout(md, included, report.ReportLocale(r.URL.Query().Get("lang")), layout)
+		template, ok := s.resolveReportTemplate(w,r)
+		if !ok{return}
+		data, err := report.DOCXWithTemplate(md, included, report.ReportLocale(r.URL.Query().Get("lang")), layout, template)
 		if err != nil {
 			writeErr(w, 500, "failed to generate Word report")
 			return
 		}
+		if r.Method=="POST" {s.saveGeneratedReport(w,r,taskID,data,template);return}
 		w.Header().Set("Content-Type", report.DOCXContentType)
 		w.Header().Set("Content-Disposition", `attachment; filename="task-report.docx"`)
 		_, _ = w.Write(data)
 		return
 	}
+	if r.Method=="POST" {s.saveGeneratedReport(w,r,taskID,[]byte(md),nil);return}
 	w.Header().Set("Content-Type", "text/markdown; charset=utf-8")
 	w.WriteHeader(200)
 	_, _ = w.Write([]byte(md))
