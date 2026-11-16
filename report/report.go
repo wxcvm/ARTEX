@@ -49,7 +49,15 @@ func parseFinding(n *db.Node) findingView {
 	return findingView{VulnClass: p.VulnClass, Name: p.Name, Severity: p.Severity, Summary: p.Summary, PoC: p.Evidence.PoC}
 }
 
-var sevRank = map[string]int{"critical": 0, "high": 1, "medium": 2, "low": 3, "": 4}
+var sevRank = map[string]int{"critical": 0, "high": 1, "medium": 2, "low": 3, "info": 4, "unknown": 5}
+
+func severityKey(value string) string {
+	v := strings.ToLower(strings.TrimSpace(value))
+	if _, ok := sevRank[v]; ok { return v }
+	return "unknown"
+}
+
+func severityRank(value string) int { return sevRank[severityKey(value)] }
 
 // Markdown retains the original English rendering for existing callers.
 func Markdown(in Input) string {
@@ -101,6 +109,8 @@ func MarkdownLocalized(in Input, locale string) string {
 	}
 	b.WriteString("\n\n")
 
+	writeFindingSummary(&b, fs, locale)
+
 	// findings
 	b.WriteString(tr("## 发现结果\n\n", "## Findings\n\n"))
 	if len(fs) == 0 {
@@ -110,9 +120,9 @@ func MarkdownLocalized(in Input, locale string) string {
 			b.WriteString(tr("_当前没有发现记录；这不代表不存在安全问题。_\n\n", "_No finding records at present; this does not establish safety._\n\n"))
 		}
 	} else {
-		sort.SliceStable(fs, func(i, j int) bool { return sevRank[fs[i].Severity] < sevRank[fs[j].Severity] })
+		sort.SliceStable(fs, func(i, j int) bool { return severityRank(fs[i].Severity) < severityRank(fs[j].Severity) })
 		for i, f := range fs {
-			fmt.Fprintf(&b, "### %d. [%s] %s\n\n", i+1, reportSeverity(locale, nz(f.Severity, "info")), nz(f.Name, nz(f.VulnClass, tr("未分类", "Uncategorized"))))
+			fmt.Fprintf(&b, "### %d. [%s] %s\n\n", i+1, reportSeverity(locale, severityKey(f.Severity)), nz(f.Name, nz(f.VulnClass, tr("未分类", "Uncategorized"))))
 			fmt.Fprintf(&b, tr("- 状态：%s\n\n", "- Status: %s\n\n"), taskFindingStatus(locale, f.Status))
 			fmt.Fprintf(&b, "%s\n\n", nz(f.Summary, ""))
 			if f.PoC != "" {
@@ -133,6 +143,7 @@ func MarkdownLocalized(in Input, locale string) string {
 		if c.Completeness != nil && !c.Completeness.Complete {
 			b.WriteString(tr("- 本次任务未正常完成。\n", "- This run did not complete normally.\n"))
 		}
+		writeCoverageEntries(&b,c,locale)
 		for _, g := range c.Gaps {
 			fmt.Fprintf(&b, "- %s\n", g)
 		}
@@ -167,6 +178,7 @@ func reportText(locale, zh, en string) string {
 }
 
 func reportSeverity(locale, value string) string {
+	if value == "unknown" { return reportText(locale,"未知","Unknown") }
 	if locale == "en" {
 		return strings.ToUpper(value)
 	}
@@ -268,6 +280,8 @@ var traditionalReportText = strings.NewReplacer(
 	"委托", "委託",
 	"编制", "編製",
 	"级别", "級別",
+	"等级", "等級",
+	"适用", "適用",
 	"目录", "目錄",
 	"页码", "頁碼",
 	"附录", "附錄",
