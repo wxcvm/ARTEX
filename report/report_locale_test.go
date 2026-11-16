@@ -1,7 +1,10 @@
 package report
 
 import (
+	"archive/zip"
+	"bytes"
 	"encoding/json"
+	"io"
 	"strings"
 	"testing"
 	"time"
@@ -109,4 +112,54 @@ func TestTaskReportLinkedEvidence(t *testing.T) {
 	if strings.Contains(md, "excluded evidence") || strings.Index(md, "first saved note") > strings.Index(md, "second saved note") {
 		t.Fatal("wrong evidence scope or order")
 	}
+}
+
+func TestTraditionalReportPreservesOriginalEvidence(t *testing.T) {
+	if ReportLocale("zh-TW") != "zh-TW" { t.Fatal("locale lost") }
+	f := &db.DBFinding{ID: 1, Name: "原始发现", Severity: "high", Status: "confirmed", Evidence: "原始证据", Report: "原始详细报告"}
+	md := SingleFindingMarkdownLocalized(f, time.Unix(0,0), "zh-TW")
+	for _, want := range []string{"## 詳細報告", "## 證據", "原始证据", "原始详细报告", "原始发现"} {
+		if !strings.Contains(md,want) { t.Fatalf("missing %q",want) }
+	}
+	in:=Input{Title:"原始任务",Goal:"原始目标",AssetCounts:map[string]int{"app":1}}
+	task:=MarkdownLocalized(in,"zh-TW")
+	for _,want:=range []string{"安全測試報告","任務目標","應用","原始任务","原始目标"} {if !strings.Contains(task,want){t.Fatalf("missing %q",want)}}
+	data,err:=DOCXWithLayout(task,nil,"zh-TW","professional")
+	if err!=nil{t.Fatal(err)}
+	z,err:=zip.NewReader(bytes.NewReader(data),int64(len(data)))
+	if err!=nil{t.Fatal(err)}
+	for _,file:=range z.File{if file.Name=="word/document.xml"{r,err:=file.Open();if err!=nil{t.Fatal(err)};raw,err:=io.ReadAll(r);r.Close();if err!=nil{t.Fatal(err)};for _,want:=range []string{"目錄","頁碼","安全測試報告","原始任务"}{if !strings.Contains(string(raw),want){t.Fatalf("docx missing %q",want)}};return}}
+	t.Fatal("missing document.xml")
+}
+
+func TestReportRiskSummaryAndRecordedChecks(t *testing.T){
+	in:=Input{
+		Findings:[]*db.Node{
+			{ID:1,Payload:json.RawMessage(`{"name":"confirmed high","severity":"high"}`)},
+			{ID:2,Payload:json.RawMessage(`{"name":"pending info","severity":"info"}`)},
+			{ID:3,Payload:json.RawMessage(`{"name":"missing severity"}`)},
+			{ID:4,Payload:json.RawMessage(`{"name":"unknown severity","severity":"unexpected"}`)},
+		},
+		FindingMeta:map[int64]db.FindingMeta{1:{Status:db.FindingConfirmed},2:{Status:db.FindingPending}},
+		Coverage:&db.CoverageLedger{
+			Entries:[]db.CoverageEntry{{Surface:"fixture endpoint",RiskArea:"authentication",Outcome:db.OutcomeNoIssueFound,Evidence:"recorded response"},{Surface:"fixture endpoint",RiskArea:"authorization",Outcome:db.OutcomeNeedsFollowUp,Reason:"not tested"}},
+			Gaps:[]db.CoverageGap{{Kind:db.GapUnrecordedRiskClass,RiskArea:"input validation"}},
+		},
+	}
+	md:=MarkdownLocalized(in,"en")
+	for _,want:=range []string{"### Severity distribution","- HIGH: 1","- INFO: 1","- Unknown: 2","### Finding status distribution","- confirmed: 1","- pending: 1","### Recorded checks","Reported no issue found","recorded response","Needs follow-up","not tested","unrecorded_risk_class input validation"}{
+		if !strings.Contains(md,want){t.Fatalf("missing %q",want)}
+	}
+	if strings.Index(md,"confirmed high")>strings.Index(md,"missing severity"){t.Fatal("unknown severity sorted above high")}
+	in.ConfirmedOnly=true
+	md=MarkdownLocalized(in,"en")
+	for _,want:=range []string{"- HIGH: 1","- INFO: 0","- Unknown: 0","- pending: 0","fixture endpoint"}{if !strings.Contains(md,want){t.Fatalf("confirmed-only missing %q",want)}}
+	if strings.Contains(md,"pending info"){t.Fatal("pending finding included")}
+	tw:=MarkdownLocalized(in,"zh-TW")
+	if !strings.Contains(tw,"風險等級分布")||!strings.Contains(tw,"已記錄檢查項目"){t.Fatal(tw)}
+}
+
+func TestFindingsSummaryCountsInformationalAndUnknown(t *testing.T){
+	md:=FindingsMarkdownLocalized([]*db.DBFinding{{Name:"info",Severity:"info"},{Name:"missing"},{Name:"unexpected",Severity:"other"}},time.Unix(0,0),"en")
+	if !strings.Contains(md,"| Info | 1 |")||!strings.Contains(md,"| Unknown | 2 |"){t.Fatal(md)}
 }

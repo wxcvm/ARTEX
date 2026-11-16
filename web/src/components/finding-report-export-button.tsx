@@ -8,12 +8,14 @@ import { DownloadIcon, Loader2Icon } from "lucide-react";
 import { toast } from "sonner";
 import { Button } from "@/components/ui/button";
 import { api } from "@/lib/api";
+import { ReportTemplateSelect } from "@/components/report-template-manager";
 import { buildFindingReportMarkdown, collectFindingReport, findingReportFilename } from "@/lib/finding-report-export";
 
 export function FindingReportExportButton({ findingId, contextTask }: { findingId: string; contextTask?: string }) {
   const locale = useUiLocale();
   const tr = (zh: string, en: string) => uiText(locale, zh, en);
   const [loading, setLoading] = React.useState(false);
+  const [template,setTemplate]=React.useState("");
   const busy = React.useRef(false);
 
   async function exportMarkdown() {
@@ -50,7 +52,7 @@ export function FindingReportExportButton({ findingId, contextTask }: { findingI
     busy.current = true;
     setLoading(true);
     try {
-      await api.exportFindings({ format: "docx", scope: "selected", ids: [findingId], locale, layout: "professional" });
+      await api.exportFindings({ format: "docx", scope: "selected", ids: [findingId], locale, layout: "professional", template });
       toast.success(tr("Word 报告已导出", "Word report exported"));
     } catch (error) {
       toast.error(tr("导出失败：", "Export failed: ") + (error instanceof Error ? error.message : tr("请重试", "Please retry")));
@@ -66,6 +68,7 @@ export function FindingReportExportButton({ findingId, contextTask }: { findingI
       {loading ? <Loader2Icon className="animate-spin" /> : <DownloadIcon />}
       {tr("导出 Markdown", "Export Markdown")}
     </Button>
+    <ReportTemplateSelect value={template} onChange={setTemplate}/>
     <Button variant="outline" size="sm" onClick={() => void exportWord()} disabled={loading}>
       <DownloadIcon /> {tr("导出 Word", "Export Word")}
     </Button>

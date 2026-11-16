@@ -3,6 +3,10 @@ package traffic
 import (
 	"bytes"
 	"context"
+	"encoding/json"
+	"fmt"
+	"os"
+	"path/filepath"
 	"io"
 	"strings"
 	"testing"
@@ -69,4 +73,61 @@ func TestImportHARRejectsMalformedContainer(t *testing.T) {
 		if _,err:=tr.ImportHAR(context.Background(),[]byte(data)); err==nil { t.Fatalf("accepted malformed HAR: %s",data) }
 	}
 	if n,_:=tr.Count(); n!=0 { t.Fatalf("malformed HAR wrote %d records",n) }
+}
+
+
+func TestHARPageAttributionRoundTrip(t *testing.T) {
+	tr,_ := openTraffic(t)
+	// Only the page ordinal and association state are persisted, never the
+	// original page identifier, title or unrelated page fields.
+	var doc struct { Log struct { Entries []json.RawMessage `json:"entries"` } `json:"log"` }
+	if err := json.Unmarshal([]byte(harFixture), &doc); err != nil { t.Fatal(err) }
+	var first map[string]any
+	if err := json.Unmarshal(doc.Log.Entries[0], &first); err != nil { t.Fatal(err) }
+	refs := []any{"PAGE_PRIVATE","DUP_PRIVATE","not-listed",nil,42,"PAGE_PRIVATE"}
+	entries := make([]any,0,len(refs))
+	for _, ref := range refs {
+		e := make(map[string]any,len(first)+1)
+		for k,v := range first { e[k] = v }
+		e["pageref"] = ref
+		entries = append(entries,e)
+	}
+	raw,err := json.Marshal(map[string]any{"log":map[string]any{
+		"pages":[]any{map[string]any{"id":"PAGE_PRIVATE","title":"SECRET_TITLE"},map[string]any{"id":"DUP_PRIVATE"},map[string]any{"id":"DUP_PRIVATE"}},
+		"entries":entries,
+	}})
+	if err != nil { t.Fatal(err) }
+	result,err := tr.ImportHAR(context.Background(),raw)
+	if err != nil || result.Imported != len(refs) { t.Fatalf("import: %+v %v",result,err) }
+	rows,total,err := tr.Page(PageQuery{Host:"example.invalid",RespMin:-1,RespMax:-1},0,10)
+	if err != nil || total != len(refs) || len(rows) != len(refs) { t.Fatalf("page: %v %v",rows,err) }
+	want := []HARPageAttribution{{State:"unique",Ordinal:1},{State:"ambiguous"},{State:"unknown"},{State:"missing"},{State:"unknown"},{State:"unique",Ordinal:1}}
+	check := func(store *Traffic) {
+		t.Helper()
+		for _,row := range rows {
+			i := strings.LastIndex(row.ID,"-")
+			var index int
+			if _,err := fmt.Sscanf(row.ID[i+1:],"%d",&index); err != nil { t.Fatal(err) }
+			err := store.ReadEvidence(context.Background(),[]string{row.ID},func(e EvidenceExchange) error {
+				if e.HARPage == nil || *e.HARPage != want[index] { t.Fatalf("page %d: %+v",index,e.HARPage) }
+				return nil
+			})
+			if err != nil { t.Fatal(err) }
+		}
+	}
+	check(tr)
+	if retry,err := tr.ImportHAR(context.Background(),raw); err != nil || retry.Duplicates != len(refs) { t.Fatalf("retry: %+v %v",retry,err) }
+	dir := t.TempDir()
+	if n,err := tr.ExportHosts([]string{"example.invalid"},dir); err != nil || n != int64(len(refs)) { t.Fatalf("export: %d %v",n,err) }
+	manifest,err := os.ReadFile(filepath.Join(dir,"traffic.json"))
+	if err != nil { t.Fatal(err) }
+	for _,s := range []string{"PAGE_PRIVATE","DUP_PRIVATE","SECRET_TITLE","not-listed"} {
+		if strings.Contains(string(manifest),s) { t.Fatalf("raw page metadata leaked: %s",s) }
+	}
+	restored,_ := openTraffic(t)
+	if n,err := restored.ImportArchive(dir); err != nil || n != int64(len(refs)) { t.Fatalf("restore: %d %v",n,err) }
+	check(restored)
+	if n,err := restored.DeleteHost("example.invalid"); err != nil || n != int64(len(refs)) { t.Fatalf("delete: %d %v",n,err) }
+	var remaining int
+	if err := restored.db.QueryRow("SELECT count(*) FROM har_page_attribution").Scan(&remaining); err != nil || remaining != 0 { t.Fatalf("orphaned page records: %d %v",remaining,err) }
 }

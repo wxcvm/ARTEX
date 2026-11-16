@@ -2,6 +2,7 @@ package agent
 
 import (
 	"context"
+	"fmt"
 	"strings"
 	"time"
 	"unicode/utf8"
@@ -219,4 +220,14 @@ func approvalHistory(messages []llm.Message) []db.InterceptContextEntry {
 		}
 	}
 	return entries
+}
+
+// resumeRecordedSession distinguishes a new session (Norma returns nil for a
+// missing transcript) from a failed restore. Never append fresh messages to a
+// damaged transcript or run an agent without its expected history.
+func resumeRecordedSession(s *agentcore.Session, sessionID string) error {
+	if err := s.Resume(sessionID); err != nil {
+		return fmt.Errorf("restore session %q: %w", sessionID, err)
+	}
+	return nil
 }

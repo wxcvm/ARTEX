@@ -570,7 +570,12 @@ func (w *Worker) execute(ctx context.Context, name string, taskID int64, as *db.
 	// restarting from scratch.
 	alreadyRecorded := false
 	if w.tx != nil {
-		_ = s.Resume(opts.SessionID)
+		if err := resumeRecordedSession(s, opts.SessionID); err != nil {
+			emitWrap(db.Activity{Kind: "result", IsError: true, Summary: err.Error(), Detail: err.Error()})
+			// A transcript read error is not a provider error. The engine marks
+			// this intent blocked without retrying it against another model.
+			return "", tsx.Writes(), err
+		}
 		alreadyRecorded = requestID != "" && hasWorkerChatMessage(s.Messages(), requestID)
 		if len(s.Messages()) > 0 && message == "" {
 			seedUnlockFromHistory(s.Messages(), def.UnlockSkill)

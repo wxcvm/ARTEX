@@ -1,0 +1,83 @@
+{
+  "id": "cyberstrike-csf-third-v1",
+  "framework": "NIST CSF 2.0",
+  "authority": "https://doi.org/10.6028/NIST.CSWP.29",
+  "upstream": "https://github.com/CyberStrikeus/CyberStrike",
+  "revision": "9303b210ab82bd6362d7ad7fbd2b2c8f2e335450",
+  "upstream_license": "AGPL-3.0",
+  "category": "defensive-csf",
+  "entries": [
+    {
+      "code": "GV.RM-06",
+      "title": "GV.RM-06 风险分级与优先级 / Risk prioritization",
+      "source_path": ".cyberstrike/skill/NIST/CSF_v2.0/GV_govern/GV.RM-06_gvrm-06/SKILL.md",
+      "source_blob": "fda7f5861e668ac789f865bbc43c5b7cc90717ac",
+      "keywords": "风险,影响,可能性,分级,risk,priority",
+      "body": "使用统一的影响与可能性定义核查风险记录。记录资产价值、暴露情况、已证实条件、现有缓解措施和不确定性，区分技术严重性与业务优先级。为评分保留依据与复核时间；不把框架编号或候选发现直接转换为 CVSS。ARTEX：关联发现、证据版本及责任人，保留调整前后评分和理由。"
+    },
+    {
+      "code": "GV.SC-07",
+      "title": "GV.SC-07 供应商风险跟踪 / Supplier risk tracking",
+      "source_path": ".cyberstrike/skill/NIST/CSF_v2.0/GV_govern/GV.SC-07_gvsc-07/SKILL.md",
+      "source_blob": "39f3ea4eed42f62fbcfc2b42722842436d0ff1d2",
+      "keywords": "供应商,第三方,依赖,风险,supplier,third party",
+      "body": "从合同、组件清单、服务目录和供应商公告记录依赖关系、版本、负责人、业务影响及支持期限。评估已知风险、缓解和复核日期；区分供应商声明与独立证据。ARTEX：将第三方发现与受影响资产及处置记录关联，保留不确定项，避免将整个供应商的风险泛化到所有产品。"
+    },
+    {
+      "code": "ID.RA-06",
+      "title": "ID.RA-06 风险处置与验证闭环 / Risk response tracking",
+      "source_path": ".cyberstrike/skill/NIST/CSF_v2.0/ID_identify/ID.RA-06_idra-06/SKILL.md",
+      "source_blob": "a62418bd3bb4c3ddc35a9272f13f82808ed817a3",
+      "keywords": "风险处置,修复,缓解,复验,risk response,remediation",
+      "body": "对已确认风险记录处置方案、责任人、期限、验收条件与实际结果。区分修复、缓解、接受和转移；记录残余风险和重新评估日期。ARTEX：保留原发现、修复前后证据和复核回执，不将工单关闭或部署成功等同于风险消除。"
+    },
+    {
+      "code": "ID.RA-07",
+      "title": "ID.RA-07 变更与例外管理 / Change and exception management",
+      "source_path": ".cyberstrike/skill/NIST/CSF_v2.0/ID_identify/ID.RA-07_idra-07/SKILL.md",
+      "source_blob": "f782515f3807052a162459814f04bd2aacd40ad6",
+      "keywords": "变更,例外,审批,回滚,change,exception",
+      "body": "核对变更记录、影响分析、审批、有效期和回滚方案，识别未纳入管理的配置变化。例外须记录适用范围、理由、替代措施和复核日期；区分计划与实际生效版本。ARTEX：通过配置和证据差分记录变化，保留审批及复验结果，不自动修改目标配置。"
+    },
+    {
+      "code": "PR.DS-02",
+      "title": "PR.DS-02 传输中数据保护 / Data in transit protection",
+      "source_path": ".cyberstrike/skill/NIST/CSF_v2.0/PR_protect/PR.DS-02_prds-02/SKILL.md",
+      "source_blob": "3fe235633f1554ec9870b7ab7c65f3ef862a5fdd",
+      "keywords": "传输,加密,TLS,证书,网络,data in transit",
+      "body": "核对获准查看的通信配置、证书生命周期、信任配置、服务端点及现有连接记录。区分传输加密、端点身份验证和应用授权；记录实际观察的协议与配置版本。ARTEX：引用已有 HAR 和 TLS 配置证据，标注代理终止点及观察限制，不根据 HTTPS 字样认定全链路安全。"
+    },
+    {
+      "code": "PR.PS-04",
+      "title": "PR.PS-04 日志生成与可用性 / Logging availability",
+      "source_path": ".cyberstrike/skill/NIST/CSF_v2.0/PR_protect/PR.PS-04_prps-04/SKILL.md",
+      "source_blob": "5417134a3cb7525e5cdb8663453f97b965708f21",
+      "keywords": "日志,审计,采集,留存,logging,telemetry",
+      "body": "核对系统和应用日志类别、生成位置、时间同步、保留期限、采集状态及访问权限。用既有测试记录验证日志可用性，区分未配置、未采集和未发生事件。ARTEX：关联日志来源、采集范围和证据时间，避免以空结果证明系统正常。"
+    },
+    {
+      "code": "DE.CM-09",
+      "title": "DE.CM-09 运行环境持续监测 / Runtime monitoring",
+      "source_path": ".cyberstrike/skill/NIST/CSF_v2.0/DE_detect/DE.CM-09_decm-09/SKILL.md",
+      "source_blob": "74c744fd8567bd24ea719dab22e66ab7bb0df02f",
+      "keywords": "运行环境,监测,服务,端点,runtime,monitoring",
+      "body": "从已有运行指标、主机及容器监测、应用日志和告警核对硬件、软件、运行环境和数据的覆盖范围。记录传感器失联、采集延迟、版本和异常处理。ARTEX：按资产和时间关联观察记录，区分异常指标、已确认事件与监测缺口，不把单一异常解释为入侵。"
+    },
+    {
+      "code": "RS.AN-06",
+      "title": "RS.AN-06 调查行为与证据来源 / Investigation provenance",
+      "source_path": ".cyberstrike/skill/NIST/CSF_v2.0/RS_respond/RS.AN-06_rsan-06/SKILL.md",
+      "source_blob": "b5cd92bd7f237ad3081aab9cd6056116fb34913a",
+      "keywords": "调查,证据,来源,完整性,provenance,chain of custody",
+      "body": "记录调查动作、执行人、时间、授权范围、输入来源及输出引用。保留原始记录与分析衍生记录的区别，说明截断、格式转换、缺失和复核结果；必要时使用已有完整性验证。ARTEX：将证据快照、报告版本和复核记录关联，不用推断替代原始观测。"
+    },
+    {
+      "code": "RC.CO-03",
+      "title": "RC.CO-03 恢复进度与沟通 / Recovery communication",
+      "source_path": ".cyberstrike/skill/NIST/CSF_v2.0/RC_recover/RC.CO-03_rcco-03/SKILL.md",
+      "source_blob": "5fef8733605208d5ff40927ce1e8690fb79a8b65",
+      "keywords": "恢复,进度,沟通,责任,recovery,stakeholders",
+      "body": "按既定恢复计划向相关责任人沟通已恢复服务、未完成事项、实际恢复时间、业务影响和剩余风险。区分预计时间与已验证结果，记录信息版本、来源和接收方。ARTEX：从版本化报告及复验记录生成恢复状态摘要，不披露不必要的敏感证据。"
+    }
+  ]
+}

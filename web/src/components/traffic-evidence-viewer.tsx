@@ -81,6 +81,15 @@ export function TrafficEvidenceViewer({
             {detail?.binding.snapshot.url ?? tr("查看关联时保存的请求和响应", "View the request and response saved at binding time")}
           </DialogDescription>
         </DialogHeader>
+        {detail?.binding.snapshot.source_traffic_id.startsWith("har-") && (
+          <p className="text-xs text-muted-foreground">{detail.binding.snapshot.har_page_state === "unique"
+            ? tr("HAR 文件内页面 #" + detail.binding.snapshot.har_page_ordinal, "HAR file-local page #" + detail.binding.snapshot.har_page_ordinal)
+            : detail.binding.snapshot.har_page_state === "missing" ? tr("未提供页面引用", "No page reference")
+            : detail.binding.snapshot.har_page_state === "ambiguous" ? tr("页面引用歧义", "Ambiguous page reference")
+            : detail.binding.snapshot.har_page_state === "unknown" ? tr("未知页面引用", "Unknown page reference")
+            : tr("页面归属未观测", "Page attribution unobserved")}
+            {" · "}{tr("仅为原始文件关联，不代表浏览器身份。", "File-local attribution only, not browser identity.")}</p>
+        )}
         {error ? (
           <Alert variant="destructive">
             <AlertDescription>{error}</AlertDescription>

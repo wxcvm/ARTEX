@@ -1223,6 +1223,8 @@ CREATE TABLE IF NOT EXISTS traffic_evidence_snapshots (
     unreferenced_at TIMESTAMPTZ,
     created_at TIMESTAMPTZ NOT NULL DEFAULT now()
 );
+ALTER TABLE traffic_evidence_snapshots ADD COLUMN IF NOT EXISTS har_page_state TEXT NOT NULL DEFAULT '';
+ALTER TABLE traffic_evidence_snapshots ADD COLUMN IF NOT EXISTS har_page_ordinal INTEGER NOT NULL DEFAULT 0;
 CREATE TABLE IF NOT EXISTS finding_traffic_bindings (
     id BIGSERIAL PRIMARY KEY,
     finding_id BIGINT NOT NULL REFERENCES findings(id) ON DELETE CASCADE,
@@ -1251,6 +1253,37 @@ CREATE INDEX IF NOT EXISTS idx_finding_screenshots_order ON finding_screenshots(
 
 -- Explicit human-authored observations, optionally linked to captured traffic.
 -- User-managed knowledge documents are separate from the bundled read-only SQLite library.
+CREATE TABLE IF NOT EXISTS task_report_snapshots (
+    id TEXT PRIMARY KEY,
+    task_id BIGINT NOT NULL REFERENCES tasks(id) ON DELETE CASCADE,
+    name TEXT NOT NULL,
+    format TEXT NOT NULL CHECK (format IN ('md','docx')),
+    scope TEXT NOT NULL,
+    locale TEXT NOT NULL,
+    template_name TEXT NOT NULL DEFAULT '',
+    payload BYTEA NOT NULL,
+    created_at TIMESTAMPTZ NOT NULL DEFAULT now()
+);
+CREATE INDEX IF NOT EXISTS idx_task_report_snapshots_task ON task_report_snapshots(task_id, created_at DESC,id);
+
+CREATE TABLE IF NOT EXISTS report_templates (
+    id TEXT PRIMARY KEY,
+    name TEXT NOT NULL,
+    brand TEXT NOT NULL DEFAULT '',
+    cover_title TEXT NOT NULL DEFAULT '',
+    subtitle TEXT NOT NULL DEFAULT '',
+    prepared_for TEXT NOT NULL DEFAULT '',
+    author TEXT NOT NULL DEFAULT '',
+    confidentiality TEXT NOT NULL DEFAULT '',
+    footer TEXT NOT NULL DEFAULT '',
+    created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
+    updated_at TIMESTAMPTZ NOT NULL DEFAULT now()
+);
+
+ALTER TABLE report_templates ADD COLUMN IF NOT EXISTS logo BYTEA;
+ALTER TABLE report_templates ADD COLUMN IF NOT EXISTS sections JSONB NOT NULL DEFAULT '[]'::jsonb;
+ALTER TABLE report_templates ADD COLUMN IF NOT EXISTS metadata JSONB NOT NULL DEFAULT '{}'::jsonb;
+
 CREATE TABLE IF NOT EXISTS knowledge_documents (
     id TEXT PRIMARY KEY,
     task_id BIGINT REFERENCES tasks(id) ON DELETE CASCADE,
@@ -1598,3 +1631,12 @@ CREATE TABLE IF NOT EXISTS coverage_ledger (
  updated_at TIMESTAMPTZ NOT NULL DEFAULT now(),
  PRIMARY KEY (task_id,surface,risk_area)
 );
+
+-- Account activity audit: fixed action/result values, never request bodies or credentials.
+CREATE TABLE IF NOT EXISTS account_audit (
+    id BIGSERIAL PRIMARY KEY,
+    created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
+    action TEXT NOT NULL,
+    result TEXT NOT NULL
+);
+CREATE INDEX IF NOT EXISTS idx_account_audit_action ON account_audit(action, id DESC);

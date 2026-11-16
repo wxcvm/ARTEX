@@ -169,6 +169,9 @@ func (s *Store) prepare(ctx context.Context, refs []db.TrafficRef) ([]db.Prepare
 		}
 		v := db.TrafficEvidenceSnapshot{SourceTrafficID: e.ID, CapturedAt: e.TS, URL: e.URL, Method: e.Method, Status: e.Status, ContentType: e.ContentType,
 			ReqHead: e.ReqHead, RespHead: e.RespHead, ReqHash: rh, RespHash: ph, ReqLen: e.ReqLen, RespLen: e.RespLen}
+		if e.HARPage != nil {
+			v.HARPageState, v.HARPageOrdinal = e.HARPage.State, e.HARPage.Ordinal
+		}
 		// Raw wire bytes: normalize once here so the ID, the stored row and every
 		// downstream consumer (archive, API responses) all see the same text.
 		v = v.Normalize()

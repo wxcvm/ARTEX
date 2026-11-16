@@ -1645,6 +1645,8 @@ export interface TrafficEvidenceRef {
   note?: string;
 }
 export interface TrafficEvidenceSnapshot {
+  har_page_state?: "unique" | "missing" | "unknown" | "ambiguous";
+  har_page_ordinal?: number;
   id: string;
   source_traffic_id: string;
   captured_at: number;
@@ -1749,4 +1751,46 @@ export interface ReleaseUpdate {
   release_url: string;
   published_at: string;
   assets: {name:string;size:number;url:string}[];
+}
+
+export interface ReportSection {
+  title: string;
+  body: string;
+  position: "before" | "after";
+}
+export interface ReportPerson { name: string; role: string; contact: string }
+export interface ReportMetadata { project: string; version: string; personnel?: ReportPerson[] | null; standards?: string[] | null }
+export interface ReportTemplateInput {
+  name: string;
+  brand: string;
+  cover_title: string;
+  subtitle: string;
+  prepared_for: string;
+  author: string;
+  confidentiality: string;
+  footer: string;
+  sections?: ReportSection[];
+  metadata?: ReportMetadata | null;
+}
+export interface ReportTemplate extends ReportTemplateInput {
+  id: string;
+  has_logo: boolean;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface TaskReportSnapshot {
+  id:string;
+  name:string;
+  format:"md"|"docx";
+  scope:"all"|"confirmed";
+  locale:string;
+  template_name:string;
+  size:number;
+  created_at:string;
+}
+
+export interface TaskReportLibraryItem extends TaskReportSnapshot {
+  task_id:string;
+  task_name:string;
 }

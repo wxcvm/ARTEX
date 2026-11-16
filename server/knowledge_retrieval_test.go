@@ -148,7 +148,7 @@ func TestRankedKnowledgeDocumentSearch(t *testing.T){
 }
 
 
-// Exercise the shipped reference material through the same scoped tools
+// Exercise all 27 shipped references through the same scoped tools
 // exposed to the agent, not merely the manifest or the database insert.
 func TestCyberStrikeReferenceToolRetrieval(t *testing.T) {
 	s,f,_:=trafficEvidenceServer(t)
@@ -188,6 +188,9 @@ func TestCyberStrikeReferenceToolRetrieval(t *testing.T) {
 		{"GV.RR-02","GV.RR-02"},{"ID.AM-02","ID.AM-02"},{"ID.AM-03","ID.AM-03"},
 		{"ID.IM-01","ID.IM-01"},{"PR.AA-03","PR.AA-03"},{"PR.DS-01","PR.DS-01"},
 		{"DE.AE-03","DE.AE-03"},{"RS.MA-02","RS.MA-02"},{"RC.RP-05","RC.RP-05"},
+		{"GV.RM-06","GV.RM-06"},{"GV.SC-07","GV.SC-07"},{"ID.RA-06","ID.RA-06"},
+		{"ID.RA-07","ID.RA-07"},{"PR.DS-02","PR.DS-02"},{"PR.PS-04","PR.PS-04"},
+		{"DE.CM-09","DE.CM-09"},{"RS.AN-06","RS.AN-06"},{"RC.CO-03","RC.CO-03"},
 	}{
 		hits:=search(tc.q,1)
 		if len(hits)!=1||hits[0].Scope!="global"||!strings.HasPrefix(hits[0].Title,tc.code+" ")||hits[0].DocumentID==""||!strings.HasPrefix(hits[0].SourceFilename,".cyberstrike/skill/NIST/CSF_v2.0/"){

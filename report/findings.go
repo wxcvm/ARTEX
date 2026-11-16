@@ -21,7 +21,7 @@ import (
 // sortFindingsForExport sorts by severity descending, then by time descending, consistent with the summary report's grouping.
 func sortFindingsForExport(fs []*db.DBFinding) {
 	sort.SliceStable(fs, func(i, j int) bool {
-		ri, rj := sevRank[fs[i].Severity], sevRank[fs[j].Severity]
+		ri, rj := severityRank(fs[i].Severity), severityRank(fs[j].Severity)
 		if ri != rj {
 			return ri < rj // smaller sevRank means more severe
 		}
@@ -53,12 +53,12 @@ func FindingsMarkdownLocalized(fs []*db.DBFinding, generatedAt time.Time, locale
 	// Summary: counts per severity.
 	counts := map[string]int{}
 	for _, f := range items {
-		counts[f.Severity]++
+		counts[severityKey(f.Severity)]++
 	}
 	b.WriteString(tr("## 摘要\n\n", "## Summary\n\n"))
 	b.WriteString(tr("| 严重程度 | 数量 |\n| --- | --- |\n", "| Severity | Count |\n| --- | --- |\n"))
 	for _, s := range []struct{ key, label string }{
-		{"critical", "Critical"}, {"high", "High"}, {"medium", "Medium"}, {"low", "Low"},
+		{"critical", "Critical"}, {"high", "High"}, {"medium", "Medium"}, {"low", "Low"}, {"info", "Info"}, {"unknown", "Unknown"},
 	} {
 		fmt.Fprintf(&b, "| %s | %d |\n", reportText(locale, reportSeverity(locale, s.key), s.label), counts[s.key])
 	}
@@ -71,7 +71,7 @@ func FindingsMarkdownLocalized(fs []*db.DBFinding, generatedAt time.Time, locale
 
 	b.WriteString(tr("## 漏洞详情\n\n", "## Vulnerability Details\n\n"))
 	for i, f := range items {
-		fmt.Fprintf(&b, "### %d. [%s] %s\n\n", i+1, reportSeverity(locale, nz(f.Severity, "info")), nz(f.Name, nz(f.VulnClass, tr("未分类", "Uncategorized"))))
+		fmt.Fprintf(&b, "### %d. [%s] %s\n\n", i+1, reportSeverity(locale, severityKey(f.Severity)), nz(f.Name, nz(f.VulnClass, tr("未分类", "Uncategorized"))))
 		if f.VulnClass != "" {
 			fmt.Fprintf(&b, tr("- **类型**：%s\n", "- **Class**: %s\n"), f.VulnClass)
 		}
@@ -107,7 +107,7 @@ func SingleFindingMarkdown(f *db.DBFinding, generatedAt time.Time) string {
 func SingleFindingMarkdownLocalized(f *db.DBFinding, generatedAt time.Time, locale string) string {
 	tr := func(zh, en string) string { return reportText(locale, zh, en) }
 	var b strings.Builder
-	fmt.Fprintf(&b, "# [%s] %s\n\n", reportSeverity(locale, nz(f.Severity, "info")), nz(f.Name, nz(f.VulnClass, tr("未分类", "Uncategorized"))))
+	fmt.Fprintf(&b, "# [%s] %s\n\n", reportSeverity(locale, severityKey(f.Severity)), nz(f.Name, nz(f.VulnClass, tr("未分类", "Uncategorized"))))
 	if f.VulnClass != "" {
 		fmt.Fprintf(&b, tr("- **类型**：%s\n", "- **Class**: %s\n"), f.VulnClass)
 	}

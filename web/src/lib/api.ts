@@ -272,10 +272,11 @@ export const api = {
       : post<KnowledgeDocument>(`/knowledge/documents?${new URLSearchParams(task ? {task} : {})}`, doc),
   deleteKnowledgeDocument: (id: string, task?: string) =>
     del<{ok: boolean}>(`/knowledge/documents/${encodeURIComponent(id)}?${new URLSearchParams(task ? {task} : {})}`),
-  uploadKnowledgeDocument: async (file: File, category: string, task?: string) => {
+  uploadKnowledgeDocument: async (file: File, category: string, task?: string,ocr?:{forceOCR:boolean;ocrLanguage:string}) => {
     const data = new FormData();
     data.append("file", file);
     data.append("category", category);
+    if(ocr){data.append("force_ocr",String(ocr.forceOCR));data.append("ocr_language",ocr.ocrLanguage);}
     const token = getToken();
     const r = await fetch(`/api/knowledge/documents/upload?${new URLSearchParams(task ? {task} : {})}`, {
       method: "POST", body: data, headers: token ? {Authorization: `Bearer ${token}`} : {},
@@ -625,18 +626,35 @@ export const api = {
     get<FindingAssetTree>(`/exploration/findings/asset-tree?${findingFilterParams(q).toString()}`),
   findingStats: (q: Omit<FindingQuery, "page" | "pageSize"> = {}) =>
     get<FindingStats>(`/exploration/findings/stats?${findingFilterParams(q).toString()}`),
+  taskReportLibrary: (q="",format="",offset=0) => get<import("./types").TaskReportLibraryItem[]>(`/report/library?${new URLSearchParams({q,format,offset:String(offset)})}`),
+  taskReportSnapshots: (task:string,offset=0) => get<import("./types").TaskReportSnapshot[]>(`/report/snapshots?${new URLSearchParams({task,offset:String(offset)})}`),
+  saveTaskReportSnapshot: (task:string,format:"md"|"docx",scope:"all"|"confirmed",locale:string,layout:"simple"|"professional",template:string,name:string) => post<import("./types").TaskReportSnapshot>(`/report/snapshots?${new URLSearchParams({task,format,scope,lang:locale,layout,template,name})}`,{}),
+  deleteTaskReportSnapshot: (task:string,id:string) => del<{ok:boolean}>(`/report/snapshots/${encodeURIComponent(id)}?${new URLSearchParams({task})}`),
+  downloadTaskReportSnapshot: async(task:string,id:string,format:"md"|"docx") => {
+    const token=getToken();
+    const r=await fetch(`/api/report/snapshots/${encodeURIComponent(id)}?${new URLSearchParams({task})}`,{headers:token?{Authorization:`Bearer ${token}`}:{}});
+    if(!r.ok)throw new Error(`Saved report: ${r.status}`);
+    const blob=await r.blob();const url=URL.createObjectURL(blob);
+    const a=document.createElement("a");a.href=url;a.download=downloadFilename(r.headers.get("Content-Disposition")??"",`task-report.${format}`);document.body.appendChild(a);a.click();a.remove();window.setTimeout(()=>URL.revokeObjectURL(url),1000);
+  },
+  setReportTemplateLogo: (id:string,file?:File) => http<import("./types").ReportTemplate>(`/report/templates/${encodeURIComponent(id)}/logo`,file?{method:"PUT",body:file,headers:{"Content-Type":"application/octet-stream"}}:{method:"DELETE"}),
+  reportTemplates: () => get<import("./types").ReportTemplate[]>("/report/templates"),
+  saveReportTemplate: (data: import("./types").ReportTemplateInput, id?: string) => id ? put<import("./types").ReportTemplate>(`/report/templates/${encodeURIComponent(id)}`, data) : post<import("./types").ReportTemplate>("/report/templates", data),
+  deleteReportTemplate: (id: string) => del<{ok:boolean}>(`/report/templates/${encodeURIComponent(id)}`),
   // exportFindings triggers the findings page export and downloads the file. scope=selected
   // sends ids (a finding_id list); scope=filtered sends the current filters (the FindingQuery filter fields); scope=all ignores filters.
   exportFindings: async (opts: {
     format: "md-single" | "md-zip" | "csv" | "json" | "sarif" | "docx";
     layout?: "simple" | "professional";
-    locale?: "zh-CN" | "en";
+    template?: string;
+    locale?: "zh-CN" | "zh-TW" | "en";
     scope: "filtered" | "all" | "selected";
     filters?: Omit<FindingQuery, "page" | "pageSize">;
     ids?: string[];
   }) => {
     const p = new URLSearchParams({ format: opts.format, scope: opts.scope, lang: opts.locale ?? "zh-CN" });
     if (opts.format === "docx" && opts.layout) p.set("layout", opts.layout);
+    if (opts.format === "docx" && opts.template) p.set("template",opts.template);
     if (opts.scope === "selected") {
       p.set("ids", (opts.ids ?? []).join(","));
     } else if (opts.scope === "filtered" && opts.filters) {
@@ -974,7 +992,7 @@ export const api = {
     ).then((r) => ({ ...r, deliveries: arr(r.deliveries) }));
   },
   notifyRetryDelivery: (id: number) => post<{ ok: boolean }>(`/notify/deliveries/${id}/retry`),
-  report: async (task?: string, locale: "zh-CN" | "en" = "zh-CN", scope: "all" | "confirmed" = "all") => {
+  report: async (task?: string, locale: "zh-CN" | "zh-TW" | "en" = "zh-CN", scope: "all" | "confirmed" = "all") => {
     if (MOCK) return taskOutcomeScenarioReport(task ?? "") ?? mockReport(task);
     const token = getToken();
     const params = new URLSearchParams({ lang: locale, scope });
@@ -985,9 +1003,10 @@ export const api = {
     if (!r.ok) throw new Error(`report: ${r.status}`);
     return r.text();
   },
-  reportDOCX: async (task: string, locale: "zh-CN" | "en" = "zh-CN", scope: "all" | "confirmed" = "all", layout: "simple" | "professional" = "professional") => {
+  reportDOCX: async (task: string, locale: "zh-CN" | "zh-TW" | "en" = "zh-CN", scope: "all" | "confirmed" = "all", layout: "simple" | "professional" = "professional", template?: string) => {
     const token = getToken();
     const params = new URLSearchParams({ task, lang: locale, format: "docx", scope, layout });
+    if(template) params.set("template",template);
     const r = await fetch(`/api/report?${params}`, {
       headers: token ? { Authorization: `Bearer ${token}` } : {},
     });

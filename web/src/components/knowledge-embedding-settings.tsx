@@ -3,7 +3,8 @@
 import * as React from "react";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { api } from "@/lib/api";
+import { api, http } from "@/lib/api";
+import { MOCK } from "@/lib/mock/enabled";
 import type { KnowledgeEmbeddingConfig, KnowledgeIndexStatus } from "@/lib/types";
 import { useUiLocale } from "@/lib/ui-locale.client";
 import { uiText } from "@/lib/ui-locale";
@@ -96,54 +97,73 @@ export function KnowledgeIndexControl({documentId,taskId}:{documentId:string;tas
 }
 
 
+type KnowledgeBatchStatus = {
+  state: "idle" | "running" | "stopping" | "finished" | "cancelled" | "error";
+  model?: string; current?: string; succeeded: number; failed: number;
+  reused: number; embedded: number; errors?: string[];
+};
+function batchActive(s: KnowledgeBatchStatus | null) { return s?.state === "running" || s?.state === "stopping"; }
+
 export function KnowledgeBatchIndex({taskId,configRevision,onComplete}:{taskId?:string;configRevision:number;onComplete:()=>void}){
   const locale=useUiLocale();
   const tr=(zh:string,en:string)=>uiText(locale,zh,en);
   const [enabled,setEnabled]=React.useState(false);
+  const [status,setStatus]=React.useState<KnowledgeBatchStatus|null>(null);
   const [busy,setBusy]=React.useState(false);
-  const [progress,setProgress]=React.useState("");
-  const [errors,setErrors]=React.useState<string[]>([]);
-  const stop=React.useRef(false);
+  const [error,setError]=React.useState("");
+  const [refresh,setRefresh]=React.useState(0);
+  const wasActive=React.useRef(false);
+  const completion=React.useRef(onComplete);
+  completion.current=onComplete;
+  const path="/knowledge/documents/index-batch?"+new URLSearchParams(taskId?{task:taskId}:{});
+  const active=batchActive(status);
   React.useEffect(()=>{
-    let active=true;
-    api.knowledgeEmbedding().then(c=>{if(active)setEnabled(c.enabled);}).catch(()=>{if(active)setEnabled(false);});
-    return ()=>{active=false;};
+    let live=true;
+    api.knowledgeEmbedding().then(c=>{if(live)setEnabled(c.enabled);}).catch(()=>{if(live)setEnabled(false);});
+    return ()=>{live=false;};
   },[configRevision,taskId]);
-  React.useEffect(()=>()=>{stop.current=true;},[]);
-  async function run(){
-    if(busy||!enabled)return;
-    setBusy(true);setErrors([]);stop.current=false;
-    let done=0,failed=0,reused=0,embedded=0,after="";
+  React.useEffect(()=>{
+    if(MOCK){setStatus({state:"idle",succeeded:0,failed:0,reused:0,embedded:0});return;}
+    let live=true;
+    let timer: ReturnType<typeof setTimeout> | undefined;
+    async function poll(){
+      let delay=5000;
+      try{
+        const next=await http<KnowledgeBatchStatus>(path);
+        if(!live)return;
+        setStatus(next);setError("");
+        const running=batchActive(next);
+        if(wasActive.current&&!running)completion.current();
+        wasActive.current=running;
+        if(running)delay=1000;
+      }catch(e){if(live)setError((e as Error).message);}
+      if(live)timer=setTimeout(poll,delay);
+    }
+    void poll();
+    return ()=>{live=false;if(timer)clearTimeout(timer);};
+  },[path,refresh]);
+  async function change(method:"POST"|"DELETE"){
+    setBusy(true);setError("");
     try{
-      do{
-        if(stop.current)break;
-        const page=await api.pendingKnowledgeIndexes(taskId,after);
-        for(const doc of page.items){
-          if(stop.current)break;
-          setProgress(tr("索引：","Indexing: ")+doc.title);
-          try{
-            const result=await api.buildKnowledgeIndex(doc.id,taskId,true);
-            done++;reused+=result.reused??0;embedded+=result.embedded??0;
-          }catch(e){
-            failed++;
-            setErrors(old=>[...old,doc.title+": "+(e as Error).message]);
-          }
-        }
-        after=page.next;
-      }while(after&&!stop.current);
-      setProgress((stop.current?tr("已停止。","Stopped. "):tr("本轮结束。","Finished. "))+tr("成功 ","Success ")+done+tr("，失败 ",", failed ")+failed+tr("；复用片段 ","; reused ")+reused+tr("，新生成 ",", embedded ")+embedded);
-      onComplete();
-    }catch(e){setErrors(old=>[...old,(e as Error).message]);}
+      const next=await http<KnowledgeBatchStatus>(path,{method});
+      setStatus(next);
+      if(method==="POST"){wasActive.current=batchActive(next);if(!wasActive.current)completion.current();}
+      setRefresh(n=>n+1);
+    }
+    catch(e){setError((e as Error).message);}
     finally{setBusy(false);}
   }
+  const state=status?.state;
+  const stateText=state==="running"?tr("正在索引","Indexing"):state==="stopping"?tr("正在取消","Cancelling"):state==="finished"?tr("本轮结束","Finished"):state==="cancelled"?tr("已取消","Cancelled"):state==="error"?tr("执行失败","Failed"):tr("尚未启动","Not started");
   return <section className="space-y-2 rounded-md border p-3">
     <div className="flex flex-wrap items-center gap-2">
-      <h3 className="flex-1 text-sm font-medium">{tr("增量批量索引","Incremental batch index")}</h3>
-      <Button size="sm" variant="outline" disabled={!enabled||busy} onClick={()=>void run()}>{busy?tr("正在处理…","Indexing…"):tr("索引本库待处理文档","Index pending documents")}</Button>
-      {busy&&<Button size="sm" variant="ghost" onClick={()=>{stop.current=true;}}>{tr("停止后续文档","Stop after current")}</Button>}
+      <h3 className="flex-1 text-sm font-medium">{tr("后台增量批量索引","Background incremental indexing")}</h3>
+      <Button size="sm" variant="outline" disabled={!enabled||busy||active||!status} onClick={()=>void change("POST")}>{tr("索引本库待处理文档","Index pending documents")}</Button>
+      {active&&<Button size="sm" variant="ghost" disabled={busy||state==="stopping"} onClick={()=>void change("DELETE")}>{tr("取消索引","Cancel indexing")}</Button>}
     </div>
-    <p className="text-xs text-muted-foreground">{tr("跳过当前模型已索引文档；编辑过的文档复用未变化的片段，仅生成新片段向量。按文档串行处理，减少本机资源竞争。","Skip current indexes and reuse unchanged chunks after edits. Process documents sequentially to reduce local model contention.")}</p>
-    {progress&&<p role="status" className="text-xs">{progress}</p>}
-    {errors.length>0&&<div role="alert" className="max-h-40 space-y-1 overflow-auto text-xs text-destructive">{errors.map((msg,i)=><p key={i}>{msg}</p>)}</div>}
+    <p className="text-xs text-muted-foreground">{tr("后台串行处理当前知识库，离开页面不影响运行。已完成文档保留；取消或服务重启后可重新启动，跳过已索引文档。","Processes this library on the server, even after leaving the page. Completed indexes are retained; restart the job after cancellation or a service restart to skip already indexed documents.")}</p>
+    {status&&state!=="idle"&&<p role="status" className="text-xs">{stateText} · {status.model} · {tr("成功 ","Success ")}{status.succeeded}{tr("，失败 ",", failed ")}{status.failed}{tr("；复用片段 ","; reused ")}{status.reused}{tr("，新生成 ",", embedded ")}{status.embedded}{status.current?" · "+status.current:""}</p>}
+    {error&&<p role="alert" className="text-xs text-destructive">{error}</p>}
+    {!!status?.errors?.length&&<div role="alert" className="max-h-40 space-y-1 overflow-auto text-xs text-destructive">{status.errors.map((msg,i)=><p key={i}>{msg}</p>)}</div>}
   </section>;
 }

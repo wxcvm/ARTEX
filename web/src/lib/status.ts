@@ -169,8 +169,49 @@ const chineseStatusLabels: Record<string, string> = {
   "Skipped": "已跳过"
 };
 
-export function statusLabel(domain: StatusDomain, key: string, locale: "zh-CN" | "en" = "zh-CN"): string {
+const traditionalStatusLabels: Record<string, string> = {
+  "Open": "待處理",
+  "Running": "執行中",
+  "Paused": "已暫停",
+  "Completed": "已完成",
+  "Error": "錯誤",
+  "Budget exhausted": "預算耗盡",
+  "Stopped": "已停止",
+  "Deleted": "已刪除",
+  "Created": "已建立",
+  "Queued": "排隊中",
+  "Failed": "失敗",
+  "Timed out": "已逾時",
+  "Critical": "嚴重",
+  "High": "高風險",
+  "Medium": "中風險",
+  "Low": "低風險",
+  "Pending": "待處理",
+  "In progress": "進行中",
+  "Confirmed": "已確認",
+  "Resolved": "已解決",
+  "Fixed": "已修復",
+  "False positive": "誤報",
+  "Ignored": "已忽略",
+  "Duplicate": "重複",
+  "Risk accepted": "風險已接受",
+  "Exploring": "探索中",
+  "Stalled": "停滯",
+  "Idle": "閒置",
+  "Met": "已達成",
+  "Abandoned": "已放棄",
+  "Allow": "允許",
+  "Block": "阻擋",
+  "Observed": "已觀察",
+  "Tombstoned": "已作廢",
+  "Sending": "傳送中",
+  "Sent": "已傳送",
+  "Skipped": "已略過"
+};
+
+export function statusLabel(domain: StatusDomain, key: string, locale: "zh-CN" | "zh-TW" | "en" = "zh-CN"): string {
   const meta = Object.hasOwn(maps[domain], key) ? maps[domain][key] : undefined;
   if (!meta) return key;
-  return locale === "zh-CN" ? chineseStatusLabels[meta.label] ?? meta.label : meta.label;
+  const labels = locale === "zh-CN" ? chineseStatusLabels : locale === "zh-TW" ? traditionalStatusLabels : undefined;
+  return labels?.[meta.label] ?? meta.label;
 }
