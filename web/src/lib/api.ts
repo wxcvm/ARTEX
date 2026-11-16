@@ -625,11 +625,15 @@ export const api = {
     get<FindingAssetTree>(`/exploration/findings/asset-tree?${findingFilterParams(q).toString()}`),
   findingStats: (q: Omit<FindingQuery, "page" | "pageSize"> = {}) =>
     get<FindingStats>(`/exploration/findings/stats?${findingFilterParams(q).toString()}`),
+  reportTemplates: () => get<import("./types").ReportTemplate[]>("/report/templates"),
+  saveReportTemplate: (data: import("./types").ReportTemplateInput, id?: string) => id ? put<import("./types").ReportTemplate>(`/report/templates/${encodeURIComponent(id)}`, data) : post<import("./types").ReportTemplate>("/report/templates", data),
+  deleteReportTemplate: (id: string) => del<{ok:boolean}>(`/report/templates/${encodeURIComponent(id)}`),
   // exportFindings triggers the findings page export and downloads the file. scope=selected
   // sends ids (a finding_id list); scope=filtered sends the current filters (the FindingQuery filter fields); scope=all ignores filters.
   exportFindings: async (opts: {
     format: "md-single" | "md-zip" | "csv" | "json" | "sarif" | "docx";
     layout?: "simple" | "professional";
+    template?: string;
     locale?: "zh-CN" | "en";
     scope: "filtered" | "all" | "selected";
     filters?: Omit<FindingQuery, "page" | "pageSize">;
@@ -637,6 +641,7 @@ export const api = {
   }) => {
     const p = new URLSearchParams({ format: opts.format, scope: opts.scope, lang: opts.locale ?? "zh-CN" });
     if (opts.format === "docx" && opts.layout) p.set("layout", opts.layout);
+    if (opts.format === "docx" && opts.template) p.set("template",opts.template);
     if (opts.scope === "selected") {
       p.set("ids", (opts.ids ?? []).join(","));
     } else if (opts.scope === "filtered" && opts.filters) {
@@ -985,9 +990,10 @@ export const api = {
     if (!r.ok) throw new Error(`report: ${r.status}`);
     return r.text();
   },
-  reportDOCX: async (task: string, locale: "zh-CN" | "en" = "zh-CN", scope: "all" | "confirmed" = "all", layout: "simple" | "professional" = "professional") => {
+  reportDOCX: async (task: string, locale: "zh-CN" | "en" = "zh-CN", scope: "all" | "confirmed" = "all", layout: "simple" | "professional" = "professional", template?: string) => {
     const token = getToken();
     const params = new URLSearchParams({ task, lang: locale, format: "docx", scope, layout });
+    if(template) params.set("template",template);
     const r = await fetch(`/api/report?${params}`, {
       headers: token ? { Authorization: `Bearer ${token}` } : {},
     });

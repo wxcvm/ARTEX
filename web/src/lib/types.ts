@@ -1750,3 +1750,19 @@ export interface ReleaseUpdate {
   published_at: string;
   assets: {name:string;size:number;url:string}[];
 }
+
+export interface ReportTemplateInput {
+  name: string;
+  brand: string;
+  cover_title: string;
+  subtitle: string;
+  prepared_for: string;
+  author: string;
+  confidentiality: string;
+  footer: string;
+}
+export interface ReportTemplate extends ReportTemplateInput {
+  id: string;
+  created_at: string;
+  updated_at: string;
+}

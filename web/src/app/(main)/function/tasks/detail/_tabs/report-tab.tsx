@@ -13,6 +13,7 @@ import { Markdown } from "@/components/markdown";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { api } from "@/lib/api";
+import { ReportTemplateSelect } from "@/components/report-template-manager";
 import { copyText } from "@/lib/utils";
 
 export function ReportTab({ taskId }: { taskId: string }) {
@@ -21,6 +22,7 @@ export function ReportTab({ taskId }: { taskId: string }) {
   const [report, setReport] = React.useState<string>("");
   const [scope, setScope] = React.useState<"confirmed" | "all">("confirmed");
   const [layout, setLayout] = React.useState<"simple" | "professional">("professional");
+  const [template,setTemplate] = React.useState("");
   const reportKey = `${taskId}:${locale}:${scope}`;
   const [reportTaskId, setReportTaskId] = React.useState(reportKey);
   // When the task changes, never display the previous task's report.
@@ -80,7 +82,7 @@ export function ReportTab({ taskId }: { taskId: string }) {
     if (exporting || loading || currentError || !currentReport) return;
     setExporting(true);
     try {
-      await api.reportDOCX(taskId, locale, scope, layout);
+      await api.reportDOCX(taskId, locale, scope, layout, layout==="professional"?template:undefined);
       toast.success(tr("Word 报告已导出", "Word report exported"));
     } catch (cause) {
       toast.error(tr("导出失败：", "Export failed: ") + (cause instanceof Error ? cause.message : tr("请重试", "Please retry")));
@@ -133,6 +135,7 @@ export function ReportTab({ taskId }: { taskId: string }) {
             <option value="professional">{tr("专业版（封面与目录）", "Professional (cover and contents)")}</option>
             <option value="simple">{tr("简洁版", "Simple")}</option>
           </select>
+          {layout==="professional"&&<ReportTemplateSelect value={template} onChange={setTemplate}/>}
           <Button size="sm" variant="outline" disabled={loading} onClick={() => setRefresh((n) => n + 1)}>
             <RefreshCwIcon className={loading ? "animate-spin" : ""} /> {currentError ? tr("重试加载", "Retry") : tr("刷新报告", "Refresh report")}
           </Button>
