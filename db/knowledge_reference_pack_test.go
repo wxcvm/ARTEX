@@ -68,3 +68,57 @@ func TestKnowledgeReferencePackSeedOnceAndSearch(t *testing.T) {
 	if err!=nil || doc.Content!="user edited reference" { t.Fatalf("edit overwritten: %+v %v",doc,err) }
 	if _,err:=d.GetKnowledgeDocument(ctx,0,false,b);err!=ErrKnowledgeDocumentNotFound { t.Fatalf("deleted reference reinstalled: %v",err) }
 }
+
+
+func TestCyberStrikeSupplementManifest(t *testing.T) {
+	var first, supplement knowledgeReferencePack
+	if err := json.Unmarshal(cyberStrikeReferencePackJSON, &first); err != nil { t.Fatal(err) }
+	if err := json.Unmarshal(cyberStrikeSupplementPackJSON, &supplement); err != nil { t.Fatal(err) }
+	if supplement.ID != "cyberstrike-csf-supplement-v1" || len(supplement.Entries) != 9 ||
+		supplement.Revision != first.Revision || supplement.UpstreamLicense != first.UpstreamLicense ||
+		supplement.Framework != first.Framework || referencePackMarker(first) == referencePackMarker(supplement) {
+		t.Fatalf("unexpected supplemental manifest: %+v", supplement)
+	}
+	codes := map[string]bool{}
+	ids := map[string]bool{}
+	for _, pack := range []knowledgeReferencePack{first, supplement} {
+		for _, entry := range pack.Entries {
+			id := referenceDocumentID(pack, entry)
+			if codes[entry.Code] || ids[id] || len(entry.SourceBlob) != 40 ||
+				!strings.HasPrefix(entry.SourcePath, ".cyberstrike/skill/NIST/CSF_v2.0/") ||
+				!strings.HasPrefix(entry.Title, entry.Code+" ") || strings.TrimSpace(entry.Body) == "" || entry.Keywords == "" {
+				t.Fatalf("invalid or duplicate reference: %+v", entry)
+			}
+			codes[entry.Code], ids[id] = true, true
+		}
+	}
+}
+
+func TestKnowledgeReferenceSupplementPreservesEarlierPack(t *testing.T) {
+	d, err := Open(testDSN(t))
+	if err != nil { t.Skipf("postgres unavailable (%v)", err) }
+	defer d.Close()
+	ctx := context.Background()
+	var first, supplement knowledgeReferencePack
+	if err := json.Unmarshal(cyberStrikeReferencePackJSON, &first); err != nil { t.Fatal(err) }
+	if err := json.Unmarshal(cyberStrikeSupplementPackJSON, &supplement); err != nil { t.Fatal(err) }
+	prefix := "test-supplement-" + uuid.NewString()
+	first.ID, supplement.ID = prefix+"-first", prefix+"-second"
+	first.Entries, supplement.Entries = first.Entries[:2], supplement.Entries[:1]
+	a, b, c := referenceDocumentID(first, first.Entries[0]), referenceDocumentID(first, first.Entries[1]), referenceDocumentID(supplement, supplement.Entries[0])
+	defer d.Exec(`DELETE FROM knowledge_documents WHERE id IN ($1,$2,$3)`,a,b,c)
+	defer d.Exec(`DELETE FROM settings WHERE key IN ($1,$2)`,referencePackMarker(first),referencePackMarker(supplement))
+	if err := d.seedKnowledgeReferencePack(first); err != nil { t.Fatal(err) }
+	doc, err := d.GetKnowledgeDocument(ctx,0,false,a)
+	if err != nil { t.Fatal(err) }
+	doc.Content = "retained user edit"
+	if _,err := d.SaveKnowledgeDocument(ctx,0,a,doc); err != nil { t.Fatal(err) }
+	if err := d.DeleteKnowledgeDocument(ctx,0,b); err != nil { t.Fatal(err) }
+	if err := d.seedKnowledgeReferencePack(first); err != nil { t.Fatal(err) }
+	if err := d.seedKnowledgeReferencePack(supplement); err != nil { t.Fatal(err) }
+	doc,err = d.GetKnowledgeDocument(ctx,0,false,a)
+	if err != nil || doc.Content != "retained user edit" { t.Fatalf("earlier edit: %+v %v",doc,err) }
+	if _,err := d.GetKnowledgeDocument(ctx,0,false,b); err != ErrKnowledgeDocumentNotFound { t.Fatalf("earlier deletion: %v",err) }
+	doc,err = d.GetKnowledgeDocument(ctx,0,false,c)
+	if err != nil || doc.TaskID != "" || doc.SourceFilename != supplement.Entries[0].SourcePath { t.Fatalf("supplement: %+v %v",doc,err) }
+}

@@ -185,6 +185,9 @@ func TestCyberStrikeReferenceToolRetrieval(t *testing.T) {
 		{"NIST CSF PR.AA-05","PR.AA-05"},{"PR.DS-11","PR.DS-11"},{"PR.PS-02","PR.PS-02"},
 		{"DE.CM-01","DE.CM-01"},{"RS.AN","RS.AN"},{"RC.RP","RC.RP"},{"GV.SC","GV.SC"},
 		{"最小权限","PR.AA-05"},{"软件生命周期","PR.PS-02"},
+		{"GV.RR-02","GV.RR-02"},{"ID.AM-02","ID.AM-02"},{"ID.AM-03","ID.AM-03"},
+		{"ID.IM-01","ID.IM-01"},{"PR.AA-03","PR.AA-03"},{"PR.DS-01","PR.DS-01"},
+		{"DE.AE-03","DE.AE-03"},{"RS.MA-02","RS.MA-02"},{"RC.RP-05","RC.RP-05"},
 	}{
 		hits:=search(tc.q,1)
 		if len(hits)!=1||hits[0].Scope!="global"||!strings.HasPrefix(hits[0].Title,tc.code+" ")||hits[0].DocumentID==""||!strings.HasPrefix(hits[0].SourceFilename,".cyberstrike/skill/NIST/CSF_v2.0/"){

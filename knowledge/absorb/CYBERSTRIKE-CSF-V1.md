@@ -31,6 +31,13 @@ The manifest test checks all nine unique IDs, source metadata and searchable tex
 Nine reviewed reference documents are the first delivery, not a claim of complete CyberStrike knowledge absorption. No automatic CWE/severity mapping, active testing instructions, or wholesale upstream copy is included. Expand the catalog after source and duplication review.
 
 
+## 第二批增量参考包
+
+`db/knowledgepacks/cyberstrike-csf-supplement-v1.json` 新增 9 条（合计 18 条）：GV.RR-02、ID.AM-02、ID.AM-03、ID.IM-01、PR.AA-03、PR.DS-01、DE.AE-03、RS.MA-02、RC.RP-05。与首包使用同一固定上游版本，逐条核对源文件与 blob；只独立整理防护核查、证据与修复复验参考，不复制技能正文。上游目录包含旧框架编号，不将整个目录视为已核实的 CSF 2.0 语料。
+
+增量包有独立入库标记，沿用全局文档库与事务式入库；已安装首包的实例仅新增第二包，原有文档编辑和删除保留。测试覆盖两包编号/文档身份去重及旧包编辑删除后的增量入库。无需新增表或依赖。
+
+
 ## 智能体检索验收
 
-CSF 分类或子分类编号（如 `GV.SC`、`PR.AA-05`）作为查询词时，匹配标题首编号的参考文档优先于只在标题中提及编号的资料；仍需满足原有全部检索词匹配，普通任务资料仍保留在结果中。验收通过现有 `kb_search` / `kb_get` 调用检查首包 9 条参考的编号、大小写、框架组合词和中文关键词检索，以及全局文档 UUID、来源路径及固定上游版本。测试只使用本地参考数据，不调用模型、外部检索或目标网络；实际模型选择和回答质量仍需独立实验。
+CSF 分类或子分类编号（如 `GV.SC`、`PR.AA-05`）作为查询词时，匹配标题首编号的参考文档优先于只在标题中提及编号的资料；仍需满足原有全部检索词匹配，普通任务资料仍保留在结果中。验收通过现有 `kb_search` / `kb_get` 调用检查已合并两包 18 条参考的编号、大小写、框架组合词和中文关键词检索，以及全局文档 UUID、来源路径及固定上游版本。测试只使用本地参考数据，不调用模型、外部检索或目标网络；实际模型选择和回答质量仍需独立实验。

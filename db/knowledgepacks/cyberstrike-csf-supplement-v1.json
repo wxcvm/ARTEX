@@ -1,0 +1,83 @@
+{
+  "id": "cyberstrike-csf-supplement-v1",
+  "framework": "NIST CSF 2.0",
+  "authority": "https://doi.org/10.6028/NIST.CSWP.29",
+  "upstream": "https://github.com/CyberStrikeus/CyberStrike",
+  "revision": "9303b210ab82bd6362d7ad7fbd2b2c8f2e335450",
+  "upstream_license": "AGPL-3.0",
+  "category": "defensive-csf",
+  "entries": [
+    {
+      "code": "GV.RR-02",
+      "title": "GV.RR-02 安全责任与授权 / Security roles and accountability",
+      "source_path": ".cyberstrike/skill/NIST/CSF_v2.0/GV_govern/GV.RR-02_gvrr-02/SKILL.md",
+      "source_blob": "730e017ccf117321e4f92875dbce001373e00597",
+      "keywords": "责任,授权,审批,RACI,accountability,governance",
+      "body": "核对安全职责、资产所有人、风险接受人和复核人是否明确。使用岗位职责、审批记录和交接工单验证职责分离、替代人员和授权有效期。记录每项未明确的责任及影响；不得从账号名称推断审批权。ARTEX：在任务和报告中保留责任人与验收依据，区分执行者、发现报告者与最终复核者。"
+    },
+    {
+      "code": "ID.AM-02",
+      "title": "ID.AM-02 软件服务与系统清单 / Software and service inventory",
+      "source_path": ".cyberstrike/skill/NIST/CSF_v2.0/ID_identify/ID.AM-02_idam-02/SKILL.md",
+      "source_blob": "08736309d94af8e08bdd6ee2297bf96baeacadda",
+      "keywords": "软件,服务,系统,SBOM,inventory,版本",
+      "body": "汇总软件物料表、部署清单、云服务目录和资产管理记录，记录产品、运行版本、环境、所有人和最后核验日期。区分已安装组件、实际运行服务与历史记录，使用稳定资产标识关联，不把相同产品名称当作同一实例。ARTEX：将清单缺口、版本不一致和待复核项关联覆盖账本与证据，不从清单直接判定漏洞。"
+    },
+    {
+      "code": "ID.AM-03",
+      "title": "ID.AM-03 网络通信与数据流 / Authorized network data flows",
+      "source_path": ".cyberstrike/skill/NIST/CSF_v2.0/ID_identify/ID.AM-03_idam-03/SKILL.md",
+      "source_blob": "0dd0e80d31eaf914d45eed0ce45e490afcc1e319",
+      "keywords": "网络,数据流,拓扑,通信,flow,network map",
+      "body": "从获准查看的架构图、防火墙策略、服务依赖和已有流量记录整理来源、目的、协议、方向及责任人。区分设计允许的通信与实际观察，记录采集覆盖、时间和未知路径。核对跨环境与第三方连接的业务依据；未观察到流量不证明不存在。ARTEX：关联 HAR、已有证据快照及资产身份，使用差异结果支持人工复核。"
+    },
+    {
+      "code": "ID.IM-01",
+      "title": "ID.IM-01 评估反馈与持续改进 / Evaluation-driven improvement",
+      "source_path": ".cyberstrike/skill/NIST/CSF_v2.0/ID_identify/ID.IM-01_idim-01/SKILL.md",
+      "source_blob": "23c872ab47e2700d57da6f87a0594dec71dd87f9",
+      "keywords": "评估,改进,复核,回归,evaluation,lessons learned",
+      "body": "将已完成评估、演练和回归结果整理成可执行改进项。为每项记录问题、影响、证据、优先级、负责人及复验条件。比较前后基线时保持样本和环境一致，区分完成动作与实际效果。ARTEX：使用版本化报告及复核回执跟踪改进；不以发现数量或任务结束状态代替质量。"
+    },
+    {
+      "code": "PR.AA-03",
+      "title": "PR.AA-03 身份验证与身份生命周期 / Authentication assurance",
+      "source_path": ".cyberstrike/skill/NIST/CSF_v2.0/PR_protect/PR.AA-03_praa-03/SKILL.md",
+      "source_blob": "81ae24f5f4d771e38c3016d416ec9fbe83713be4",
+      "keywords": "认证,身份,MFA,服务账户,authentication,identity",
+      "body": "核对用户、服务和设备身份验证策略及现有配置证据。检查账户生命周期、凭据轮换、强认证覆盖、失效凭据撤销和异常登录审计；区分声明的策略与实际生效的控制。使用脱敏账户标识和已授权日志，记录未验证的身份类型。ARTEX：关联配置记录和复核证据，不收集明文凭据，不将认证成功等同于授权正确。"
+    },
+    {
+      "code": "PR.DS-01",
+      "title": "PR.DS-01 静态数据保护 / Data at rest protection",
+      "source_path": ".cyberstrike/skill/NIST/CSF_v2.0/PR_protect/PR.DS-01_prds-01/SKILL.md",
+      "source_blob": "b26e6ce39fc5651d77019bc9f3520c1f301f9dcd",
+      "keywords": "静态数据,加密,密钥,存储,retention,data at rest",
+      "body": "核对数据分类、存储位置、访问权限、加密配置、密钥责任及留存策略。区分磁盘、数据库、对象存储、日志和备份；检查密钥与数据的访问职责是否分离，记录实际配置版本及例外。验证只使用获准查看的配置和脱敏样本，不导出真实敏感内容。ARTEX：关联证据存储与归档策略，记录缺失或过期的配置证据。"
+    },
+    {
+      "code": "DE.AE-03",
+      "title": "DE.AE-03 多来源事件关联 / Multi-source event correlation",
+      "source_path": ".cyberstrike/skill/NIST/CSF_v2.0/DE_detect/DE.AE-03_deae-03/SKILL.md",
+      "source_blob": "c49c513a029c9a1344cd08bdadc4d0c89a06d87e",
+      "keywords": "事件,日志,关联,时间线,SIEM,correlation",
+      "body": "使用现有告警、日志、工单和流量记录按稳定事件标识、资产、时间窗口及上下文关联。保留各自来源与时区，区分独立观察、同源重复和推断关系。对冲突记录说明原因，不能仅凭时间相近认定同一事件。ARTEX：保留证据引用、观察与复核状态，支持跨记录差异比较与人工确认。"
+    },
+    {
+      "code": "RS.MA-02",
+      "title": "RS.MA-02 事件报告分级与验证 / Incident triage and validation",
+      "source_path": ".cyberstrike/skill/NIST/CSF_v2.0/RS_respond/RS.MA-02_rsma-02/SKILL.md",
+      "source_blob": "f5a5be368ed6e513b74e7858c23cf5f47b7bd970",
+      "keywords": "事件,分级,报告,验证,triage,incident",
+      "body": "核对报告来源、涉及资产、时间、已观察影响和证据可用性，按既定业务影响与响应标准分类。区分未确认、已确认、误报和需要更多证据；记录分级依据、责任人及后续核查事项。ARTEX：关联发现候选、复核回执和已有记录，不以单条异常或报告严重性自动认定事件。"
+    },
+    {
+      "code": "RC.RP-05",
+      "title": "RC.RP-05 恢复资产完整性验收 / Restored asset integrity",
+      "source_path": ".cyberstrike/skill/NIST/CSF_v2.0/RC_recover/RC.RP-05_rcrp-05/SKILL.md",
+      "source_blob": "858e183e6708388b59838e178c10a758bb067da0",
+      "keywords": "恢复,完整性,业务验收,健康检查,recovery,integrity",
+      "body": "在批准的恢复环境核对恢复资产版本、数据一致性、依赖服务、业务健康检查和监控结果。将验收条件与实测证据逐项对应，区分服务启动、部分恢复、正常运行和未验证。记录恢复时间、负责人、例外及后续观察窗口。ARTEX：保留恢复前后证据与复验回执，不用单一健康指标替代完整业务验收。"
+    }
+  ]
+}
