@@ -39,6 +39,7 @@ type ArchiveExchange struct {
 	RespHead    string `json:"resp_head"`
 	RespBody    []byte `json:"resp_body,omitempty"`
 	RespBlob    string `json:"resp_blob,omitempty"`
+	HARPage *HARPageAttribution `json:"har_page,omitempty"`
 }
 
 // ExportHosts writes an exact-host snapshot to dir. It holds the traffic writer
@@ -91,6 +92,8 @@ FROM exchange_bodies WHERE id=?`, item.ID).Scan(&item.ReqHead, &item.ReqBody, &r
 		} else if err != nil {
 			return 0, err
 		}
+		item.HARPage, err = t.readHARPage(item.ID)
+		if err != nil { return 0, err }
 		item.ReqBlob, item.RespBlob = reqBlob.String, respBlob.String
 		for _, hash := range []string{item.ReqBlob, item.RespBlob} {
 			if hash != "" {
@@ -192,6 +195,10 @@ VALUES(?,?,?,?,?,?,?,?,?,?,'')`, item.ID, item.TS, item.Host, item.Method, item.
 VALUES(?,?,?,?,?,?,?)`, item.ID, item.ReqHead, item.ReqBody, nullIfEmpty(item.ReqBlob),
 			item.RespHead, item.RespBody, nullIfEmpty(item.RespBlob)); err != nil {
 			return imported, err
+		}
+		if item.HARPage != nil {
+			if !item.HARPage.valid() { return imported, fmt.Errorf("invalid archived HAR page attribution") }
+			if _, err := tx.Exec(`INSERT INTO har_page_attribution(exchange_id,state,ordinal) VALUES(?,?,?)`, item.ID,item.HARPage.State,item.HARPage.Ordinal); err != nil { return imported, err }
 		}
 		for _, hash := range []string{item.ReqBlob, item.RespBlob} {
 			if hash != "" {
