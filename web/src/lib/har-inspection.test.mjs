@@ -20,6 +20,8 @@ test("HAR inventory distinguishes missing status, invalid status and omitted tex
     responseTextPresent: 2, responseTextNotEmbedded: 3, encodedResponseText: 1,
     requestPostDataNotEmbedded: 0, entriesWithDuplicateHeaders: 0,
     captureTimePresent: 2, captureTimeUnknown: 3,
+    declaredPages: 0, invalidPages: 0, entriesWithKnownPage: 0, entriesWithUnknownPage: 0,
+    entriesWithAmbiguousPage: 0, entriesWithoutPage: 5,
   });
   assert.doesNotMatch(JSON.stringify(result), /SECRET|PRIVATE|example\.invalid/);
 });
@@ -48,4 +50,21 @@ test("invalid HAR containers error and empty archives remain explicit", () => {
   assert.equal(result.entries, 0);
   assert.equal(result.httpEntries, 0);
   assert.equal(result.responseTextNotEmbedded, 0);
+});
+
+
+test("browser page attribution distinguishes missing, unknown and ambiguous page references without leaking metadata", () => {
+  const request = { method: "GET", url: "https://example.invalid/private" };
+  const result = inspectHar({log:{pages:[{id:"PAGE_PRIVATE",title:"SECRET"},{id:"DUP"},{id:"DUP"},{id:""},{id:123}],entries:[
+    {request,pageref:"PAGE_PRIVATE"}, {request,pageref:"DUP"}, {request,pageref:"UNKNOWN"},
+    {request}, {request,pageref:42}, {request,pageref:""}, {request:{method:"GET",url:"file:///tmp/test"},pageref:"PAGE_PRIVATE"},
+  ]}});
+  assert.equal(result.declaredPages,5);
+  assert.equal(result.invalidPages,2);
+  assert.equal(result.entriesWithKnownPage,1);
+  assert.equal(result.entriesWithAmbiguousPage,1);
+  assert.equal(result.entriesWithUnknownPage,2);
+  assert.equal(result.entriesWithoutPage,2);
+  assert.equal(result.entriesWithKnownPage+result.entriesWithAmbiguousPage+result.entriesWithUnknownPage+result.entriesWithoutPage,result.httpEntries);
+  assert.doesNotMatch(JSON.stringify(result), /PAGE_PRIVATE|SECRET|DUP|UNKNOWN|example\\.invalid/);
 });
