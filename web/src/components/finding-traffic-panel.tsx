@@ -145,7 +145,7 @@ export function FindingTrafficPanel({
                     {index + 1}. {(locale === "en" ? ROLES : CHINESE_ROLES)[b.role]}
                   </Badge>
                   <Badge variant="secondary">
-                    {b.snapshot.method} · {b.snapshot.status}
+                    {b.snapshot.method} · {b.snapshot.status === 0 ? tr("状态未观测", "Status unobserved") : b.snapshot.status}
                   </Badge>
                   <span className="text-xs text-muted-foreground">{tr("证据", "Evidence")} #{b.id}</span>
                 </div>
