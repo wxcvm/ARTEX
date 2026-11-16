@@ -20,6 +20,7 @@ func TestTaskReportSnapshotArchiveRoundTrip(t *testing.T){
 	task:=strconv.FormatInt(tid,10)
 	base:="/api/report/snapshots"
 	if w:=req("POST",base+"?format=md","{}");w.Code!=400{t.Fatal(w.Code,w.Body)}
+	if w:=req("POST",base+"?task=active&format=md","{}");w.Code!=400{t.Fatal(w.Code,w.Body)}
 	w:=req("POST","/api/report/templates",`{"name":"Snapshot fixture","brand":"Snapshot & Co","footer":"Original footer"}`)
 	if w.Code!=200{t.Fatal(w.Code,w.Body)}
 	var tmpl db.ReportTemplate
@@ -53,4 +54,10 @@ func TestTaskReportSnapshotArchiveRoundTrip(t *testing.T){
 	format,restored,err:=s.m.pg.ReadTaskReportSnapshot(s.ctx,tid,snap.ID)
 	if err!=nil||format!="docx"||!bytes.Equal(restored,original){t.Fatal("snapshot restore",format,len(restored),err)}
 	if err=s.m.pg.DeleteTaskReportSnapshot(s.ctx,tid,snap.ID);err!=nil{t.Fatal(err)}
+	w=req("POST",base+"?task="+task+"&format=md&scope=confirmed&name=Markdown","{}")
+	if w.Code!=201{t.Fatal(w.Code,w.Body)}
+	var md db.TaskReportSnapshot
+	if err:=json.Unmarshal(w.Body.Bytes(),&md);err!=nil||md.Format!="md"||md.Scope!="confirmed"{t.Fatal(md,err)}
+	if w=req("GET",base+"/"+md.ID+"?task="+task,"");w.Code!=200||!strings.HasPrefix(w.Header().Get("Content-Type"),"text/markdown"){t.Fatal(w.Code,w.Header())}
+	if w=req("DELETE",base+"/"+md.ID+"?task="+task,"");w.Code!=200{t.Fatal(w.Code,w.Body)}
 }

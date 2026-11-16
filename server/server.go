@@ -4043,7 +4043,7 @@ func (s *Server) fallbackChat(t *Task, msg string) string {
 }
 
 func (s *Server) getReport(w http.ResponseWriter, r *http.Request) {
-	if r.Method=="POST" && r.URL.Query().Get("task")=="" {writeErr(w,400,"task is required");return}
+	if r.Method=="POST" {if _,ok:=s.reportSnapshotTask(w,r);!ok{return}}
 	if r.Method=="POST" && r.URL.Query().Get("format")!="md" && r.URL.Query().Get("format")!="docx" {writeErr(w,400,"invalid snapshot format");return}
 	t := s.m.ResolveTask(r.URL.Query().Get("task"))
 	if t == nil {
