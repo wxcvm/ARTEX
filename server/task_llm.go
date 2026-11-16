@@ -579,8 +579,8 @@ func isRetryableStreamError(err error) bool {
 // CompactionWindow mirrors current()'s precedence so the context window always
 // matches the provider the role will actually stream on.
 func (r *taskLLMRuntime) CompactionWindow() int {
-	if _, cfg, ok := r.s.agentBindingProvider(r.agentKey); ok {
-		return cfg.CompactionWindow()
+	if prov, cfg, ok := r.s.agentBindingProvider(r.agentKey); ok {
+		return poolCompactionWindow(prov, cfg.CompactionWindow())
 	}
 	taskNum, err := parseTaskID(r.taskID)
 	if err != nil {
@@ -591,8 +591,8 @@ func (r *taskLLMRuntime) CompactionWindow() int {
 		return (agent.Config{}).CompactionWindow()
 	}
 	if len(chain) == 0 {
-		if _, cfg, ok := r.s.globalProvider(); ok {
-			return cfg.CompactionWindow()
+		if prov, cfg, ok := r.s.globalProvider(); ok {
+			return poolCompactionWindow(prov, cfg.CompactionWindow())
 		}
 		return (agent.Config{}).CompactionWindow()
 	}

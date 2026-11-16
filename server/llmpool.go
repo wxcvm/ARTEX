@@ -155,6 +155,23 @@ func (s *Server) poolForBinding(id int64, prov llm.Provider, cfg agent.Config) l
 	return prov
 }
 
+
+// poolCompactionWindow keeps the prompt within the smallest context window
+// of any model that can receive it after a pre-stream failover. A fallback
+// cannot shrink a prompt already built for the larger primary model.
+func poolCompactionWindow(prov llm.Provider, configured int) int {
+	pool, ok := prov.(*llmpool.Pool)
+	if !ok {
+		return configured
+	}
+	for _, member := range pool.Members() {
+		if member.WindowTokens > 0 && (configured <= 0 || member.WindowTokens < configured) {
+			configured = member.WindowTokens
+		}
+	}
+	return configured
+}
+
 // LLMPoolMemberStatus is one chain entry as shown in the UI.
 type LLMPoolMemberStatus struct {
 	ProfileID string `json:"profile_id"`
