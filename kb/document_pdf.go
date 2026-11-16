@@ -4,14 +4,18 @@ import (
 	"bytes"
 	"context"
 	"errors"
-	"io"
+	"fmt"
+	"os"
 	"os/exec"
+	"path/filepath"
 	"strings"
 	"time"
 )
 
-// PDF extraction uses the optional local Poppler pdftotext executable. No
-// document is written to a temporary file, uploaded, or passed to a shell.
+// PDF extraction uses optional local pdftotext (Poppler or compatible).
+// A private temporary input file provides seekable input on Windows builds
+// that cannot read a PDF from stdin. It is removed on every exit path.
+// No shell or external service is involved.
 // Scanned/image-only PDFs need OCR, which is not performed here.
 func extractPDFText(ctx context.Context,raw []byte)(string,error){
 	header:=raw
@@ -21,15 +25,20 @@ func extractPDFText(ctx context.Context,raw []byte)(string,error){
 	if err!=nil{return "",errors.New("PDF text import requires local pdftotext (Poppler) on PATH")}
 	ctx,cancel:=context.WithTimeout(ctx,30*time.Second)
 	defer cancel()
-	cmd:=exec.CommandContext(ctx,path,"-enc","UTF-8","-layout","-","-")
-	cmd.Stdin=bytes.NewReader(raw)
+	dir,err:=os.MkdirTemp("","artex-pdf-")
+	if err!=nil{return "",fmt.Errorf("create local PDF workspace: %w",err)}
+	defer os.RemoveAll(dir)
+	input:=filepath.Join(dir,"document.pdf")
+	if err=os.WriteFile(input,raw,0600);err!=nil{return "",fmt.Errorf("write local PDF input: %w",err)}
+	cmd:=exec.CommandContext(ctx,path,"-enc","UTF-8","-layout",input,"-")
 	var output limitedPDFText
 	cmd.Stdout=&output
-	cmd.Stderr=io.Discard
+	var diagnostic limitedPDFText
+	cmd.Stderr=&diagnostic
 	if err:=cmd.Run();err!=nil{
 		if output.overflow{return "",errors.New("PDF extracted text exceeds 4 MiB")}
 		if ctx.Err()!=nil{return "",ctx.Err()}
-		return "",errors.New("PDF text extraction failed (invalid or encrypted PDF)")
+		return "",fmt.Errorf("PDF text extraction failed: %w (%s)",err,strings.TrimSpace(diagnostic.buf.String()[:min(diagnostic.buf.Len(),512)]))
 	}
 	if output.overflow{return "",errors.New("PDF extracted text exceeds 4 MiB")}
 	text:=strings.TrimSpace(output.buf.String())
