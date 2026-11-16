@@ -897,6 +897,24 @@ export const api = {
     if (!r.ok) throw new Error(`report: ${r.status}`);
     return r.text();
   },
+  reportDOCX: async (task: string, locale: "zh-CN" | "en" = "zh-CN") => {
+    const token = getToken();
+    const params = new URLSearchParams({ task, lang: locale, format: "docx" });
+    const r = await fetch(`/api/report?${params}`, {
+      headers: token ? { Authorization: `Bearer ${token}` } : {},
+    });
+    if (!r.ok) throw new Error(`report: ${r.status}`);
+    if (!r.headers.get("Content-Type")?.includes("wordprocessingml.document")) throw new Error("Unexpected report format");
+    const blob = await r.blob();
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement("a");
+    a.href = url;
+    a.download = downloadFilename(r.headers.get("Content-Disposition") ?? "", "task-report.docx");
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    setTimeout(() => URL.revokeObjectURL(url), 1000);
+  },
   chatMentions: (kind: string, query: string, signal?: AbortSignal, cursor = "") =>
     http<{ items: ChatMention[]; next_cursor?: string }>(
       `/chat/mentions?${new URLSearchParams({ kind, q: query, cursor })}`,

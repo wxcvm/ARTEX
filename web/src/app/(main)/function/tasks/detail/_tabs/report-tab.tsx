@@ -6,7 +6,7 @@ import { uiText } from "@/lib/ui-locale";
 
 import * as React from "react";
 
-import { CheckIcon, CopyIcon, FileTextIcon, RefreshCwIcon } from "lucide-react";
+import { CheckIcon, CopyIcon, DownloadIcon, FileTextIcon, RefreshCwIcon } from "lucide-react";
 import { toast } from "sonner";
 
 import { Markdown } from "@/components/markdown";
@@ -25,6 +25,7 @@ export function ReportTab({ taskId }: { taskId: string }) {
   const currentReport = reportTaskId === reportKey ? report : "";
   const [loading, setLoading] = React.useState(true);
   const [copied, setCopied] = React.useState(false);
+  const [exporting, setExporting] = React.useState(false);
   const [error, setError] = React.useState("");
   const [errorTaskId, setErrorTaskId] = React.useState(reportKey);
   const currentError = errorTaskId === reportKey ? error : "";
@@ -73,6 +74,19 @@ export function ReportTab({ taskId }: { taskId: string }) {
     }
   }
 
+  async function exportDOCX() {
+    if (exporting || loading || currentError || !currentReport) return;
+    setExporting(true);
+    try {
+      await api.reportDOCX(taskId, locale);
+      toast.success(tr("Word 报告已导出", "Word report exported"));
+    } catch (cause) {
+      toast.error(tr("导出失败：", "Export failed: ") + (cause instanceof Error ? cause.message : tr("请重试", "Please retry")));
+    } finally {
+      setExporting(false);
+    }
+  }
+
   let content: React.ReactNode;
   if (loading && !currentReport && !currentError) {
     content = (
@@ -112,6 +126,11 @@ export function ReportTab({ taskId }: { taskId: string }) {
           <Button size="sm" variant="outline" disabled={loading} onClick={() => setRefresh((n) => n + 1)}>
             <RefreshCwIcon className={loading ? "animate-spin" : ""} /> {currentError ? tr("重试加载", "Retry") : tr("刷新报告", "Refresh report")}
           </Button>
+          {currentReport && !currentError && (
+            <Button size="sm" variant="outline" disabled={exporting || loading} onClick={() => void exportDOCX()}>
+              <DownloadIcon /> {exporting ? tr("正在导出…", "Exporting…") : tr("导出 Word", "Export Word")}
+            </Button>
+          )}
           {currentReport && (
             <Button size="sm" variant="outline" onClick={copy}>
               {copied ? <CheckIcon /> : <CopyIcon />} {copied ? tr("已复制", "Copied") : tr("复制 Markdown", "Copy Markdown")}

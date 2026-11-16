@@ -4021,7 +4021,11 @@ func (s *Server) getReport(w http.ResponseWriter, r *http.Request) {
 		writeErr(w, 404, "no active task")
 		return
 	}
-	findings, _ := t.Store.ListByKind(db.KindFinding, 1000) // pure vulnerabilities (facts are a separate KindFact and never enter the report)
+	findings, err := t.Store.ListByKind(db.KindFinding, 1000) // pure vulnerabilities (facts are a separate KindFact and never enter the report)
+	if err != nil {
+		writeErr(w, 500, "failed to read report findings")
+		return
+	}
 	counts := map[string]int{}
 	for _, ty := range []string{"root_domain", "ip", "subdomain", "app", "service", "endpoint"} {
 		ns, _ := s.m.Assets().QueryByType(ty, 100000, 0)
@@ -4038,6 +4042,17 @@ func (s *Server) getReport(w http.ResponseWriter, r *http.Request) {
 		Title: t.Description, Goal: t.Goal, GeneratedAt: time.Now(),
 		AssetCounts: counts, Findings: findings, Coverage: ledger,
 	}, report.ReportLocale(r.URL.Query().Get("lang")))
+	if r.URL.Query().Get("format") == "docx" {
+		data, err := report.DOCX(md)
+		if err != nil {
+			writeErr(w, 500, "failed to generate Word report")
+			return
+		}
+		w.Header().Set("Content-Type", report.DOCXContentType)
+		w.Header().Set("Content-Disposition", `attachment; filename="task-report.docx"`)
+		_, _ = w.Write(data)
+		return
+	}
 	w.Header().Set("Content-Type", "text/markdown; charset=utf-8")
 	w.WriteHeader(200)
 	_, _ = w.Write([]byte(md))
