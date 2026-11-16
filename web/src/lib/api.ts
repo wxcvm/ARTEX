@@ -585,12 +585,14 @@ export const api = {
   // sends ids (a finding_id list); scope=filtered sends the current filters (the FindingQuery filter fields); scope=all ignores filters.
   exportFindings: async (opts: {
     format: "md-single" | "md-zip" | "csv" | "json" | "sarif" | "docx";
+    layout?: "simple" | "professional";
     locale?: "zh-CN" | "en";
     scope: "filtered" | "all" | "selected";
     filters?: Omit<FindingQuery, "page" | "pageSize">;
     ids?: string[];
   }) => {
     const p = new URLSearchParams({ format: opts.format, scope: opts.scope, lang: opts.locale ?? "zh-CN" });
+    if (opts.format === "docx" && opts.layout) p.set("layout", opts.layout);
     if (opts.scope === "selected") {
       p.set("ids", (opts.ids ?? []).join(","));
     } else if (opts.scope === "filtered" && opts.filters) {
@@ -937,9 +939,9 @@ export const api = {
     if (!r.ok) throw new Error(`report: ${r.status}`);
     return r.text();
   },
-  reportDOCX: async (task: string, locale: "zh-CN" | "en" = "zh-CN", scope: "all" | "confirmed" = "all") => {
+  reportDOCX: async (task: string, locale: "zh-CN" | "en" = "zh-CN", scope: "all" | "confirmed" = "all", layout: "simple" | "professional" = "professional") => {
     const token = getToken();
-    const params = new URLSearchParams({ task, lang: locale, format: "docx", scope });
+    const params = new URLSearchParams({ task, lang: locale, format: "docx", scope, layout });
     const r = await fetch(`/api/report?${params}`, {
       headers: token ? { Authorization: `Bearer ${token}` } : {},
     });

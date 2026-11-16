@@ -20,6 +20,7 @@ export function ReportTab({ taskId }: { taskId: string }) {
   const tr = (zh: string, en: string) => uiText(locale, zh, en);
   const [report, setReport] = React.useState<string>("");
   const [scope, setScope] = React.useState<"confirmed" | "all">("confirmed");
+  const [layout, setLayout] = React.useState<"simple" | "professional">("professional");
   const reportKey = `${taskId}:${locale}:${scope}`;
   const [reportTaskId, setReportTaskId] = React.useState(reportKey);
   // When the task changes, never display the previous task's report.
@@ -79,7 +80,7 @@ export function ReportTab({ taskId }: { taskId: string }) {
     if (exporting || loading || currentError || !currentReport) return;
     setExporting(true);
     try {
-      await api.reportDOCX(taskId, locale, scope);
+      await api.reportDOCX(taskId, locale, scope, layout);
       toast.success(tr("Word 报告已导出", "Word report exported"));
     } catch (cause) {
       toast.error(tr("导出失败：", "Export failed: ") + (cause instanceof Error ? cause.message : tr("请重试", "Please retry")));
@@ -127,6 +128,10 @@ export function ReportTab({ taskId }: { taskId: string }) {
           <select aria-label={tr("报告收录范围", "Report scope")} value={scope} onChange={(e) => setScope(e.target.value === "all" ? "all" : "confirmed")} className="h-8 rounded-md border bg-background px-2 text-sm">
             <option value="confirmed">{tr("仅已确认", "Confirmed only")}</option>
             <option value="all">{tr("全部发现", "All findings")}</option>
+          </select>
+          <select aria-label={tr("Word 报告样式", "Word report layout")} value={layout} onChange={(e) => setLayout(e.target.value === "simple" ? "simple" : "professional")} className="h-8 rounded-md border bg-background px-2 text-sm">
+            <option value="professional">{tr("专业版（封面与目录）", "Professional (cover and contents)")}</option>
+            <option value="simple">{tr("简洁版", "Simple")}</option>
           </select>
           <Button size="sm" variant="outline" disabled={loading} onClick={() => setRefresh((n) => n + 1)}>
             <RefreshCwIcon className={loading ? "animate-spin" : ""} /> {currentError ? tr("重试加载", "Retry") : tr("刷新报告", "Refresh report")}

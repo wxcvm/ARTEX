@@ -2337,7 +2337,12 @@ func (s *Server) findingsExport(w http.ResponseWriter, r *http.Request) {
 		setDownload("text/markdown; charset=utf-8", "findings-"+stamp+".md")
 		_, _ = w.Write([]byte(report.FindingsMarkdownLocalized(fs, now, report.ReportLocale(q.Get("lang")))))
 	case "docx":
-		payload, err := report.DOCXWithScreenshots(report.FindingsMarkdownLocalized(fs, now, report.ReportLocale(q.Get("lang"))), fs, report.ReportLocale(q.Get("lang")))
+		layout := q.Get("layout")
+		if layout != "" && layout != "simple" && layout != "professional" {
+			writeErr(w, 400, "invalid Word report layout")
+			return
+		}
+		payload, err := report.DOCXWithLayout(report.FindingsMarkdownLocalized(fs, now, report.ReportLocale(q.Get("lang"))), fs, report.ReportLocale(q.Get("lang")), layout)
 		if err != nil {
 			writeErr(w, 500, "failed to generate Word report")
 			return
@@ -4108,7 +4113,12 @@ func (s *Server) getReport(w http.ResponseWriter, r *http.Request) {
 		FindingMeta: meta, FindingDetails: details, ConfirmedOnly: scope == "confirmed",
 	}, report.ReportLocale(r.URL.Query().Get("lang")))
 	if r.URL.Query().Get("format") == "docx" {
-		data, err := report.DOCXWithScreenshots(md, included, report.ReportLocale(r.URL.Query().Get("lang")))
+		layout := r.URL.Query().Get("layout")
+		if layout != "" && layout != "simple" && layout != "professional" {
+			writeErr(w, 400, "invalid Word report layout")
+			return
+		}
+		data, err := report.DOCXWithLayout(md, included, report.ReportLocale(r.URL.Query().Get("lang")), layout)
 		if err != nil {
 			writeErr(w, 500, "failed to generate Word report")
 			return

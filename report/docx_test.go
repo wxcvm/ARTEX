@@ -111,3 +111,52 @@ func TestDOCXWithScreenshots(t *testing.T) {
 		}
 	}
 }
+
+func TestProfessionalDOCXLayout(t *testing.T) {
+	data, err := DOCXWithLayout("# Client <&> report\n## Findings", nil, "en", "professional")
+	if err != nil {
+		t.Fatal(err)
+	}
+	z, err := zip.NewReader(bytes.NewReader(data), int64(len(data)))
+	if err != nil {
+		t.Fatal(err)
+	}
+	parts := map[string]string{}
+	for _, f := range z.File {
+		r, err := f.Open()
+		if err != nil {
+			t.Fatal(err)
+		}
+		raw, err := io.ReadAll(r)
+		r.Close()
+		if err != nil {
+			t.Fatal(err)
+		}
+		dec := xml.NewDecoder(bytes.NewReader(raw))
+		for {
+			if _, err := dec.Token(); err == io.EOF {
+				break
+			} else if err != nil {
+				t.Fatalf("invalid XML %s: %v", f.Name, err)
+			}
+		}
+		parts[f.Name] = string(raw)
+	}
+	for part, values := range map[string][]string{
+		"word/document.xml": {"CoverTitle", "Client &lt;&amp;&gt; report", "Contents", "TOC", "rIdFooter"},
+		"word/footer1.xml": {"PAGE", "ARTEX"},
+		"word/settings.xml": {"updateFields"},
+		"word/_rels/document.xml.rels": {"footer1.xml", "settings.xml"},
+		"[Content_Types].xml": {"footer+xml", "settings+xml"},
+		"word/styles.xml": {"CoverTitle", "CoverKicker"},
+	} {
+		for _, want := range values {
+			if !strings.Contains(parts[part], want) {
+				t.Fatalf("%s missing %q", part, want)
+			}
+		}
+	}
+	if _, err := DOCXWithLayout("x", nil, "en", "bad"); err == nil {
+		t.Fatal("accepted unknown layout")
+	}
+}
