@@ -23,6 +23,7 @@ import { toast } from "sonner";
 import { HttpCodeBlock } from "@/components/http-code-block";
 import { HarInspectionPanel } from "@/components/har-inspection-panel";
 import { LinkTrafficDialog } from "@/components/link-traffic-dialog";
+import { TrafficCompareSheet } from "@/components/traffic-compare-sheet";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -125,6 +126,7 @@ export default function TrafficPage() {
     else toast.error(tr("复制失败，请手动选择流量 ID", "Copy failed; select the traffic ID manually"));
   };
   const [linking, setLinking] = React.useState(false);
+  const [compareIDs, setCompareIDs] = React.useState<[string, string] | null>(null);
   const [page, setPage] = React.useState(0);
   const [size, setSize] = React.useState(50);
   const [host, setHost] = React.useState(""); // raw host input
@@ -619,6 +621,9 @@ export default function TrafficPage() {
 
       <div className="flex flex-wrap items-center gap-2">
         <span className="text-sm text-muted-foreground">{tr(`已选 ${selectedFlows.size} 条`, `${selectedFlows.size} selected`)}</span>
+        <Button variant="outline" size="sm" disabled={selectedFlows.size !== 2} onClick={() => { const ids = [...selectedFlows]; setCompareIDs([ids[0], ids[1]]); }}>
+          {tr("比较两条流量", "Compare two records")}
+        </Button>
         <Button variant="outline" size="sm" disabled={selectedFlows.size === 0} onClick={() => setLinking(true)}>
           {tr("关联发现结果", "Link findings")}
         </Button>
@@ -759,6 +764,7 @@ export default function TrafficPage() {
           onBound={() => setSelectedFlows(new Set())}
         />
       ) : null}
+      <TrafficCompareSheet ids={compareIDs} onClose={() => setCompareIDs(null)} />
       <Sheet open={selected !== null} onOpenChange={(open) => !open && setSelected(null)}>
         <SheetContent className="w-full! max-w-none! gap-0 p-0 sm:w-[48rem]! sm:max-w-[48rem]!">
           {selected && (
