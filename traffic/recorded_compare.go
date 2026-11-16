@@ -6,8 +6,11 @@ import (
 	"crypto/sha256"
 	"encoding/hex"
 	"encoding/json"
+	"encoding/xml"
 	"errors"
 	"io"
+	"mime"
+	"net/url"
 	"reflect"
 	"sort"
 	"strings"
@@ -49,6 +52,8 @@ type BodyComparison struct {
 	CandidateBytes int64 `json:"candidate_bytes"`
 	Relation string `json:"relation"` // equal, different, unknown
 	JSONFields NameChanges `json:"json_fields"`
+	FormFields NameChanges `json:"form_fields"`
+	XMLChildren NameChanges `json:"xml_children"`
 }
 
 const compareJSONBudget = 256 << 10
@@ -59,6 +64,9 @@ type recordedBody struct {
 	digest string
 	valid bool
 	object map[string]any
+	form map[string][]string
+	xmlChildren map[string][]string
+	xmlRoot string
 }
 type recordedSide struct {
 	meta RecordedMeta
@@ -73,19 +81,46 @@ func (t *Traffic) CompareRecorded(ctx context.Context, baseline, candidate strin
 	}
 	sides := make([]recordedSide, 0, 2)
 	err := t.ReadEvidence(ctx, []string{baseline, candidate}, func(e EvidenceExchange) error {
-		req, err := inspectRecordedBody(ctx, e.Request, e.ReqLen, e.ReqHash)
+		side, err := inspectRecordedSide(ctx, e)
 		if err != nil { return err }
-		resp, err := inspectRecordedBody(ctx, e.Response, e.RespLen, e.RespHash)
-		if err != nil { return err }
-		sides = append(sides, recordedSide{
-			meta: RecordedMeta{ID:e.ID, Method:e.Method, TS:e.TS, Status:e.Status, ContentType:e.ContentType},
-			url:e.URL, reqHead:recordedHeaderMap(e.ReqHead), respHead:recordedHeaderMap(e.RespHead),
-			request:req, response:resp,
-		})
+		sides = append(sides, side)
 		return nil
 	})
 	if err != nil { return RecordedComparison{}, err }
-	a,b := sides[0],sides[1]
+	return compareRecordedSides(sides[0], sides[1]), nil
+}
+
+// CompareEvidencePair also supports immutable evidence snapshots. Callers own
+// the readers and must keep them open for this call.
+func CompareEvidencePair(ctx context.Context, baseline, candidate EvidenceExchange) (RecordedComparison, error) {
+	a, err := inspectRecordedSide(ctx, baseline)
+	if err != nil { return RecordedComparison{}, err }
+	b, err := inspectRecordedSide(ctx, candidate)
+	if err != nil { return RecordedComparison{}, err }
+	return compareRecordedSides(a, b), nil
+}
+
+func inspectRecordedSide(ctx context.Context, e EvidenceExchange) (recordedSide, error) {
+	reqHead, respHead := recordedHeaderMap(e.ReqHead), recordedHeaderMap(e.RespHead)
+	req, err := inspectRecordedBody(ctx, e.Request, e.ReqLen, e.ReqHash, recordedContentType(reqHead))
+	if err != nil { return recordedSide{}, err }
+	ct := recordedContentType(respHead)
+	if ct == "" { ct = e.ContentType }
+	resp, err := inspectRecordedBody(ctx, e.Response, e.RespLen, e.RespHash, ct)
+	if err != nil { return recordedSide{}, err }
+	return recordedSide{
+		meta: RecordedMeta{ID:e.ID, Method:e.Method, TS:e.TS, Status:e.Status, ContentType:e.ContentType},
+		url:e.URL, reqHead:reqHead, respHead:respHead, request:req, response:resp,
+	}, nil
+}
+
+func recordedContentType(headers map[string][]string) string {
+	values := headers["content-type"]
+	if len(values) == 1 { return values[0] }
+	return ""
+}
+
+func compareRecordedSides(a, b recordedSide) RecordedComparison {
 	status := "unknown"
 	if a.meta.Status >= 100 && a.meta.Status <= 599 && b.meta.Status >= 100 && b.meta.Status <= 599 {
 		status = "different"
@@ -95,7 +130,7 @@ func (t *Traffic) CompareRecorded(ctx context.Context, baseline, candidate strin
 		Baseline:a.meta, Candidate:b.meta, SameURL:a.url==b.url, StatusRelation:status,
 		RequestHeaders:compareNames(a.reqHead,b.reqHead), ResponseHeaders:compareNames(a.respHead,b.respHead),
 		RequestBody:compareRecordedBodies(a.request,b.request), ResponseBody:compareRecordedBodies(a.response,b.response),
-	},nil
+	}
 }
 
 // Parse the recorded header representation, not a reconstructed HTTP message.
@@ -143,7 +178,7 @@ func (r compareContextReader) Read(p []byte) (int,error) {
 	return r.r.Read(p)
 }
 
-func inspectRecordedBody(ctx context.Context, r io.Reader, expected int64, blobHash string) (recordedBody,error) {
+func inspectRecordedBody(ctx context.Context, r io.Reader, expected int64, blobHash string, contentTypes ...string) (recordedBody,error) {
 	h:=sha256.New()
 	reader:=io.TeeReader(compareContextReader{ctx:ctx,r:r},h)
 	// Stream the full body for byte comparison; retain only a small prefix for
@@ -164,11 +199,68 @@ func inspectRecordedBody(ctx context.Context, r io.Reader, expected int64, blobH
 		var obj map[string]any
 		if dec.Decode(&obj)==nil { out.object=obj }
 	}
+	if len(contentTypes) > 0 {
+		mediaType, _, err := mime.ParseMediaType(contentTypes[0])
+		if err == nil {
+			switch {
+			case mediaType == "application/x-www-form-urlencoded":
+				if values, err := url.ParseQuery(string(prefix)); err == nil { out.form = values }
+			case mediaType == "application/xml" || mediaType == "text/xml" || strings.HasSuffix(mediaType, "+xml"):
+				out.xmlRoot, out.xmlChildren = inspectXMLChildren(prefix)
+			}
+		}
+	}
 	return out,nil
 }
 
+// Compare direct XML children by expanded name, keeping repetitions and the
+// recorded lexical subtree bytes. Root attributes/text and other byte changes
+// remain visible through the full byte comparison. No entities are expanded
+// from external sources; directives (including DTDs) are not interpreted.
+func inspectXMLChildren(raw []byte) (string, map[string][]string) {
+	d := xml.NewDecoder(bytes.NewReader(raw))
+	children := map[string][]string{}
+	root := ""
+	depth := 0
+	var childName string
+	var childStart int64
+	nameOf := func(n xml.Name) string {
+		if n.Space == "" { return n.Local }
+		return "{" + n.Space + "}" + n.Local
+	}
+	for {
+		before := d.InputOffset()
+		tok, err := d.Token()
+		if errors.Is(err, io.EOF) {
+			if depth == 0 && root != "" { return root, children }
+			return "", nil
+		}
+		if err != nil { return "", nil }
+		switch v := tok.(type) {
+		case xml.Directive:
+			return "", nil
+		case xml.StartElement:
+			if depth == 0 {
+				if root != "" { return "", nil }
+				root = nameOf(v.Name)
+			} else if depth == 1 {
+				childName, childStart = nameOf(v.Name), before
+			}
+			depth++
+		case xml.EndElement:
+			depth--
+			if depth == 1 {
+				children[childName] = append(children[childName], string(raw[childStart:d.InputOffset()]))
+			}
+		case xml.CharData:
+			if depth == 0 && strings.TrimSpace(string(v)) != "" { return "", nil }
+		}
+	}
+}
+
 func compareRecordedBodies(a,b recordedBody) BodyComparison {
-	out:=BodyComparison{BaselineBytes:a.size,CandidateBytes:b.size,Relation:"unknown",JSONFields:compareNames(a.object,b.object)}
+	out:=BodyComparison{BaselineBytes:a.size,CandidateBytes:b.size,Relation:"unknown",JSONFields:compareNames(a.object,b.object),FormFields:compareNames(a.form,b.form),XMLChildren:compareNames(a.xmlChildren,b.xmlChildren)}
+	if a.xmlRoot != b.xmlRoot { out.XMLChildren = compareNames[[]string](nil,nil) }
 	if a.valid && b.valid {
 		out.Relation="different"
 		if a.size==b.size && a.digest==b.digest { out.Relation="equal" }

@@ -52,3 +52,36 @@ func TestRecordedBodyComparisonUsesFullStoredBytes(t *testing.T) {
 	if err!=nil { t.Fatal(err) }
 	if c:=compareRecordedBodies(x,bad); c.Relation!="unknown" { t.Fatalf("bad blob hash: %+v",c) }
 }
+
+func TestCompareRecordedFormAndXML(t *testing.T) {
+	ctx := context.Background()
+	read := func(raw, ct string) recordedBody {
+		t.Helper()
+		b, err := inspectRecordedBody(ctx, strings.NewReader(raw), int64(len(raw)), "", ct)
+		if err != nil { t.Fatal(err) }
+		return b
+	}
+	a := read("tag=a&tag=b&old=1&same=x+y", "application/x-www-form-urlencoded")
+	b := read("same=x%20y&tag=b&tag=a&new=2", "application/x-www-form-urlencoded; charset=UTF-8")
+	f := compareRecordedBodies(a,b).FormFields
+	if !f.Available || f.AddedCount != 1 || f.Added[0] != "new" || f.RemovedCount != 1 || f.Removed[0] != "old" || f.ChangedCount != 1 || f.Changed[0] != "tag" {
+		t.Fatalf("form changes: %+v", f)
+	}
+	if compareRecordedBodies(a,read("tag=%ZZ","application/x-www-form-urlencoded")).FormFields.Available {
+		t.Fatal("invalid form treated as parsed")
+	}
+	x := read(`<r xmlns="urn:x"><a>one</a><a>two</a><old/></r>`,"application/xml")
+	y := read(`<r xmlns="urn:x"><a>two</a><a>one</a><new/></r>`,"application/example+xml")
+	d := compareRecordedBodies(x,y).XMLChildren
+	if !d.Available || d.AddedCount != 1 || d.Added[0] != "{urn:x}new" || d.RemovedCount != 1 || d.ChangedCount != 1 || d.Changed[0] != "{urn:x}a" {
+		t.Fatalf("XML changes: %+v", d)
+	}
+	for _, raw := range []string{`<r><a></r>`, `<!DOCTYPE r SYSTEM "https://example.invalid/external"><r/>`, `<r/><r/>`} {
+		if compareRecordedBodies(x,read(raw,"application/xml")).XMLChildren.Available {
+			t.Fatalf("invalid XML compared: %s", raw)
+		}
+	}
+	if compareRecordedBodies(x,read("<other><a/></other>","application/xml")).XMLChildren.Available {
+		t.Fatal("different roots treated as comparable")
+	}
+}
