@@ -107,7 +107,7 @@ func restoreKnowledgeDocumentsTx(tx *sql.Tx,snapshot *TaskArchiveSnapshot) error
 }
 
 
-// SearchKnowledgeDocuments ranks exact title/phrase matches first, then
+// SearchKnowledgeDocuments ranks exact titles and CSF reference codes first, then
 // documents containing every query term (in any order). The UI's literal
 // substring filter remains unchanged. Only snippets are returned.
 func (d *DB) SearchKnowledgeDocuments(ctx context.Context,taskID int64,q string,limit int)([]KnowledgeDocument,error){
@@ -124,9 +124,10 @@ source_filename,created_at,updated_at
 FROM knowledge_documents WHERE `+knowledgeScope+`
 AND NOT EXISTS(SELECT 1 FROM terms WHERE strpos(lower(title),term)=0 AND strpos(lower(category),term)=0 AND strpos(lower(content),term)=0)
 ORDER BY CASE WHEN lower(title)=lower($3) THEN 0
-WHEN strpos(lower(title),lower($3))>0 THEN 1
-WHEN strpos(lower(category),lower($3))>0 THEN 2
-WHEN strpos(lower(content),lower($3))>0 THEN 3 ELSE 4 END,
+WHEN EXISTS(SELECT 1 FROM terms WHERE term ~ '^[a-z]{2}[.][a-z]{2}(-[0-9]{2})?$' AND split_part(lower(title),' ',1)=term) THEN 1
+WHEN strpos(lower(title),lower($3))>0 THEN 2
+WHEN strpos(lower(category),lower($3))>0 THEN 3
+WHEN strpos(lower(content),lower($3))>0 THEN 4 ELSE 5 END,
 CASE WHEN task_id IS NOT NULL THEN 0 ELSE 1 END,updated_at DESC,id LIMIT $5`,taskID,true,q,string(raw),limit)
 	if err!=nil{return nil,err}
 	defer rows.Close()
