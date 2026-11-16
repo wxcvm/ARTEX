@@ -21,7 +21,7 @@ type DSHReview = {
   evidence_changed: boolean;
 };
 
-type ImportResult = { imported: number; missing: number; task_mismatch: number };
+type ImportResult = { imported: number; missing: number; task_mismatch: number; skipped_not_newer?: number };
 const labels: Record<DSHReview["status"], string> = {
   pending: "待核查",
   in_progress: "核查中",
@@ -61,7 +61,7 @@ export function DSHReviewFeedbackPanel() {
         method: "POST",
         body: JSON.stringify(feedback),
       });
-      setMessage(tr(`已接收 ${outcome.imported} 条；来源漏洞不存在 ${outcome.missing} 条；任务关联不一致 ${outcome.task_mismatch} 条。`, `Received ${outcome.imported}; missing source findings ${outcome.missing}; task mismatches ${outcome.task_mismatch}.`));
+      setMessage(tr(`已写入 ${outcome.imported} 条；旧版或重复回执跳过 ${outcome.skipped_not_newer ?? 0} 条；来源漏洞不存在 ${outcome.missing} 条；任务关联不一致 ${outcome.task_mismatch} 条。`, `Saved ${outcome.imported}; older or duplicate reviews skipped ${outcome.skipped_not_newer ?? 0}; missing source findings ${outcome.missing}; task mismatches ${outcome.task_mismatch}.`));
       await reload();
     } catch (err) {
       setError(err instanceof Error ? err.message : tr("无法导入 DSH 回执", "Unable to import DSH feedback"));

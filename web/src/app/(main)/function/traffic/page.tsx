@@ -21,6 +21,7 @@ import {
 import { toast } from "sonner";
 
 import { HttpCodeBlock } from "@/components/http-code-block";
+import { HarInspectionPanel } from "@/components/har-inspection-panel";
 import { LinkTrafficDialog } from "@/components/link-traffic-dialog";
 import {
   AlertDialog,
@@ -374,6 +375,8 @@ export default function TrafficPage() {
         </div>
       </header>
 
+      <HarInspectionPanel onImported={() => { setPage(0); setReloadTick((tick) => tick + 1); }} />
+
       {/* Toolbar */}
       <div className="flex min-w-0 flex-wrap items-center gap-2 rounded-xl border border-border/70 bg-card/90 p-3 shadow-sm sm:p-4">
         <Popover open={pickerOpen} onOpenChange={setPickerOpen}>
@@ -578,6 +581,7 @@ export default function TrafficPage() {
           </SelectTrigger>
           <SelectContent>
             <SelectItem value="all">{tr("全部状态", "All statuses")}</SelectItem>
+            <SelectItem value="0">{tr("未观测状态", "Unobserved status")}</SelectItem>
             {STATUS_BUCKETS.map((s) => (
               <SelectItem key={s} value={s}>
                 {s}
@@ -715,6 +719,7 @@ export default function TrafficPage() {
                         }}
                       >
                         <CopyIcon className="size-3 shrink-0" />
+                        {e.id.startsWith("har-") && <span className="shrink-0 text-[10px] text-muted-foreground">HAR</span>}
                         <span className="truncate">{e.id}</span>
                       </Button>
                     </TableCell>
@@ -727,7 +732,7 @@ export default function TrafficPage() {
                     </TableCell>
                     <TableCell>
                       <span className={cn("font-mono text-xs font-semibold tabular-nums", statusTone(e.status))}>
-                        {e.status}
+                        {e.status === 0 ? tr("未观测", "Unobserved") : e.status}
                       </span>
                     </TableCell>
                     <TableCell className="text-xs text-muted-foreground">{e.content_type}</TableCell>
@@ -762,7 +767,7 @@ export default function TrafficPage() {
                 <div className="flex items-center gap-2 pr-8">
                   <MethodBadge method={selected.method} />
                   <Badge variant="secondary" className={cn("font-mono tabular-nums", statusTone(selected.status))}>
-                    {selected.status}
+                    {selected.status === 0 ? tr("未观测", "Unobserved") : selected.status}
                   </Badge>
                   <Button
                     variant="outline"
@@ -772,6 +777,7 @@ export default function TrafficPage() {
                     onClick={() => void copyTrafficID(selected.id)}
                   >
                     <CopyIcon className="size-3" />
+                    {selected.id.startsWith("har-") && <span className="shrink-0 text-[10px] text-muted-foreground">HAR</span>}
                     <span className="max-w-32 truncate">{selected.id}</span>
                   </Button>
                   <span className="ml-auto text-xs text-muted-foreground tabular-nums">{fmtTime(selected.ts)}</span>

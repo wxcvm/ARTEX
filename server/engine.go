@@ -648,6 +648,10 @@ func (e *Engine) Broadcaster() *Broadcaster { return e.bc }
 // emitActivity persists one captured step AND fans it out to live subscribers,
 // from a single point so storage and the SSE stream never diverge.
 func (e *Engine) emitActivity(t *Task, r db.Activity) db.Activity {
+	// Keep the persisted ID order and the live stream order identical for
+	// concurrent planner/worker events in the same task. Other tasks remain independent.
+	t.activityMu.Lock()
+	defer t.activityMu.Unlock()
 	id, err := e.appendActivity(t, r)
 	if err != nil {
 		// NO LONGER SILENT: dropping a record breaks command↔result pairing in the

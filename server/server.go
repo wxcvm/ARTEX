@@ -850,6 +850,7 @@ func (s *Server) Handler() http.Handler {
 	mux.HandleFunc("GET /api/traffic/exchange", s.getTrafficExchange)
 	mux.HandleFunc("GET /api/traffic/blob", s.getTrafficBlob)
 	mux.HandleFunc("POST /api/traffic/ingest", s.ingestTraffic)
+	mux.HandleFunc("POST /api/traffic/har/import", s.importTrafficHAR)
 	mux.HandleFunc("GET /api/commands", s.pgListCommands)
 	mux.HandleFunc("GET /api/commands/stats", s.pgToolStats) // aggregate call counts per tool
 	mux.HandleFunc("GET /api/llm/records", s.pgListLLMRecords)
@@ -3220,10 +3221,12 @@ func (s *Server) streamActivity(w http.ResponseWriter, r *http.Request) {
 
 	// Emit a standard SSE id: line so the browser echoes it as Last-Event-ID on
 	// auto-reconnect (see cursor precedence above).
-	sendSSE := func(a db.Activity) {
-		b, _ := json.Marshal(activityDTO(a))
-		fmt.Fprintf(w, "id: %d\ndata: %s\n\n", a.ID, b)
+	sendSSE := func(a db.Activity) bool {
+		b, err := json.Marshal(activityDTO(a))
+		if err != nil { return false }
+		if _, err = fmt.Fprintf(w, "id: %d\ndata: %s\n\n", a.ID, b); err != nil {return false}
 		flusher.Flush()
+		return true
 	}
 
 	// Compensate the DB backlog after `since` in batches until caught up. This is the
@@ -3241,7 +3244,7 @@ func (s *Server) streamActivity(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 		for _, a := range items {
-			sendSSE(a)
+			if !sendSSE(a) {return}
 		}
 		if cursor > since {
 			since = cursor
@@ -3269,10 +3272,10 @@ func (s *Server) streamActivity(w http.ResponseWriter, r *http.Request) {
 			if intentPtr != nil && (a.NodeID == nil || *a.NodeID != *intentPtr) {
 				continue // scoped session: only this intent's steps
 			}
+			if !sendSSE(a) {return}
 			since = a.ID
-			sendSSE(a)
 		case <-ping.C:
-			fmt.Fprint(w, ": ping\n\n")
+			if _, err := fmt.Fprint(w, ": ping\n\n"); err != nil {return}
 			flusher.Flush()
 		}
 	}
@@ -3924,7 +3927,11 @@ func (s *Server) chat(w http.ResponseWriter, r *http.Request) {
 	// renders attachment cards.
 	humanTurn := userActivityWithAttachments("mainagent", req.Message, req.Attachments)
 	humanTurn.MainSeg = segPtr
-	s.engine.emitActivity(t, humanTurn)
+	if saved := s.engine.emitActivity(t, humanTurn); saved.ID <= 0 {
+		s.finishTaskChat(t.ID, cancel)
+		writeErr(w, 503, "Could not save the user message; no turn was started")
+		return
+	}
 	var ma *agent.MainAgent
 	if s.taskRuntimeAvailable(t, "mainagent") {
 		ma = s.agentsForTask(t).main
