@@ -63,3 +63,21 @@ func listMCPByName(t *testing.T, pg *db.DB, name string) *db.MCPServer {
 	t.Fatalf("server %s not found", name)
 	return nil
 }
+
+func TestMCPDiscoveryCacheAndHealthCommitTogether(t *testing.T) {
+	s, _, _ := trafficEvidenceServer(t)
+	pg := s.m.pg
+	id, err := pg.SaveMCP(&db.MCPServer{Name:"discovery-atomic-test",Transport:"http",URL:"http://127.0.0.1:1/mcp",Enabled:true})
+	if err != nil { t.Fatal(err) }
+	t.Cleanup(func(){ _ = pg.DeleteMCP(id) })
+	if err := pg.SaveMCPDiscovery(id, []db.MCPTool{{Name:"old",Description:"old description"}}); err != nil { t.Fatal(err) }
+	if err := pg.UpdateMCPHealth(id,false,"previous failure"); err != nil { t.Fatal(err) }
+	// PostgreSQL text rejects NUL; failure after delete must roll back the
+	// catalog and the success state rather than exposing a partial discovery.
+	if err := pg.SaveMCPDiscovery(id,[]db.MCPTool{{Name:"new"},{Name:"invalid\x00name"}}); err == nil { t.Fatal("expected invalid catalog to fail") }
+	row := listMCPByName(t,pg,"discovery-atomic-test")
+	if row.LastConnectOK == nil || *row.LastConnectOK || len(row.Tools)!=1 || row.Tools[0]!="old" { t.Fatalf("failed discovery changed state: %+v",row) }
+	if err := pg.SaveMCPDiscovery(id,[]db.MCPTool{}); err != nil { t.Fatal(err) }
+	row = listMCPByName(t,pg,"discovery-atomic-test")
+	if row.LastConnectOK == nil || !*row.LastConnectOK || row.LastConnectErr!=nil || len(row.Tools)!=0 { t.Fatalf("empty successful catalog: %+v",row) }
+}

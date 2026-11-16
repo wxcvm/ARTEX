@@ -82,6 +82,7 @@ WHERE key=$1 AND system AND NOT(COALESCE(schema->'properties','{}'::jsonb) ? $2)
 func (s *Server) registerFindingTraffic(mux *http.ServeMux) {
 	base := "/api/exploration/findings/{id}/traffic"
 	mux.HandleFunc("GET "+base, s.getFindingTraffic)
+	mux.HandleFunc("GET "+base+"/compare", s.compareFindingTraffic)
 	mux.HandleFunc("POST "+base, s.bindFindingTraffic)
 	mux.HandleFunc("PATCH "+base+"/{binding_id}", s.editFindingTraffic)
 	mux.HandleFunc("DELETE "+base+"/{binding_id}", s.editFindingTraffic)

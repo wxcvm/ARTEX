@@ -933,7 +933,12 @@ func (s *Server) pgRefreshMCP(w http.ResponseWriter, r *http.Request) {
 		writeErr(w, 502, "tool discovery failed: "+err.Error())
 		return
 	}
-	tools, _ := pg.MCPToolsDetailed(id)
+	tools, err := pg.MCPToolsDetailed(id)
+	if err != nil {
+		writeErr(w, 500, err.Error())
+		return
+	}
+	if tools == nil { tools = []db.MCPTool{} }
 	writeJSON(w, 200, map[string]any{"tools": tools})
 }
 

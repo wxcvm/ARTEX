@@ -62,6 +62,7 @@ export default function MCPPage() {
   const [saving, setSaving] = React.useState(false);
   const [tools, setTools] = React.useState<MCPTool[]>([]);
   const [toolsLoading, setToolsLoading] = React.useState(false);
+  const [toolsLoadError, setToolsLoadError] = React.useState(false);
   const [refreshing, setRefreshing] = React.useState(false);
 
   const load = React.useCallback(() => {
@@ -116,6 +117,8 @@ export default function MCPPage() {
 
   function openEdit(s: MCPServer) {
     setEditing(s);
+    setTools([]);
+    setToolsLoadError(false);
     setForm({
       name: s.name,
       transport: s.transport,
@@ -133,10 +136,11 @@ export default function MCPPage() {
 
   async function loadTools(id: number) {
     setToolsLoading(true);
+    setToolsLoadError(false);
     try {
       setTools(await api.mcpTools(id));
     } catch {
-      setTools([]);
+      setToolsLoadError(true);
     } finally {
       setToolsLoading(false);
     }
@@ -199,9 +203,11 @@ export default function MCPPage() {
     try {
       const t = await api.refreshMcpServer(editing.id);
       setTools(t);
+      setToolsLoadError(false);
       toast.success(tr(`发现 ${t.length} 个工具`, `Discovered ${t.length} tools`));
       load();
     } catch (e) {
+      load();
       toast.error(tr("刷新失败：", "Refresh failed: ") + (e as Error).message);
     } finally {
       setRefreshing(false);
@@ -359,6 +365,8 @@ export default function MCPPage() {
         </div>
         {toolsLoading ? (
           <p className="text-muted-foreground text-sm">{tr("正在加载…", "Loading…")}</p>
+        ) : toolsLoadError ? (
+          <p role="alert" className="text-destructive text-sm">{tr("无法读取缓存工具列表，请重试。", "Unable to read the cached tool list; retry.")}</p>
         ) : tools.length === 0 ? (
           <p className="text-muted-foreground text-sm">{tr("尚未发现工具，点击刷新重新获取。", "No tools discovered; refresh to fetch them.")}</p>
         ) : (
@@ -409,7 +417,9 @@ export default function MCPPage() {
                 <Badge variant="outline" className="uppercase">
                   {s.transport}
                 </Badge>
-                {s.last_connect_ok === false ? (
+                {!s.enabled ? (
+                  <Badge variant="outline">{tr("已停用", "Disabled")}</Badge>
+                ) : s.last_connect_ok === false ? (
                   <Badge variant="destructive" className="max-w-55 truncate font-normal" title={s.last_connect_err ?? tr("连接失败", "Connection failed")}>
                     {tr("连接异常：", "Connection error: ")}{s.last_connect_err ? s.last_connect_err.slice(0, 60) : tr("连接失败", "Connection failed")}
                   </Badge>
@@ -441,7 +451,8 @@ export default function MCPPage() {
             </CardHeader>
             <CardContent className="grid gap-3">
               <p className="text-muted-foreground text-sm">
-                {s.tools && s.tools.length > 0 ? tr(`${s.tools.length} 个工具`, `${s.tools.length} tools`) : tr("尚未发现工具", "No tools discovered")}
+                {s.tools && s.tools.length > 0 ? tr(`缓存 ${s.tools.length} 个工具`, `${s.tools.length} cached tools`) : tr("缓存无工具", "No cached tools")}
+                {s.last_connect_ok === false && s.tools && s.tools.length > 0 ? tr(" · 上次发现结果，可能已过期", " · previous discovery; may be stale") : ""}
               </p>
               <div className="grid gap-2" onClick={(e) => e.stopPropagation()}>
                 <span className="text-muted-foreground text-xs">{tr("可见权限（按智能体分配）", "Visibility (per agent)")}</span>
