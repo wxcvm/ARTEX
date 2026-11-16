@@ -259,6 +259,7 @@ export default function FindingsPage() {
   const [exportOpen, setExportOpen] = React.useState(false);
   const [exportScope, setExportScope] = React.useState<"filtered" | "all" | "selected">("filtered");
   const [exportFormat, setExportFormat] = React.useState<"md-single" | "md-zip" | "csv" | "json" | "sarif" | "docx">("md-single");
+  const [exportLayout, setExportLayout] = React.useState<"simple" | "professional">("professional");
   const [exporting, setExporting] = React.useState(false);
 
   const toggleSelected = React.useCallback((id: string, checked: boolean) => {
@@ -293,6 +294,7 @@ export default function FindingsPage() {
       await api.exportFindings({
         locale,
         format: exportFormat,
+        layout: exportLayout,
         scope: exportScope,
         filters: { severity, status, vulnclass, task, query, sort },
         ids: [...selectedIds],
@@ -1256,6 +1258,10 @@ export default function FindingsPage() {
                   <RadioGroupItem id="export-format-sarif" value="sarif" /> SARIF 2.1.0 (.sarif, security tool interchange)
                 </label>
               </RadioGroup>
+              {exportFormat === "docx" && <select aria-label={tr("Word 报告样式", "Word report layout")} value={exportLayout} onChange={(e) => setExportLayout(e.target.value === "simple" ? "simple" : "professional")} className="rounded-md border bg-background p-2 text-sm">
+                <option value="professional">{tr("专业版（封面与目录）", "Professional (cover and contents)")}</option>
+                <option value="simple">{tr("简洁版", "Simple")}</option>
+              </select>}
             </div>
           </div>
 

@@ -1246,6 +1246,7 @@ CREATE TABLE IF NOT EXISTS finding_screenshots (
     image BYTEA NOT NULL CHECK (octet_length(image) BETWEEN 1 AND 8388608),
     created_at TIMESTAMPTZ NOT NULL DEFAULT now()
 );
+ALTER TABLE finding_screenshots ADD COLUMN IF NOT EXISTS position INTEGER;
 CREATE INDEX IF NOT EXISTS idx_finding_screenshots_order ON finding_screenshots(finding_id, created_at, id);
 
 -- Explicit human-authored observations, optionally linked to captured traffic.

@@ -293,6 +293,13 @@ func TestFindingTrafficArchiveV3RoundTripAndRetry(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
+	secondShot, err := s.m.pg.CreateFindingScreenshot(ctx, f.FindingID, nil, "ordered screenshot", "image/png", screenshotImage.Bytes())
+	if err != nil {
+		t.Fatal(err)
+	}
+	if err := s.m.pg.OrderFindingScreenshots(ctx, f.FindingID, []string{secondShot.ID, screenshot.ID}); err != nil {
+		t.Fatal(err)
+	}
 	if err := s.m.pg.ReplaceFindingReproduction(ctx, f.FindingID, []db.FindingReproductionStep{{Title:"Archive fixture step", Observation:"Saved observation", BindingID:i64s(bindingID)}}); err != nil {
 		t.Fatal(err)
 	}
@@ -391,7 +398,7 @@ func TestFindingTrafficArchiveV3RoundTripAndRetry(t *testing.T) {
 		t.Fatal(err)
 	}
 	shots, err := s.m.pg.ListFindingScreenshots(ctx, f.FindingID)
-	if err != nil || len(shots) != 1 || shots[0].ID != screenshot.ID || shots[0].BindingID != i64s(bindingID) || shots[0].Caption != "keep note" {
+	if err != nil || len(shots) != 2 || shots[0].ID != secondShot.ID || shots[1].ID != screenshot.ID || shots[1].BindingID != i64s(bindingID) || shots[1].Caption != "keep note" {
 		t.Fatal("screenshot metadata not restored", shots, err)
 	}
 	mime, raw, err := s.m.pg.ReadFindingScreenshot(ctx, f.FindingID, screenshot.ID)

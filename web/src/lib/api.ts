@@ -585,12 +585,14 @@ export const api = {
   // sends ids (a finding_id list); scope=filtered sends the current filters (the FindingQuery filter fields); scope=all ignores filters.
   exportFindings: async (opts: {
     format: "md-single" | "md-zip" | "csv" | "json" | "sarif" | "docx";
+    layout?: "simple" | "professional";
     locale?: "zh-CN" | "en";
     scope: "filtered" | "all" | "selected";
     filters?: Omit<FindingQuery, "page" | "pageSize">;
     ids?: string[];
   }) => {
     const p = new URLSearchParams({ format: opts.format, scope: opts.scope, lang: opts.locale ?? "zh-CN" });
+    if (opts.format === "docx" && opts.layout) p.set("layout", opts.layout);
     if (opts.scope === "selected") {
       p.set("ids", (opts.ids ?? []).join(","));
     } else if (opts.scope === "filtered" && opts.filters) {
@@ -624,6 +626,8 @@ export const api = {
     ),
   saveFindingReproduction: (id: string, steps: FindingReproductionStep[], contextTask?: string) =>
     put<FindingReproductionStep[]>(`/exploration/findings/${encodeURIComponent(id)}/reproduction${contextTask ? `?context_task=${encodeURIComponent(contextTask)}` : ""}`, { steps }),
+  orderFindingScreenshots: (id: string, ids: string[], contextTask?: string) =>
+    put<FindingScreenshot[]>(`/exploration/findings/${encodeURIComponent(id)}/screenshots/order${contextTask ? `?context_task=${encodeURIComponent(contextTask)}` : ""}`, { ids }),
   findingScreenshots: (id: string, contextTask?: string): Promise<FindingScreenshot[]> =>
     MOCK ? Promise.resolve([]) : get<FindingScreenshot[]>(
       `/exploration/findings/${encodeURIComponent(id)}/screenshots${contextTask ? `?context_task=${encodeURIComponent(contextTask)}` : ""}`,
@@ -937,9 +941,9 @@ export const api = {
     if (!r.ok) throw new Error(`report: ${r.status}`);
     return r.text();
   },
-  reportDOCX: async (task: string, locale: "zh-CN" | "en" = "zh-CN", scope: "all" | "confirmed" = "all") => {
+  reportDOCX: async (task: string, locale: "zh-CN" | "en" = "zh-CN", scope: "all" | "confirmed" = "all", layout: "simple" | "professional" = "professional") => {
     const token = getToken();
-    const params = new URLSearchParams({ task, lang: locale, format: "docx", scope });
+    const params = new URLSearchParams({ task, lang: locale, format: "docx", scope, layout });
     const r = await fetch(`/api/report?${params}`, {
       headers: token ? { Authorization: `Bearer ${token}` } : {},
     });

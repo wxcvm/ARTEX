@@ -50,7 +50,7 @@ export function FindingReportExportButton({ findingId, contextTask }: { findingI
     busy.current = true;
     setLoading(true);
     try {
-      await api.exportFindings({ format: "docx", scope: "selected", ids: [findingId], locale });
+      await api.exportFindings({ format: "docx", scope: "selected", ids: [findingId], locale, layout: "professional" });
       toast.success(tr("Word 报告已导出", "Word report exported"));
     } catch (error) {
       toast.error(tr("导出失败：", "Export failed: ") + (error instanceof Error ? error.message : tr("请重试", "Please retry")));

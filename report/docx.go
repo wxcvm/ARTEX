@@ -27,8 +27,22 @@ func DOCX(markdown string) ([]byte, error) {
 // DOCXWithScreenshots embeds local image bytes in a finding-labelled appendix.
 // Report text cannot introduce an image reference or remote relationship.
 func DOCXWithScreenshots(markdown string, findings []*db.DBFinding, locale string) ([]byte, error) {
+	return DOCXWithLayout(markdown, findings, locale, "simple")
+}
+
+// DOCXWithLayout supports built-in simple and professional report layouts.
+func DOCXWithLayout(markdown string, findings []*db.DBFinding, locale, layout string) ([]byte, error) {
+	if layout != "" && layout != "simple" && layout != "professional" {
+		return nil, fmt.Errorf("unknown Word report layout: %s", layout)
+	}
+	professional := layout == "professional"
 	var body bytes.Buffer
 	body.WriteString("<?xml version=\"1.0\" encoding=\"UTF-8\" standalone=\"yes\"?><w:document xmlns:w=\"" + wordNS + "\" xmlns:r=\"http://schemas.openxmlformats.org/officeDocument/2006/relationships\" xmlns:wp=\"http://schemas.openxmlformats.org/drawingml/2006/wordprocessingDrawing\" xmlns:a=\"http://schemas.openxmlformats.org/drawingml/2006/main\" xmlns:pic=\"http://schemas.openxmlformats.org/drawingml/2006/picture\"><w:body>")
+	if professional {
+		if err := writeProfessionalFrontMatter(&body, markdown, locale); err != nil {
+			return nil, err
+		}
+	}
 	inCode := false
 	for _, line := range strings.Split(strings.ReplaceAll(markdown, "\r\n", "\n"), "\n") {
 		style := "Normal"
@@ -59,16 +73,30 @@ func DOCXWithScreenshots(markdown string, findings []*db.DBFinding, locale strin
 	if err != nil {
 		return nil, err
 	}
-	body.WriteString("<w:sectPr><w:pgSz w:w=\"11906\" w:h=\"16838\"/><w:pgMar w:top=\"1440\" w:right=\"1440\" w:bottom=\"1440\" w:left=\"1440\" w:header=\"720\" w:footer=\"720\" w:gutter=\"0\"/></w:sectPr></w:body></w:document>")
+	body.WriteString("<w:sectPr>")
+	if professional {
+		body.WriteString(`<w:footerReference w:type="default" r:id="rIdFooter"/>`)
+	}
+	body.WriteString("<w:pgSz w:w=\"11906\" w:h=\"16838\"/><w:pgMar w:top=\"1440\" w:right=\"1440\" w:bottom=\"1440\" w:left=\"1440\" w:header=\"720\" w:footer=\"720\" w:gutter=\"0\"/></w:sectPr></w:body></w:document>")
 
 	var out bytes.Buffer
 	z := zip.NewWriter(&out)
+	types := strings.Replace(contentTypes, "</Types>", "<Default Extension=\"png\" ContentType=\"image/png\"/><Default Extension=\"jpg\" ContentType=\"image/jpeg\"/></Types>", 1)
+	styles := wordStyles
+	if professional {
+		types = strings.Replace(types, "</Types>", professionalContentTypes+"</Types>", 1)
+		relationships += professionalRelationships
+		styles = strings.Replace(styles, "</w:styles>", professionalStyles+"</w:styles>", 1)
+	}
 	parts := []struct{ name, data string }{
-		{"[Content_Types].xml", strings.Replace(contentTypes, "</Types>", "<Default Extension=\"png\" ContentType=\"image/png\"/><Default Extension=\"jpg\" ContentType=\"image/jpeg\"/></Types>", 1)},
+		{"[Content_Types].xml", types},
 		{"_rels/.rels", packageRels},
 		{"word/document.xml", body.String()},
 		{"word/_rels/document.xml.rels", strings.Replace(documentRels, "</Relationships>", relationships+"</Relationships>", 1)},
-		{"word/styles.xml", wordStyles},
+		{"word/styles.xml", styles},
+	}
+	if professional {
+		parts = append(parts, struct{ name, data string }{"word/footer1.xml", professionalFooter}, struct{ name, data string }{"word/settings.xml", professionalSettings})
 	}
 	for _, part := range parts {
 		w, err := z.Create(part.name)
