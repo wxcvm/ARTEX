@@ -86,14 +86,18 @@ func TestKnowledgeDocumentArchiveRoundTrip(t *testing.T) {
 	tid:=*finding.TaskID
 	doc,err:=s.m.pg.SaveKnowledgeDocument(s.ctx,tid,"",db.KnowledgeDocument{Title:"archive knowledge",Category:"notes",Content:"retained 中文"})
 	if err!=nil{t.Fatal(err)}
+	if err=s.m.pg.RecordKnowledgeRetrieval(s.ctx,tid,"fixture","archived query",[]db.KnowledgeRetrievalHit{{ID:doc.ID,Scope:"task",Title:doc.Title}},false);err!=nil{t.Fatal(err)}
 	if err=s.m.SetTaskPaused(strconv.FormatInt(tid,10),true);err!=nil{t.Fatal(err)}
 	job,err:=s.m.pg.QueueTaskArchive(tid)
 	if err!=nil{t.Fatal(err)}
 	if _,err=s.m.pg.SaveKnowledgeDocument(s.ctx,tid,doc.ID,db.KnowledgeDocument{Title:"late",Content:"late"});err==nil{t.Fatal("archive allowed late edit")}
 	if err=s.runOneTaskArchiveJob();err!=nil{t.Fatal(err)}
 	if _,err=s.m.pg.GetKnowledgeDocument(s.ctx,tid,false,doc.ID);err==nil{t.Fatal("archived document retained hot")}
+	if history,err:=s.m.pg.ListKnowledgeRetrievals(s.ctx,tid);err!=nil||len(history)!=0{t.Fatal("history retained hot",history,err)}
 	if _,err=s.m.pg.QueueTaskArchiveRestore(job.ID);err!=nil{t.Fatal(err)}
 	if err=s.runOneTaskArchiveJob();err!=nil{t.Fatal(err)}
 	got,err:=s.m.pg.GetKnowledgeDocument(s.ctx,tid,false,doc.ID)
 	if err!=nil||got.Content!=doc.Content||got.Category!=doc.Category||got.Title!=doc.Title{t.Fatal(got,err)}
+	history,err:=s.m.pg.ListKnowledgeRetrievals(s.ctx,tid)
+	if err!=nil||len(history)!=1||history[0].Query!="archived query"||len(history[0].Hits)!=1||history[0].Hits[0].ID!=doc.ID{t.Fatal("history not restored",history,err)}
 }

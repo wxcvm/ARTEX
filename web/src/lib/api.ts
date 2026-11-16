@@ -52,6 +52,7 @@ import type {
   FindingScreenshot,
   KnowledgeDocument,
   KnowledgeDocumentPage,
+  KnowledgeRetrieval,
   FindingReproductionStep,
   FindingTrafficDetail,
   IntentAsset,
@@ -247,6 +248,8 @@ export const api = {
   knowledgeSearch: (query: string) => get<{ hits: { id: number; title: string; snippet?: string; category?: string; verified: boolean }[] | null; degraded: boolean }>(`/knowledge?q=${encodeURIComponent(query)}`),
   knowledgeDocuments: (task: string | undefined, includeGlobal: boolean, q = "", category = "", offset = 0): Promise<KnowledgeDocumentPage> =>
     MOCK ? Promise.resolve({items: [], has_more: false}) : get<KnowledgeDocumentPage>(`/knowledge/documents?${new URLSearchParams({ ...(task ? { task } : {}), include_global: String(includeGlobal), q, category, offset: String(offset) })}`),
+  knowledgeRetrievals: (task?: string): Promise<KnowledgeRetrieval[]> =>
+    MOCK ? Promise.resolve([]) : get<KnowledgeRetrieval[]>(`/knowledge/retrievals?${new URLSearchParams(task ? {task} : {})}`),
   knowledgeDocument: (id: string, task?: string, includeGlobal = false) =>
     get<KnowledgeDocument>(`/knowledge/documents/${encodeURIComponent(id)}?${new URLSearchParams({ ...(task ? { task } : {}), include_global: String(includeGlobal) })}`),
   saveKnowledgeDocument: (doc: Pick<KnowledgeDocument, "title" | "category" | "content">, task?: string, id?: string) =>

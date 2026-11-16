@@ -1263,6 +1263,18 @@ CREATE TABLE IF NOT EXISTS knowledge_documents (
 );
 CREATE INDEX IF NOT EXISTS idx_knowledge_documents_scope ON knowledge_documents(task_id, updated_at DESC, id);
 
+-- Retrieval history records provenance, never document body or embeddings.
+CREATE TABLE IF NOT EXISTS knowledge_retrievals (
+    id TEXT PRIMARY KEY,
+    task_id BIGINT REFERENCES tasks(id) ON DELETE CASCADE,
+    agent_key TEXT NOT NULL,
+    query TEXT NOT NULL,
+    hits JSONB NOT NULL DEFAULT '[]'::jsonb,
+    degraded BOOLEAN NOT NULL DEFAULT false,
+    created_at TIMESTAMPTZ NOT NULL DEFAULT now()
+);
+CREATE INDEX IF NOT EXISTS idx_knowledge_retrievals_scope ON knowledge_retrievals(task_id, created_at DESC, id);
+
 CREATE TABLE IF NOT EXISTS finding_reproduction_steps (
     finding_id BIGINT NOT NULL REFERENCES findings(id) ON DELETE CASCADE,
     position INTEGER NOT NULL,

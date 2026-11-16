@@ -238,7 +238,23 @@ func wireTools(pg *db.DB, domainReg map[string]actool.CoreTool) {
 			log.Printf("[tools] seed %s failed: %v", s.Key, err)
 		}
 	}
-	if agent.Knowledge() != nil {
+	// Register the same knowledge tool names even without a bundled SQLite file.
+	// Preserve existing bindings and enabled state via first-insert-only seeding.
+	knowledgeCatalog := agent.ScopedKnowledgeTools(pg, 0, "")
+	registry := make(map[string]actool.CoreTool, len(domainReg)+len(knowledgeCatalog))
+	for key, tool := range domainReg {
+		registry[key] = tool
+	}
+	knowledgeAgents, _ := json.Marshal([]string{"mainagent", "planner", "worker"})
+	for _, tool := range knowledgeCatalog {
+		registry[tool.Name()] = tool
+		schema, _ := json.Marshal(tool.InputSchema())
+		if err := pg.SeedTool(tool.Name(), tool.Description(), schema, knowledgeAgents); err != nil {
+			log.Printf("[tools] seed %s failed: %v", tool.Name(), err)
+		}
+	}
+	domainReg = registry
+	{
 		if err := migrateKnowledgeMainBinding(pg); err != nil {
 			log.Printf("[tools] knowledge main-agent binding migration: %v", err)
 		}
@@ -272,12 +288,25 @@ func wireTools(pg *db.DB, domainReg map[string]actool.CoreTool) {
 			byKey[t.Key] = t
 		}
 		runInfo := agent.RunInfoFrom(ctx)
+		// Bind scope once at assembly; the model cannot choose a different task.
+		knowledgeTools := make(map[string]actool.CoreTool, 2)
+		for _, t := range agent.ScopedKnowledgeTools(pg, runInfo.TaskID, agentKey) {
+			knowledgeTools[t.Name()] = t
+		}
 		resolve := func(t actool.CoreTool, row *db.Tool) actool.CoreTool {
 			var schema map[string]any
 			if len(row.Schema) > 0 {
 				_ = json.Unmarshal(row.Schema, &schema)
 			}
-			return meterTool(agent.DecorateTool(t, row.Description, schema), pg, row.Key, agentKey, runInfo)
+			desc := row.Description
+			if scoped, ok := knowledgeTools[t.Name()]; ok && row.System {
+				t = scoped
+				schema = agent.ScopedKnowledgeSchema(t, schema)
+				if desc != "" && desc != t.Description() {
+					desc += "\n\n" + t.Description()
+				}
+			}
+			return meterTool(agent.DecorateTool(t, desc, schema), pg, row.Key, agentKey, runInfo)
 		}
 		out := tools[:0:0]
 		for _, t := range tools {

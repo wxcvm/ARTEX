@@ -8,7 +8,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { api } from "@/lib/api";
-import type { KnowledgeDocument } from "@/lib/types";
+import type { KnowledgeDocument, KnowledgeRetrieval } from "@/lib/types";
 import { useUiLocale } from "@/lib/ui-locale.client";
 import { uiText } from "@/lib/ui-locale";
 
@@ -34,6 +34,9 @@ export function KnowledgeDocumentLibrary({taskId}: {taskId?: string}) {
   const [file,setFile] = React.useState<File | null>(null);
   const [uploadCategory,setUploadCategory] = React.useState("");
   const [deleting,setDeleting] = React.useState(false);
+  const [history,setHistory] = React.useState<KnowledgeRetrieval[] | null>(null);
+  const [historyBusy,setHistoryBusy] = React.useState(false);
+  const [historyError,setHistoryError] = React.useState("");
   const input = React.useRef<HTMLInputElement>(null);
   const request = React.useRef(0);
 
@@ -48,6 +51,12 @@ export function KnowledgeDocumentLibrary({taskId}: {taskId?: string}) {
     return () => {active=false;};
   }, [taskId,includeGlobal,filters,offset,revision]);
 
+  async function loadHistory(){
+    setHistoryBusy(true);setHistoryError("");
+    try{setHistory(await api.knowledgeRetrievals(taskId));}
+    catch(e){setHistoryError((e as Error).message);}
+    finally{setHistoryBusy(false);}
+  }
   function refresh(){setOffset(0);setRevision(n=>n+1);}
   function clearSelection(){request.current++;setSelected(null);setDraft(null);setDeleting(false);}
   async function open(doc: KnowledgeDocument){
@@ -137,6 +146,28 @@ export function KnowledgeDocumentLibrary({taskId}: {taskId?: string}) {
           <pre className="max-h-[65vh] overflow-auto whitespace-pre-wrap break-words text-sm leading-6">{selected.content}</pre>
         </article>:<p className="text-sm text-muted-foreground">{tr("选择文档查看正文，或创建新资料。","Select a document to view its text, or create one.")}</p>}
       </div>
+      <section className="space-y-3 rounded-md border p-3">
+        <div className="flex flex-wrap items-center gap-2">
+          <h3 className="flex-1 text-sm font-medium">{tr("智能体检索历史","Agent retrieval history")}</h3>
+          <Button size="sm" variant="outline" disabled={historyBusy} onClick={()=>void loadHistory()}>{historyBusy?tr("读取中…","Loading…"):history?tr("刷新","Refresh"):tr("查看历史","View history")}</Button>
+          {history&&<Button size="sm" variant="ghost" disabled={historyBusy} onClick={()=>setHistory(null)}>{tr("收起","Collapse")}</Button>}
+        </div>
+        <p className="text-xs text-muted-foreground">{tr("最近 50 次本作用域的检索，保存关键词和命中来源，不保存文档正文。","Last 50 searches in this scope, with queries and source references, not document bodies.")}</p>
+        {historyError&&<p role="alert" className="text-sm text-destructive">{historyError}</p>}
+        {history?.length===0&&<p className="text-sm text-muted-foreground">{tr("暂无检索记录","No retrievals yet")}</p>}
+        {history&&<div className="max-h-[48vh] space-y-2 overflow-auto">{history.map(entry=><article key={entry.id} className="space-y-1 rounded-md border p-2">
+          <div className="flex flex-wrap items-center gap-2 text-xs text-muted-foreground">
+            <span>{entry.agent_key||tr("未知智能体","Unknown agent")}</span>
+            <span>{new Date(entry.created_at).toLocaleString()}</span>
+            {entry.degraded&&<span>{tr("降级检索","Degraded retrieval")}</span>}
+          </div>
+          <p className="break-words text-sm font-medium">{entry.query}</p>
+          <p className="text-xs text-muted-foreground">{tr("命中","Hits")}：{entry.hits.length}</p>
+          {entry.hits.map(hit=><div key={hit.scope+":"+hit.id} className="break-words text-xs">
+            {hit.scope==="bundled"?tr("内置","Bundled"):hit.scope==="global"?tr("全局","Global"):tr("任务","Task")} · {hit.title} <span className="text-muted-foreground">#{hit.id}</span>
+          </div>)}
+        </article>)}</div>}
+      </section>
     </CardContent>
   </Card>;
 }

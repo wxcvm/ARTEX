@@ -1712,3 +1712,12 @@ export interface KnowledgeDocumentPage {
   items: KnowledgeDocument[];
   has_more: boolean;
 }
+
+export interface KnowledgeRetrieval {
+  id: string;
+  agent_key: string;
+  query: string;
+  hits: { id: string; scope: "bundled" | "global" | "task"; title: string }[];
+  degraded: boolean;
+  created_at: string;
+}
