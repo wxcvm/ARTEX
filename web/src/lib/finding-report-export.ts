@@ -49,7 +49,7 @@ export function findingReportFilename(finding: Finding): string {
   return "finding-" + finding.id.replace(/[^a-z0-9_-]/gi, "-") + "-" + title + ".md";
 }
 
-export function buildFindingReportMarkdown({ finding, lineage, traffic, packets, retests }: FindingReportData, locale: "zh-CN" | "en" = "zh-CN"): string {
+export function buildFindingReportMarkdown({ finding, lineage, traffic, packets, retests }: FindingReportData, locale: "zh-CN" | "zh-TW" | "en" = "zh-CN"): string {
   const tr = (zh: string, en: string) => locale === "en" ? en : zh;
   const lines = [
     "# " + inline(finding.name || finding.vulnclass || tr("未命名漏洞", "Untitled finding")), "",
