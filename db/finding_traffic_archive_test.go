@@ -85,3 +85,32 @@ func TestFindingTrafficLegacyArchiveDefaults(t *testing.T) {
 		})
 	}
 }
+
+
+func TestHARPageSnapshotLegacyHashAndArchive(t *testing.T) {
+	// Existing v3 archives lack these optional fields. Their original hash
+	// must not change when decoded under the new schema.
+	var legacy TrafficEvidenceSnapshot
+	if err := json.Unmarshal([]byte(`{"id":"","source_traffic_id":"har-old","captured_at":1,"url":"https://fixture.local/","method":"GET","status":200,"content_type":"","req_hash":"a","resp_hash":"b","req_len":0,"resp_len":2,"created_at":"0001-01-01T00:00:00Z"}`),&legacy); err != nil { t.Fatal(err) }
+	oldID := TrafficSnapshotID(legacy)
+	legacy.ID = oldID
+	raw,err := json.Marshal(legacy)
+	if err != nil { t.Fatal(err) }
+	var fields map[string]any
+	if err := json.Unmarshal(raw,&fields); err != nil { t.Fatal(err) }
+	if _,ok := fields["har_page_state"]; ok { t.Fatal("legacy state serialized") }
+	if _,ok := fields["har_page_ordinal"]; ok { t.Fatal("legacy ordinal serialized") }
+	current := legacy
+	current.HARPageState,current.HARPageOrdinal = "unique",2
+	current.ID = TrafficSnapshotID(current)
+	if current.ID == oldID { t.Fatal("new provenance missing from hash") }
+	rows,err := json.Marshal([]TrafficEvidenceSnapshot{legacy,current})
+	if err != nil { t.Fatal(err) }
+	archive := &TaskArchiveSnapshot{FormatVersion:3,Tables:map[string]json.RawMessage{"traffic_evidence_snapshots":rows}}
+	got,err := ArchiveEvidenceSnapshots(archive)
+	if err != nil || len(got)!=2 { t.Fatalf("archive: %+v %v",got,err) }
+	for _,v := range got {
+		if v.ID != TrafficSnapshotID(v) { t.Fatal("archive hash mismatch") }
+	}
+	if got[0].HARPageState!="" || got[1].HARPageState!="unique" || got[1].HARPageOrdinal!=2 { t.Fatal(got) }
+}
