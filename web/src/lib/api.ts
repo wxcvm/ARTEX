@@ -636,6 +636,7 @@ export const api = {
     const blob=await r.blob();const url=URL.createObjectURL(blob);
     const a=document.createElement("a");a.href=url;a.download=downloadFilename(r.headers.get("Content-Disposition")??"",`task-report.${format}`);document.body.appendChild(a);a.click();a.remove();window.setTimeout(()=>URL.revokeObjectURL(url),1000);
   },
+  setReportTemplateLogo: (id:string,file?:File) => http<import("./types").ReportTemplate>(`/report/templates/${encodeURIComponent(id)}/logo`,file?{method:"PUT",body:file,headers:{"Content-Type":"application/octet-stream"}}:{method:"DELETE"}),
   reportTemplates: () => get<import("./types").ReportTemplate[]>("/report/templates"),
   saveReportTemplate: (data: import("./types").ReportTemplateInput, id?: string) => id ? put<import("./types").ReportTemplate>(`/report/templates/${encodeURIComponent(id)}`, data) : post<import("./types").ReportTemplate>("/report/templates", data),
   deleteReportTemplate: (id: string) => del<{ok:boolean}>(`/report/templates/${encodeURIComponent(id)}`),

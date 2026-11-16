@@ -1763,6 +1763,7 @@ export interface ReportTemplateInput {
 }
 export interface ReportTemplate extends ReportTemplateInput {
   id: string;
+  has_logo: boolean;
   created_at: string;
   updated_at: string;
 }

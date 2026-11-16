@@ -11,7 +11,7 @@ import (
 
 var ErrReportTemplateNotFound = errors.New("report template not found")
 
-// ReportTemplate contains text-only presentation settings, never report data.
+// ReportTemplate contains presentation settings and an optional local logo, never report data.
 type ReportTemplate struct {
 	ID string `json:"id"`
 	Name string `json:"name"`
@@ -24,12 +24,16 @@ type ReportTemplate struct {
 	Footer string `json:"footer"`
 	CreatedAt time.Time `json:"created_at"`
 	UpdatedAt time.Time `json:"updated_at"`
+	HasLogo bool `json:"has_logo"`
+	Logo []byte `json:"-"`
 }
-const reportTemplateCols = `id,name,brand,cover_title,subtitle,prepared_for,author,confidentiality,footer,created_at,updated_at`
+const reportTemplateCols = `id,name,brand,cover_title,subtitle,prepared_for,author,confidentiality,footer,created_at,updated_at,(logo IS NOT NULL)`
 
-func scanReportTemplate(row interface{Scan(...any)error})(ReportTemplate,error){
+func scanReportTemplate(row interface{Scan(...any)error}, withLogo bool)(ReportTemplate,error){
 	var t ReportTemplate
-	err:=row.Scan(&t.ID,&t.Name,&t.Brand,&t.CoverTitle,&t.Subtitle,&t.PreparedFor,&t.Author,&t.Confidentiality,&t.Footer,&t.CreatedAt,&t.UpdatedAt)
+	dest:=[]any{&t.ID,&t.Name,&t.Brand,&t.CoverTitle,&t.Subtitle,&t.PreparedFor,&t.Author,&t.Confidentiality,&t.Footer,&t.CreatedAt,&t.UpdatedAt,&t.HasLogo}
+	if withLogo{dest=append(dest,&t.Logo)}
+	err:=row.Scan(dest...)
 	if errors.Is(err,sql.ErrNoRows){err=ErrReportTemplateNotFound}
 	return t,err
 }
@@ -38,19 +42,19 @@ func(d *DB) ListReportTemplates(ctx context.Context)([]ReportTemplate,error){
 	if err!=nil{return nil,err}
 	defer rows.Close()
 	out:=[]ReportTemplate{}
-	for rows.Next(){t,err:=scanReportTemplate(rows);if err!=nil{return nil,err};out=append(out,t)}
+	for rows.Next(){t,err:=scanReportTemplate(rows,false);if err!=nil{return nil,err};out=append(out,t)}
 	return out,rows.Err()
 }
 func(d *DB) GetReportTemplate(ctx context.Context,id string)(ReportTemplate,error){
-	return scanReportTemplate(d.QueryRowContext(ctx,"SELECT "+reportTemplateCols+" FROM report_templates WHERE id=$1",id))
+	return scanReportTemplate(d.QueryRowContext(ctx,"SELECT "+reportTemplateCols+",logo FROM report_templates WHERE id=$1",id),true)
 }
 func(d *DB) SaveReportTemplate(ctx context.Context,id string,t ReportTemplate)(ReportTemplate,error){
 	if id==""{
 		return scanReportTemplate(d.QueryRowContext(ctx,`INSERT INTO report_templates(id,name,brand,cover_title,subtitle,prepared_for,author,confidentiality,footer)
-VALUES($1,$2,$3,$4,$5,$6,$7,$8,$9) RETURNING `+reportTemplateCols,uuid.NewString(),t.Name,t.Brand,t.CoverTitle,t.Subtitle,t.PreparedFor,t.Author,t.Confidentiality,t.Footer))
+VALUES($1,$2,$3,$4,$5,$6,$7,$8,$9) RETURNING `+reportTemplateCols,uuid.NewString(),t.Name,t.Brand,t.CoverTitle,t.Subtitle,t.PreparedFor,t.Author,t.Confidentiality,t.Footer),false)
 	}
 	return scanReportTemplate(d.QueryRowContext(ctx,`UPDATE report_templates SET name=$2,brand=$3,cover_title=$4,subtitle=$5,prepared_for=$6,author=$7,confidentiality=$8,footer=$9,updated_at=now()
-WHERE id=$1 RETURNING `+reportTemplateCols,id,t.Name,t.Brand,t.CoverTitle,t.Subtitle,t.PreparedFor,t.Author,t.Confidentiality,t.Footer))
+WHERE id=$1 RETURNING `+reportTemplateCols,id,t.Name,t.Brand,t.CoverTitle,t.Subtitle,t.PreparedFor,t.Author,t.Confidentiality,t.Footer),false)
 }
 func(d *DB) DeleteReportTemplate(ctx context.Context,id string)error{
 	res,err:=d.ExecContext(ctx,"DELETE FROM report_templates WHERE id=$1",id)
@@ -58,4 +62,8 @@ func(d *DB) DeleteReportTemplate(ctx context.Context,id string)error{
 	n,err:=res.RowsAffected()
 	if err==nil&&n==0{return ErrReportTemplateNotFound}
 	return err
+}
+
+func(d *DB) SetReportTemplateLogo(ctx context.Context,id string,logo []byte)(ReportTemplate,error){
+	return scanReportTemplate(d.QueryRowContext(ctx,`UPDATE report_templates SET logo=$2,updated_at=now() WHERE id=$1 RETURNING `+reportTemplateCols,id,logo),false)
 }

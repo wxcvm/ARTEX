@@ -1278,6 +1278,8 @@ CREATE TABLE IF NOT EXISTS report_templates (
     updated_at TIMESTAMPTZ NOT NULL DEFAULT now()
 );
 
+ALTER TABLE report_templates ADD COLUMN IF NOT EXISTS logo BYTEA;
+
 CREATE TABLE IF NOT EXISTS knowledge_documents (
     id TEXT PRIMARY KEY,
     task_id BIGINT REFERENCES tasks(id) ON DELETE CASCADE,
