@@ -43,6 +43,7 @@ type sarifResultProperties struct {
 	EvidenceVersion       int64  `json:"evidenceVersion"`
 	ReportEvidenceVersion int64  `json:"reportEvidenceVersion"`
 	ReportStale           bool   `json:"reportStale"`
+	ReportAvailable       bool   `json:"reportAvailable"`
 }
 
 // Stable source identity for cross-tool reconciliation. Never exports auth,
@@ -187,7 +188,8 @@ func FindingsSARIFWithAssets(findings []*db.DBFinding, identity map[int64]*db.As
 				TrafficCount:          f.TrafficCount,
 				EvidenceVersion:       f.EvidenceVersion,
 				ReportEvidenceVersion: f.ReportEvidenceVersion,
-				ReportStale:           f.Report != "" && f.EvidenceVersion != f.ReportEvidenceVersion,
+				ReportStale:           strings.TrimSpace(f.Report) != "" && f.EvidenceVersion != f.ReportEvidenceVersion,
+				ReportAvailable:       strings.TrimSpace(f.Report) != "",
 			},
 		})
 	}
