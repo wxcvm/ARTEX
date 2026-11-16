@@ -43,6 +43,8 @@ func TestTaskReportSnapshotArchiveRoundTrip(t *testing.T){
 	if w=req("GET",base+"/"+snap.ID+"?task="+other.ID,"");w.Code!=404{t.Fatal("cross task read",w.Code)}
 	if w=req("DELETE",base+"/"+snap.ID+"?task="+other.ID,"");w.Code!=404{t.Fatal("cross task delete",w.Code)}
 	if w=req("GET",base+"?task="+task,"");w.Code!=200||!strings.Contains(w.Body.String(),snap.ID){t.Fatal(w.Code,w.Body)}
+	if w=req("GET","/api/report/library?q=Version+one&format=docx","");w.Code!=200||!strings.Contains(w.Body.String(),snap.ID)||!strings.Contains(w.Body.String(),`"task_id":"`+task+`"`){t.Fatal(w.Code,w.Body)}
+	if w=req("GET","/api/report/library?q=Version+one&format=md","");w.Code!=200||strings.Contains(w.Body.String(),snap.ID){t.Fatal("format filter failed",w.Code,w.Body)}
 	if err=s.m.SetTaskPaused(task,true);err!=nil{t.Fatal(err)}
 	job,err:=s.m.pg.QueueTaskArchive(tid)
 	if err!=nil{t.Fatal(err)}
