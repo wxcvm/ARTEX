@@ -1624,6 +1624,14 @@ export interface InterceptDetail extends InterceptApprovalRow {
   audit: InterceptAudit | null;
 }
 
+export interface FindingScreenshot {
+  id: string;
+  binding_id?: string;
+  caption: string;
+  mime: "image/png" | "image/jpeg";
+  created_at: string;
+}
+
 export type TrafficEvidenceRole = "baseline" | "proof" | "verification" | "supporting";
 export interface TrafficEvidenceRef {
   traffic_id: string;

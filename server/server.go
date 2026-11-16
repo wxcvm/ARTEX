@@ -814,6 +814,7 @@ func (s *Server) Handler() http.Handler {
 	mux.HandleFunc("POST /api/exploration/findings/dsh-reviews/import", s.importDSHReviewFeedback)
 	mux.HandleFunc("GET /api/exploration/findings/dsh-reviews", s.listDSHReviewFeedback)
 	s.registerFindingTraffic(mux)
+	s.registerFindingScreenshots(mux)
 	mux.HandleFunc("GET /api/exploration/findings/{id}", s.getFinding)
 	mux.HandleFunc("GET /api/exploration/findings/{id}/lineage", s.findingLineage)
 	mux.HandleFunc("POST /api/exploration/findings/{id}/deepen", s.deepenFinding)

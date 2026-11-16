@@ -6,6 +6,8 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"image"
+	"image/png"
 	"io"
 	"net/http/httptest"
 	"os"
@@ -282,6 +284,15 @@ func TestFindingTrafficArchiveV3RoundTripAndRetry(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
+	var screenshotImage bytes.Buffer
+	if err := png.Encode(&screenshotImage, image.NewRGBA(image.Rect(0, 0, 2, 2))); err != nil {
+		t.Fatal(err)
+	}
+	bindingID := list.Bindings[0].ID
+	screenshot, err := s.m.pg.CreateFindingScreenshot(ctx, f.FindingID, &bindingID, "", "image/png", screenshotImage.Bytes())
+	if err != nil {
+		t.Fatal(err)
+	}
 	finding, err := s.m.pg.GetFinding(f.FindingID)
 	if err != nil {
 		t.Fatal(err)
@@ -332,7 +343,7 @@ func TestFindingTrafficArchiveV3RoundTripAndRetry(t *testing.T) {
 		t.Fatal(err)
 	}
 	// Force a database error after validated body installation; then retry normally.
-	if _, err = s.m.pg.Exec(`CREATE FUNCTION fail_evidence_restore_test() RETURNS trigger LANGUAGE plpgsql AS $$ BEGIN RAISE EXCEPTION 'restore fixture failure'; END $$`); err != nil {
+	if _, err = s.m.pg.Exec(`CREATE FUNCTION fail_evidence_restore_test() RETURNS trigger LANGUAGE plpgsql AS $ BEGIN RAISE EXCEPTION 'restore fixture failure'; END $`); err != nil {
 		t.Fatal(err)
 	}
 	if _, err = s.m.pg.Exec(`CREATE TRIGGER fail_evidence_restore_test BEFORE INSERT ON finding_traffic_bindings FOR EACH ROW EXECUTE FUNCTION fail_evidence_restore_test()`); err != nil {
@@ -375,6 +386,14 @@ func TestFindingTrafficArchiveV3RoundTripAndRetry(t *testing.T) {
 		return err
 	}); err != nil {
 		t.Fatal(err)
+	}
+	shots, err := s.m.pg.ListFindingScreenshots(ctx, f.FindingID)
+	if err != nil || len(shots) != 1 || shots[0].ID != screenshot.ID || shots[0].BindingID != i64s(bindingID) || shots[0].Caption != "keep note" {
+		t.Fatal("screenshot metadata not restored", shots, err)
+	}
+	mime, raw, err := s.m.pg.ReadFindingScreenshot(ctx, f.FindingID, screenshot.ID)
+	if err != nil || mime != "image/png" || !bytes.Equal(raw, screenshotImage.Bytes()) {
+		t.Fatal("screenshot image not restored", mime, err)
 	}
 	// The read tool enforces task visibility too.
 	result, err := s.toolGetFindingTraffic().Call(agent.WithRunInfo(ctx, agent.RunInfo{TaskID: sid}), json.RawMessage(fmt.Sprintf(`{"finding_id":"%d"}`, f.FindingID)), nil)
