@@ -146,7 +146,7 @@ export default function LoginPage() {
                 </button>
               </Label>
             </div>
-            {error && <p className="text-sm text-destructive">{locale === "en" ? error : ({ "Unable to connect to the backend service": "无法连接后端服务", "Please read and agree to the Terms of Use first": "请先阅读并同意使用条款", "Incorrect username or password": "用户名或密码错误" } as Record<string, string>)[error] ?? error}</p>}
+            {error && <p className="text-sm text-destructive">{({ "Unable to connect to the backend service": t("无法连接后端服务", "Unable to connect to the backend service"), "Please read and agree to the Terms of Use first": t("请先阅读并同意使用条款", "Please read and agree to the Terms of Use first"), "Incorrect username or password": t("用户名或密码错误", "Incorrect username or password") } as Record<string, string>)[error] ?? error}</p>}
             <Button type="submit" className="w-full" disabled={loading || !password || !agreed}>
               {loading ? t("正在登录…", "Signing in...") : t("登录", "Sign in")}
             </Button>
