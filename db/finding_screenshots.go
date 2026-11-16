@@ -20,7 +20,7 @@ type FindingScreenshot struct {
 const screenshotCols = `id, COALESCE(binding_id::text,''), caption, mime, created_at`
 
 func (d *DB) ListFindingScreenshots(ctx context.Context, findingID int64) ([]FindingScreenshot, error) {
-	rows, err := d.QueryContext(ctx, `SELECT `+screenshotCols+` FROM finding_screenshots WHERE finding_id=$1 ORDER BY created_at,id`, findingID)
+	rows, err := d.QueryContext(ctx, `SELECT `+screenshotCols+` FROM finding_screenshots WHERE finding_id=$1 ORDER BY position NULLS LAST,created_at,id`, findingID)
 	if err != nil {
 		return nil, err
 	}
@@ -144,9 +144,9 @@ func (d *DB) LoadFindingReportEvidence(ctx context.Context, findings []*DBFindin
 	}
 	return d.WithEvidenceTx(ctx, func(tx *sql.Tx) error {
 		for _, f := range findings {
-			query := `SELECT ` + screenshotCols + `, NULL::bytea FROM finding_screenshots WHERE finding_id=$1 ORDER BY created_at,id`
+			query := `SELECT ` + screenshotCols + `, NULL::bytea FROM finding_screenshots WHERE finding_id=$1 ORDER BY position NULLS LAST,created_at,id`
 			if includeImages {
-				query = `SELECT ` + screenshotCols + `, image FROM finding_screenshots WHERE finding_id=$1 ORDER BY created_at,id`
+				query = `SELECT ` + screenshotCols + `, image FROM finding_screenshots WHERE finding_id=$1 ORDER BY position NULLS LAST,created_at,id`
 			}
 			rows, err := tx.QueryContext(ctx, query, f.ID)
 			if err != nil {
@@ -172,6 +172,43 @@ func (d *DB) LoadFindingReportEvidence(ctx context.Context, findings []*DBFindin
 				return err
 			}
 			f.ReproductionSteps = steps
+		}
+		return nil
+	})
+}
+
+// OrderFindingScreenshots replaces the complete ordering of a finding's images.
+// A stale or foreign list is rejected before changing any position. Older
+// archives and new uploads use NULL positions and follow the ordered images.
+func (d *DB) OrderFindingScreenshots(ctx context.Context, findingID int64, ids []string) error {
+	return d.WithEvidenceTx(ctx, func(tx *sql.Tx) error {
+		if err := LockFindingEvidenceTx(tx, findingID, nil); err != nil {
+			return err
+		}
+		var count int
+		if err := tx.QueryRowContext(ctx, "SELECT count(*) FROM finding_screenshots WHERE finding_id=$1", findingID).Scan(&count); err != nil {
+			return err
+		}
+		if count != len(ids) {
+			return ErrEvidenceConflict
+		}
+		seen := make(map[string]bool, len(ids))
+		for i, id := range ids {
+			if id == "" || seen[id] {
+				return ErrEvidenceConflict
+			}
+			seen[id] = true
+			res, err := tx.ExecContext(ctx, "UPDATE finding_screenshots SET position=$3 WHERE finding_id=$1 AND id=$2", findingID, id, i)
+			if err != nil {
+				return err
+			}
+			n, err := res.RowsAffected()
+			if err != nil {
+				return err
+			}
+			if n != 1 {
+				return ErrEvidenceConflict
+			}
 		}
 		return nil
 	})

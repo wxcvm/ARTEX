@@ -589,7 +589,7 @@ func (d *DB) snapshotTaskArchive(taskID int64, llmRecords io.Writer) (*TaskArchi
 		{"coverage_ledger", `SELECT * FROM coverage_ledger WHERE task_id=$1 ORDER BY risk_area,surface`, []any{taskID}},
 		{"findings", `SELECT * FROM findings WHERE task_id=$1 ORDER BY id`, []any{taskID}},
 		{"finding_traffic_bindings", `SELECT b.* FROM finding_traffic_bindings b JOIN findings f ON f.id=b.finding_id WHERE f.task_id=$1 ORDER BY b.finding_id,b.position,b.id`, []any{taskID}},
-		{"finding_screenshots", `SELECT s.* FROM finding_screenshots s JOIN findings f ON f.id=s.finding_id WHERE f.task_id=$1 ORDER BY s.finding_id,s.created_at,s.id`, []any{taskID}},
+		{"finding_screenshots", `SELECT s.* FROM finding_screenshots s JOIN findings f ON f.id=s.finding_id WHERE f.task_id=$1 ORDER BY s.finding_id,s.position NULLS LAST,s.created_at,s.id`, []any{taskID}},
 		{"finding_reproduction_steps", `SELECT s.* FROM finding_reproduction_steps s JOIN findings f ON f.id=s.finding_id WHERE f.task_id=$1 ORDER BY s.finding_id,s.position`, []any{taskID}},
 		{"traffic_evidence_snapshots", `SELECT s.* FROM traffic_evidence_snapshots s WHERE EXISTS(SELECT 1 FROM finding_traffic_bindings b JOIN findings f ON f.id=b.finding_id WHERE b.snapshot_id=s.id AND f.task_id=$1) ORDER BY s.id`, []any{taskID}},
 		{"llm_records", `SELECT * FROM llm_records WHERE COALESCE(task_id,'')=$1 ORDER BY id`, []any{strconv.FormatInt(taskID, 10)}},

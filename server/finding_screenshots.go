@@ -20,6 +20,7 @@ func (s *Server) registerFindingScreenshots(mux *http.ServeMux) {
 	base := "/api/exploration/findings/{id}/screenshots"
 	mux.HandleFunc("GET "+base, s.listFindingScreenshots)
 	mux.HandleFunc("POST "+base, s.createFindingScreenshot)
+	mux.HandleFunc("PUT "+base+"/order", s.orderFindingScreenshots)
 	mux.HandleFunc("GET "+base+"/{screenshot_id}", s.readFindingScreenshot)
 	mux.HandleFunc("PATCH "+base+"/{screenshot_id}", s.changeFindingScreenshot)
 	mux.HandleFunc("DELETE "+base+"/{screenshot_id}", s.changeFindingScreenshot)
@@ -161,4 +162,23 @@ func (s *Server) changeFindingScreenshot(w http.ResponseWriter, r *http.Request)
 		return
 	}
 	writeJSON(w, 200, map[string]bool{"ok": true})
+}
+
+func (s *Server) orderFindingScreenshots(w http.ResponseWriter, r *http.Request) {
+	id, ok := s.findingTrafficAccess(w, r, true)
+	if !ok {
+		return
+	}
+	var body struct {
+		IDs []string `json:"ids"`
+	}
+	if err := json.NewDecoder(http.MaxBytesReader(w, r.Body, 1<<20)).Decode(&body); err != nil || body.IDs == nil {
+		writeErr(w, 400, "ids array is required")
+		return
+	}
+	if err := s.m.pg.OrderFindingScreenshots(r.Context(), id, body.IDs); err != nil {
+		evidenceError(w, err)
+		return
+	}
+	s.listFindingScreenshots(w, r)
 }

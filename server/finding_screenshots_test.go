@@ -73,6 +73,27 @@ func TestFindingScreenshotAPI(t *testing.T) {
 		t.Fatal(w.Code, w.Body)
 	}
 	path := base + "/" + screenshot.ID
+	second, err := s.m.pg.CreateFindingScreenshot(t.Context(), f.FindingID, nil, "second screenshot", "image/png", img.Bytes())
+	if err != nil {
+		t.Fatal(err)
+	}
+	order, err := json.Marshal(map[string][]string{"ids": {second.ID, screenshot.ID}})
+	if err != nil {
+		t.Fatal(err)
+	}
+	if w = req("PUT", base+"/order", string(order)); w.Code != 200 {
+		t.Fatal(w.Code, w.Body)
+	}
+	var ordered []db.FindingScreenshot
+	if err := json.Unmarshal(w.Body.Bytes(), &ordered); err != nil || len(ordered) != 2 || ordered[0].ID != second.ID {
+		t.Fatal("wrong screenshot order", ordered, err)
+	}
+	if w = req("PUT", base+"/order", `{"ids":[]}`); w.Code != 409 {
+		t.Fatal("stale order was accepted", w.Code)
+	}
+	if w = req("DELETE", base+"/"+second.ID, ""); w.Code != 200 {
+		t.Fatal(w.Code, w.Body)
+	}
 	if w = req("GET", path, ""); w.Code != 200 || w.Header().Get("Content-Type") != "image/png" {
 		t.Fatal(w.Code, w.Header())
 	}

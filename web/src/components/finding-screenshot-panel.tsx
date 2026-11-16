@@ -2,6 +2,7 @@
 
 import * as React from "react";
 import { toast } from "sonner";
+import { ArrowDownIcon, ArrowUpIcon } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Textarea } from "@/components/ui/textarea";
@@ -77,6 +78,15 @@ export function FindingScreenshotPanel({ findingId, contextTask, readOnly }: {
     });
   }
 
+  async function move(index: number, delta: number) {
+    if (!items || index + delta < 0 || index + delta >= items.length || busy) return;
+    const ids = items.map((item) => item.id);
+    [ids[index], ids[index + delta]] = [ids[index + delta], ids[index]];
+    await mutate(async () => {
+      setItems(await api.orderFindingScreenshots(findingId, ids, contextTask));
+    });
+  }
+
   async function view(item: FindingScreenshot) {
     setBusy(true);
     try {
@@ -117,6 +127,10 @@ export function FindingScreenshotPanel({ findingId, contextTask, readOnly }: {
               <span className="text-sm font-medium">{tr("截图", "Screenshot")} {index + 1}</span>
               {item.binding_id && <span className="text-xs text-muted-foreground">{tr("关联证据", "Evidence")} #{item.binding_id}</span>}
               <span className="flex-1" />
+              {!readOnly && <>
+                <Button size="sm" variant="ghost" aria-label={tr("上移截图", "Move screenshot up")} disabled={busy || index === 0} onClick={() => void move(index, -1)}><ArrowUpIcon /></Button>
+                <Button size="sm" variant="ghost" aria-label={tr("下移截图", "Move screenshot down")} disabled={busy || index === items.length - 1} onClick={() => void move(index, 1)}><ArrowDownIcon /></Button>
+              </>}
               <Button size="sm" variant="outline" disabled={busy} onClick={() => void view(item)}>{tr("查看", "View")}</Button>
               {!readOnly && <Button size="sm" variant="outline" disabled={busy} onClick={() => { setEditing(item.id); setEditCaption(item.caption); }}>{tr("编辑图注", "Edit caption")}</Button>}
               {!readOnly && <Button size="sm" variant="ghost" disabled={busy} onClick={() => void mutate(async () => {

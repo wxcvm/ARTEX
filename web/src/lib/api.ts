@@ -626,6 +626,8 @@ export const api = {
     ),
   saveFindingReproduction: (id: string, steps: FindingReproductionStep[], contextTask?: string) =>
     put<FindingReproductionStep[]>(`/exploration/findings/${encodeURIComponent(id)}/reproduction${contextTask ? `?context_task=${encodeURIComponent(contextTask)}` : ""}`, { steps }),
+  orderFindingScreenshots: (id: string, ids: string[], contextTask?: string) =>
+    put<FindingScreenshot[]>(`/exploration/findings/${encodeURIComponent(id)}/screenshots/order${contextTask ? `?context_task=${encodeURIComponent(contextTask)}` : ""}`, { ids }),
   findingScreenshots: (id: string, contextTask?: string): Promise<FindingScreenshot[]> =>
     MOCK ? Promise.resolve([]) : get<FindingScreenshot[]>(
       `/exploration/findings/${encodeURIComponent(id)}/screenshots${contextTask ? `?context_task=${encodeURIComponent(contextTask)}` : ""}`,
