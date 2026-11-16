@@ -224,7 +224,7 @@ export function TrafficPickerDialog({
                     <TableCell className="whitespace-nowrap text-xs">
                       {new Date(e.ts).toLocaleString(locale)}
                     </TableCell>
-                    <TableCell>{e.status}</TableCell>
+                    <TableCell>{e.status === 0 ? tr("未观测", "Unobserved") : e.status}</TableCell>
                     <TableCell>
                       <Button variant="ghost" size="sm" onClick={() => setPreview(e.id)}>
                         {tr("预览", "Preview")}

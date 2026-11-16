@@ -578,6 +578,7 @@ export default function TrafficPage() {
           </SelectTrigger>
           <SelectContent>
             <SelectItem value="all">{tr("全部状态", "All statuses")}</SelectItem>
+            <SelectItem value="0">{tr("未观测状态", "Unobserved status")}</SelectItem>
             {STATUS_BUCKETS.map((s) => (
               <SelectItem key={s} value={s}>
                 {s}
@@ -727,7 +728,7 @@ export default function TrafficPage() {
                     </TableCell>
                     <TableCell>
                       <span className={cn("font-mono text-xs font-semibold tabular-nums", statusTone(e.status))}>
-                        {e.status}
+                        {e.status === 0 ? tr("未观测", "Unobserved") : e.status}
                       </span>
                     </TableCell>
                     <TableCell className="text-xs text-muted-foreground">{e.content_type}</TableCell>
@@ -762,7 +763,7 @@ export default function TrafficPage() {
                 <div className="flex items-center gap-2 pr-8">
                   <MethodBadge method={selected.method} />
                   <Badge variant="secondary" className={cn("font-mono tabular-nums", statusTone(selected.status))}>
-                    {selected.status}
+                    {selected.status === 0 ? tr("未观测", "Unobserved") : selected.status}
                   </Badge>
                   <Button
                     variant="outline"

@@ -75,3 +75,36 @@ func TestRecordExternalRejectsBadInput(t *testing.T) {
 		}
 	}
 }
+
+func TestRecordExternalPreservesUnobservedStatus(t *testing.T) {
+	tr, _ := openTraffic(t)
+	for _, e := range []ExternalExchange{
+		{Method: "GET", URL: "https://example.invalid/unobserved", ResponseBody: "partial capture"},
+		{Method: "GET", URL: "https://example.invalid/observed", Status: 200, ResponseBody: "ok"},
+	} {
+		if err := tr.RecordExternal(e); err != nil {
+			t.Fatal(err)
+		}
+	}
+	rows, total, err := tr.Page(PageQuery{Status: "0", RespMin: -1, RespMax: -1}, 0, 10)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if total != 1 || len(rows) != 1 || rows[0].Status != 0 {
+		t.Fatalf("unknown-status filter: rows=%+v total=%d", rows, total)
+	}
+	_, resp, err := tr.Get(rows[0].ID)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if !strings.Contains(resp, "HTTP status unavailable") || !strings.Contains(resp, "partial capture") || strings.Contains(resp, "HTTP 200") {
+		t.Fatalf("unobserved status was misrepresented: %q", resp)
+	}
+	rows, total, err = tr.Page(PageQuery{Status: "2xx", RespMin: -1, RespMax: -1}, 0, 10)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if total != 1 || len(rows) != 1 || rows[0].Status != 200 {
+		t.Fatalf("2xx must exclude unknown status: rows=%+v total=%d", rows, total)
+	}
+}
