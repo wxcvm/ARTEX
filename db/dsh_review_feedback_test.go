@@ -38,3 +38,59 @@ func TestParseDSHReviewFeedback(t *testing.T) {
         })
     }
 }
+
+func TestImportDSHReviewFeedbackPreservesNewerAndEqualTimestamps(t *testing.T) {
+    d, err := Open(testDSN(t))
+    if err != nil {
+        t.Skipf("postgres unavailable (%v) — skipping", err)
+    }
+    defer d.Close()
+    fid, err := d.AddFinding(0, 0, "review-import-test", "Review import test", "info", "summary", "evidence", "tester", nil)
+    if err != nil {
+        t.Fatal(err)
+    }
+    defer d.DeleteFinding(fid)
+    input := DSHReviewFeedback{
+        Schema: DSHReviewFeedbackSchema,
+        Source: "dsh-purge",
+        Engagement: "review-import-test",
+        Reviews: []DSHReviewEntry{{
+            FindingID: fid, Status: "needs_evidence", Note: "newer review",
+            UpdatedAt: "2026-11-10T09:00:00Z",
+        }},
+    }
+    check := func(wantImported, wantSkipped int) {
+        t.Helper()
+        got, err := d.ImportDSHReviewFeedback(input)
+        if err != nil {
+            t.Fatal(err)
+        }
+        if got.Imported != wantImported || got.SkippedNotNewer != wantSkipped || got.Missing != 0 || got.TaskMismatch != 0 {
+            t.Fatalf("import result: got %+v, want imported=%d skipped=%d", got, wantImported, wantSkipped)
+        }
+    }
+    check(1, 0)
+    check(0, 1) // Identical re-import is a no-op.
+    input.Reviews[0].Status = "pending"
+    input.Reviews[0].Note = "same timestamp, different content"
+    check(0, 1) // Equal timestamp must not overwrite the saved review.
+    input.Reviews[0].UpdatedAt = "2026-11-10T08:00:00Z"
+    check(0, 1)
+    var status, note string
+    if err := d.QueryRow("SELECT review_status,note FROM finding_dsh_reviews WHERE finding_id=$1 AND dsh_engagement=$2", fid, input.Engagement).Scan(&status, &note); err != nil {
+        t.Fatal(err)
+    }
+    if status != "needs_evidence" || note != "newer review" {
+        t.Fatalf("saved newer review changed: %q %q", status, note)
+    }
+    input.Reviews[0].UpdatedAt = "2026-11-10T10:00:00Z"
+    input.Reviews[0].Status = "reviewed"
+    input.Reviews[0].Note = "new review"
+    check(1, 0)
+    if err := d.QueryRow("SELECT review_status,note FROM finding_dsh_reviews WHERE finding_id=$1 AND dsh_engagement=$2", fid, input.Engagement).Scan(&status, &note); err != nil {
+        t.Fatal(err)
+    }
+    if status != "reviewed" || note != "new review" {
+        t.Fatalf("new review not saved: %q %q", status, note)
+    }
+}

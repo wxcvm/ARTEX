@@ -38,14 +38,16 @@ func (t *Traffic) RecordExternal(e ExternalExchange) error {
 	if method == "" {
 		return fmt.Errorf("empty method for %q", e.URL)
 	}
+	// Status 0 means the external recorder did not observe an HTTP status.
+	// Preserve that uncertainty rather than fabricating a successful response.
 	status := e.Status
-	if status == 0 {
-		status = 200
-	}
 
 	host := u.Hostname()
 	reqHead := fmt.Sprintf("%s %s %s\n%s", method, u.RequestURI(), "HTTP/1.1", headerLines(toHeaderMap(e.RequestHeaders)))
 	respHead := fmt.Sprintf("HTTP %d\n%s", status, headerLines(toHeaderMap(e.ResponseHeaders)))
+	if status == 0 {
+		respHead = "HTTP status unavailable\n" + headerLines(toHeaderMap(e.ResponseHeaders))
+	}
 	respCT := e.ResponseHeaders["content-type"]
 
 	t.wmu.Lock()
