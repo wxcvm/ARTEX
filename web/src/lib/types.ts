@@ -1766,3 +1766,14 @@ export interface ReportTemplate extends ReportTemplateInput {
   created_at: string;
   updated_at: string;
 }
+
+export interface TaskReportSnapshot {
+  id:string;
+  name:string;
+  format:"md"|"docx";
+  scope:"all"|"confirmed";
+  locale:string;
+  template_name:string;
+  size:number;
+  created_at:string;
+}

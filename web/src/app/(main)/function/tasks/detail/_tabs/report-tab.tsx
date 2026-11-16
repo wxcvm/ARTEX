@@ -14,6 +14,7 @@ import { Button } from "@/components/ui/button";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { api } from "@/lib/api";
 import { ReportTemplateSelect } from "@/components/report-template-manager";
+import { TaskReportHistory } from "@/components/task-report-history";
 import { copyText } from "@/lib/utils";
 
 export function ReportTab({ taskId }: { taskId: string }) {
@@ -161,6 +162,7 @@ export function ReportTab({ taskId }: { taskId: string }) {
           </div>
         )}
         {content}
+        <TaskReportHistory key={taskId} taskId={taskId} scope={scope} locale={locale} layout={layout} template={layout==="professional"?template:""}/>
       </CardContent>
     </Card>
   );

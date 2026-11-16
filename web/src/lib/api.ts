@@ -625,6 +625,16 @@ export const api = {
     get<FindingAssetTree>(`/exploration/findings/asset-tree?${findingFilterParams(q).toString()}`),
   findingStats: (q: Omit<FindingQuery, "page" | "pageSize"> = {}) =>
     get<FindingStats>(`/exploration/findings/stats?${findingFilterParams(q).toString()}`),
+  taskReportSnapshots: (task:string,offset=0) => get<import("./types").TaskReportSnapshot[]>(`/report/snapshots?${new URLSearchParams({task,offset:String(offset)})}`),
+  saveTaskReportSnapshot: (task:string,format:"md"|"docx",scope:"all"|"confirmed",locale:string,layout:"simple"|"professional",template:string,name:string) => post<import("./types").TaskReportSnapshot>(`/report/snapshots?${new URLSearchParams({task,format,scope,lang:locale,layout,template,name})}`,{}),
+  deleteTaskReportSnapshot: (task:string,id:string) => del<{ok:boolean}>(`/report/snapshots/${encodeURIComponent(id)}?${new URLSearchParams({task})}`),
+  downloadTaskReportSnapshot: async(task:string,id:string,format:"md"|"docx") => {
+    const token=getToken();
+    const r=await fetch(`/api/report/snapshots/${encodeURIComponent(id)}?${new URLSearchParams({task})}`,{headers:token?{Authorization:`Bearer ${token}`}:{}});
+    if(!r.ok)throw new Error(`Saved report: ${r.status}`);
+    const blob=await r.blob();const url=URL.createObjectURL(blob);
+    const a=document.createElement("a");a.href=url;a.download=downloadFilename(r.headers.get("Content-Disposition")??"",`task-report.${format}`);document.body.appendChild(a);a.click();a.remove();window.setTimeout(()=>URL.revokeObjectURL(url),1000);
+  },
   reportTemplates: () => get<import("./types").ReportTemplate[]>("/report/templates"),
   saveReportTemplate: (data: import("./types").ReportTemplateInput, id?: string) => id ? put<import("./types").ReportTemplate>(`/report/templates/${encodeURIComponent(id)}`, data) : post<import("./types").ReportTemplate>("/report/templates", data),
   deleteReportTemplate: (id: string) => del<{ok:boolean}>(`/report/templates/${encodeURIComponent(id)}`),
