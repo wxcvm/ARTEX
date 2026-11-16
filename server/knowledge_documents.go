@@ -18,6 +18,11 @@ func (s *Server) registerKnowledgeDocuments(mux *http.ServeMux) {
 	const base="/api/knowledge/documents"
 	mux.HandleFunc("GET "+base,s.listKnowledgeDocuments)
 	mux.HandleFunc("GET /api/knowledge/retrievals",s.listKnowledgeRetrievals)
+	mux.HandleFunc("GET /api/knowledge/embedding",s.getKnowledgeEmbedding)
+	mux.HandleFunc("PUT /api/knowledge/embedding",s.putKnowledgeEmbedding)
+	mux.HandleFunc("POST /api/knowledge/embedding/test",s.testKnowledgeEmbedding)
+	mux.HandleFunc("GET "+base+"/{document}/index",s.getKnowledgeIndex)
+	mux.HandleFunc("POST "+base+"/{document}/index",s.buildKnowledgeIndex)
 	mux.HandleFunc("POST "+base,s.saveKnowledgeDocument)
 	mux.HandleFunc("POST "+base+"/upload",s.uploadKnowledgeDocument)
 	mux.HandleFunc("GET "+base+"/{document}",s.getKnowledgeDocument)
