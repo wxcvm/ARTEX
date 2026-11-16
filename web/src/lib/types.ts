@@ -1731,4 +1731,12 @@ export interface KnowledgeIndexStatus {
   enabled: boolean;
   chunks: number;
   model: string;
+  reused?: number;
+  embedded?: number;
+  skipped?: boolean;
+}
+export interface KnowledgeIndexCandidatePage {
+  items: {id:string;title:string}[];
+  next: string;
+  model: string;
 }
