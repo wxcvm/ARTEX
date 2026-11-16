@@ -1,0 +1,83 @@
+{
+  "id": "cyberstrike-csf-v1",
+  "framework": "NIST CSF 2.0",
+  "authority": "https://doi.org/10.6028/NIST.CSWP.29",
+  "upstream": "https://github.com/CyberStrikeus/CyberStrike",
+  "revision": "9303b210ab82bd6362d7ad7fbd2b2c8f2e335450",
+  "upstream_license": "AGPL-3.0",
+  "category": "defensive-csf",
+  "entries": [
+    {
+      "code": "ID.AM-01",
+      "title": "ID.AM-01 资产台账与硬件清单 / Asset inventory",
+      "source_path": ".cyberstrike/skill/NIST/CSF_v2.0/ID_identify/ID.AM-01_idam-01/SKILL.md",
+      "source_blob": "b53464b40fed6deb0e49541c8ed35ee7c03893f0",
+      "keywords": "资产,设备,硬件,CMDB,inventory,asset ownership",
+      "body": "目标：用授权范围内的已有资产记录维护可核对的硬件清单。\n\n检查：汇总资产台账、设备管理平台及云资源导出；为每个资产保留稳定 ID、责任人、所属环境、来源和最后观察时间。区分实体设备、虚拟机和逻辑服务，不以 IP 地址作为唯一永久标识。对照任务范围，记录未纳管、过期、重复或无法确认的资产，避免将历史记录当作在线设备。\n\n证据：保存原始清单的时间、来源、版本及稳定引用；记录覆盖范围和未能核对的原因。抽样检查责任人、生命周期和退役状态。\n\nARTEX：复用资产记录、任务范围与覆盖账本。仅按确有证据的身份关联资产；不能确认同一资产时保留独立记录。交付清单覆盖率、冲突及待核对项，不将清单差异自动定性为漏洞。"
+    },
+    {
+      "code": "ID.RA-01",
+      "title": "ID.RA-01 漏洞验证与风险台账 / Vulnerability risk assessment",
+      "source_path": ".cyberstrike/skill/NIST/CSF_v2.0/ID_identify/ID.RA-01_idra-01/SKILL.md",
+      "source_blob": "cbb5e8fda6173e5ca7c9a479c96a73019376a54d",
+      "keywords": "风险评估,漏洞验证,资产,复核,CVE,risk register,findings",
+      "body": "目标：将已识别的资产风险转化为可复核的记录，而不是只堆积扫描输出。\n\n检查：关联资产、版本、发现来源和时间；核对适用的厂商公告、配置证据及既有验证结果。候选发现、独立确认、误报、未测试及修复复核应分别记录。对同一根因去重前确认资产、组件、授权上下文及证据是否一致。\n\n证据：记录原始结果引用、观察事实、推断与未知、受影响条件、修复建议和责任人。严重性结合实际影响、暴露面、资产价值及适用条件确定，不能从框架编号直接推出 CVSS 或 CWE。\n\nARTEX：复用 finding、流量证据快照、报告版本、SARIF 及复核回执；修复后关联新证据，保留原结论。没有独立验证时明确待核查。"
+    },
+    {
+      "code": "PR.AA-05",
+      "title": "PR.AA-05 权限治理与最小权限 / Least privilege access review",
+      "source_path": ".cyberstrike/skill/NIST/CSF_v2.0/PR_protect/PR.AA-05_praa-05/SKILL.md",
+      "source_blob": "838bd951e8dc80c655f4b287faf3213bda68a0a1",
+      "keywords": "权限,最小权限,角色,审计,IAM,RBAC,least privilege,separation of duties",
+      "body": "目标：核查角色、授权范围和职责分离是否与实际业务需要一致。\n\n检查：使用获准查看的角色与权限清单、身份平台导出、审批记录和应用配置；区分用户、服务账户、临时权限与管理员角色。对照岗位需求、租户范围、到期时间和审批流程，确认离职、角色变更及紧急授权是否按流程撤回。检查高权限操作是否需要独立审批与可追溯记录。\n\n证据：列明账号或角色的脱敏标识、权限来源、策略版本、检查时间、期望权限和实际权限。不能仅根据角色名字判断实际访问能力，也不能将未知权限当作已授权。\n\nARTEX：将已保存配置或接口记录关联到相应发现；用比较面板核查修复前后差异（若可用），并通过人工复核确认业务例外。不要在审计中自行修改账号或权限。"
+    },
+    {
+      "code": "PR.DS-11",
+      "title": "PR.DS-11 备份保护与恢复测试 / Backup integrity and restore testing",
+      "source_path": ".cyberstrike/skill/NIST/CSF_v2.0/PR_protect/PR.DS-11_prds-11/SKILL.md",
+      "source_blob": "76ee24e4e69dea8b6024569c02d3b9e9c0dfb180",
+      "keywords": "备份,恢复,完整性,保留,backup,restore,RPO,RTO",
+      "body": "目标：证明关键数据能够从受保护的备份恢复，而不仅是存在备份任务。\n\n检查：核对数据范围、备份频率、保留策略、访问控制、加密、独立存储和恢复责任人。检查最近成功与失败记录以及告警处理。使用已获批准的隔离恢复环境核对备份可读性、应用一致性、完整性和依赖项；不得用未验证备份覆盖生产数据。\n\n证据：记录备份时间、恢复样本、实际恢复耗时和恢复点、失败原因及验证人员。配置中的 RPO/RTO 目标与实测结果必须区分；没有恢复演练就不能宣称恢复成功。\n\nARTEX：保留归档导出、恢复结果和关联证据版本；报告缺失的验证或未覆盖系统，给出责任人与复验建议。"
+    },
+    {
+      "code": "PR.PS-02",
+      "title": "PR.PS-02 软件生命周期与补丁管理 / Software patch lifecycle",
+      "source_path": ".cyberstrike/skill/NIST/CSF_v2.0/PR_protect/PR.PS-02_prps-02/SKILL.md",
+      "source_blob": "05f4bb50707a5f6bb956daa144391024e3039f84",
+      "keywords": "补丁,版本,软件生命周期,升级,EOL,patch,software maintenance",
+      "body": "目标：按风险管理软件维护、替换和退役，建立可验证的修复闭环。\n\n检查：从授权资产清单或软件物料表记录组件、安装版本、维护状态和责任人；对照厂商公告及支持周期，区分存在更新、受影响、已修复与无法确认。核对变更审批、测试环境、回滚方案、部署时间和实际运行版本。\n\n证据：保存公告链接、组件版本、环境、配置或部署记录；修复复核应证明运行实例确实使用新版本或相应缓解措施，而非仅凭安装包存在。对于无法立即升级的系统，记录临时缓解、风险接受和复核期限。\n\nARTEX：将版本证据与发现和复测结果关联，保留原始报告及新版本证据。区分已发布补丁和已完成部署。"
+    },
+    {
+      "code": "DE.CM-01",
+      "title": "DE.CM-01 网络监测与日志覆盖 / Network continuous monitoring",
+      "source_path": ".cyberstrike/skill/NIST/CSF_v2.0/DE_detect/DE.CM-01_decm-01/SKILL.md",
+      "source_blob": "0cccf0bd90d860f3d95b98a54af7a2d94d76a6a6",
+      "keywords": "持续监测,日志,网络,告警,SIEM,coverage,telemetry",
+      "body": "目标：核对网络与服务的监测覆盖、时效及异常事件的可追溯性。\n\n检查：从已有日志、传感器清单、监控配置和告警记录核对覆盖范围；确认采集点、时间同步、转发失败、保留周期和访问控制。区分无事件、无采集、采集失败和未检查。使用既有测试事件或批准的离线样本验证告警链路，而不是在生产环境产生攻击流量。\n\n证据：保存采集时间、事件标识、源系统、观测范围、日志缺口和告警处理记录。未知 HTTP 状态或缺失正文不能作为成功响应或正常行为的依据。\n\nARTEX：复用流量记录、HAR 导入、覆盖账本及证据快照；记录原始捕获时间与缺失字段。不要将单条流量差异直接判为事件或漏洞。"
+    },
+    {
+      "code": "RS.AN",
+      "title": "RS.AN 事件分析与证据保全 / Incident analysis",
+      "source_path": ".cyberstrike/skill/NIST/CSF_v2.0/RS_respond/incident-analysis-rs-an-incident/SKILL.md",
+      "source_blob": "0e14e453c4060a5d189515d1a3e5c0409dd327c5",
+      "keywords": "事件响应,事件分析,取证,时间线,incident analysis,forensics",
+      "body": "目标：根据已授权收集的事件记录建立可信时间线，并支持处置和恢复决策。\n\n检查：汇总告警、工单、资产和日志引用；区分原始事件发生时间、接收时间和分析时间。记录已观察事实、待验证假设、影响范围及未决问题。对冲突时间或重复事件保留来源与关联依据；避免在证据保全前修改原始记录。\n\n证据：保存只读副本的引用、采集方法、责任人、访问记录和必要的完整性校验；说明缺失、截断、时区或保留限制。结论应能够回溯到具体记录，不以单个异常指标自动推断根因或攻击者身份。\n\nARTEX：使用已绑定证据、任务归档、报告版本和复核回执组织材料；保留与假设不一致的证据。交付时间线、已确认影响、待核查事项和下一步处置建议。"
+    },
+    {
+      "code": "RC.RP",
+      "title": "RC.RP 事件恢复执行与验收 / Incident recovery plan execution",
+      "source_path": ".cyberstrike/skill/NIST/CSF_v2.0/RC_recover/incident-recovery-plan-execution-rc-rp/SKILL.md",
+      "source_blob": "e1cd1b323d186a631f9d13b868cb0a4d1412991a",
+      "keywords": "恢复,业务连续性,验收,回滚,recovery,restoration,continuity",
+      "body": "目标：依据既有恢复计划恢复受影响服务，并用可追溯的检查结果确认恢复状态。\n\n检查：核对恢复优先级、依赖关系、责任人、恢复点和目标时间。验证备份及恢复环境可信，确认必要修复已部署，并按批准顺序进行恢复。用业务健康检查、数据一致性检查和监控证据评估服务可用性；失败时记录回滚或暂停原因。\n\n证据：保存恢复开始与结束时间、版本、备份来源、验收条件、实际检查结果及未完成事项。不能将服务启动成功等同于业务完整恢复或所有安全问题已修复。\n\nARTEX：把恢复前后证据、复测结果及报告修订关联到同一资产和事件；保留历史状态，区分恢复成功、部分恢复、失败和未验证。"
+    },
+    {
+      "code": "GV.SC",
+      "title": "GV.SC 供应链风险与依赖来源 / Supply chain risk management",
+      "source_path": ".cyberstrike/skill/NIST/CSF_v2.0/GV_govern/cybersecurity-supply-chain-risk/SKILL.md",
+      "source_blob": "be46743c09b640a890d58ee61e3549369cce0c14",
+      "keywords": "供应链,依赖,第三方,SBOM,许可证,supply chain,provenance,license",
+      "body": "目标：核对第三方软件、工具和服务的来源、责任与风险管理记录。\n\n检查：从现有依赖锁文件、软件物料表、采购清单、版本和发布记录建立可追溯清单。关注组件来源、许可证、维护状态、升级责任、供应商通知和替换计划。对照构建产物与依赖清单，记录无法核对的间接依赖和未经确认的来源。\n\n证据：保存明确版本、来源链接、许可证信息、构建或发布引用、发现时间及责任人。来源声明不等于已验证签名；上游 README 也不是独立测试结果。避免将未审阅的上游脚本或知识直接作为执行指令。\n\nARTEX：对导入知识记录源仓库、固定版本、路径与许可；已有相同主题优先归纳，保留独立验证状态。对工具使用现有注册、缓存和审计机制。交付差异、风险和待补证据。"
+    }
+  ]
+}

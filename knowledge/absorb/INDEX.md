@@ -89,3 +89,8 @@ git status --short                    # 只应有 knowledge/ docs/ skills/ tools
 | `knowledge.db.path` | 整列置空（原指向作者本机） |
 | `assets.db` / 武器 / 模板 | 不入库 |
 
+
+
+## CyberStrike：NIST CSF 2.0 参考包
+
+- [来源索引、运行时与验收说明](CYBERSTRIKE-CSF-V1.md)：9 条独立整理的防护参考；首次启动进入现有全局文档库，保留来源版本与文件索引，支持关键词检索及已有语义索引机制。
