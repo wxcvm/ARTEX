@@ -36,3 +36,8 @@ Nine reviewed reference documents are the first delivery, not a claim of complet
 `db/knowledgepacks/cyberstrike-csf-supplement-v1.json` 新增 9 条（合计 18 条）：GV.RR-02、ID.AM-02、ID.AM-03、ID.IM-01、PR.AA-03、PR.DS-01、DE.AE-03、RS.MA-02、RC.RP-05。与首包使用同一固定上游版本，逐条核对源文件与 blob；只独立整理防护核查、证据与修复复验参考，不复制技能正文。上游目录包含旧框架编号，不将整个目录视为已核实的 CSF 2.0 语料。
 
 增量包有独立入库标记，沿用全局文档库与事务式入库；已安装首包的实例仅新增第二包，原有文档编辑和删除保留。测试覆盖两包编号/文档身份去重及旧包编辑删除后的增量入库。无需新增表或依赖。
+
+
+## 第三批增量参考包
+
+`db/knowledgepacks/cyberstrike-csf-third-v1.json` 新增 9 条：GV.RM-06、GV.SC-07、ID.RA-06、ID.RA-07、PR.DS-02、PR.PS-04、DE.CM-09、RS.AN-06、RC.CO-03。重点补齐风险分级、处置与变更、传输保护、日志监测、调查证据来源和恢复沟通。三包合计 27 条，继续使用固定上游版本和独立安装标记。测试覆盖跨三包的编号、文档身份、安装标记去重；沿用现有入库与检索，不改写旧包。

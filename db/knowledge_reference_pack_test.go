@@ -122,3 +122,31 @@ func TestKnowledgeReferenceSupplementPreservesEarlierPack(t *testing.T) {
 	doc,err = d.GetKnowledgeDocument(ctx,0,false,c)
 	if err != nil || doc.TaskID != "" || doc.SourceFilename != supplement.Entries[0].SourcePath { t.Fatalf("supplement: %+v %v",doc,err) }
 }
+
+
+func TestCyberStrikeThirdPackManifest(t *testing.T) {
+	var first, second, third knowledgeReferencePack
+	for i, item := range []struct{ raw []byte; pack *knowledgeReferencePack }{
+		{cyberStrikeReferencePackJSON,&first}, {cyberStrikeSupplementPackJSON,&second}, {cyberStrikeThirdPackJSON,&third},
+	} {
+		if err := json.Unmarshal(item.raw,item.pack); err != nil { t.Fatal(err) }
+		if len(item.pack.Entries)!=9 { t.Fatalf("pack %d: unexpected entry count",i) }
+	}
+	if third.ID!="cyberstrike-csf-third-v1" || third.Revision!=first.Revision || third.Framework!=first.Framework || third.UpstreamLicense!=first.UpstreamLicense {
+		t.Fatalf("third pack metadata: %+v",third)
+	}
+	codes, ids, markers := map[string]bool{}, map[string]bool{}, map[string]bool{}
+	for _,pack := range []knowledgeReferencePack{first,second,third} {
+		marker := referencePackMarker(pack)
+		if markers[marker] { t.Fatal("duplicate installation marker") }
+		markers[marker]=true
+		for _,e := range pack.Entries {
+			id:=referenceDocumentID(pack,e)
+			if codes[e.Code] || ids[id] || len(e.SourceBlob)!=40 || !strings.HasPrefix(e.SourcePath,".cyberstrike/skill/NIST/CSF_v2.0/") || !strings.HasPrefix(e.Title,e.Code+" ") || strings.TrimSpace(e.Body)=="" || e.Keywords=="" {
+				t.Fatalf("invalid or duplicate reference: %+v",e)
+			}
+			codes[e.Code],ids[id]=true,true
+		}
+	}
+	if len(codes)!=27 { t.Fatal("unexpected total reference count") }
+}
