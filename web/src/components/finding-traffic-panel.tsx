@@ -9,6 +9,7 @@ import { ArrowDownIcon, ArrowUpIcon, PlusIcon } from "lucide-react";
 import { toast } from "sonner";
 
 import { TrafficEvidenceViewer } from "@/components/traffic-evidence-viewer";
+import { TrafficCompareSheet } from "@/components/traffic-compare-sheet";
 import { TrafficPickerDialog } from "@/components/traffic-picker-dialog";
 import { Alert, AlertDescription } from "@/components/ui/alert";
 import { Badge } from "@/components/ui/badge";
@@ -55,6 +56,9 @@ export function FindingTrafficPanel({
   const [error, setError] = React.useState("");
   const [adding, setAdding] = React.useState(false);
   const [preview, setPreview] = React.useState<string | null>(null);
+  const [compareSelected, setCompareSelected] = React.useState<string[]>([]);
+  const [compareIDs, setCompareIDs] = React.useState<[string, string] | null>(null);
+  const [compareVersion, setCompareVersion] = React.useState<number | undefined>(undefined);
   const [editing, setEditing] = React.useState<FindingTrafficBinding | null>(null);
   const [role, setRole] = React.useState<TrafficEvidenceRole>("supporting");
   const [note, setNote] = React.useState("");
@@ -65,6 +69,8 @@ export function FindingTrafficPanel({
     let active = true;
     setData(null);
     setError("");
+    setCompareSelected([]);
+    setCompareIDs(null);
     api
       .findingTraffic(findingId, contextTask)
       .then((value) => {
@@ -100,6 +106,7 @@ export function FindingTrafficPanel({
     void mutate(() => api.orderFindingTraffic(findingId, ids, data.version, contextTask));
   }
 
+  const activeCompare = compareSelected.filter((id) => data?.bindings.some((b) => b.id === id));
   return (
     <>
       <Card>
@@ -116,6 +123,7 @@ export function FindingTrafficPanel({
             )}
           </div>
           <CardDescription>{tr("按复现顺序组织请求与响应。原始流量清理后，已绑定证据仍会保留。", "Requests and responses organized in reproduction order. Bound evidence is kept even after raw traffic is purged.")}</CardDescription>
+          {data && data.bindings.length >= 2 && <Button variant="outline" size="sm" disabled={activeCompare.length !== 2} onClick={() => { setCompareVersion(data.version); setCompareIDs([activeCompare[0], activeCompare[1]]); }}>{tr("比较两条已保存证据", "Compare two saved evidence records")} ({activeCompare.length}/2)</Button>}
         </CardHeader>
         <CardContent className="flex flex-col gap-3">
           {error ? (
@@ -163,6 +171,9 @@ export function FindingTrafficPanel({
                     {new Date(b.snapshot.captured_at * 1000).toLocaleString(locale)}
                   </span>
                   <div className="flex flex-wrap gap-1">
+                    <Button variant={activeCompare.includes(b.id) ? "default" : "outline"} size="sm" disabled={!activeCompare.includes(b.id) && activeCompare.length >= 2} onClick={() => setCompareSelected(activeCompare.includes(b.id) ? activeCompare.filter((id) => id !== b.id) : [...activeCompare, b.id])}>
+                      {activeCompare.includes(b.id) ? tr("取消比较选择", "Remove from comparison") : tr("加入比较", "Add to comparison")}
+                    </Button>
                     <Button variant="outline" size="sm" onClick={() => setPreview(b.id)}>
                       {tr("查看报文", "View message")}
                     </Button>
@@ -229,6 +240,7 @@ export function FindingTrafficPanel({
           }}
         />
       ) : null}
+      <TrafficCompareSheet ids={compareIDs} findingId={findingId} contextTask={contextTask} evidenceVersion={compareVersion} onClose={() => setCompareIDs(null)} />
       <TrafficEvidenceViewer
         findingId={findingId}
         bindingId={preview}
