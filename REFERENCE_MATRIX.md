@@ -32,3 +32,12 @@
 6. 在相同 source/case version 下比较工程结果；真实模型评测另表记录。
 
 下一批候选：OpenAPI 输入、结构化报告导出、可选观测。它们均不在本批生产执行流程中。
+
+## AntiFox 平台与运行时差异（2026-11-16）
+
+对照固定 AntiFox `070f798bf590667bc2a0a13c687dd87d8a4413bf` 的 `server/auth.go`、`db/audit.go`、`server/audit.go`、`server/update.go`、`selfupdate/selfupdate.go` 与 ARTEX 现有 `server/auth.go`、`server/assembly.go`、`server/engine.go`、`agent/cancelcause.go`、Windows 安装器及 release workflow：
+
+- **更新**：AntiFox 的二进制 staging/smoke/回滚依赖外部 supervisor。ARTEX 已有 Docker/源码 update.sh、Windows Setup 升级烟测和独立桌面进程；本批仅采用明确版本比较、平台资产匹配与发布页入口，不移植退出码 75 或在线替换 EXE。运行中应用不自动退出，不自动下载/执行文件。
+- **身份**：AntiFox 多用户 RBAC、token_version、滑动续期与角色权限映射与 ARTEX 单管理员及专用 Purge/隐私桥凭证不同；不在未授权情况下改变既有认证行为，完整 RBAC 另行评估。
+- **审计**：AntiFox 持久化登录/平台操作日志与 ARTEX 现有任务 guard 审计、模型出站审计、工具使用账本不同。暂不重复记录请求正文/密钥或扩大日志范围。
+- **运行时**：AntiFox 的 `engine/harness/streaming.go` 和 `server/engine.go` 属于另一套 harness/runtime；ARTEX 当前使用 Norma、任务级取消原因、模型预算及 lifecycle 回归测试。不整仓替换，后续按流式事件和取消/恢复契约逐项对照。

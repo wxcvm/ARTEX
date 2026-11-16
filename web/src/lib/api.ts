@@ -286,6 +286,7 @@ export const api = {
   knowledgeEntry: (id: number) => get<{ id: number; title: string; category?: string; kind?: string; usage?: string; content: string; verified: boolean }>(`/knowledge?id=${id}`),
   // Backend application version (injected via ldflags at release, default "dev").
   health: () => get<{ ok: boolean; service: string; version: string }>("/health"),
+  checkReleaseUpdate: () => get<import("./types").ReleaseUpdate>("/update/check"),
   privacyExposure: () => get<{ listen_address: string; scope: "loopback" | "all_interfaces" | "specific_interface" | "unknown"; public_reachability: "not_tested"; detail: string }>("/privacy/exposure"),
 
   // ---- auth ----
