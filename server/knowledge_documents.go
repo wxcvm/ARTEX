@@ -17,6 +17,7 @@ import (
 func (s *Server) registerKnowledgeDocuments(mux *http.ServeMux) {
 	const base="/api/knowledge/documents"
 	mux.HandleFunc("GET "+base,s.listKnowledgeDocuments)
+	mux.HandleFunc("GET /api/knowledge/retrievals",s.listKnowledgeRetrievals)
 	mux.HandleFunc("POST "+base,s.saveKnowledgeDocument)
 	mux.HandleFunc("POST "+base+"/upload",s.uploadKnowledgeDocument)
 	mux.HandleFunc("GET "+base+"/{document}",s.getKnowledgeDocument)
@@ -97,4 +98,12 @@ func (s *Server) uploadKnowledgeDocument(w http.ResponseWriter,r *http.Request){
 	out,err:=s.m.pg.SaveKnowledgeDocument(r.Context(),id,"",doc)
 	if err!=nil{knowledgeDocumentError(w,err);return}
 	writeJSON(w,201,out)
+}
+
+func (s *Server) listKnowledgeRetrievals(w http.ResponseWriter,r *http.Request){
+	id,ok:=s.knowledgeDocumentTask(w,r)
+	if !ok{return}
+	items,err:=s.m.pg.ListKnowledgeRetrievals(r.Context(),id)
+	if err!=nil{knowledgeDocumentError(w,err);return}
+	writeJSON(w,200,items)
 }

@@ -240,7 +240,7 @@ func wireTools(pg *db.DB, domainReg map[string]actool.CoreTool) {
 	}
 	// Register the same knowledge tool names even without a bundled SQLite file.
 	// Preserve existing bindings and enabled state via first-insert-only seeding.
-	knowledgeCatalog := agent.ScopedKnowledgeTools(pg, 0)
+	knowledgeCatalog := agent.ScopedKnowledgeTools(pg, 0, "")
 	registry := make(map[string]actool.CoreTool, len(domainReg)+len(knowledgeCatalog))
 	for key, tool := range domainReg {
 		registry[key] = tool
@@ -290,7 +290,7 @@ func wireTools(pg *db.DB, domainReg map[string]actool.CoreTool) {
 		runInfo := agent.RunInfoFrom(ctx)
 		// Bind scope once at assembly; the model cannot choose a different task.
 		knowledgeTools := make(map[string]actool.CoreTool, 2)
-		for _, t := range agent.ScopedKnowledgeTools(pg, runInfo.TaskID) {
+		for _, t := range agent.ScopedKnowledgeTools(pg, runInfo.TaskID, agentKey) {
 			knowledgeTools[t.Name()] = t
 		}
 		resolve := func(t actool.CoreTool, row *db.Tool) actool.CoreTool {
