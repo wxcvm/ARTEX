@@ -1,10 +1,16 @@
 package server
 
 import (
+	"bufio"
+	"context"
 	"fmt"
+	"net/http"
+	"net/http/httptest"
 	"strconv"
+	"strings"
 	"sync"
 	"testing"
+	"time"
 
 	"github.com/Autumn-27/artex/db"
 )
@@ -72,4 +78,44 @@ func TestConcurrentActivityPublishMatchesDatabaseOrder(t *testing.T){
 		default:t.Fatal("missing live activity",item.ID)
 		}
 	}
+}
+
+func TestActivityStreamReconnectReplaysAfterLastEventID(t *testing.T){
+	s,f,_:=trafficEvidenceServer(t)
+	finding,err:=s.m.pg.GetFinding(f.FindingID)
+	if err!=nil||finding==nil||finding.TaskID==nil{t.Fatal("missing task",err)}
+	task:=s.m.ResolveTask(strconv.FormatInt(*finding.TaskID,10))
+	if task==nil||s.engine==nil{t.Fatal("missing task or engine")}
+	ids:=[]int64{}
+	for i:=0;i<3;i++{
+		a:=s.engine.emitActivity(task,db.Activity{Worker:"fixture",Kind:"text",Summary:fmt.Sprintf("reconnect-%d",i)})
+		if a.ID<=0{t.Fatal("persist failed")}
+		ids=append(ids,a.ID)
+	}
+	server:=httptest.NewServer(s.Handler())
+	defer server.Close()
+	ctx,cancel:=context.WithTimeout(context.Background(),5*time.Second)
+	defer cancel()
+	req,err:=http.NewRequestWithContext(ctx,"GET",server.URL+"/api/exploration/activity/stream?task="+task.ID+"&since=0",nil)
+	if err!=nil{t.Fatal(err)}
+	token,err:=signJWT(s.jwtKey)
+	if err!=nil{t.Fatal(err)}
+	req.Header.Set("Authorization","Bearer "+token)
+	req.Header.Set("Last-Event-ID",strconv.FormatInt(ids[0],10))
+	resp,err:=server.Client().Do(req)
+	if err!=nil{t.Fatal(err)}
+	defer resp.Body.Close()
+	if resp.StatusCode!=200||!strings.Contains(resp.Header.Get("Content-Type"),"text/event-stream"){t.Fatal(resp.Status,resp.Header)}
+	scanner:=bufio.NewScanner(resp.Body)
+	got:=[]int64{}
+	for len(got)<2&&scanner.Scan(){
+		if line:=scanner.Text();strings.HasPrefix(line,"id: "){
+			id,err:=strconv.ParseInt(strings.TrimPrefix(line,"id: "),10,64)
+			if err!=nil{t.Fatal(err)}
+			got=append(got,id)
+		}
+	}
+	if err:=scanner.Err();err!=nil{t.Fatal(err)}
+	if len(got)!=2||got[0]!=ids[1]||got[1]!=ids[2]{t.Fatal("incorrect replay",got,ids)}
+	cancel()
 }
