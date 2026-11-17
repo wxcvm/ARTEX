@@ -14,6 +14,7 @@ func TestCaptureAttributionSurvivesArchiveAndDelete(t *testing.T) {
     });err!=nil{t.Fatal(err)}
     rows,total,err:=tr.Page(PageQuery{Host:"example.invalid",RespMin:-1,RespMax:-1},0,10)
     if err!=nil||total!=1||len(rows)!=1{t.Fatalf("page: %+v %d %v",rows,total,err)}
+    if rows[0].CaptureID!=captureID{t.Fatalf("page lost capture group: %q",rows[0].CaptureID)}
     id:=rows[0].ID
     read:=func(store *Traffic){
         t.Helper()
@@ -29,6 +30,8 @@ func TestCaptureAttributionSurvivesArchiveAndDelete(t *testing.T) {
     restored,_:=openTraffic(t)
     if n,err:=restored.ImportArchive(dir);err!=nil||n!=1{t.Fatalf("archive import: %d %v",n,err)}
     read(restored)
+    restoredRows,restoredTotal,restoredErr:=restored.Page(PageQuery{Host:"example.invalid",RespMin:-1,RespMax:-1},0,10)
+    if restoredErr!=nil||restoredTotal!=1||len(restoredRows)!=1||restoredRows[0].CaptureID!=captureID{t.Fatalf("restored listing: %+v %d %v",restoredRows,restoredTotal,restoredErr)}
     if n,err:=restored.ImportArchive(dir);err!=nil||n!=0{t.Fatalf("archive duplicate: %d %v",n,err)}
     if n,err:=tr.DeleteHost("example.invalid");err!=nil||n!=1{t.Fatalf("delete: %d %v",n,err)}
     var count int
@@ -42,6 +45,7 @@ func TestCaptureAttributionOptionalAndLength(t *testing.T) {
     if err:=tr.RecordExternal(ExternalExchange{Method:"GET",URL:"https://example.invalid/legacy",Status:200});err!=nil{t.Fatal(err)}
     rows,total,err:=tr.Page(PageQuery{Host:"example.invalid",RespMin:-1,RespMax:-1},0,10)
     if err!=nil||total!=1{t.Fatalf("page: %d %v",total,err)}
+    if rows[0].CaptureID!=""{t.Fatalf("legacy row invented group: %q",rows[0].CaptureID)}
     if err:=tr.ReadEvidence(context.Background(),[]string{rows[0].ID},func(e EvidenceExchange)error{
         if e.CaptureID!=""{t.Fatalf("invented attribution: %q",e.CaptureID)}
         return nil
@@ -63,6 +67,7 @@ func TestCaptureGroupPageFilter(t *testing.T) {
     q:=PageQuery{CaptureID:"batch-a",RespMin:-1,RespMax:-1}
     rows,total,err:=tr.Page(q,0,20)
     if err!=nil||total!=2||len(rows)!=2{t.Fatalf("batch filter: %+v %d %v",rows,total,err)}
+    for _,row:=range rows{if row.CaptureID!="batch-a"{t.Fatalf("wrong filtered group: %+v",row)}}
     q.Host="one.example.invalid"
     rows,total,err=tr.Page(q,0,20)
     if err!=nil||total!=1||len(rows)!=1{t.Fatalf("combined filters: %+v %d %v",rows,total,err)}
@@ -73,4 +78,12 @@ func TestCaptureGroupPageFilter(t *testing.T) {
     q.CaptureID=""
     rows,total,err=tr.Page(q,0,20)
     if err!=nil||total!=4||len(rows)!=4{t.Fatalf("unfiltered legacy rows: %+v %d %v",rows,total,err)}
+    groupCounts:=map[string]int{}
+    for _,row:=range rows{groupCounts[row.CaptureID]++}
+    if groupCounts["batch-a"]!=2||groupCounts["batch-b"]!=1||groupCounts[""]!=1{t.Fatalf("unfiltered attribution: %+v",groupCounts)}
+    searched,err:=tr.Search("one.example.invalid",0,20)
+    if err!=nil||len(searched)!=3{t.Fatalf("search attribution: %+v %v",searched,err)}
+    seen:=map[string]int{}
+    for _,row:=range searched{seen[row.CaptureID]++}
+    if seen["batch-a"]!=1||seen["batch-b"]!=1||seen[""]!=1{t.Fatalf("search attribution lost: %+v",seen)}
 }

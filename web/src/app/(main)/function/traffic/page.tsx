@@ -691,6 +691,7 @@ export default function TrafficPage() {
                     className="w-36"
                   />
                   <TableHead className="w-32">ID</TableHead>
+                  <TableHead className="w-36">{tr("捕获批次", "Capture group")}</TableHead>
                   <TableHead className="w-44">{tr("主机", "Host")}</TableHead>
                   <TableHead className="w-20">{tr("方法", "Method")}</TableHead>
                   <TableHead>URL</TableHead>
@@ -754,6 +755,26 @@ export default function TrafficPage() {
                         <span className="truncate">{e.id}</span>
                       </Button>
                     </TableCell>
+                    <TableCell className="max-w-36">
+                      {e.capture_id ? (
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          className="h-auto max-w-full px-1 font-mono text-xs"
+                          title={tr(`按捕获批次筛选：${e.capture_id}`, `Filter by capture group: ${e.capture_id}`)}
+                          aria-label={tr(`筛选捕获批次 ${e.capture_id}`, `Filter capture group ${e.capture_id}`)}
+                          onClick={(event) => {
+                            event.stopPropagation();
+                            setCaptureId(e.capture_id ?? "");
+                            setCaptureIdQ(e.capture_id ?? "");
+                          }}
+                        >
+                          <span className="truncate">{e.capture_id.slice(0, 12)}</span>
+                        </Button>
+                      ) : (
+                        <span className="text-xs text-muted-foreground">—</span>
+                      )}
+                    </TableCell>
                     <TableCell className="font-mono text-xs">{e.host}</TableCell>
                     <TableCell>
                       <MethodBadge method={e.method} />
@@ -772,7 +793,7 @@ export default function TrafficPage() {
                 ))}
                 {exchanges.length === 0 && (
                   <TableRow>
-                    <TableCell colSpan={9} className="py-12 text-center text-sm text-muted-foreground">
+                    <TableCell colSpan={10} className="py-12 text-center text-sm text-muted-foreground">
                       {traffic === null ? tr("正在加载流量记录…", "Loading traffic…") : tr("没有匹配的流量记录，请调整筛选条件。", "No matching traffic; adjust filters.")}
                     </TableCell>
                   </TableRow>

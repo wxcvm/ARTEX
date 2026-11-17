@@ -40,3 +40,8 @@ Open **Traffic → Advanced filters** and paste the exact **Capture group ID** s
 This is a lookup of recorded traffic, not browser control or an authenticated assertion about which Playwright session produced the traffic. If the original traffic has been deleted, the immutable finding evidence may still show the group, but the traffic-list filter will correctly return no hot rows.
 
 The finding's evidence detail also offers **View group traffic** to open the pre-filled filter directly. This may return no rows if the original hot traffic was deleted; the immutable finding evidence remains available.
+
+
+## Locate capture groups in traffic
+
+`Page`, `Search`, and agent-side traffic queries return an optional `capture_id` per exchange. The **Capture group** column shows a shortened ID; hover for the full value or click it to apply the existing exact-group filter while preserving other active filters. Unattributed legacy rows display a dash rather than an inferred identity. Groups are extension-supplied correlation hints, not a verified Playwright browser session or user identity.

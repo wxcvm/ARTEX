@@ -761,6 +761,7 @@ func (t *Traffic) BlobRange(hash string, offset, length int64) (data []byte, tot
 // ExchangeMeta is one row of the index (returned by Search).
 type ExchangeMeta struct {
 	ID          string `json:"id"`
+	CaptureID   string `json:"capture_id,omitempty"`
 	TS          int64  `json:"ts"`
 	Host        string `json:"host"`
 	Method      string `json:"method"`
@@ -777,7 +778,7 @@ func (t *Traffic) Search(host string, page, size int) ([]ExchangeMeta, error) {
 	if size <= 0 || size > 500 {
 		size = 100
 	}
-	q := `SELECT id,ts,host,method,url_template,url,status,content_type,resp_len,path FROM exchanges`
+	q := `SELECT id,ts,host,method,url_template,url,status,content_type,resp_len,path,COALESCE((SELECT capture_id FROM capture_attribution WHERE exchange_id=exchanges.id),'') FROM exchanges`
 	args := []any{}
 	if host != "" {
 		q += ` WHERE host=?`
@@ -793,7 +794,7 @@ func (t *Traffic) Search(host string, page, size int) ([]ExchangeMeta, error) {
 	var out []ExchangeMeta
 	for rows.Next() {
 		var m ExchangeMeta
-		if err := rows.Scan(&m.ID, &m.TS, &m.Host, &m.Method, &m.URLTemplate, &m.URL, &m.Status, &m.ContentType, &m.RespLen, &m.Path); err != nil {
+		if err := rows.Scan(&m.ID, &m.TS, &m.Host, &m.Method, &m.URLTemplate, &m.URL, &m.Status, &m.ContentType, &m.RespLen, &m.Path, &m.CaptureID); err != nil {
 			return nil, err
 		}
 		out = append(out, m)
@@ -939,7 +940,7 @@ func (t *Traffic) Page(f PageQuery, page, size int) (rows []ExchangeMeta, total 
 	}
 	// id embeds capture timestamp + sequence, so a trailing id DESC makes the order
 	// total and pagination stable even when the sort column has many ties.
-	sel := `SELECT id,ts,host,method,url_template,url,status,content_type,resp_len,path FROM exchanges` +
+	sel := `SELECT id,ts,host,method,url_template,url,status,content_type,resp_len,path,COALESCE((SELECT capture_id FROM capture_attribution WHERE exchange_id=exchanges.id),'') FROM exchanges` +
 		where + ` ORDER BY ` + col + ` ` + dir + `, id DESC LIMIT ? OFFSET ?`
 	qargs := append(append([]any{}, args...), size, page*size)
 	rs, err := t.db.Query(sel, qargs...)
@@ -949,7 +950,7 @@ func (t *Traffic) Page(f PageQuery, page, size int) (rows []ExchangeMeta, total 
 	defer rs.Close()
 	for rs.Next() {
 		var m ExchangeMeta
-		if err := rs.Scan(&m.ID, &m.TS, &m.Host, &m.Method, &m.URLTemplate, &m.URL, &m.Status, &m.ContentType, &m.RespLen, &m.Path); err != nil {
+		if err := rs.Scan(&m.ID, &m.TS, &m.Host, &m.Method, &m.URLTemplate, &m.URL, &m.Status, &m.ContentType, &m.RespLen, &m.Path, &m.CaptureID); err != nil {
 			return nil, 0, err
 		}
 		rows = append(rows, m)
@@ -1924,7 +1925,7 @@ func (t *Traffic) query(host, contains, bodyContains string, page, limit int) ([
 	if page < 0 {
 		page = 0
 	}
-	q := `SELECT id,ts,host,method,url_template,url,status,content_type,resp_len,path FROM exchanges WHERE 1=1`
+	q := `SELECT id,ts,host,method,url_template,url,status,content_type,resp_len,path,COALESCE((SELECT capture_id FROM capture_attribution WHERE exchange_id=exchanges.id),'') FROM exchanges WHERE 1=1`
 	args := []any{}
 	if host != "" {
 		hostName, port, err := normalizeSearchHost(host)
@@ -1971,7 +1972,7 @@ func (t *Traffic) query(host, contains, bodyContains string, page, limit int) ([
 	var out []ExchangeMeta
 	for rows.Next() {
 		var m ExchangeMeta
-		if err := rows.Scan(&m.ID, &m.TS, &m.Host, &m.Method, &m.URLTemplate, &m.URL, &m.Status, &m.ContentType, &m.RespLen, &m.Path); err != nil {
+		if err := rows.Scan(&m.ID, &m.TS, &m.Host, &m.Method, &m.URLTemplate, &m.URL, &m.Status, &m.ContentType, &m.RespLen, &m.Path, &m.CaptureID); err != nil {
 			return nil, err
 		}
 		out = append(out, m)
