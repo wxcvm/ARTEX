@@ -13,6 +13,7 @@
 - 独立代理桥仅将 `artex-proxy-relay:8788` 转发到 ARTEX 的流量代理端口；
 - 内置 Bash、Read/Write/Edit/MultiEdit、LS/Glob/Grep、交互式 Shell（如被启用）和 TaskOutput/TaskStop/TaskList/Monitor 都通过 Socket 执行；
 - 命令执行失败或 Runner 无法连接时**不回退到控制容器本地执行**；
+- Docker 模式通过 Linux `SO_PEERCRED` 拒绝同一 PID 命名空间内的 Shell 直接调用 Runner RPC；控制端必须处在独立 PID 命名空间；
 - 各 Agent 的权限、拦截规则、模型与任务范围不做改动。
 
 ## 启用与回退
@@ -64,6 +65,6 @@ docker compose -f docker-compose.yml -f docker-compose.runner.yml exec -T tool-r
 3. 控制端数据库领域工具、WebFetch/WebSearch、MCP/技能启动的自定义本地进程、浏览器工具以及其他非 SDK 内置工具不由此 RPC 自动隔离。启用这些能力时不能将此阶段当成完整凭证沙箱。
 4. SDK 本地后台任务完成通知不能自动跨进程转发；可通过远程 TaskList/TaskOutput/Monitor 查询。会话结束时会请求清理 Runner 的后台进程和 PTY。
 5. Runner 拥有常规探测网络权限。代理桥只是固定端口转发，不是严格的网络目标白名单；抓包与非 HTTP 探测需实机回归。部分工具依赖可写 HOME，Runner 默认映射到 tmpfs。
-6. Unix Socket 采用文件权限 0600 且只挂载给控制容器和 Runner。仍需对 Unix Socket 生命周期、服务重启、恶意符号链接与 Compose 部署进行独立安全测试。
+6. Unix Socket 采用文件权限 0600；隔离部署中还将拒绝本容器 PID 命名空间的直接调用，防止 Bash 通过 Socket 绕过控制端审计。此机制依赖 Linux PID 命名空间（不要设置 `pid: host` 或共享 PID 命名空间），不是独立的身份认证；Runner 中的 root 工具仍可能破坏 Socket 文件造成拒绝服务。服务重启、恶意符号链接与 Compose 部署仍需独立测试。
 
 **后续目标**：完善工具覆盖、后台事件回传、每任务独立 UID/挂载和真正的非 root 执行，并进行真实 Docker 环境的凭证读取对抗测试。以上完成前不将 #159 标记为安全隔离验收通过。

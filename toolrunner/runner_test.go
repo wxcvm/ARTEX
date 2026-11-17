@@ -222,3 +222,42 @@ func TestRunnerServiceHonorsSDKDisableFlags(t *testing.T) {
 		t.Fatalf("interactive Shell opt-out was bypassed: %+v", shell)
 	}
 }
+
+func TestRemotePeerOnlyRejectsLocalSDKToolRPC(t *testing.T) {
+	if runtime.GOOS != "linux" {
+		t.Skip("SO_PEERCRED only available on Linux")
+	}
+	t.Setenv("ARTEX_RUNNER_REMOTE_PEER_ONLY", "1")
+	root := t.TempDir()
+	socket := filepath.Join(root, "runner.sock")
+	ctx, cancel := context.WithCancel(context.Background())
+	defer cancel()
+	done := make(chan error, 1)
+	go func() { done <- Serve(ctx, socket) }()
+	for i := 0; i < 100; i++ {
+		if _, err := os.Stat(socket); err == nil {
+			break
+		}
+		time.Sleep(10 * time.Millisecond)
+	}
+	client := NewClient(socket)
+	callCtx, callCancel := context.WithTimeout(context.Background(), 3*time.Second)
+	defer callCancel()
+	_, err := client.Call(callCtx, Request{
+		Session: "local-attacker", Name: "Write", WorkingDir: root,
+		Input: json.RawMessage(`{"file_path":"bypass.txt","content":"must-not-write"}`),
+	})
+	if err == nil {
+		t.Fatal("local SDK tool bypassed remote-peer-only listener")
+	}
+	if _, err := os.Stat(filepath.Join(root, "bypass.txt")); !os.IsNotExist(err) {
+		t.Fatalf("local caller wrote through control RPC, stat=%v", err)
+	}
+	cancel()
+	select {
+	case err := <-done:
+		if err != nil { t.Fatal(err) }
+	case <-time.After(5*time.Second):
+		t.Fatal("guarded listener did not stop")
+	}
+}
