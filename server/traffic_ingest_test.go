@@ -119,3 +119,27 @@ func TestTrafficIngestCaptureGroup(t *testing.T) {
         return nil
     });err!=nil{t.Fatal(err)}
 }
+
+
+func TestTrafficListCaptureGroupFilter(t *testing.T) {
+    _,request:=ingestServer(t)
+    body:=`{"exchanges":[
+       {"captureId":"batch-alpha","method":"GET","url":"https://example.invalid/a","status":200},
+       {"captureId":"batch-beta","method":"GET","url":"https://example.invalid/b","status":200},
+       {"method":"GET","url":"https://example.invalid/legacy","status":200}
+    ]}`
+    if w:=request("POST","/api/traffic/ingest",body);w.Code!=200{
+        t.Fatalf("ingest: %d %s",w.Code,w.Body)
+    }
+    for _,tc:=range []struct{query string; want int}{
+        {"capture_id=batch-alpha",1},{"capture_id=batch-beta",1},
+        {"capture_id=unknown",0},{"",3},
+    }{
+        url:="/api/traffic"
+        if tc.query!=""{url+="?"+tc.query}
+        w:=request("GET",url,"")
+        if w.Code!=200||!strings.Contains(w.Body.String(),fmt.Sprintf(`"total":%d`,tc.want)){
+            t.Fatalf("filter %q: %d %s",tc.query,w.Code,w.Body)
+        }
+    }
+}

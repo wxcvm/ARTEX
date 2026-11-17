@@ -3325,6 +3325,7 @@ func (s *Server) getTraffic(w http.ResponseWriter, r *http.Request) {
 	size := atoiDefault(q.Get("size"), 100)
 	ex, matched, _ := tr.Page(traffic.PageQuery{
 		Host:    q.Get("host"),
+		CaptureID: q.Get("capture_id"),
 		Method:  q.Get("method"),
 		Query:   q.Get("q"),
 		Body:    q.Get("body"),
