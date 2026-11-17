@@ -122,8 +122,10 @@ function truncate(s) {
 }
 
 async function queueExchange(info, response, skipResponseBody = false) {
-  const respHeaders = {};
-  for (const h of response.headers || []) respHeaders[h.name.toLowerCase()] = h.value;
+  // Chrome CDP Network.Headers is a JSON object, not a HAR header array.
+  const respHeaders = Object.fromEntries(
+    Object.entries(response.headers || {}).map(([name, value]) => [name.toLowerCase(), String(value)])
+  );
   const mime = respHeaders["content-type"] || "";
 
   let reqBody = truncate(info.postData || "");
@@ -211,7 +213,7 @@ function retainUnfinishedRequests() {
   const unfinished = [...session.requests.values()];
   session.requests.clear();
   return unfinished.map((info) =>
-    queueExchange(info, info.response || { status: 0, headers: [] }, true)
+    queueExchange(info, info.response || { status: 0, headers: {} }, true)
       .catch((e) => { session.lastError = e.message; })
   );
 }
@@ -237,7 +239,7 @@ chrome.debugger.onEvent.addListener((source, method, params) => {
     // Preserve failed/cancelled requests without inventing a 200 response.
     // If a status was actually observed before the failure, retain it.
     const failed = method === "Network.loadingFailed";
-    const response = info.response || { status: 0, headers: [] };
+    const response = info.response || { status: 0, headers: {} };
     const pending = queueExchange(info, response, failed).catch((e) => {
       session.lastError = e.message;
       return saveState();
