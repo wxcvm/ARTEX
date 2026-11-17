@@ -531,7 +531,7 @@ func (w *Worker) execute(ctx context.Context, name string, taskID int64, as *db.
 		Todos:         actool.NewTodoStore(),                  // session-level scratch todos (TodoWrite), pure planning, discarded on exit
 		NonStreaming:  w.nonStreaming(),                       // when this profile selects non-streaming, use Provider.Complete
 		MaxTokens:     w.maxTokens(),                          // 0 = send no cap; the server default decides
-		UntrustedOutputBoundary: untrustedBoundaryEnabled(), // optional, off by default
+		UntrustedOutputBoundary: untrustedBoundaryEnabled(), // enabled by default; set ARTEX_UNTRUSTED_BOUNDARY=0 to opt out
 	}
 	if hooks != nil { // typed-nil guard: only set when concrete (avoids harness panic)
 		opts.Hooks = hooks
@@ -560,6 +560,7 @@ func (w *Worker) execute(ctx context.Context, name string, taskID int64, as *db.
 	// Experimental: when on, noa takes over context compression (archives persist under <workDir>/noa/<SessionID>).
 	noaSession := WorkerSessionID(ts.ID(), intent.ID)
 	enableNoa(&opts, w.noaEnabledFn, w.workDir, noaSession, noaWarn(noaSession))
+	applyUntrustedCompactionBoundary(&opts)
 	ctx = attachSideCapture(ctx, &opts)
 	s := agentcore.NewSession(opts)
 	defer s.Close() // release the session's background-task manager (temp dir + processes)
