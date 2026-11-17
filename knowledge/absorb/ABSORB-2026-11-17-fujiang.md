@@ -10,7 +10,9 @@
 | 中间结构 | dsh-purge `f806b96` 的 `lib/redteam/cve-catalog/*.json`（已只取元数据） |
 | 取用部分 | 105 条组件/CVE + 59 条灰产手法 = **164 条** |
 
-上游的 3 篇方法论与 9 个分类入口 `SKILL.md` 未取：它们是目录导航，进不了台账的检索价值。
+上游的 3 篇方法论与 9 个分类入口 `SKILL.md` 未取：它们是目录导航，未进入本批索引。
+
+**来源限制（2026-11-17）：** 声明的原仓库目前无法通过 GitHub API 读取（404），第三方公开索引也没有提供可核实的许可证。保留固定提交与路径只为可追溯，**不代表原链接当前可访问、内容已独立验证或获得再分发授权**。本批只整理已在用户分支中的最小元数据/检查提示，不搬运原始利用脚本、正文与图片。
 
 ## 构成
 
@@ -77,23 +79,21 @@ python knowledge/tools/kb_check.py --write
 | MAP 仅有台账 | 80 | **80**（不变） |
 | MAP 仅有目录 | 1 | **1**（不变） |
 | QA `poc_files` | 432 | **596** |
-| QA `poc_bytes` | 1488822 | **1654954** |
+| QA `poc_bytes` | 1488822 | **1654945** |
 
 - 新行 id 区间 `518..681`；FTS 孤儿 0
 - 抽检 `poc_fts match`：`withdraw` 15、`actuator` 16、`nacos` 2
 - `kb_check.py` 退出码 0，P1 无
 - `tools/scan_sensitive.py` 退出码 0
 - `go build ./...` 通过；`go test ./kb/` 通过
-- 导入前备份：`knowledge/knowledge.db.bak-<时间戳>`（`.gitignore` 已排除 `*.db.bak-*`，不入库）
+- 导入前备份：`knowledge/knowledge.db.bak-<时间戳>`（`.gitignore` 排除该备份文件，不入库）
 
-## 版本号写法
+## 版本保真与来源修订
 
-上游的版本串经常是四段以上（WebLogic 一类是 `X.Y.Z.W.V`），`tools/scan_sensitive.py` 的 IPv4 正则会把其中任意四段当成公网 IP，导致提交前自检直接失败。
-
-处理：`versions` / `product` 里的四段及以上版本串**截到前三段（分支级）**，并对截断后出现的相邻重复做一次去重（`12.2.1、12.2.1` → `12.2.1`）。完整版本串留在 `source_url` 指向的上游文件里。
-
-- 以 `10.` / `127.` / `169.254.` / `192.168.` / `172.16-31.` / `203.0.113.` 等开头的串按私网/回环常量**原样保留**，不做截断 —— 它们是探测目标，不是版本号。
-- 导入器在写入前会再校验一遍：`title` / `keywords` / `entry` / `src_file` 里出现非私网的四段数字就中止，避免真把公网 IP 用截断糊过去。
+- **保留精确版本号**：`product`、`versions` 及生成的 `entry.md` 不再把四段以上的厂商构建号截成三段。受影响范围仅是原资料声明，具体资产仍需按厂商安全公告逐项复核。
+- 原索引中 59 条 `/blob/HEAD/` 链接已替换成所声明的固定提交 `cf086fc329011c6f8eeb3b67f0adbcc3f005debb`。固定化不代表现时 URL 可访问；完整声明原件的独立核验仍待来源恢复。
+- 导入器先在临时数据库和临时目录生成全部内容、校验 FTS，再替换正式文档与数据库；普通写入错误会恢复旧文档，原数据库在最后一步前不触动。断电或强制终止不能实现跨文件原子性，回退请使用 `knowledge.db.bak-*` 并重新执行导入。
+- `tools/scan_sensitive.py` 保留原有敏感信息识别规则，不通过丢失版本精度来消除误报；对误报应核验确切字段与来源。
 
 ## 与既有库的关系
 
@@ -102,5 +102,5 @@ python knowledge/tools/kb_check.py --write
 
 ## 幂等与回滚
 
-- 重跑导入器：先 `delete from poc where created_by='fujiang-import'`，连带清 FTS，再整批插入 → 结果一致，不翻倍。
+- 重跑导入器：在临时 SQLite 副本中先删除 `created_by='fujiang-import'` 的旧行及 FTS，再插入 → 条数不翻倍；数据库行 ID 可能变化，外部引用请使用稳定的 `code`。
 - 撤销整批：`delete from poc_fts where poc_id in (select id from poc where created_by='fujiang-import'); delete from poc where created_by='fujiang-import';` 再删 `pocs/fujiang-*` 目录，重跑 `export_docs.py` 与 `kb_check.py --write`。
