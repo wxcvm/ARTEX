@@ -17,7 +17,9 @@ services:
       - runner_socket:/run/artex-runner
     depends_on:
       tool-runner:
-        condition: service_started
+        condition: service_healthy
+      artex-proxy-relay:
+        condition: service_healthy
     networks: [runner-control]
 
   tool-runner:
@@ -39,6 +41,11 @@ services:
     security_opt:
       - no-new-privileges:true
     networks: [runner-execution]
+    healthcheck:
+      test: ["CMD-SHELL", "test -S /run/artex-runner/runner.sock"]
+      interval: 2s
+      timeout: 2s
+      retries: 20
     restart: unless-stopped
 
   # The bridge forwards only the recording proxy port. It has neither
@@ -52,6 +59,11 @@ services:
     security_opt:
       - no-new-privileges:true
     networks: [runner-control, runner-execution]
+    healthcheck:
+      test: ["CMD-SHELL", "nc -z 127.0.0.1 8788"]
+      interval: 2s
+      timeout: 2s
+      retries: 20
     restart: unless-stopped
 
 networks:
