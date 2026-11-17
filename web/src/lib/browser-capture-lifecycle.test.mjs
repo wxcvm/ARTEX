@@ -160,6 +160,43 @@ test("each capture gets a new group and previously queued records keep their ori
   assert.equal(entries[1].captureId, second);
 });
 
+
+test("stop retains requests without terminal events, without inventing successful responses", async () => {
+  const x = fixture();
+  await x.message("start");
+  for (const requestId of ["no-headers", "headers-seen"]) {
+    x.events.event({ tabId: 7 }, "Network.requestWillBeSent", {
+      requestId, request: { method: "POST", url: `https://example.test/${requestId}`, headers: {}, postData: "started" },
+    });
+  }
+  x.events.event({ tabId: 7 }, "Network.responseReceived", {
+    requestId: "headers-seen", response: { status: 202, headers: [{ name: "content-type", value: "text/plain" }] },
+  });
+  const stopped = await x.message("stop");
+  assert.equal(stopped.queued, 0);
+  const entries = x.calls.uploads.flat();
+  assert.equal(entries.length, 2);
+  assert.equal(entries.find(e => e.exchangeId === "no-headers").status, 0);
+  assert.equal(entries.find(e => e.exchangeId === "headers-seen").status, 202);
+  assert.ok(entries.every(e => e.responseBody === ""));
+  assert.ok(entries.every(e => e.requestBody === "started"));
+  assert.equal((await x.message("getState")).ingested, 2);
+});
+
+test("unexpected debugger detach also retains requests still in flight", async () => {
+  const x = fixture();
+  await x.message("start");
+  x.events.event({ tabId: 7 }, "Network.requestWillBeSent", {
+    requestId: "detached", request: { method: "GET", url: "https://example.test/pending", headers: {} },
+  });
+  x.events.detach({ tabId: 7 });
+  await new Promise(resolve => setImmediate(resolve));
+  assert.equal(x.calls.uploads.flat().length, 1);
+  assert.equal(x.calls.uploads.flat()[0].status, 0);
+  assert.equal(x.calls.uploads.flat()[0].exchangeId, "detached");
+  assert.match((await x.message("getState")).lastError, /debugger detached/);
+});
+
 test("failed network requests are recorded with unobserved status rather than silently discarded", async () => {
   const x = fixture();
   await x.message("start");
