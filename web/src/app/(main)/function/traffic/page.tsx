@@ -49,7 +49,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 import { api } from "@/lib/api";
 import { useStoredSortPreference } from "@/lib/sort-preference";
-import type { CaptureGroupSummary, TrafficDetail, TrafficExchange, TrafficHost, TrafficResp } from "@/lib/types";
+import type { CaptureGroupSummary, Task, TrafficDetail, TrafficExchange, TrafficHost, TrafficResp } from "@/lib/types";
 import { cn, copyText } from "@/lib/utils";
 
 function fmtTime(ts: string) {
@@ -143,9 +143,14 @@ export default function TrafficPage() {
   const [bodyQ, setBodyQ] = React.useState("");
   const [captureId, setCaptureId] = React.useState("");
   const [captureIdQ, setCaptureIdQ] = React.useState("");
+  const [taskID, setTaskID] = React.useState("all");
+  const [tasks, setTasks] = React.useState<Task[]>([]);
   // A finding evidence detail can open this page scoped to its capture group.
   React.useEffect(() => {
-    const linkedGroup = new URLSearchParams(window.location.search).get("capture_id");
+    const params = new URLSearchParams(window.location.search);
+    const linkedTask = params.get("task");
+    if (linkedTask && /^[1-9]\d*$/.test(linkedTask)) setTaskID(linkedTask);
+    const linkedGroup = params.get("capture_id");
     if (linkedGroup) {
       setCaptureId(linkedGroup);
       setCaptureIdQ(linkedGroup);
@@ -242,6 +247,7 @@ export default function TrafficPage() {
         .traffic(page, size, hostQ, method, queryQ, {
           body: bodyQ,
           captureId: captureIdQ,
+          task: taskID === "all" ? undefined : taskID,
           path: pathQ,
           status: statusFilter,
           respMin: respMinQ,
@@ -273,7 +279,15 @@ export default function TrafficPage() {
       alive = false;
       clearInterval(t);
     };
-  }, [page, size, hostQ, method, queryQ, bodyQ, captureIdQ, pathQ, statusFilter, respMinQ, respMaxQ, sort, reloadTick]);
+  }, [page, size, hostQ, method, queryQ, bodyQ, captureIdQ, taskID, pathQ, statusFilter, respMinQ, respMaxQ, sort, reloadTick]);
+
+  React.useEffect(() => {
+    let alive = true;
+    api.tasks().then((r) => {
+      if (alive) setTasks(r.tasks);
+    }).catch(() => {});
+    return () => { alive = false; };
+  }, [reloadTick]);
 
   // Group summaries are requested only when the picker is open, not on traffic polling.
   React.useEffect(() => {
@@ -618,6 +632,19 @@ export default function TrafficPage() {
             className="h-8 pl-8"
           />
         </div>
+        <Select value={taskID} onValueChange={(v) => { setTaskID(v); setPage(0); }}>
+          <SelectTrigger size="sm" className="w-44">
+            <SelectValue placeholder={tr("全部任务", "All tasks")} />
+          </SelectTrigger>
+          <SelectContent>
+            <SelectItem value="all">{tr("全部任务", "All tasks")}</SelectItem>
+            {tasks.map((task) => (
+              <SelectItem key={task.id} value={task.id}>
+                {task.name || task.description || `#${task.id}`}
+              </SelectItem>
+            ))}
+          </SelectContent>
+        </Select>
         <Select value={method} onValueChange={setMethod}>
           <SelectTrigger size="sm" className="w-32">
             <SelectValue placeholder={tr("请求方法", "Method")} />

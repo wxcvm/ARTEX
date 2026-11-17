@@ -3332,7 +3332,7 @@ func (s *Server) getTraffic(w http.ResponseWriter, r *http.Request) {
 	q := r.URL.Query()
 	page := atoiDefault(q.Get("page"), 0)
 	size := atoiDefault(q.Get("size"), 100)
-	ex, matched, _ := tr.Page(traffic.PageQuery{
+	filter := traffic.PageQuery{
 		Host:    q.Get("host"),
 		CaptureID: q.Get("capture_id"),
 		Method:  q.Get("method"),
@@ -3344,13 +3344,56 @@ func (s *Server) getTraffic(w http.ResponseWriter, r *http.Request) {
 		RespMax: int64(atoiDefault(q.Get("resp_max"), -1)),
 		Sort:    q.Get("sort"),
 		Order:   q.Get("order"),
-	}, page, size)
-	count, _ := tr.Count() // global total, for the stat card
+	}
+	// Traffic is globally recorded, not intrinsically task-tagged. Scope a
+	// selected task by its exact asset hosts AND its active run window, rather
+	// than accidentally including another task's earlier tests of the same host.
+	scoped := false
+	if raw := strings.TrimSpace(q.Get("task")); raw != "" {
+		id, err := strconv.ParseInt(raw, 10, 64)
+		if err != nil || id <= 0 {
+			writeErr(w, 400, "invalid task id")
+			return
+		}
+		task, err := s.m.pg.GetTask(id)
+		if err != nil {
+			writeErr(w, 500, err.Error())
+			return
+		}
+		if task == nil {
+			writeErr(w, 404, "task not found")
+			return
+		}
+		hosts, err := s.m.Assets().HostsByTask(id)
+		if err != nil {
+			writeErr(w, 500, err.Error())
+			return
+		}
+		if hosts == nil {
+			hosts = []string{} // no assets must not silently become global traffic
+		}
+		filter.TaskHosts = hosts
+		filter.TsMin, filter.TsMax = taskTrafficBounds(task, time.Now())
+		scoped = true
+	}
+	ex, matched, err := tr.Page(filter, page, size)
+	if err != nil {
+		writeErr(w, 500, err.Error())
+		return
+	}
+	count := matched // task view: only scoped matches, not all other tasks' captures
+	if !scoped {
+		count, err = tr.Count()
+		if err != nil {
+			writeErr(w, 500, err.Error())
+			return
+		}
+	}
 	writeJSON(w, 200, map[string]any{
-		"enabled":   s.m.TrafficEnabled(), // reflect the capture toggle
+		"enabled":   s.m.TrafficEnabled(),
 		"proxy":     s.m.ProxyAddr(),
-		"count":     count,   // total recorded (unfiltered)
-		"total":     matched, // rows matching the current filter (for pagination)
+		"count":     count,
+		"total":     matched,
 		"page":      page,
 		"size":      size,
 		"exchanges": trafficDTOs(ex),

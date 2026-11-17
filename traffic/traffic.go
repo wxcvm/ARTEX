@@ -827,6 +827,9 @@ func ftsQuote(s string) string {
 // newest-first by timestamp.
 type PageQuery struct {
 	Host    string // host substring
+	TaskHosts []string // nil = unscoped, empty non-nil = no matching hosts; exact match
+	TsMin int64 // Unix seconds; 0 = unbounded
+	TsMax int64 // Unix seconds; 0 = unbounded
 	CaptureID string // exact optional extension-supplied capture group
 	Method  string // exact method (case-insensitive)
 	Query   string // broad search box: metadata columns OR captured text
@@ -888,6 +891,17 @@ func (t *Traffic) Page(f PageQuery, page, size int) (rows []ExchangeMeta, total 
 	}
 	if h := strings.TrimSpace(f.Host); h != "" {
 		add("host LIKE ?", "%"+h+"%")
+	}
+	if f.TaskHosts != nil {
+		// One JSON parameter avoids SQLite variable-count limits for large asset sets.
+		hosts, _ := json.Marshal(f.TaskHosts)
+		add("host IN (SELECT value FROM json_each(?))", string(hosts))
+	}
+	if f.TsMin > 0 {
+		add("ts>=?", f.TsMin)
+	}
+	if f.TsMax > 0 {
+		add("ts<=?", f.TsMax)
 	}
 	if group := strings.TrimSpace(f.CaptureID); group != "" {
 		add("id IN (SELECT exchange_id FROM capture_attribution WHERE capture_id=?)",group)
