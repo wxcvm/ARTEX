@@ -10,6 +10,9 @@ cleanup() {
 }
 trap cleanup EXIT
 mkdir -p "$tmp/socket" "$tmp/work" "$tmp/controller"
+# GitHub hosted Docker can remap container root; allow the isolated test
+# container to create the socket. Production uses a private named volume.
+chmod 0777 "$tmp/socket"
 printf 'CONTROL_SECRET_CANARY_NOT_FOR_RUNNER\n' > "$tmp/controller/jwt.key"
 chmod 600 "$tmp/controller/jwt.key"
 
