@@ -41,7 +41,7 @@ func (s *Server) ingestTraffic(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	ingested, duplicates, failed := 0, 0
+	ingested, duplicates, failed := 0, 0, 0
 	for _, e := range req.Exchanges {
 		e.RequestBody = truncateBody(e.RequestBody)
 		e.ResponseBody = truncateBody(e.ResponseBody)
