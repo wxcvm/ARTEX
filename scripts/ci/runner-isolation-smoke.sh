@@ -24,21 +24,25 @@ POSTGRES_PASSWORD=ci-placeholder docker compose \
 python3 - "$tmp/compose.json" <<'PY'
 import json, sys
 services = json.load(open(sys.argv[1]))["services"]
-runner = services["tool-runner"]
-controller = services["artex"]
-assert "ARTEX_PG_DSN" in controller.get("environment", {}), "fixture needs controller credentials"
-assert not (set(runner.get("environment", {})) & {
-    "ARTEX_PG_DSN", "OPENAI_API_KEY", "ANTHROPIC_API_KEY",
-    "ARTEX_LLM_SECRET_KEY", "ARTEX_SETUP_TOKEN", "ARTEX_JWT_KEY_DIR"
-}), "runner inherited control variables"
-assert set(runner["networks"]) == {"runner-execution"}, "runner joined controller network"
-destinations = {m["target"] for m in runner.get("volumes", [])}
-assert destinations == {"/run/artex-runner", "/app/data/tasks", "/app/data/sessions"}, destinations
-assert runner.get("read_only") is True
-assert "ALL" in runner.get("cap_drop", [])
-assert runner.get("environment", {}).get("ARTEX_RUNNER_REMOTE_PEER_ONLY") == "1"
-assert not runner.get("pid") and not controller.get("pid"), "PID namespace sharing bypasses the remote-peer guard"
-print("Compose runner environment, networks and mounts checked")
+broker, executor, controller = (services[n] for n in ("tool-runner", "tool-executor", "artex"))
+assert "ARTEX_PG_DSN" in controller.get("environment", {}), "fixture needs control credentials"
+blocked = {"ARTEX_PG_DSN", "OPENAI_API_KEY", "ANTHROPIC_API_KEY",
+           "ARTEX_LLM_SECRET_KEY", "ARTEX_SETUP_TOKEN", "ARTEX_JWT_KEY_DIR"}
+assert not (set(broker.get("environment", {})) & blocked), "broker inherited control vars"
+assert not (set(executor.get("environment", {})) & blocked), "executor inherited control vars"
+assert set(executor["networks"]) == {"runner-execution"}, "executor joined control network"
+assert set(broker["networks"]) == {"runner-control"}, "broker joined execution network"
+broker_mounts = {m["target"] for m in broker.get("volumes", [])}
+executor_mounts = {m["target"] for m in executor.get("volumes", [])}
+assert broker_mounts == {"/run/artex-runner", "/run/artex-executor"}, broker_mounts
+assert executor_mounts == {"/run/artex-executor", "/app/data/tasks", "/app/data/sessions"}, executor_mounts
+assert "/run/artex-runner" not in executor_mounts
+for service in (broker, executor):
+    assert service.get("read_only") is True
+    assert "ALL" in service.get("cap_drop", [])
+assert broker.get("environment", {}).get("ARTEX_RUNNER_REMOTE_PEER_ONLY") == "1"
+assert not broker.get("pid") and not controller.get("pid"), "PID namespace sharing bypasses SO_PEERCRED"
+print("Compose controller/worker sockets, networks and mounts checked")
 PY
 
 CGO_ENABLED=0 go build -o "$tmp/artex" ./cmd/artex

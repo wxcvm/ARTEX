@@ -1,10 +1,5 @@
-# Opt-in isolated built-in tool execution for Linux Docker deployments.
-# Usage:
-#   docker compose -f docker-compose.yml -f docker-compose.runner.yml up -d
-#
-# The controller stays on the database network. The Runner sees only task and
-# chat workspace paths plus a Unix socket; it receives no ARTEX DB/API/JWT
-# environment variables and no ./keys or whole ./data bind mount.
+# Opt-in Linux Docker Socket Broker + tool Executor.
+# Default Compose and native Windows remain untouched.
 services:
   postgres:
     networks: [runner-control]
@@ -22,28 +17,23 @@ services:
         condition: service_healthy
     networks: [runner-control]
 
+  # Broker owns the controller-facing socket but no tools or workspaces.
   tool-runner:
     image: ${ARTEX_IMAGE:-artex}:${ARTEX_TAG:-local}
     entrypoint: ["/app/artex"]
-    command: ["-runner-socket", "/run/artex-runner/runner.sock"]
+    command: ["-runner-broker-socket", "/run/artex-runner/runner.sock", "-runner-broker-target", "/run/artex-executor/executor.sock"]
     environment:
-      HOME: /tmp
       ARTEX_RUNNER_REMOTE_PEER_ONLY: "1"
     volumes:
       - runner_socket:/run/artex-runner
-      - ./data/tasks:/app/data/tasks
-      - ./data/sessions:/app/data/sessions
+      - runner_executor_socket:/run/artex-executor
+    depends_on:
+      tool-executor:
+        condition: service_healthy
     read_only: true
-    tmpfs:
-      - /tmp:rw,nosuid,size=1g
     cap_drop: [ALL]
-    # Existing nmap raw-socket probes need CAP_NET_RAW.
-    cap_add: [NET_RAW]
-    security_opt:
-      - no-new-privileges:true
-    # PID namespace must not be shared with the controller or host:
-    # SO_PEERCRED denies local shell processes direct access to the RPC.
-    networks: [runner-execution]
+    security_opt: ["no-new-privileges:true"]
+    networks: [runner-control]
     healthcheck:
       test: ["CMD-SHELL", "test -S /run/artex-runner/runner.sock"]
       interval: 2s
@@ -51,16 +41,38 @@ services:
       retries: 20
     restart: unless-stopped
 
-  # The bridge forwards only the recording proxy port. It has neither
-  # database connection credentials nor the controller's keys or data mounts.
+  # Executor can run Bash/files/background/PTY, but has no controller Socket,
+  # no DB/JWT credentials and no TCP tool-management listener.
+  tool-executor:
+    image: ${ARTEX_IMAGE:-artex}:${ARTEX_TAG:-local}
+    entrypoint: ["/app/artex"]
+    command: ["-runner-socket", "/run/artex-executor/executor.sock"]
+    environment:
+      HOME: /tmp
+    volumes:
+      - runner_executor_socket:/run/artex-executor
+      - ./data/tasks:/app/data/tasks
+      - ./data/sessions:/app/data/sessions
+    read_only: true
+    tmpfs: ["/tmp:rw,nosuid,size=1g"]
+    cap_drop: [ALL]
+    cap_add: [NET_RAW]
+    security_opt: ["no-new-privileges:true"]
+    networks: [runner-execution]
+    healthcheck:
+      test: ["CMD-SHELL", "test -S /run/artex-executor/executor.sock"]
+      interval: 2s
+      timeout: 2s
+      retries: 20
+    restart: unless-stopped
+
   artex-proxy-relay:
     image: ${ARTEX_IMAGE:-artex}:${ARTEX_TAG:-local}
     entrypoint: ["/app/artex"]
     command: ["-runner-relay-listen", ":8788", "-runner-relay-target", "artex:8788"]
     read_only: true
     cap_drop: [ALL]
-    security_opt:
-      - no-new-privileges:true
+    security_opt: ["no-new-privileges:true"]
     networks: [runner-control, runner-execution]
     healthcheck:
       test: ["CMD-SHELL", "nc -z 127.0.0.1 8788"]
@@ -75,3 +87,4 @@ networks:
 
 volumes:
   runner_socket:
+  runner_executor_socket:
