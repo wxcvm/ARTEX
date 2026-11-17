@@ -4,7 +4,7 @@ set -euo pipefail
 cd "$(dirname "$0")/../.."
 
 tmp="$(mktemp -d)"
-project="artexrunner${GITHUB_RUN_ID:-$}"
+project="artexrunner${GITHUB_RUN_ID:-0}${RANDOM}"
 export POSTGRES_PASSWORD=fixture-only ARTEX_IMAGE=artex-runner-ci ARTEX_TAG=local
 cp docker-compose.yml docker-compose.runner.yml "$tmp/"
 mkdir -p "$tmp/data/tasks" "$tmp/data/sessions"
