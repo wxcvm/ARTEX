@@ -1,5 +1,5 @@
-# Opt-in control-socket Broker and isolated tool Executor.
-# Native Windows and the default docker-compose.yml remain unchanged.
+# Opt-in Linux Docker Socket Broker + tool Executor.
+# Default Compose and native Windows remain untouched.
 services:
   postgres:
     networks: [runner-control]
@@ -17,23 +17,23 @@ services:
         condition: service_healthy
     networks: [runner-control]
 
-  # Only Broker and ARTEX see the controller-facing socket volume.
-  # Broker cannot run any of the SDK execution tools itself.
+  # Broker owns the controller-facing socket but no tools or workspaces.
   tool-runner:
     image: ${ARTEX_IMAGE:-artex}:${ARTEX_TAG:-local}
     entrypoint: ["/app/artex"]
-    command: ["-runner-broker-socket", "/run/artex-runner/runner.sock", "-runner-broker-target", "http://tool-executor:8789"]
+    command: ["-runner-broker-socket", "/run/artex-runner/runner.sock", "-runner-broker-target", "/run/artex-executor/executor.sock"]
     environment:
       ARTEX_RUNNER_REMOTE_PEER_ONLY: "1"
     volumes:
       - runner_socket:/run/artex-runner
+      - runner_executor_socket:/run/artex-executor
     depends_on:
       tool-executor:
         condition: service_healthy
     read_only: true
     cap_drop: [ALL]
     security_opt: ["no-new-privileges:true"]
-    networks: [runner-control, runner-execution]
+    networks: [runner-control]
     healthcheck:
       test: ["CMD-SHELL", "test -S /run/artex-runner/runner.sock"]
       interval: 2s
@@ -41,32 +41,31 @@ services:
       retries: 20
     restart: unless-stopped
 
-  # Existing toolkit runs here with access to task/session files only.
-  # No controller Socket, JWT private key, database DSN or Docker socket.
+  # Executor can run Bash/files/background/PTY, but has no controller Socket,
+  # no DB/JWT credentials and no TCP tool-management listener.
   tool-executor:
     image: ${ARTEX_IMAGE:-artex}:${ARTEX_TAG:-local}
     entrypoint: ["/app/artex"]
-    command: ["-runner-executor-listen", ":8789"]
+    command: ["-runner-socket", "/run/artex-executor/executor.sock"]
     environment:
       HOME: /tmp
     volumes:
+      - runner_executor_socket:/run/artex-executor
       - ./data/tasks:/app/data/tasks
       - ./data/sessions:/app/data/sessions
     read_only: true
     tmpfs: ["/tmp:rw,nosuid,size=1g"]
     cap_drop: [ALL]
-    # Needed by existing raw-network probes; isolated from the controller.
     cap_add: [NET_RAW]
     security_opt: ["no-new-privileges:true"]
     networks: [runner-execution]
     healthcheck:
-      test: ["CMD-SHELL", "curl -fsS http://127.0.0.1:8789/health >/dev/null"]
+      test: ["CMD-SHELL", "test -S /run/artex-executor/executor.sock"]
       interval: 2s
       timeout: 2s
       retries: 20
     restart: unless-stopped
 
-  # Fixed-port recording-proxy forwarder: no control credentials or volumes.
   artex-proxy-relay:
     image: ${ARTEX_IMAGE:-artex}:${ARTEX_TAG:-local}
     entrypoint: ["/app/artex"]
@@ -88,3 +87,4 @@ networks:
 
 volumes:
   runner_socket:
+  runner_executor_socket:

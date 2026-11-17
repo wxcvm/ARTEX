@@ -62,15 +62,14 @@ func run() int {
 		setupAppDB = flag.Bool("setup-app-db", false, "create a dedicated login role and database owned by it (new setups only)")
 		runnerSocket = flag.String("runner-socket", "", "serve isolated SDK tools over a Unix socket (legacy single-process mode)")
 		runnerBrokerSocket = flag.String("runner-broker-socket", "", "serve control-only Unix socket broker")
-		runnerBrokerTarget = flag.String("runner-broker-target", "", "target executor HTTP endpoint for socket broker")
-		runnerExecutorListen = flag.String("runner-executor-listen", "", "listen for SDK tool calls on the private execution network")
+		runnerBrokerTarget = flag.String("runner-broker-target", "", "absolute Unix socket path to the tool executor")
 		relayListen = flag.String("runner-relay-listen", "", "fixed-target network proxy relay listen address")
 		relayTarget = flag.String("runner-relay-target", "", "fixed-target proxy endpoint (required with runner-relay-listen)")
 	)
 	flag.Parse()
-	if *runnerSocket != "" || *relayListen != "" || *runnerBrokerSocket != "" || *runnerExecutorListen != "" {
+	if *runnerSocket != "" || *relayListen != "" || *runnerBrokerSocket != "" {
 		modes := 0
-		for _, v := range []string{*runnerSocket, *relayListen, *runnerBrokerSocket, *runnerExecutorListen} {
+		for _, v := range []string{*runnerSocket, *relayListen, *runnerBrokerSocket} {
 			if v != "" { modes++ }
 		}
 		if modes != 1 {
@@ -85,8 +84,6 @@ func run() int {
 			err = toolrunner.Serve(ctx, *runnerSocket)
 		case *runnerBrokerSocket != "":
 			err = toolrunner.ServeBroker(ctx, *runnerBrokerSocket, *runnerBrokerTarget)
-		case *runnerExecutorListen != "":
-			err = toolrunner.ServeExecutor(ctx, *runnerExecutorListen)
 		default:
 			err = toolrunner.Relay(ctx, *relayListen, *relayTarget)
 		}
