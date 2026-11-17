@@ -17,6 +17,7 @@ import { Label } from "@/components/ui/label";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { api } from "@/lib/api";
+import { assetSyncTabFromSearch } from "@/lib/asset-sync-tab";
 import { PurgeIntelPanel } from "./purge-intel-panel";
 import type { SSProject, SSTask } from "@/lib/types";
 
@@ -40,13 +41,17 @@ const ASSET_TYPES: { key: string; label: string }[] = [
 export default function AssetSyncPage() {
   const locale = useUiLocale();
   const tr = (zh: string, en: string) => uiText(locale, zh, en);
+  const [tab, setTab] = React.useState("scopesentry");
+  React.useEffect(() => {
+    setTab(assetSyncTabFromSearch(window.location.search));
+  }, []);
   return (
     <div className="p-4 md:p-6">
       <div className="mb-4">
         <h1 className="font-semibold text-xl">{tr("资产同步", "Asset synchronization")}</h1>
         <p className="text-muted-foreground text-sm">{tr("从外部数据源同步资产入库", "Import assets from external sources")}</p>
       </div>
-      <Tabs defaultValue="scopesentry">
+      <Tabs value={tab} onValueChange={setTab}>
         <TabsList>
           <TabsTrigger value="scopesentry">ScopeSentry</TabsTrigger>
           <TabsTrigger value="purge-intel">{tr("Purge 情报", "Purge intelligence")}</TabsTrigger>
