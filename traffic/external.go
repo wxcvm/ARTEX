@@ -1,12 +1,12 @@
 package traffic
 
 import (
-	"fmt"
-	"log"
 	"crypto/sha256"
 	"database/sql"
 	"encoding/hex"
 	"errors"
+	"fmt"
+	"log"
 	"net/url"
 	"strings"
 	"time"
@@ -37,7 +37,7 @@ type ExternalExchange struct {
 // full-text search.
 func (t *Traffic) RecordExternal(e ExternalExchange) error {
 	_, err := t.RecordExternalWithReceipt(e)
-	return false, err
+	return err
 }
 
 // RecordExternalWithReceipt acknowledges a previously persisted browser request
@@ -72,7 +72,7 @@ func (t *Traffic) RecordExternalWithReceipt(e ExternalExchange) (duplicate bool,
 	// acknowledgement was lost. Old clients without IDs retain old behavior.
 	id := ""
 	if e.CaptureID != "" && e.ExchangeID != "" {
-		sum := sha256.Sum256([]byte("artex-browser-v1\\x00" + e.CaptureID + "\\x00" + e.ExchangeID))
+		sum := sha256.Sum256([]byte("artex-browser-v1\x00" + e.CaptureID + "\x00" + e.ExchangeID))
 		id = "ext-" + hex.EncodeToString(sum[:])
 		var present int
 		err := t.db.QueryRow(`SELECT 1 FROM exchanges WHERE id=?`, id).Scan(&present)
