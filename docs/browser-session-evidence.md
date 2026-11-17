@@ -32,3 +32,9 @@ Each successful Start in the Chrome extension creates a new random capture group
 The traffic index stores capture IDs in an optional auxiliary row alongside HAR page attribution. Traffic archive export/import preserves the capture group; normal traffic deletion removes it. When an ingested exchange is linked to a finding, the immutable snapshot copies the group and includes it in its identity hash. Old snapshots without a group retain their previous IDs. The finding card shows a short group prefix, and the detail viewer shows the full value.
 
 This is **capture-batch correlation**, not the browser's authenticated identity, user identity, cookie state or Playwright's `-s` session name. The API accepts metadata from authorized clients, so the value is not independently attested. Captured bodies remain in memory until successful ingestion; no new persistent browser storage or cross-browser session control is introduced.
+
+## Find all requests from a capture group
+
+Open **Traffic → Advanced filters** and paste the exact **Capture group ID** shown in the extension popup or the immutable finding evidence detail. This filters the traffic list by the optional capture group while preserving the existing host, method, response-status and content filters. The same filter is available as `GET /api/traffic?capture_id=<id>`. An empty filter continues to show legacy traffic records without a capture ID.
+
+This is a lookup of recorded traffic, not browser control or an authenticated assertion about which Playwright session produced the traffic. If the original traffic has been deleted, the immutable finding evidence may still show the group, but the traffic-list filter will correctly return no hot rows.
