@@ -139,3 +139,25 @@ func TestRunnerRejectsUnknownTool(t *testing.T) {
 		t.Fatal("Bash must be available")
 	}
 }
+
+func TestRunnerToolEnvForwardsOnlyProxyAndPublicCA(t *testing.T) {
+	env := []string{
+		"HTTP_PROXY=http://127.0.0.1:8788",
+		"ALL_PROXY=socks5://proxy.example:1080",
+		"SSL_CERT_FILE=/app/data/_ca/public.pem",
+		"OPENAI_API_KEY=model-secret",
+		"ARTEX_PG_DSN=postgres://user:password@postgres/db",
+		"ARTEX_LLM_SECRET_KEY=internal-secret",
+		"CUSTOM_API_TOKEN=credential",
+		"PATH=/custom/bin",
+	}
+	got := runnerToolEnv(env)
+	if len(got) != 3 {
+		t.Fatalf("forwarded unexpected environment variables: %v", got)
+	}
+	for i, want := range env[:3] {
+		if got[i] != want {
+			t.Fatalf("env[%d]=%q, want %q", i, got[i], want)
+		}
+	}
+}
