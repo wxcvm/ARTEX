@@ -49,6 +49,7 @@ services:
     command: ["-runner-socket", "/run/artex-executor/executor.sock"]
     environment:
       HOME: /tmp
+      ARTEX_RUNNER_REMOTE_PEER_ONLY: "1"
     volumes:
       - runner_executor_socket:/run/artex-executor
       - ./data/tasks:/app/data/tasks

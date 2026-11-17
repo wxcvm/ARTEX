@@ -13,7 +13,7 @@
 - 独立代理桥仅将 `artex-proxy-relay:8788` 转发到 ARTEX 的流量代理端口；
 - 内置 Bash、Read/Write/Edit/MultiEdit、LS/Glob/Grep、交互式 Shell（如被启用）和 TaskOutput/TaskStop/TaskList/Monitor 都通过 Socket 执行；
 - 命令执行失败或 Runner 无法连接时**不回退到控制容器本地执行**；
-- Docker Broker 通过 Linux `SO_PEERCRED` 限制 Socket 的来源；执行容器里的 Bash 根本无法访问或替换控制 Socket，避免通过 Socket 伪造工具调用；
+- Docker Broker 和 Executor 的 Socket 都通过 Linux `SO_PEERCRED` 拒绝本容器进程直接调用，减少工具命令绕过主程序审计的风险；执行容器里的 Bash 也无法访问或替换**控制 Socket**；
 - 各 Agent 的权限、拦截规则、模型与任务范围不做改动。
 
 ## 启用与回退
@@ -57,7 +57,7 @@ docker compose -f docker-compose.yml -f docker-compose.runner.yml exec -T tool-e
 '
 ```
 
-CI 还会通过 `scripts/ci/runner-broker-smoke.sh` 在两个**没有共享网络**的 Docker 容器中验证：Broker 经执行 Socket 转发文件与 Bash 工具请求，Executor 看不到控制 Socket，且无工具管理 TCP 端口；这不等于正式 Compose 部署已验收。
+CI 还会通过 `scripts/ci/runner-broker-smoke.sh` 在两个**没有共享网络**的 Docker 容器中验证：Broker 经执行 Socket 转发文件、Bash 与交互式 PTY 工具请求；Executor 看不到控制 Socket，也不能直接通过执行 Socket 伪造额外工具调用，且无工具管理 TCP 端口。这不等于正式 Compose 部署已验收。
 
 CI 还会通过 `scripts/ci/runner-relay-smoke.sh` 使用两个临时 Docker 网络和真实 `artex` 代理转发二进制验证：执行网络经指定 relay 能访问模拟控制端代理，不能直接访问控制端。这是网络路径的容器回归，**不代表正式 Compose 及真实流量抓包已验收**。
 
@@ -70,6 +70,6 @@ CI 还会通过 `scripts/ci/runner-relay-smoke.sh` 使用两个临时 Docker 网
 3. 控制端数据库领域工具、WebFetch/WebSearch、MCP/技能启动的自定义本地进程、浏览器工具以及其他非 SDK 内置工具不由此 RPC 自动隔离。启用这些能力时不能将此阶段当成完整凭证沙箱。
 4. SDK 本地后台任务完成通知不能自动跨进程转发；可通过远程 TaskList/TaskOutput/Monitor 查询。会话结束时会请求清理 Runner 的后台进程和 PTY。
 5. Runner 拥有常规探测网络权限。代理桥只是固定端口转发，不是严格的网络目标白名单；抓包与非 HTTP 探测需实机回归。部分工具依赖可写 HOME，Runner 默认映射到 tmpfs。
-6. 控制 Socket 只挂载给 ARTEX 与 Broker，执行 Socket 只挂载给 Broker 与 Executor。Broker 与 Executor 不共享 Docker 网络；Executor 无法删除或替换**控制 Socket**。但是执行 Socket 仍可被 Executor 内的 root 工具调用或篡改，且工作目录仍被所有任务共享，因此仍需任务级 UID、独立文件权限与完整 Compose 现场测试。
+6. 控制 Socket 只挂载给 ARTEX 与 Broker，执行 Socket 只挂载给 Broker 与 Executor。Broker 与 Executor 不共享 Docker 网络；Executor 无法删除或替换**控制 Socket**，并且直接调用执行 Socket 会被 Linux 进程来源检查拒绝。但 Executor 内 root 工具仍可篡改、替换**执行 Socket 路径**造成拒绝服务或伪造响应，工作目录也被所有任务共享，因此仍需任务级 UID、独立文件权限与完整 Compose 现场测试。
 
 **后续目标**：完善工具覆盖、后台事件回传、每任务独立 UID/挂载和真正的非 root 执行，并进行真实 Docker 环境的凭证读取对抗测试。以上完成前不将 #159 标记为安全隔离验收通过。
