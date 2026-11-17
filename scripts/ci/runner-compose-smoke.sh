@@ -4,7 +4,8 @@ set -euo pipefail
 cd "$(dirname "$0")/../.."
 
 tmp="$(mktemp -d)"
-project="artexrunner\${GITHUB_RUN_ID:-$$}"
+project="artexrunner${GITHUB_RUN_ID:-$}"
+export POSTGRES_PASSWORD=fixture-only ARTEX_IMAGE=artex-runner-ci ARTEX_TAG=local
 cp docker-compose.yml docker-compose.runner.yml "$tmp/"
 mkdir -p "$tmp/data/tasks" "$tmp/data/sessions"
 # Disposable CI fixture only; not a production permission recommendation.
@@ -13,7 +14,7 @@ chmod 0777 "$tmp/data/tasks" "$tmp/data/sessions"
 compose=(docker compose -p "$project" -f "$tmp/docker-compose.yml" -f "$tmp/docker-compose.runner.yml")
 cleanup() {
   POSTGRES_PASSWORD=fixture-only ARTEX_IMAGE=artex-runner-ci ARTEX_TAG=local \
-    "\${compose[@]}" down -v --remove-orphans >/dev/null 2>&1 || true
+    "${compose[@]}" down -v --remove-orphans >/dev/null 2>&1 || true
   rm -rf "$tmp"
 }
 trap cleanup EXIT
@@ -22,22 +23,22 @@ trap cleanup EXIT
 docker image inspect artex-runner-ci:local >/dev/null
 # No control service, database or real recording proxy is started.
 POSTGRES_PASSWORD=fixture-only ARTEX_IMAGE=artex-runner-ci ARTEX_TAG=local \
-  "\${compose[@]}" up -d --no-deps --wait tool-executor tool-runner
+  "${compose[@]}" up -d --no-deps --wait tool-executor tool-runner
 
 for svc in tool-runner tool-executor; do
-  cid="$("\${compose[@]}" ps -q "$svc")"
+  cid="$("${compose[@]}" ps -q "$svc")"
   test -n "$cid"
   test "$(docker inspect -f '{{.State.Health.Status}}' "$cid")" = healthy
 done
-test -z "$("\${compose[@]}" ps -q artex)"
+test -z "$("${compose[@]}" ps -q artex)"
 
-"\${compose[@]}" exec -T tool-executor sh -ec '
+"${compose[@]}" exec -T tool-executor sh -ec '
   test -S /run/artex-executor/executor.sock
   test ! -e /run/artex-runner/runner.sock
   test ! -e /app/keys/jwt.key
   test -z "$(printenv ARTEX_PG_DSN || true)"
 '
-"\${compose[@]}" exec -T tool-runner sh -ec '
+"${compose[@]}" exec -T tool-runner sh -ec '
   test -S /run/artex-runner/runner.sock
   test -S /run/artex-executor/executor.sock
   test ! -e /app/data/tasks/compose.txt
@@ -46,7 +47,7 @@ test -z "$("\${compose[@]}" ps -q artex)"
 # Client has a separate PID namespace and no network access. Broker relays
 # the request through the private execution Socket to the Executor container.
 docker run --rm --network none \
-  -v "\${project}_runner_socket:/run/artex-runner:ro" \
+  -v "${project}_runner_socket:/run/artex-runner:ro" \
   --entrypoint sh artex-runner-ci:local -ec '
     curl --fail --silent --show-error --max-time 20 \
       --unix-socket /run/artex-runner/runner.sock \
@@ -55,7 +56,7 @@ docker run --rm --network none \
       http://localhost/call
   ' > "$tmp/write.json"
 docker run --rm --network none \
-  -v "\${project}_runner_socket:/run/artex-runner:ro" \
+  -v "${project}_runner_socket:/run/artex-runner:ro" \
   --entrypoint sh artex-runner-ci:local -ec '
     curl --fail --silent --show-error --max-time 20 \
       --unix-socket /run/artex-runner/runner.sock \
