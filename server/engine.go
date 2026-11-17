@@ -785,7 +785,9 @@ func (e *Engine) Run(ctx context.Context, t *Task) {
 	// worker just started above has claimed it as running first — both count as "work
 	// exists", so skip the first planner round: the worker runs the seed intent directly and NotifyDone/heartbeat wakes the planner when done.
 	// ⚠️ Do not use Frontier (counts only open): a worker claiming (open→running) races with this check and would kick spuriously. After a restart-driven auto-recovery only running intents may remain — skip then too.
-	if has, _ := t.Store.HasActiveIntent(); !has {
+	if has, err := t.Store.HasActiveIntent(); err != nil {
+		log.Printf("[engine] task %s could not inspect active intents before initial planning: %v", t.ID, err)
+	} else if !has {
 		t.Notify() // kick the first planning round (acted on once LLM is ready)
 	}
 }
