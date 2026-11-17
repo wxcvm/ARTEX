@@ -714,14 +714,22 @@ docker compose logs --tail=100 postgres
 本阶段采用手动 JSON 导入，不需要额外 API Key，不自动传输数据；不包含跨项目后台同步、自动扫描、向智能体注入证据或把历史情报提升为已验证资产。需要安装包含本阶段代码的 ARTEX 版本及 Purge 关联清单功能。
 
 
-### Purge 本机一键同步
+### Purge 本机配对与一键同步
 
-可选启用独立写入桥接：在 ARTEX 服务端设置 `ARTEX_PURGE_INTEL_TOKEN`（至少 32 字符的独立随机秘密）及 `ARTEX_PURGE_INTEL_COMPANY_ID`（已存在的公司数字 ID）。在 DSH/Purge 宿主设置相同的 `DSH_PURGE_ARTEX_INTEL_TOKEN` 和 `DSH_PURGE_ARTEX_INTEL_COMPANY_ID`，重启两端。Docker Compose 已透传 ARTEX 两个变量。不要复用隐私桥接、总览或安装令牌，不要将秘密提交到仓库。
+**推荐使用现有页面配对，无需编辑环境变量或重启：**
 
-Purge 测绘中心先生成统一关联清单，再检查接收公司、勾选确认并点击「同步至 ARTEX」。发送端只使用 `http://127.0.0.1:8787`，不接受自定义远程 URL。ARTEX 接口 `POST /api/purge/intel-bridge` 使用 X-Artex-Purge-Intel-Token 和 X-Artex-Purge-Intel-Company 两个请求头；接收公司由服务端配置决定，发送端 ID 不匹配则拒绝。复用管理员手动导入的验证及去重逻辑，成功返回快照 ID。令牌不授予任何读取、管理或其他公司写入权限。
+1. 在 ARTEX「资产同步 → Purge 情报」选择已登记授权范围的公司，点击「生成配对令牌」。ARTEX 只在生成时显示完整令牌；轮换或撤销会使旧令牌失效。
+2. 在 Purge「作战台 → 资源 → ARTEX → 本机情报同步 → 配对配置」填写相同公司 ID 与令牌，点击「保存并检测配对」。已保存配对可以直接复用，Purge 不会回显令牌。
+3. 在 Purge 选择当前项目的已登记授权目标，先生成关联清单、确认接收公司与条目，再勾选确认并点击「同步至 ARTEX」。成功后 ARTEX 保存历史快照，可返回「Purge 情报」查看导入历史与离线分析。
+4. 运行中的 ARTEX 可通过 Purge 工作台「打开 ARTEX 情报同步」直接跳转至 `http://127.0.0.1:8787/function/sync?tab=purge-intel`；直接打开「资产同步」仍默认显示 ScopeSentry。
 
-仅在同一可信本机使用，保持 ARTEX 管理监听回环或受保护。服务身份探测不等于加密认证。传输不启动扫描或智能体；响应丢失时在 ARTEX 历史中确认，重复提交相同证据会复用快照。尚无定时同步或 ARTEX 智能体自动消费。
+如果使用旧版脚本或集中部署，也可以继续通过 ARTEX 进程环境变量 `ARTEX_PURGE_INTEL_TOKEN`、`ARTEX_PURGE_INTEL_COMPANY_ID` 与 Purge 进程环境变量 `DSH_PURGE_ARTEX_INTEL_TOKEN`、`DSH_PURGE_ARTEX_INTEL_COMPANY_ID` 配对；这种方式修改变量后需要重启相应进程。**环境变量优先于页面保存的配对**。两种方式均不应复用隐私桥接、总览或管理员 JWT。
 
+Purge 仅连接本机固定地址 `http://127.0.0.1:8787`，先检查 `/api/health` 服务身份，不跟随重定向。ARTEX 的 `POST /api/purge/intel-bridge` 使用独立的 `X-Artex-Purge-Intel-Token` 和 `X-Artex-Purge-Intel-Company` 请求头。导入复用范围验证与内容去重：仅保存授权范围内的历史情报，不创建实时资产、漏洞或扫描任务；重复内容复用快照 ID。
+
+**读取边界**：该独立令牌除了写入和配对状态检查，还可以读取当前配对公司的受限概览、资产分页、任务状态、符合公司归属条件的发现与报告以及历史快照分析。不能充当管理员登录凭据、读取任意公司数据或访问无关管理接口。Purge 变更/解除配对后会清空旧公司概览，需重新读取当前配对公司的数据。
+
+仅在可信本机使用；不自动启动 ARTEX、Agent 或扫描，不自动同步任务、凭据或 MCP。请在实际 Windows 安装与升级后再验证配对、写入、读取、解除和重连，GitHub CI 通过不等于本机联合验收。
 
 ### Purge 情报离线分析
 
