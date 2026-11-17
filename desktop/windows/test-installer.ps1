@@ -21,7 +21,7 @@ if (Test-Path $installed) { Remove-Item -Recurse -Force $installed }
 $installArgs = "/VERYSILENT /SUPPRESSMSGBOXES /NORESTART /SP- /DIR=" + '"' + $installed + '"'
 Run-Setup $setup $installArgs
 
-foreach ($file in @("ARTEX.Desktop.exe", "artex.exe", "ARTEX.ico", "README-Windows.txt", "knowledge/knowledge.db", "docs/USER_GUIDE_ZH.md", "unins000.exe")) {
+foreach ($file in @("ARTEX.Desktop.exe", "artex.exe", "ARTEX.ico", "README-Windows.txt", "knowledge/knowledge.db", "docs/USER_GUIDE_ZH.md", "extension/manifest.json", "unins000.exe")) {
     if (-not (Test-Path (Join-Path $installed $file))) {
         throw "Installed package is incomplete: $file"
     }
