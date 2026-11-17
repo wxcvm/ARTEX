@@ -1,0 +1,62 @@
+# Opt-in isolated built-in tool execution for Linux Docker deployments.
+# Usage:
+#   docker compose -f docker-compose.yml -f docker-compose.runner.yml up -d
+#
+# The controller stays on the database network. The Runner sees only task and
+# chat workspace paths plus a Unix socket; it receives no ARTEX DB/API/JWT
+# environment variables and no ./keys or whole ./data bind mount.
+services:
+  postgres:
+    networks: [runner-control]
+
+  artex:
+    environment:
+      ARTEX_RUNNER_SOCKET: /run/artex-runner/runner.sock
+      ARTEX_RUNNER_PROXY_ADDR: http://artex-proxy-relay:8788
+    volumes:
+      - runner_socket:/run/artex-runner
+    depends_on:
+      tool-runner:
+        condition: service_started
+    networks: [runner-control]
+
+  tool-runner:
+    image: ${ARTEX_IMAGE:-artex}:${ARTEX_TAG:-local}
+    entrypoint: ["/app/artex"]
+    command: ["-runner-socket", "/run/artex-runner/runner.sock"]
+    environment:
+      HOME: /tmp
+    volumes:
+      - runner_socket:/run/artex-runner
+      - ./data/tasks:/app/data/tasks
+      - ./data/sessions:/app/data/sessions
+    read_only: true
+    tmpfs:
+      - /tmp:rw,nosuid,size=1g
+    cap_drop: [ALL]
+    # Existing nmap raw-socket probes need CAP_NET_RAW.
+    cap_add: [NET_RAW]
+    security_opt:
+      - no-new-privileges:true
+    networks: [runner-execution]
+    restart: unless-stopped
+
+  # The bridge forwards only the recording proxy port. It has neither
+  # database connection credentials nor the controller's keys or data mounts.
+  artex-proxy-relay:
+    image: ${ARTEX_IMAGE:-artex}:${ARTEX_TAG:-local}
+    entrypoint: ["/app/artex"]
+    command: ["-runner-relay-listen", ":8788", "-runner-relay-target", "artex:8788"]
+    read_only: true
+    cap_drop: [ALL]
+    security_opt:
+      - no-new-privileges:true
+    networks: [runner-control, runner-execution]
+    restart: unless-stopped
+
+networks:
+  runner-control:
+  runner-execution:
+
+volumes:
+  runner_socket:
