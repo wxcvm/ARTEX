@@ -6,6 +6,8 @@ $ErrorActionPreference = "Stop"
 $root = (Resolve-Path (Join-Path $PSScriptRoot "../..")).Path
 $program = Join-Path $root (Join-Path $OutputDir "ARTEX-Windows-Desktop-amd64/ARTEX.Desktop.exe")
 if (-not (Test-Path $program)) { throw "Desktop executable not found: $program" }
+$extensionManifest = Join-Path $root (Join-Path $OutputDir "ARTEX-Windows-Desktop-amd64/extension/manifest.json")
+if (-not (Test-Path $extensionManifest)) { throw "Bundled browser capture extension is missing: $extensionManifest" }
 
 $tempDir = if ($env:RUNNER_TEMP) { $env:RUNNER_TEMP } else { [IO.Path]::GetTempPath() }
 $requestLog = Join-Path $tempDir "artex-desktop-http-requests.txt"
