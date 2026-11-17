@@ -38,3 +38,5 @@ This is **capture-batch correlation**, not the browser's authenticated identity,
 Open **Traffic → Advanced filters** and paste the exact **Capture group ID** shown in the extension popup or the immutable finding evidence detail. This filters the traffic list by the optional capture group while preserving the existing host, method, response-status and content filters. The same filter is available as `GET /api/traffic?capture_id=<id>`. An empty filter continues to show legacy traffic records without a capture ID.
 
 This is a lookup of recorded traffic, not browser control or an authenticated assertion about which Playwright session produced the traffic. If the original traffic has been deleted, the immutable finding evidence may still show the group, but the traffic-list filter will correctly return no hot rows.
+
+The finding's evidence detail also offers **View group traffic** to open the pre-filled filter directly. This may return no rows if the original hot traffic was deleted; the immutable finding evidence remains available.

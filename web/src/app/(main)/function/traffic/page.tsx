@@ -142,6 +142,14 @@ export default function TrafficPage() {
   const [bodyQ, setBodyQ] = React.useState("");
   const [captureId, setCaptureId] = React.useState("");
   const [captureIdQ, setCaptureIdQ] = React.useState("");
+  // A finding evidence detail can open this page scoped to its capture group.
+  React.useEffect(() => {
+    const linkedGroup = new URLSearchParams(window.location.search).get("capture_id");
+    if (linkedGroup) {
+      setCaptureId(linkedGroup);
+      setCaptureIdQ(linkedGroup);
+    }
+  }, []);
   const [path, setPath] = React.useState("");
   const [pathQ, setPathQ] = React.useState("");
   const [statusFilter, setStatusFilter] = React.useState("all");
