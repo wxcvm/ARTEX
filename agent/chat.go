@@ -160,7 +160,7 @@ func (c *ChatAgent) Chat(ctx context.Context, agentKey, sessionID, message strin
 		Settlement:   wrapupSettlement(agentKey, nil),
 		NonStreaming: c.nonStreaming(), // when this profile selects non-streaming, use Provider.Complete
 		MaxTokens:    c.maxTokens(),    // 0 = send no cap, the server's default decides
-		UntrustedOutputBoundary: untrustedBoundaryEnabled(), // optional, off by default
+		UntrustedOutputBoundary: untrustedBoundaryEnabled(), // enabled by default; set ARTEX_UNTRUSTED_BOUNDARY=0 to opt out
 	}
 	if c.guard != nil {
 		opts.Hooks = c.guard.Hooks()
@@ -171,6 +171,7 @@ func (c *ChatAgent) Chat(ctx context.Context, agentKey, sessionID, message strin
 	}
 	// experimental feature: when enabled, noa takes over context compression (archive centralized under <workDir>/noa/<SessionID>, persistent).
 	enableNoa(&opts, c.noaEnabledFn, c.workDir, "chat-"+sessionID, noaWarn("chat-"+sessionID))
+	applyUntrustedCompactionBoundary(&opts)
 	ctx = attachSideCapture(ctx, &opts)
 	s := agentcore.NewSession(opts)
 	defer s.Close()
