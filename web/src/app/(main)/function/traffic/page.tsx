@@ -917,6 +917,13 @@ export default function TrafficPage() {
                     </TableCell>
                     <TableCell className="max-w-0">
                       <span className="block truncate font-mono text-xs">{e.url}</span>
+                      {bodyQ && traffic?.match_snippets?.[e.id] && (
+                        <span className="block truncate font-mono text-[11px] text-muted-foreground" title={`${traffic.match_snippets[e.id].before}${traffic.match_snippets[e.id].match}${traffic.match_snippets[e.id].after}`}>
+                          {traffic.match_snippets[e.id].before}
+                          <mark className="rounded-sm bg-yellow-200/80 px-0.5 text-yellow-950 dark:bg-yellow-500/30 dark:text-yellow-100">{traffic.match_snippets[e.id].match}</mark>
+                          {traffic.match_snippets[e.id].after}
+                        </span>
+                      )}
                     </TableCell>
                     <TableCell>
                       <span className={cn("font-mono text-xs font-semibold tabular-nums", statusTone(e.status))}>
