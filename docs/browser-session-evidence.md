@@ -1,0 +1,26 @@
+# Browser capture sessions and evidence lifecycle
+
+ARTEX already ships a `playwright-cli` skill with **named browser sessions**. Use the upstream CLI rather than creating a second profile manager:
+
+```bash
+playwright-cli -s=review-a open https://example.test --persistent
+playwright-cli -s=review-b open https://example.test
+playwright-cli list
+playwright-cli -s=review-b close
+playwright-cli -s=review-a close
+playwright-cli -s=review-a delete-data
+```
+
+A Playwright session name and browser profile **do not yet automatically attach to ARTEX traffic evidence**. Session isolation belongs to the CLI: the ARTEX Chrome extension captures the currently selected tab through `chrome.debugger`, independently of Playwright's session manager.
+
+## Manual tab capture
+
+The extension's Start button attaches to the active tab and enables the DevTools Network domain. Starting while a different tab is already being captured reports the active tab instead of pretending that the requested tab changed. If Network.enable fails after a successful attach, the extension detaches immediately.
+
+Stop freezes new network events, waits for in-flight response-body reads, disables/detaches the debugger and flushes **all** queued batches. If a server upload fails, pending exchanges remain **in memory** for a later Flush now or Stop; a subsequent Start does not erase them. The popup shows the queue count and last upload error. An unexpected debugger detach stops capture, clears unfinished request tracking, uploads finished exchanges where possible and reports the reason.
+
+Do not treat a successful browser event or a queued exchange as persisted evidence until the ARTEX server confirms ingestion. The extension deliberately does not write request/response bodies into browser persistent storage; queued exchanges are lost if the service worker or browser process restarts. The evidence snapshot flow only covers records already ingested by ARTEX.
+
+## Scope
+
+This stage fixes capture **lifecycle reliability** and provides regression coverage through the existing web `npm test` command. It does not claim Playwright-to-ARTEX session provenance, durable offline queuing, automatic browser restart recovery, or independently managed browser profiles in the ARTEX UI. These require a separate evidence metadata contract and explicit lifecycle integration.
