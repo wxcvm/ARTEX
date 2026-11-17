@@ -5,6 +5,8 @@ package toolrunner
 
 import (
 	"context"
+	"crypto/sha256"
+	"encoding/hex"
 	"encoding/json"
 	"errors"
 	"fmt"
@@ -12,16 +14,11 @@ import (
 	"net/http"
 	"os"
 	"path/filepath"
-	"regexp"
 	"sync"
 	"time"
 
 	"github.com/Autumn-27/norma/tool"
 )
-
-const maxRequestBytes = 2 << 20
-
-var validSession = regexp.MustCompile(`^[A-Za-z0-9_-]{1,128}$`)
 
 type Request struct {
 	Session        string          `json:"session"`
@@ -71,7 +68,8 @@ func (s *Service) manager(session string) (*tool.Manager, error) {
 	if m := s.sessions[session]; m != nil {
 		return m, nil
 	}
-	m, err := tool.NewManager("artex-runner-" + session)
+	digest := sha256.Sum256([]byte(session))
+	m, err := tool.NewManager("artex-runner-" + hex.EncodeToString(digest[:16]))
 	if err != nil {
 		return nil, err
 	}
@@ -103,7 +101,7 @@ func (s *Service) handleClose(w http.ResponseWriter, r *http.Request) {
 	var req struct {
 		Session string `json:"session"`
 	}
-	if err := json.NewDecoder(http.MaxBytesReader(w, r.Body, 4096)).Decode(&req); err != nil || !validSession.MatchString(req.Session) {
+	if err := json.NewDecoder(r.Body).Decode(&req); err != nil || req.Session == "" {
 		http.Error(w, "invalid session", http.StatusBadRequest)
 		return
 	}
@@ -113,11 +111,11 @@ func (s *Service) handleClose(w http.ResponseWriter, r *http.Request) {
 
 func (s *Service) handleCall(w http.ResponseWriter, r *http.Request) {
 	var req Request
-	if err := json.NewDecoder(http.MaxBytesReader(w, r.Body, maxRequestBytes)).Decode(&req); err != nil {
+	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
 		http.Error(w, "invalid tool request", http.StatusBadRequest)
 		return
 	}
-	if !validSession.MatchString(req.Session) {
+	if req.Session == "" {
 		http.Error(w, "invalid session", http.StatusBadRequest)
 		return
 	}
@@ -152,9 +150,7 @@ func (s *Service) handleCall(w http.ResponseWriter, r *http.Request) {
 		reply.Error = callErr.Error()
 	}
 	w.Header().Set("Content-Type", "application/json")
-	if err := json.NewEncoder(w).Encode(reply); err != nil {
-		_ = err
-	}
+	_ = json.NewEncoder(w).Encode(reply)
 }
 
 // Serve listens only on a filesystem socket: no TCP management endpoint is
