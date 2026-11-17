@@ -46,3 +46,31 @@ Nine reviewed reference documents are the first delivery, not a claim of complet
 ## 智能体检索验收
 
 CSF 分类或子分类编号（如 `GV.SC`、`PR.AA-05`）作为查询词时，匹配标题首编号的参考文档优先于只在标题中提及编号的资料；仍需满足原有全部检索词匹配，普通任务资料仍保留在结果中。验收通过现有 `kb_search` / `kb_get` 调用检查已合并三包 27 条参考的编号、大小写、框架组合词和中文关键词检索，以及全局文档 UUID、来源路径及固定上游版本。测试只使用本地参考数据，不调用模型、外部检索或目标网络；实际模型选择和回答质量仍需独立实验。
+
+
+## 第四批集成参考包（单批 18 条）
+
+`db/knowledgepacks/cyberstrike-csf-fourth-v1.json` 将十八项相互关联的治理、身份、网络流量、事件调查及恢复核查主题放入**同一个**独立安装包，累计 45 条。来源统一固定在 9303b210ab82bd6362d7ad7fbd2b2c8f2e335450，逐条保留原始仓库路径和 Git blob SHA；正文为 ARTEX 独立整理的核查和证据操作提示，不直接复制 CyberStrike 原文或承诺工具能自动完成全部核查。
+
+| CSF | 主题 | 固定上游来源 |
+| --- | --- | --- |
+| GV.OC-01 | 组织使命与网络安全目标 / Mission-aligned security goals | [source](https://github.com/CyberStrikeus/CyberStrike/blob/9303b210ab82bd6362d7ad7fbd2b2c8f2e335450/.cyberstrike/skill/NIST/CSF_v2.0/GV_govern/GV.OC-01_gvoc-01/SKILL.md) |
+| GV.OC-02 | 利益相关方与安全期望 / Stakeholder expectations | [source](https://github.com/CyberStrikeus/CyberStrike/blob/9303b210ab82bd6362d7ad7fbd2b2c8f2e335450/.cyberstrike/skill/NIST/CSF_v2.0/GV_govern/GV.OC-02_gvoc-02/SKILL.md) |
+| GV.OC-03 | 法规合同与隐私责任 / Legal and privacy obligations | [source](https://github.com/CyberStrikeus/CyberStrike/blob/9303b210ab82bd6362d7ad7fbd2b2c8f2e335450/.cyberstrike/skill/NIST/CSF_v2.0/GV_govern/GV.OC-03_gvoc-03/SKILL.md) |
+| ID.AM-04 | 供应商服务清单 / Supplier service inventory | [source](https://github.com/CyberStrikeus/CyberStrike/blob/9303b210ab82bd6362d7ad7fbd2b2c8f2e335450/.cyberstrike/skill/NIST/CSF_v2.0/ID_identify/ID.AM-04_idam-04/SKILL.md) |
+| ID.AM-05 | 资产关键性与优先级 / Asset criticality | [source](https://github.com/CyberStrikeus/CyberStrike/blob/9303b210ab82bd6362d7ad7fbd2b2c8f2e335450/.cyberstrike/skill/NIST/CSF_v2.0/ID_identify/ID.AM-05_idam-05/SKILL.md) |
+| PR.AA-01 | 账户和凭据生命周期 / Credential lifecycle | [source](https://github.com/CyberStrikeus/CyberStrike/blob/9303b210ab82bd6362d7ad7fbd2b2c8f2e335450/.cyberstrike/skill/NIST/CSF_v2.0/PR_protect/PR.AA-01_praa-01/SKILL.md) |
+| PR.AA-02 | 身份核验与凭据绑定 / Identity proofing | [source](https://github.com/CyberStrikeus/CyberStrike/blob/9303b210ab82bd6362d7ad7fbd2b2c8f2e335450/.cyberstrike/skill/NIST/CSF_v2.0/PR_protect/PR.AA-02_praa-02/SKILL.md) |
+| PR.AA-04 | 身份声明保护与验证 / Identity assertion integrity | [source](https://github.com/CyberStrikeus/CyberStrike/blob/9303b210ab82bd6362d7ad7fbd2b2c8f2e335450/.cyberstrike/skill/NIST/CSF_v2.0/PR_protect/PR.AA-04_praa-04/SKILL.md) |
+| PR.PS-01 | 安全配置基线与变更 / Secure configuration baselines | [source](https://github.com/CyberStrikeus/CyberStrike/blob/9303b210ab82bd6362d7ad7fbd2b2c8f2e335450/.cyberstrike/skill/NIST/CSF_v2.0/PR_protect/PR.PS-01_prps-01/SKILL.md) |
+| DE.AE-01 | 网络与数据流行为基线 / Expected network flows | [source](https://github.com/CyberStrikeus/CyberStrike/blob/9303b210ab82bd6362d7ad7fbd2b2c8f2e335450/.cyberstrike/skill/NIST/CSF_v2.0/DE_detect/DE.AE-01_deae-01/SKILL.md) |
+| DE.AE-02 | 异常事件关联分析 / Adverse event analysis | [source](https://github.com/CyberStrikeus/CyberStrike/blob/9303b210ab82bd6362d7ad7fbd2b2c8f2e335450/.cyberstrike/skill/NIST/CSF_v2.0/DE_detect/DE.AE-02_deae-02/SKILL.md) |
+| DE.AE-04 | 事件影响范围与不确定性 / Event impact scope | [source](https://github.com/CyberStrikeus/CyberStrike/blob/9303b210ab82bd6362d7ad7fbd2b2c8f2e335450/.cyberstrike/skill/NIST/CSF_v2.0/DE_detect/DE.AE-04_deae-04/SKILL.md) |
+| DE.AE-05 | 告警阈值与响应分流 / Alert thresholds | [source](https://github.com/CyberStrikeus/CyberStrike/blob/9303b210ab82bd6362d7ad7fbd2b2c8f2e335450/.cyberstrike/skill/NIST/CSF_v2.0/DE_detect/DE.AE-05_deae-05/SKILL.md) |
+| RS.AN-01 | 检测告警调查与反馈 / Alert investigation | [source](https://github.com/CyberStrikeus/CyberStrike/blob/9303b210ab82bd6362d7ad7fbd2b2c8f2e335450/.cyberstrike/skill/NIST/CSF_v2.0/RS_respond/RS.AN-01_rsan-01/SKILL.md) |
+| RS.AN-03 | 事件根因分析与时间线 / Root cause analysis | [source](https://github.com/CyberStrikeus/CyberStrike/blob/9303b210ab82bd6362d7ad7fbd2b2c8f2e335450/.cyberstrike/skill/NIST/CSF_v2.0/RS_respond/RS.AN-03_rsan-03/SKILL.md) |
+| RC.RP-01 | 响应到恢复的计划交接 / Recovery plan handoff | [source](https://github.com/CyberStrikeus/CyberStrike/blob/9303b210ab82bd6362d7ad7fbd2b2c8f2e335450/.cyberstrike/skill/NIST/CSF_v2.0/RC_recover/RC.RP-01_rcrp-01/SKILL.md) |
+| RC.RP-03 | 恢复前备份完整性验证 / Backup integrity verification | [source](https://github.com/CyberStrikeus/CyberStrike/blob/9303b210ab82bd6362d7ad7fbd2b2c8f2e335450/.cyberstrike/skill/NIST/CSF_v2.0/RC_recover/RC.RP-03_rcrp-03/SKILL.md) |
+| RC.RP-04 | 恢复后的运行基线 / Post-incident operating baseline | [source](https://github.com/CyberStrikeus/CyberStrike/blob/9303b210ab82bd6362d7ad7fbd2b2c8f2e335450/.cyberstrike/skill/NIST/CSF_v2.0/RC_recover/RC.RP-04_rcrp-04/SKILL.md) |
+
+仍通过现有全局知识库事务及独立安装标记入库，旧三包中已编辑或删除的文档不会重新安装或覆盖。真实质量提升仍需独立实验；框架结果不是漏洞识别或认证证明。
