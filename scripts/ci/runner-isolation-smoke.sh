@@ -36,13 +36,15 @@ destinations = {m["target"] for m in runner.get("volumes", [])}
 assert destinations == {"/run/artex-runner", "/app/data/tasks", "/app/data/sessions"}, destinations
 assert runner.get("read_only") is True
 assert "ALL" in runner.get("cap_drop", [])
+assert runner.get("environment", {}).get("ARTEX_RUNNER_REMOTE_PEER_ONLY") == "1"
+assert not runner.get("pid") and not controller.get("pid"), "PID namespace sharing bypasses the remote-peer guard"
 print("Compose runner environment, networks and mounts checked")
 PY
 
 CGO_ENABLED=0 go build -o "$tmp/artex" ./cmd/artex
 cat > "$tmp/Dockerfile" <<'DOCKER'
 FROM alpine:3.21
-RUN apk add --no-cache bash
+RUN apk add --no-cache bash curl
 COPY artex /app/artex
 ENTRYPOINT ["/app/artex"]
 DOCKER
@@ -50,6 +52,7 @@ docker build -q -t artex-runner-ci:local "$tmp" >/dev/null
 
 # Mount workspace and socket only. Controller secrets stay outside this container.
 docker run -d --name "$container" --network none --cap-drop ALL \
+  -e ARTEX_RUNNER_REMOTE_PEER_ONLY=1 \
   --security-opt no-new-privileges --read-only \
   --tmpfs /tmp:rw,nosuid,size=64m \
   -v "$tmp/socket:/run/artex-runner" \
@@ -76,6 +79,28 @@ printf '%s' '{"session":"ci","name":"Write","input":{"file_path":"fixture.txt","
 printf '%s' '{"session":"ci","name":"Read","input":{"file_path":"fixture.txt"},"working_dir":"/app/data/tasks"}' | call > "$tmp/read.json"
 printf '%s' '{"session":"ci","name":"Bash","input":{"command":"test -z \"$(printenv ARTEX_PG_DSN || true)\" && test ! -e /app/controller/jwt.key && printf isolated-runner"},"working_dir":"/app/data/tasks"}' | call > "$tmp/bash.json"
 printf '%s' '{"session":"ci","name":"Read","input":{"file_path":"/app/controller/jwt.key"},"working_dir":"/app/data/tasks"}' | call > "$tmp/secret.json"
+
+# Model-controlled Bash can open the socket file, but must not be able to use
+# it as an alternative RPC endpoint to bypass the controller's tool policy.
+# The POST is fully valid; if it is accepted the canary file will appear.
+python3 - <<'PY' | call > "$tmp/local-peer.json"
+import json
+attack = json.dumps({
+    "session": "ci-bypass", "name": "Write",
+    "working_dir": "/app/data/tasks",
+    "input": {"file_path": "bypass.txt", "content": "unauthorized"}
+})
+cmd = (
+    "curl --max-time 2 --silent --unix-socket /run/artex-runner/runner.sock "
+    "-H 'Content-Type: application/json' --data "
+    + __import__("shlex").quote(attack)
+    + " http://localhost/call >/tmp/local-peer-response 2>&1 || true; "
+      "test ! -e /app/data/tasks/bypass.txt && printf local-peer-blocked"
+)
+print(json.dumps({"session": "ci", "name": "Bash", "working_dir": "/app/data/tasks",
+                  "input": {"command": cmd}}))
+PY
+
 # The same per-session manager must support background launch and retrieval.
 printf '%s' '{"session":"ci","name":"Bash","input":{"command":"printf background-ok; sleep 1","run_in_background":true},"working_dir":"/app/data/tasks"}' | call > "$tmp/background.json"
 task_id="$(python3 - "$tmp/background.json" <<'PY'
@@ -97,6 +122,8 @@ for name in ("write", "read", "bash"):
     assert not x.get("error") and not x["result"].get("IsError"), (name, x)
 assert "hello-runner" in (p / "read.json").read_text()
 assert "isolated-runner" in (p / "bash.json").read_text()
+assert "local-peer-blocked" in (p / "local-peer.json").read_text()
+assert not (p / "work" / "bypass.txt").exists()
 assert "background-ok" in (p / "taskoutput.json").read_text()
 secret = json.loads((p / "secret.json").read_text())
 assert secret["result"]["IsError"], secret

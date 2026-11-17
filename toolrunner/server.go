@@ -163,6 +163,25 @@ func (s *Service) handleCall(w http.ResponseWriter, r *http.Request) {
 
 // Serve listens only on a filesystem socket: no TCP management endpoint is
 // exposed. Socket mount ownership is enforced by the Docker deployment.
+// remotePeerOnlyListener rejects commands running inside the tool container.
+// In the opt-in Docker deployment the controller lives in a separate PID
+// namespace, so its PID is not visible to the receiving namespace (PID=0).
+// This is an extra control-plane check, not a substitute for per-task identity.
+type remotePeerOnlyListener struct { net.Listener }
+
+func (l remotePeerOnlyListener) Accept() (net.Conn, error) {
+	for {
+		conn, err := l.Listener.Accept()
+		if err != nil {
+			return nil, err
+		}
+		if peerOutsidePIDNamespace(conn) {
+			return conn, nil
+		}
+		_ = conn.Close()
+	}
+}
+
 func Serve(ctx context.Context, socket string) error {
 	if socket == "" || !filepath.IsAbs(socket) {
 		return errors.New("runner socket must be an absolute path")
@@ -179,6 +198,12 @@ func Serve(ctx context.Context, socket string) error {
 	}
 	defer ln.Close()
 	defer os.Remove(socket)
+	if os.Getenv("ARTEX_RUNNER_REMOTE_PEER_ONLY") == "1" {
+		if !peerGuardSupported() {
+			return errors.New("remote-peer-only runner requires Linux SO_PEERCRED")
+		}
+		ln = remotePeerOnlyListener{Listener: ln}
+	}
 	if err := os.Chmod(socket, 0600); err != nil {
 		return err
 	}

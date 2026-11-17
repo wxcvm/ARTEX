@@ -28,6 +28,7 @@ services:
     command: ["-runner-socket", "/run/artex-runner/runner.sock"]
     environment:
       HOME: /tmp
+      ARTEX_RUNNER_REMOTE_PEER_ONLY: "1"
     volumes:
       - runner_socket:/run/artex-runner
       - ./data/tasks:/app/data/tasks
@@ -40,6 +41,8 @@ services:
     cap_add: [NET_RAW]
     security_opt:
       - no-new-privileges:true
+    # PID namespace must not be shared with the controller or host:
+    # SO_PEERCRED denies local shell processes direct access to the RPC.
     networks: [runner-execution]
     healthcheck:
       test: ["CMD-SHELL", "test -S /run/artex-runner/runner.sock"]
