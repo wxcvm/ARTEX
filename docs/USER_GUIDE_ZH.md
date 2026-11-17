@@ -41,7 +41,7 @@
 | --- | --- | --- |
 | Windows 11，想用最新代码 | [第 2 节](#2-windows-11-从源码安装推荐使用-fork-最新代码)：PowerShell 构建 | **是**，从当前仓库编译 |
 | Linux / macOS，想用最新代码 | [第 3 节](#3-linux--macos-安装)：本地编译 | **是**，从当前仓库编译 |
-| 只想快速体验上游历史镜像 | `docker compose up -d` | **否**，默认镜像不是本 fork |
+| 只想启动已有的本地 fork 镜像 | 先构建 `artex:local`，再 `docker compose up -d` | **是**，取决于本地镜像的构建提交 |
 | 已经构建或发布了 fork 镜像 | `ARTEX_IMAGE` + `ARTEX_TAG` | **取决于镜像内容** |
 | 使用预编译压缩包 | [Releases](https://github.com/wxcvm/ARTEX/releases) | 取决于发布版本的构建提交 |
 
@@ -248,7 +248,7 @@ cd ARTEX
 
 脚本提供两种模式：
 
-- **1 · All-Docker**：配置 PostgreSQL 密码，启动 Docker Compose。默认运行**历史上游镜像**，除非 `.env` 的 `ARTEX_IMAGE` / `ARTEX_TAG` 已指向你自行构建的 fork 镜像。
+- **1 · All-Docker**：配置 PostgreSQL 密码并构建当前 fork 的本地镜像 `artex:local`，然后启动 Docker Compose。默认使用这个本地镜像；只有显式修改 `.env` 中的 `ARTEX_IMAGE` / `ARTEX_TAG` 才会切换为其他镜像。
 - **2 · Run locally (go build)**：连接已有 PostgreSQL 或通过 Docker 启动数据库，生成 `config.json`，在有 npm 的情况下构建嵌入式网页和 Go 程序。**这是直接运行当前仓库源码的便捷选项。**
 
 该脚本是 Bash 脚本；Windows 原生 PowerShell 请按第 2 节操作。脚本提示安装 Docker 时会执行相关安装操作，先确认环境和权限。
@@ -289,7 +289,7 @@ docker compose logs -f artex
 
 **可选的 Purge 隐私联动**：在 ARTEX 服务进程设置 `ARTEX_PRIVACY_BRIDGE_TOKEN`（建议使用随机生成的独立密钥，至少 32 个随机字节的编码结果），并在 DSH Purge 主机进程设置同值的 `DSH_PURGE_ARTEX_PRIVACY_TOKEN`。此密钥仅用于 `GET /api/privacy/bridge-status` 的 `X-Artex-Privacy-Token` 请求头，返回服务标识、监听范围、状态来源和公网未检测标记，不可用于登录或其他 ARTEX API。Docker Compose 从环境变量读取此可选配置；默认不启用。请勿使用管理员 JWT 或把密钥写入提交、报告或聊天；修改后重启相应进程。Purge 仅通过本机 HTTP 回环地址访问，不会跟随重定向。
 
-**Docker 重建后保留登录状态**：本 fork 的新后端使用 `ARTEX_JWT_KEY_DIR=/app/keys`，由 Compose 挂载仓库根目录的 `./keys`，单独持久化 JWT 签名密钥。`keys/` 不会被 Git 跟踪，也不进入 Docker 镜像构建上下文；备份时应保护该目录。Linux/macOS 可先执行 `mkdir -p keys`，Windows PowerShell 可执行 `New-Item -ItemType Directory -Force keys`。新后端会自动搬迁仍在挂载的 `data/jwt.key`，但**旧容器内部 `/app/jwt.key` 在容器重建后可能无法恢复**。如果已有旧容器，并希望保留现有登录令牌，应在删除或重新创建旧容器前将其密钥复制到宿主机的 `keys/jwt.key`（例如 `docker cp <旧容器名>:/app/jwt.key ./keys/jwt.key`）；只在原文件确实存在时操作，**不要生成不同的密钥覆盖它**。如果旧容器已经删除且密钥没有备份，只能重新登录。此行为仅适用于运行本 fork 新后端的 Docker 镜像；当前 Compose 的默认历史上游镜像不会因此自动更新到本 fork。
+**Docker 重建后保留登录状态**：本 fork 的新后端使用 `ARTEX_JWT_KEY_DIR=/app/keys`，由 Compose 挂载仓库根目录的 `./keys`，单独持久化 JWT 签名密钥。`keys/` 不会被 Git 跟踪，也不进入 Docker 镜像构建上下文；备份时应保护该目录。Linux/macOS 可先执行 `mkdir -p keys`，Windows PowerShell 可执行 `New-Item -ItemType Directory -Force keys`。新后端会自动搬迁仍在挂载的 `data/jwt.key`，但**旧容器内部 `/app/jwt.key` 在容器重建后可能无法恢复**。如果已有旧容器，并希望保留现有登录令牌，应在删除或重新创建旧容器前将其密钥复制到宿主机的 `keys/jwt.key`（例如 `docker cp <旧容器名>:/app/jwt.key ./keys/jwt.key`）；只在原文件确实存在时操作，**不要生成不同的密钥覆盖它**。如果旧容器已经删除且密钥没有备份，只能重新登录。此行为仅适用于运行本 fork 新后端的 Docker 镜像；Compose 默认的 `artex:local` 也必须由包含该修复的源码重新构建后才能生效。
 
 
 **特别提醒：** 只设置 `ARTEX_IMAGE=wxcvm/ARTEX` 并不意味着镜像仓库一定存在，也不意味着镜像已经包含最新代码。只有确认自行构建或发布的镜像名称与标签后，才能把它们写入 `.env`。
@@ -601,7 +601,7 @@ CGO_ENABLED=0 go build -tags embedui -o artex ./cmd/artex
 
 Windows 依次运行 `git pull --ff-only`、`npm ci`、`npm run build:static`，重新复制静态文件，并按第 2.4 节编译 `artex.exe`，停止旧进程后运行 `start.bat`。
 
-Docker 模式可使用 `./update.sh` 或手动 `docker compose pull artex` / `docker compose up -d artex`；**该过程更新的是已配置的镜像，不会自动把本地 Go 源码编进容器**。如果镜像仍是 `autumn27/artex`，升级得到的仍是历史上游镜像线。
+Docker 模式更新前先核实实际镜像来源：默认的 `artex:local` 必须用本仓库源码重新构建；单独执行 `docker compose up -d artex` 不会自动重新编译本地 Go 源码。若 `.env` 显式指向远端镜像，则更新的是所配置的镜像，而不是自动获得本 fork 最新代码。
 
 数据库 schema 会在服务启动时按项目现有机制执行幂等初始化/更新。即使如此，涉及重大更新前也应保存数据库和目录副本。
 
