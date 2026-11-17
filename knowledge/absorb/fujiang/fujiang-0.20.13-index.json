@@ -1,0 +1,4708 @@
+{
+ "upstream_repo": "FJNB5/fujiang-pojia",
+ "upstream_commit": "cf086fc329011c6f8eeb3b67f0adbcc3f005debb",
+ "source_version": "0.20.13",
+ "extracted_from": "dsh-purge@f806b96 lib/redteam/cve-catalog/*.json",
+ "version_normalization": "4-part-and-longer version strings are truncated to the first three segments (branch level); full strings stay upstream. Private/loopback constants are kept verbatim.",
+ "count": 164,
+ "entries": [
+  {
+   "origin": "cve-catalog",
+   "src_dir": "cloud-container",
+   "src_file": "cloud-container/cve-2019-7238-nexus-rce.md",
+   "cve": [
+    "CVE-2019-7238"
+   ],
+   "title": "Nexus Repository 未授权 RCE（CVE-2019-7238）",
+   "severity": "critical",
+   "cvss": null,
+   "product": "Sonatype Nexus Repository Manager 3.x",
+   "versions": "3.6.2 - 3.14.0",
+   "ports": [
+    8081
+   ],
+   "keywords": [
+    "nexus",
+    "sonatype",
+    "2019-7238",
+    "未授权",
+    "rce",
+    "供应链"
+   ],
+   "entry": "",
+   "verified": false,
+   "source_url": "https://github.com/FJNB5/fujiang-pojia/blob/cf086fc329011c6f8eeb3b67f0adbcc3f005debb/plugin/knowledge/cloud-container/cve-2019-7238-nexus-rce.md",
+   "source_version": "0.20.13",
+   "slug": "fujiang-cve-2019-7238"
+  },
+  {
+   "origin": "cve-catalog",
+   "src_dir": "cloud-container",
+   "src_file": "cloud-container/cve-2019-9193-postgres.md",
+   "cve": [
+    "CVE-2019-9193"
+   ],
+   "title": "PostgreSQL COPY PROGRAM 权限边界（CVE-2019-9193，厂商认定非漏洞）",
+   "severity": "info",
+   "cvss": null,
+   "product": "PostgreSQL",
+   "versions": "厂商认定为预期权限功能；不存在该 CVE 的修复版本边界",
+   "ports": [
+    5432
+   ],
+   "keywords": [
+    "postgresql",
+    "postgres",
+    "copy",
+    "program",
+    "命令执行",
+    "数据库"
+   ],
+   "entry": "",
+   "verified": false,
+   "source_url": "https://github.com/FJNB5/fujiang-pojia/blob/cf086fc329011c6f8eeb3b67f0adbcc3f005debb/plugin/knowledge/cloud-container/cve-2019-9193-postgres.md",
+   "source_version": "0.20.13",
+   "slug": "fujiang-cve-2019-9193"
+  },
+  {
+   "origin": "cve-catalog",
+   "src_dir": "cloud-container",
+   "src_file": "cloud-container/cve-2021-21972-vcenter-upload.md",
+   "cve": [
+    "CVE-2021-21972"
+   ],
+   "title": "vCenter Server 未授权上传 → RCE（vROPS 插件）",
+   "severity": "critical",
+   "cvss": null,
+   "product": "VMware vCenter Server",
+   "versions": "6.5 < 6.5U3n、6.7 < 6.7U3l、7.0 < 7.0U1c",
+   "ports": [
+    443
+   ],
+   "keywords": [
+    "vcenter",
+    "vrops",
+    "uploadova",
+    "21972",
+    "未授权"
+   ],
+   "entry": "",
+   "verified": false,
+   "source_url": "https://github.com/FJNB5/fujiang-pojia/blob/cf086fc329011c6f8eeb3b67f0adbcc3f005debb/plugin/knowledge/cloud-container/cve-2021-21972-vcenter-upload.md",
+   "source_version": "0.20.13",
+   "slug": "fujiang-cve-2021-21972"
+  },
+  {
+   "origin": "cve-catalog",
+   "src_dir": "cloud-container",
+   "src_file": "cloud-container/cve-2021-29441-nacos.md",
+   "cve": [
+    "CVE-2021-29441"
+   ],
+   "title": "Nacos 认证绕过（User-Agent 白名单）",
+   "severity": "critical",
+   "cvss": null,
+   "product": "Alibaba Nacos",
+   "versions": "1.4.1 之前（含默认未开鉴权）",
+   "ports": [
+    8848
+   ],
+   "keywords": [
+    "nacos",
+    "user-agent",
+    "auth-bypass",
+    "cve-2021-29441"
+   ],
+   "entry": "",
+   "verified": false,
+   "source_url": "https://github.com/FJNB5/fujiang-pojia/blob/cf086fc329011c6f8eeb3b67f0adbcc3f005debb/plugin/knowledge/cloud-container/cve-2021-29441-nacos.md",
+   "source_version": "0.20.13",
+   "slug": "fujiang-cve-2021-29441"
+  },
+  {
+   "origin": "cve-catalog",
+   "src_dir": "cloud-container",
+   "src_file": "cloud-container/cve-2021-43798-grafana-file-read.md",
+   "cve": [
+    "CVE-2021-43798"
+   ],
+   "title": "Grafana 插件路径穿越任意文件读（CVE-2021-43798）",
+   "severity": "high",
+   "cvss": null,
+   "product": "Grafana",
+   "versions": "8.0.0-beta1 至 8.0.7 之前；8.1.0 至 8.1.8 之前；8.2.0 至 8.2.7 之前；8.3.0 至 8.3.1 之前",
+   "ports": [
+    3000
+   ],
+   "keywords": [
+    "grafana",
+    "2021-43798",
+    "路径穿越",
+    "文件读取",
+    "监控"
+   ],
+   "entry": "",
+   "verified": false,
+   "source_url": "https://github.com/FJNB5/fujiang-pojia/blob/cf086fc329011c6f8eeb3b67f0adbcc3f005debb/plugin/knowledge/cloud-container/cve-2021-43798-grafana-file-read.md",
+   "source_version": "0.20.13",
+   "slug": "fujiang-cve-2021-43798"
+  },
+  {
+   "origin": "cve-catalog",
+   "src_dir": "cloud-container",
+   "src_file": "cloud-container/cve-2022-0492-cgroup-release-agent.md",
+   "cve": [
+    "CVE-2022-0492"
+   ],
+   "title": "cgroups release_agent 容器逃逸",
+   "severity": "high",
+   "cvss": null,
+   "product": "Linux kernel cgroup v1",
+   "versions": "5.16.2 之前（多数容器宿主）",
+   "ports": [],
+   "keywords": [
+    "cgroup",
+    "release_agent",
+    "escape",
+    "cap_sys_admin",
+    "container"
+   ],
+   "entry": "",
+   "verified": false,
+   "source_url": "https://github.com/FJNB5/fujiang-pojia/blob/cf086fc329011c6f8eeb3b67f0adbcc3f005debb/plugin/knowledge/cloud-container/cve-2022-0492-cgroup-release-agent.md",
+   "source_version": "0.20.13",
+   "slug": "fujiang-cve-2022-0492"
+  },
+  {
+   "origin": "cve-catalog",
+   "src_dir": "cloud-container",
+   "src_file": "cloud-container/cve-2022-22954-workspace-one-ssti.md",
+   "cve": [
+    "CVE-2022-22954"
+   ],
+   "title": "VMware Workspace ONE Access 模板注入 RCE",
+   "severity": "critical",
+   "cvss": null,
+   "product": "VMware Workspace ONE Access / Identity Manager",
+   "versions": "21.08.0 - 21.10.0.x（2022-04 补丁前）",
+   "ports": [
+    443
+   ],
+   "keywords": [
+    "workspace one",
+    "freemarker",
+    "ssti",
+    "22954",
+    "未授权"
+   ],
+   "entry": "",
+   "verified": false,
+   "source_url": "https://github.com/FJNB5/fujiang-pojia/blob/cf086fc329011c6f8eeb3b67f0adbcc3f005debb/plugin/knowledge/cloud-container/cve-2022-22954-workspace-one-ssti.md",
+   "source_version": "0.20.13",
+   "slug": "fujiang-cve-2022-22954"
+  },
+  {
+   "origin": "cve-catalog",
+   "src_dir": "cloud-container",
+   "src_file": "cloud-container/cve-2023-27532-veeam-credential-dump.md",
+   "cve": [
+    "CVE-2023-27532"
+   ],
+   "title": "Veeam Backup 凭据泄露（CVE-2023-27532）",
+   "severity": "high",
+   "cvss": null,
+   "product": "Veeam Backup & Replication",
+   "versions": "11.x、12.x（12.0.0.1420 之前）",
+   "ports": [
+    9401
+   ],
+   "keywords": [
+    "veeam",
+    "2023-27532",
+    "凭据",
+    "备份"
+   ],
+   "entry": "",
+   "verified": false,
+   "source_url": "https://github.com/FJNB5/fujiang-pojia/blob/cf086fc329011c6f8eeb3b67f0adbcc3f005debb/plugin/knowledge/cloud-container/cve-2023-27532-veeam-credential-dump.md",
+   "source_version": "0.20.13",
+   "slug": "fujiang-cve-2023-27532"
+  },
+  {
+   "origin": "cve-catalog",
+   "src_dir": "cloud-container",
+   "src_file": "cloud-container/cve-2024-21626-runc-leaky-vessels.md",
+   "cve": [
+    "CVE-2024-21626"
+   ],
+   "title": "runc 文件描述符泄露逃逸（Leaky Vessels）",
+   "severity": "critical",
+   "cvss": null,
+   "product": "runc",
+   "versions": ">= 1.0.0-rc93 至 1.1.11（1.1.12 修复）",
+   "ports": [],
+   "keywords": [
+    "runc",
+    "leaky vessels",
+    "fd leak",
+    "workdir",
+    "escape",
+    "docker build",
+    "Docker",
+    "containerd",
+    "Kubernetes",
+    "容器运行时"
+   ],
+   "entry": "",
+   "verified": false,
+   "source_url": "https://github.com/FJNB5/fujiang-pojia/blob/cf086fc329011c6f8eeb3b67f0adbcc3f005debb/plugin/knowledge/cloud-container/cve-2024-21626-runc-leaky-vessels.md",
+   "source_version": "0.20.13",
+   "slug": "fujiang-cve-2024-21626"
+  },
+  {
+   "origin": "cve-catalog",
+   "src_dir": "cloud-container",
+   "src_file": "cloud-container/cve-2024-37085-esxi-auth-bypass.md",
+   "cve": [
+    "CVE-2024-37085"
+   ],
+   "title": "VMware ESXi 认证绕过 → hypervisor 失守（CVE-2024-37085）",
+   "severity": "critical",
+   "cvss": null,
+   "product": "VMware ESXi 7.x / 8.x（已入 AD 域）",
+   "versions": "ESXi 7.0 全系、8.0 < 8.0U3（ESXi80U3-24022510 之前）",
+   "ports": [
+    443,
+    902
+   ],
+   "keywords": [
+    "esxi",
+    "vmware",
+    "2024-37085",
+    "ad",
+    "认证绕过",
+    "勒索"
+   ],
+   "entry": "",
+   "verified": false,
+   "source_url": "https://github.com/FJNB5/fujiang-pojia/blob/cf086fc329011c6f8eeb3b67f0adbcc3f005debb/plugin/knowledge/cloud-container/cve-2024-37085-esxi-auth-bypass.md",
+   "source_version": "0.20.13",
+   "slug": "fujiang-cve-2024-37085"
+  },
+  {
+   "origin": "cve-catalog",
+   "src_dir": "cloud-container",
+   "src_file": "cloud-container/cve-2024-40711-veeam-rce.md",
+   "cve": [
+    "CVE-2024-40711"
+   ],
+   "title": "Veeam Backup 未认证 RCE（CVE-2024-40711）",
+   "severity": "critical",
+   "cvss": null,
+   "product": "Veeam Backup & Replication 12.x",
+   "versions": "12.1.2 及更早（12.2.0 修复）",
+   "ports": [
+    9419,
+    9401
+   ],
+   "keywords": [
+    "veeam",
+    "2024-40711",
+    "反序列化",
+    "未认证",
+    "rce"
+   ],
+   "entry": "",
+   "verified": false,
+   "source_url": "https://github.com/FJNB5/fujiang-pojia/blob/cf086fc329011c6f8eeb3b67f0adbcc3f005debb/plugin/knowledge/cloud-container/cve-2024-40711-veeam-rce.md",
+   "source_version": "0.20.13",
+   "slug": "fujiang-cve-2024-40711"
+  },
+  {
+   "origin": "cve-catalog",
+   "src_dir": "cloud-container",
+   "src_file": "cloud-container/docker-api-2375.md",
+   "cve": [],
+   "title": "Docker Remote API 未授权（直接拿宿主）",
+   "severity": "critical",
+   "cvss": null,
+   "product": "Docker Engine",
+   "versions": "任意（2375 裸露）",
+   "ports": [
+    2375,
+    2376
+   ],
+   "keywords": [
+    "docker",
+    "api",
+    "2375",
+    "privileged",
+    "escape"
+   ],
+   "entry": "",
+   "verified": false,
+   "source_url": "https://github.com/FJNB5/fujiang-pojia/blob/cf086fc329011c6f8eeb3b67f0adbcc3f005debb/plugin/knowledge/cloud-container/docker-api-2375.md",
+   "source_version": "0.20.13",
+   "slug": "fujiang-cloud-container-615246bd"
+  },
+  {
+   "origin": "cve-catalog",
+   "src_dir": "cloud-container",
+   "src_file": "cloud-container/mongodb-unauth.md",
+   "cve": [],
+   "title": "MongoDB 未授权访问（直接拖库）",
+   "severity": "critical",
+   "cvss": null,
+   "product": "MongoDB",
+   "versions": "任意（未启认证）",
+   "ports": [
+    27017
+   ],
+   "keywords": [
+    "mongodb",
+    "未授权",
+    "拖库",
+    "数据库",
+    "nosql"
+   ],
+   "entry": "",
+   "verified": false,
+   "source_url": "https://github.com/FJNB5/fujiang-pojia/blob/cf086fc329011c6f8eeb3b67f0adbcc3f005debb/plugin/knowledge/cloud-container/mongodb-unauth.md",
+   "source_version": "0.20.13",
+   "slug": "fujiang-cloud-container-0b0a3d30"
+  },
+  {
+   "origin": "cve-catalog",
+   "src_dir": "cloud-container",
+   "src_file": "cloud-container/redis-unauth.md",
+   "cve": [
+    "CVE-2022-0543"
+   ],
+   "title": "Redis 未授权（写文件 / 模块加载 / 主从复制）",
+   "severity": "critical",
+   "cvss": null,
+   "product": "Redis",
+   "versions": "任意（无认证 + 暴露）",
+   "ports": [
+    6379,
+    6380
+   ],
+   "keywords": [
+    "redis",
+    "unauth",
+    "config-set",
+    "rdb",
+    "cron",
+    "module-load",
+    "replica"
+   ],
+   "entry": "",
+   "verified": false,
+   "source_url": "https://github.com/FJNB5/fujiang-pojia/blob/cf086fc329011c6f8eeb3b67f0adbcc3f005debb/plugin/knowledge/cloud-container/redis-unauth.md",
+   "source_version": "0.20.13",
+   "slug": "fujiang-cve-2022-0543"
+  },
+  {
+   "origin": "cve-catalog",
+   "src_dir": "edge-device",
+   "src_file": "edge-device/cve-2018-13379-fortinet-fortios.md",
+   "cve": [
+    "CVE-2018-13379"
+   ],
+   "title": "FortiOS SSL VPN 路径穿越（凭据读取）",
+   "severity": "critical",
+   "cvss": null,
+   "product": "Fortinet FortiOS (SSL VPN web portal)",
+   "versions": "5.4.0-5.4.12、5.6.3-5.6.7、6.0.0-6.0.4",
+   "ports": [
+    443,
+    10443
+   ],
+   "keywords": [
+    "fortinet",
+    "fortigate",
+    "fortios",
+    "sslvpn",
+    "path-traversal",
+    "fgt_lang"
+   ],
+   "entry": "",
+   "verified": false,
+   "source_url": "https://github.com/FJNB5/fujiang-pojia/blob/cf086fc329011c6f8eeb3b67f0adbcc3f005debb/plugin/knowledge/edge-device/cve-2018-13379-fortinet-fortios.md",
+   "source_version": "0.20.13",
+   "slug": "fujiang-cve-2018-13379"
+  },
+  {
+   "origin": "cve-catalog",
+   "src_dir": "edge-device",
+   "src_file": "edge-device/cve-2019-11510-pulse-secure-file-read.md",
+   "cve": [
+    "CVE-2019-11510"
+   ],
+   "title": "Pulse Secure 任意文件读取（凭据与会话）",
+   "severity": "critical",
+   "cvss": null,
+   "product": "Pulse Secure Connect Secure / Policy Secure",
+   "versions": "8.1R15.1 前、8.2 < 8.2R12.1、8.3 < 8.3R7.1、9.0 < 9.0R3.4",
+   "ports": [
+    443
+   ],
+   "keywords": [
+    "pulse",
+    "ivanti",
+    "file-read",
+    "session",
+    "凭据"
+   ],
+   "entry": "",
+   "verified": false,
+   "source_url": "https://github.com/FJNB5/fujiang-pojia/blob/cf086fc329011c6f8eeb3b67f0adbcc3f005debb/plugin/knowledge/edge-device/cve-2019-11510-pulse-secure-file-read.md",
+   "source_version": "0.20.13",
+   "slug": "fujiang-cve-2019-11510"
+  },
+  {
+   "origin": "cve-catalog",
+   "src_dir": "edge-device",
+   "src_file": "edge-device/cve-2019-19781-citrix-path-traversal.md",
+   "cve": [
+    "CVE-2019-19781"
+   ],
+   "title": "Citrix ADC 路径穿越 → 模板注入 RCE",
+   "severity": "critical",
+   "cvss": null,
+   "product": "Citrix NetScaler ADC / Gateway",
+   "versions": "10.5、11.1、12.0、12.1、13.0（2019-12 前）",
+   "ports": [
+    443
+   ],
+   "keywords": [
+    "citrix",
+    "netscaler",
+    "path-traversal",
+    "newbm",
+    "cve-2019-19781"
+   ],
+   "entry": "",
+   "verified": false,
+   "source_url": "https://github.com/FJNB5/fujiang-pojia/blob/cf086fc329011c6f8eeb3b67f0adbcc3f005debb/plugin/knowledge/edge-device/cve-2019-19781-citrix-path-traversal.md",
+   "source_version": "0.20.13",
+   "slug": "fujiang-cve-2019-19781"
+  },
+  {
+   "origin": "cve-catalog",
+   "src_dir": "edge-device",
+   "src_file": "edge-device/cve-2020-12812-fortios-2fa-case-bypass.md",
+   "cve": [
+    "CVE-2020-12812"
+   ],
+   "title": "FortiOS SSL VPN 双因素绕过（用户名大小写）",
+   "severity": "high",
+   "cvss": null,
+   "product": "Fortinet FortiOS",
+   "versions": "6.0.9 及以下、6.2.3 及以下、6.4.0（修复：6.0.10 / 6.2.4 / 6.4.1）",
+   "ports": [
+    443,
+    10443
+   ],
+   "keywords": [
+    "fortigate",
+    "fortios",
+    "sslvpn",
+    "2fa bypass",
+    "ldap",
+    "大小写"
+   ],
+   "entry": "",
+   "verified": false,
+   "source_url": "https://github.com/FJNB5/fujiang-pojia/blob/cf086fc329011c6f8eeb3b67f0adbcc3f005debb/plugin/knowledge/edge-device/cve-2020-12812-fortios-2fa-case-bypass.md",
+   "source_version": "0.20.13",
+   "slug": "fujiang-cve-2020-12812"
+  },
+  {
+   "origin": "cve-catalog",
+   "src_dir": "edge-device",
+   "src_file": "edge-device/cve-2020-5902-f5-tmui.md",
+   "cve": [
+    "CVE-2020-5902"
+   ],
+   "title": "F5 BIG-IP TMUI 未授权 RCE（..;/ 路径穿越）",
+   "severity": "critical",
+   "cvss": null,
+   "product": "F5 BIG-IP（TMUI 管理面）",
+   "versions": "11.6.1-11.6.5、12.1.0-12.1.5、13.1.0-13.1.3、14.1.0-14.1.2、15.1.0-15.1.0",
+   "ports": [
+    443,
+    8443
+   ],
+   "keywords": [
+    "f5",
+    "bigip",
+    "tmui",
+    "5902",
+    "tmsh",
+    "路径穿越"
+   ],
+   "entry": "",
+   "verified": false,
+   "source_url": "https://github.com/FJNB5/fujiang-pojia/blob/cf086fc329011c6f8eeb3b67f0adbcc3f005debb/plugin/knowledge/edge-device/cve-2020-5902-f5-tmui.md",
+   "source_version": "0.20.13",
+   "slug": "fujiang-cve-2020-5902"
+  },
+  {
+   "origin": "cve-catalog",
+   "src_dir": "edge-device",
+   "src_file": "edge-device/cve-2021-22986-f5-icontrol.md",
+   "cve": [
+    "CVE-2021-22986"
+   ],
+   "title": "F5 iControl REST 未授权 RCE（2021 变体）",
+   "severity": "critical",
+   "cvss": null,
+   "product": "F5 BIG-IP / BIG-IQ（iControl REST）",
+   "versions": "16.0.0-16.0.1、15.1.0-15.1.2、14.1.0-14.1.3、13.1.0-13.1.3、12.1.0-12.1.5",
+   "ports": [
+    443,
+    8443
+   ],
+   "keywords": [
+    "f5",
+    "icontrol",
+    "22986",
+    "bash",
+    "未授权"
+   ],
+   "entry": "",
+   "verified": false,
+   "source_url": "https://github.com/FJNB5/fujiang-pojia/blob/cf086fc329011c6f8eeb3b67f0adbcc3f005debb/plugin/knowledge/edge-device/cve-2021-22986-f5-icontrol.md",
+   "source_version": "0.20.13",
+   "slug": "fujiang-cve-2021-22986"
+  },
+  {
+   "origin": "cve-catalog",
+   "src_dir": "edge-device",
+   "src_file": "edge-device/cve-2022-1388-f5-icontrol.md",
+   "cve": [
+    "CVE-2022-1388"
+   ],
+   "title": "F5 BIG-IP iControl REST 认证绕过 → 命令执行",
+   "severity": "critical",
+   "cvss": null,
+   "product": "F5 BIG-IP (iControl REST)",
+   "versions": "11.6.1 - 11.6.5、12.1.0 - 12.1.6、13.1.0 - 13.1.4、14.1.0 - 14.1.4、15.1.0 - 15.1.5、16.0.0 - 16.1.2",
+   "ports": [
+    443,
+    8443
+   ],
+   "keywords": [
+    "f5",
+    "bigip",
+    "icontrol",
+    "auth-bypass",
+    "tmsh",
+    "cve-2022-1388"
+   ],
+   "entry": "",
+   "verified": false,
+   "source_url": "https://github.com/FJNB5/fujiang-pojia/blob/cf086fc329011c6f8eeb3b67f0adbcc3f005debb/plugin/knowledge/edge-device/cve-2022-1388-f5-icontrol.md",
+   "source_version": "0.20.13",
+   "slug": "fujiang-cve-2022-1388"
+  },
+  {
+   "origin": "cve-catalog",
+   "src_dir": "edge-device",
+   "src_file": "edge-device/cve-2022-40684-fortios-auth-bypass.md",
+   "cve": [
+    "CVE-2022-40684"
+   ],
+   "title": "FortiOS / FortiProxy 管理面认证绕过（假 Forwarded 头）",
+   "severity": "critical",
+   "cvss": null,
+   "product": "Fortinet FortiOS / FortiProxy",
+   "versions": "FortiOS 7.0.0-7.0.6、7.2.0-7.2.1；FortiProxy 7.0.0-7.0.6、7.2.0（修复 7.0.7 / 7.2.2）",
+   "ports": [
+    443,
+    8443,
+    10443
+   ],
+   "keywords": [
+    "fortinet",
+    "fortios",
+    "fortiproxy",
+    "auth bypass",
+    "forwarded header"
+   ],
+   "entry": "",
+   "verified": false,
+   "source_url": "https://github.com/FJNB5/fujiang-pojia/blob/cf086fc329011c6f8eeb3b67f0adbcc3f005debb/plugin/knowledge/edge-device/cve-2022-40684-fortios-auth-bypass.md",
+   "source_version": "0.20.13",
+   "slug": "fujiang-cve-2022-40684"
+  },
+  {
+   "origin": "cve-catalog",
+   "src_dir": "edge-device",
+   "src_file": "edge-device/cve-2023-35078-ivanti-epmm-auth-bypass.md",
+   "cve": [
+    "CVE-2023-35078"
+   ],
+   "title": "Ivanti EPMM 认证绕过（CVE-2023-35078）",
+   "severity": "critical",
+   "cvss": null,
+   "product": "Ivanti Endpoint Manager Mobile（原 MobileIron）",
+   "versions": "11.10.0 及更早、11.9.0、11.8.1（含 11.8/11.9/11.10 多个分支）",
+   "ports": [
+    443
+   ],
+   "keywords": [
+    "ivanti",
+    "epmm",
+    "mobileiron",
+    "2023-35078",
+    "auth bypass"
+   ],
+   "entry": "",
+   "verified": false,
+   "source_url": "https://github.com/FJNB5/fujiang-pojia/blob/cf086fc329011c6f8eeb3b67f0adbcc3f005debb/plugin/knowledge/edge-device/cve-2023-35078-ivanti-epmm-auth-bypass.md",
+   "source_version": "0.20.13",
+   "slug": "fujiang-cve-2023-35078"
+  },
+  {
+   "origin": "cve-catalog",
+   "src_dir": "edge-device",
+   "src_file": "edge-device/cve-2023-46805-2024-21887-ivanti.md",
+   "cve": [
+    "CVE-2023-46805",
+    "CVE-2024-21887"
+   ],
+   "title": "Ivanti Connect Secure 认证绕过 + 命令注入（串联）",
+   "severity": "critical",
+   "cvss": null,
+   "product": "Ivanti Connect Secure (原 Pulse Secure) / Policy Secure",
+   "versions": "9.x、22.1 - 22.7R1（22.7R2 修复）",
+   "ports": [
+    443
+   ],
+   "keywords": [
+    "ivanti",
+    "pulse",
+    "authentication-bypass",
+    "command-injection",
+    "cve-2024-21887"
+   ],
+   "entry": "",
+   "verified": false,
+   "source_url": "https://github.com/FJNB5/fujiang-pojia/blob/cf086fc329011c6f8eeb3b67f0adbcc3f005debb/plugin/knowledge/edge-device/cve-2023-46805-2024-21887-ivanti.md",
+   "source_version": "0.20.13",
+   "slug": "fujiang-cve-2023-46805-plus2"
+  },
+  {
+   "origin": "cve-catalog",
+   "src_dir": "edge-device",
+   "src_file": "edge-device/cve-2023-48788-forticlient-ems-sqli.md",
+   "cve": [
+    "CVE-2023-48788"
+   ],
+   "title": "FortiClient EMS SQL 注入 → 未认证 RCE（CVE-2023-48788）",
+   "severity": "critical",
+   "cvss": null,
+   "product": "Fortinet FortiClient EMS 7.0 / 7.2",
+   "versions": "7.0.1 - 7.0.10、7.2.0 - 7.2.2",
+   "ports": [
+    443
+   ],
+   "keywords": [
+    "forticlient",
+    "ems",
+    "sqli",
+    "2023-48788",
+    "未授权"
+   ],
+   "entry": "",
+   "verified": false,
+   "source_url": "https://github.com/FJNB5/fujiang-pojia/blob/cf086fc329011c6f8eeb3b67f0adbcc3f005debb/plugin/knowledge/edge-device/cve-2023-48788-forticlient-ems-sqli.md",
+   "source_version": "0.20.13",
+   "slug": "fujiang-cve-2023-48788"
+  },
+  {
+   "origin": "cve-catalog",
+   "src_dir": "edge-device",
+   "src_file": "edge-device/cve-2024-0012-panos-auth-bypass.md",
+   "cve": [
+    "CVE-2024-0012",
+    "CVE-2024-9474"
+   ],
+   "title": "PAN-OS 管理面认证绕过 → root RCE（CVE-2024-0012 + CVE-2024-9474）",
+   "severity": "critical",
+   "cvss": null,
+   "product": "Palo Alto PAN-OS（GlobalProtect / 管理界面）",
+   "versions": "10.2.x < 10.2.12、11.0.x < 11.0.6、11.1.x < 11.1.5、11.2.x < 11.2.4",
+   "ports": [
+    443,
+    8443
+   ],
+   "keywords": [
+    "panos",
+    "paloalto",
+    "2024-0012",
+    "2024-9474",
+    "auth bypass",
+    "管理面"
+   ],
+   "entry": "",
+   "verified": false,
+   "source_url": "https://github.com/FJNB5/fujiang-pojia/blob/cf086fc329011c6f8eeb3b67f0adbcc3f005debb/plugin/knowledge/edge-device/cve-2024-0012-panos-auth-bypass.md",
+   "source_version": "0.20.13",
+   "slug": "fujiang-cve-2024-0012-plus2"
+  },
+  {
+   "origin": "cve-catalog",
+   "src_dir": "edge-device",
+   "src_file": "edge-device/cve-2024-0204-goanywhere-auth-bypass.md",
+   "cve": [
+    "CVE-2024-0204"
+   ],
+   "title": "GoAnywhere MFT 认证绕过 → 新建管理员（CVE-2024-0204）",
+   "severity": "critical",
+   "cvss": null,
+   "product": "Fortra GoAnywhere MFT",
+   "versions": "6.x < 6.4.3、7.x < 7.4.1（7.4.1 修复）",
+   "ports": [
+    443,
+    8000,
+    8080
+   ],
+   "keywords": [
+    "goanywhere",
+    "mft",
+    "2024-0204",
+    "认证绕过",
+    "管理员"
+   ],
+   "entry": "",
+   "verified": false,
+   "source_url": "https://github.com/FJNB5/fujiang-pojia/blob/cf086fc329011c6f8eeb3b67f0adbcc3f005debb/plugin/knowledge/edge-device/cve-2024-0204-goanywhere-auth-bypass.md",
+   "source_version": "0.20.13",
+   "slug": "fujiang-cve-2024-0204"
+  },
+  {
+   "origin": "cve-catalog",
+   "src_dir": "edge-device",
+   "src_file": "edge-device/cve-2024-24919-checkpoint-quantum.md",
+   "cve": [
+    "CVE-2024-24919"
+   ],
+   "title": "Check Point Quantum 安全网关任意文件读（CVE-2024-24919）",
+   "severity": "critical",
+   "cvss": null,
+   "product": "Check Point Quantum Security Gateway / CloudGuard（开启 IPSec VPN 或移动访问）",
+   "versions": "R80.20 / R80.30 / R80.40 / R81 / R81.10 / R81.20（2024-05 补丁前）",
+   "ports": [
+    443,
+    80
+   ],
+   "keywords": [
+    "checkpoint",
+    "quantum",
+    "2024-24919",
+    "文件读取",
+    "vpn",
+    "网关"
+   ],
+   "entry": "",
+   "verified": false,
+   "source_url": "https://github.com/FJNB5/fujiang-pojia/blob/cf086fc329011c6f8eeb3b67f0adbcc3f005debb/plugin/knowledge/edge-device/cve-2024-24919-checkpoint-quantum.md",
+   "source_version": "0.20.13",
+   "slug": "fujiang-cve-2024-24919"
+  },
+  {
+   "origin": "cve-catalog",
+   "src_dir": "edge-device",
+   "src_file": "edge-device/cve-2024-3400-panos-globalprotect.md",
+   "cve": [
+    "CVE-2024-3400"
+   ],
+   "title": "PAN-OS GlobalProtect 命令注入",
+   "severity": "critical",
+   "cvss": null,
+   "product": "Palo Alto Networks PAN-OS (GlobalProtect)",
+   "versions": "10.2.x < 10.2.9-h1、11.0.x < 11.0.4-h1、11.1.x < 11.1.2-h3",
+   "ports": [
+    443
+   ],
+   "keywords": [
+    "panos",
+    "globalprotect",
+    "sessid",
+    "command-injection",
+    "cve-2024-3400"
+   ],
+   "entry": "",
+   "verified": false,
+   "source_url": "https://github.com/FJNB5/fujiang-pojia/blob/cf086fc329011c6f8eeb3b67f0adbcc3f005debb/plugin/knowledge/edge-device/cve-2024-3400-panos-globalprotect.md",
+   "source_version": "0.20.13",
+   "slug": "fujiang-cve-2024-3400"
+  },
+  {
+   "origin": "cve-catalog",
+   "src_dir": "edge-device",
+   "src_file": "edge-device/cve-2024-47575-fortimanager-fortijump.md",
+   "cve": [
+    "CVE-2024-47575"
+   ],
+   "title": "FortiManager 未认证 RCE（FortiJump，CVE-2024-47575）",
+   "severity": "critical",
+   "cvss": null,
+   "product": "Fortinet FortiManager / FortiManager Cloud",
+   "versions": "7.0.0-7.0.12、7.2.0-7.2.5、7.4.0-7.4.2、7.6.0",
+   "ports": [
+    541,
+    443
+   ],
+   "keywords": [
+    "fortimanager",
+    "fortijump",
+    "2024-47575",
+    "fgfm",
+    "未认证"
+   ],
+   "entry": "",
+   "verified": false,
+   "source_url": "https://github.com/FJNB5/fujiang-pojia/blob/cf086fc329011c6f8eeb3b67f0adbcc3f005debb/plugin/knowledge/edge-device/cve-2024-47575-fortimanager-fortijump.md",
+   "source_version": "0.20.13",
+   "slug": "fujiang-cve-2024-47575"
+  },
+  {
+   "origin": "cve-catalog",
+   "src_dir": "exchange-ad",
+   "src_file": "exchange-ad/adcs-esc1-esc8.md",
+   "cve": [],
+   "title": "AD CS 证书滥用（ESC1 / ESC8 等）",
+   "severity": "critical",
+   "cvss": null,
+   "product": "Active Directory Certificate Services",
+   "versions": "任意 AD CS 部署（配置缺陷）",
+   "ports": [
+    80,
+    443,
+    135,
+    445
+   ],
+   "keywords": [
+    "adcs",
+    "esc1",
+    "esc8",
+    "certipy",
+    "pki",
+    "certificate-template"
+   ],
+   "entry": "",
+   "verified": false,
+   "source_url": "https://github.com/FJNB5/fujiang-pojia/blob/cf086fc329011c6f8eeb3b67f0adbcc3f005debb/plugin/knowledge/exchange-ad/adcs-esc1-esc8.md",
+   "source_version": "0.20.13",
+   "slug": "fujiang-exchange-ad-e6e03808"
+  },
+  {
+   "origin": "cve-catalog",
+   "src_dir": "exchange-ad",
+   "src_file": "exchange-ad/cve-2017-0144-eternalblue.md",
+   "cve": [
+    "CVE-2017-0144"
+   ],
+   "title": "EternalBlue（MS17-010 SMBv1 远程溢出）",
+   "severity": "critical",
+   "cvss": null,
+   "product": "Windows SMBv1",
+   "versions": "Vista - 2016（未打 MS17-010）",
+   "ports": [
+    445
+   ],
+   "keywords": [
+    "eternalblue",
+    "ms17-010",
+    "smbv1",
+    "doublepulsar",
+    "cve-2017-0144"
+   ],
+   "entry": "",
+   "verified": false,
+   "source_url": "https://github.com/FJNB5/fujiang-pojia/blob/cf086fc329011c6f8eeb3b67f0adbcc3f005debb/plugin/knowledge/exchange-ad/cve-2017-0144-eternalblue.md",
+   "source_version": "0.20.13",
+   "slug": "fujiang-cve-2017-0144"
+  },
+  {
+   "origin": "cve-catalog",
+   "src_dir": "exchange-ad",
+   "src_file": "exchange-ad/cve-2020-0688-exchange-viewstate.md",
+   "cve": [
+    "CVE-2020-0688"
+   ],
+   "title": "Exchange ViewState 反序列化（静态 machineKey）",
+   "severity": "critical",
+   "cvss": null,
+   "product": "Microsoft Exchange Server",
+   "versions": "2010 SP3、2013 CU1-CU22、2016 CU1-CU16、2019 CU1-CU4（2020-02 补丁前）",
+   "ports": [
+    443
+   ],
+   "keywords": [
+    "exchange",
+    "viewstate",
+    "machinekey",
+    "ysoserial.net",
+    "ecp"
+   ],
+   "entry": "",
+   "verified": false,
+   "source_url": "https://github.com/FJNB5/fujiang-pojia/blob/cf086fc329011c6f8eeb3b67f0adbcc3f005debb/plugin/knowledge/exchange-ad/cve-2020-0688-exchange-viewstate.md",
+   "source_version": "0.20.13",
+   "slug": "fujiang-cve-2020-0688"
+  },
+  {
+   "origin": "cve-catalog",
+   "src_dir": "exchange-ad",
+   "src_file": "exchange-ad/cve-2020-1472-zerologon.md",
+   "cve": [
+    "CVE-2020-1472"
+   ],
+   "title": "Zerologon（Netlogon 密钥置零 → 域控接管）",
+   "severity": "critical",
+   "cvss": null,
+   "product": "Windows Server (Netlogon)",
+   "versions": "2008 R2 - 2019（2020-08 补丁前）",
+   "ports": [
+    445,
+    135
+   ],
+   "keywords": [
+    "zerologon",
+    "netlogon",
+    "dcsync",
+    "cve-2020-1472",
+    "domain-controller"
+   ],
+   "entry": "",
+   "verified": false,
+   "source_url": "https://github.com/FJNB5/fujiang-pojia/blob/cf086fc329011c6f8eeb3b67f0adbcc3f005debb/plugin/knowledge/exchange-ad/cve-2020-1472-zerologon.md",
+   "source_version": "0.20.13",
+   "slug": "fujiang-cve-2020-1472"
+  },
+  {
+   "origin": "cve-catalog",
+   "src_dir": "exchange-ad",
+   "src_file": "exchange-ad/cve-2021-26855-proxylogon.md",
+   "cve": [
+    "CVE-2021-26855"
+   ],
+   "title": "Exchange ProxyLogon（SSRF + 任意文件写入 → RCE）",
+   "severity": "critical",
+   "cvss": null,
+   "product": "Microsoft Exchange Server",
+   "versions": "2013 CU23、2016 CU18/CU19、2019 CU7/CU8",
+   "ports": [
+    443
+   ],
+   "keywords": [
+    "exchange",
+    "proxylogon",
+    "ssrf",
+    "ecp",
+    "autodiscover",
+    "cve-2021-26855"
+   ],
+   "entry": "",
+   "verified": false,
+   "source_url": "https://github.com/FJNB5/fujiang-pojia/blob/cf086fc329011c6f8eeb3b67f0adbcc3f005debb/plugin/knowledge/exchange-ad/cve-2021-26855-proxylogon.md",
+   "source_version": "0.20.13",
+   "slug": "fujiang-cve-2021-26855"
+  },
+  {
+   "origin": "cve-catalog",
+   "src_dir": "exchange-ad",
+   "src_file": "exchange-ad/cve-2021-34473-proxyshell.md",
+   "cve": [
+    "CVE-2021-34473"
+   ],
+   "title": "Exchange ProxyShell（三个洞串联 → RCE）",
+   "severity": "critical",
+   "cvss": null,
+   "product": "Microsoft Exchange Server",
+   "versions": "2013、2016、2019（2021-07 补丁前）",
+   "ports": [
+    443
+   ],
+   "keywords": [
+    "exchange",
+    "proxyshell",
+    "autodiscover",
+    "ews",
+    "mailboxexport",
+    "cve-2021-34473"
+   ],
+   "entry": "",
+   "verified": false,
+   "source_url": "https://github.com/FJNB5/fujiang-pojia/blob/cf086fc329011c6f8eeb3b67f0adbcc3f005debb/plugin/knowledge/exchange-ad/cve-2021-34473-proxyshell.md",
+   "source_version": "0.20.13",
+   "slug": "fujiang-cve-2021-34473"
+  },
+  {
+   "origin": "cve-catalog",
+   "src_dir": "exchange-ad",
+   "src_file": "exchange-ad/cve-2021-34527-printnightmare.md",
+   "cve": [
+    "CVE-2021-34527"
+   ],
+   "title": "PrintNightmare（打印后台服务任意 DLL 加载）",
+   "severity": "critical",
+   "cvss": null,
+   "product": "Windows Print Spooler",
+   "versions": "全版本（2021-07 补丁前；远程变体需 445 + 打印服务）",
+   "ports": [
+    445,
+    135
+   ],
+   "keywords": [
+    "printnightmare",
+    "spooler",
+    "rpcaddprinterdriverex",
+    "dll",
+    "cve-2021-34527"
+   ],
+   "entry": "",
+   "verified": false,
+   "source_url": "https://github.com/FJNB5/fujiang-pojia/blob/cf086fc329011c6f8eeb3b67f0adbcc3f005debb/plugin/knowledge/exchange-ad/cve-2021-34527-printnightmare.md",
+   "source_version": "0.20.13",
+   "slug": "fujiang-cve-2021-34527"
+  },
+  {
+   "origin": "cve-catalog",
+   "src_dir": "exchange-ad",
+   "src_file": "exchange-ad/cve-2021-42287-nopac.md",
+   "cve": [
+    "CVE-2021-42287",
+    "CVE-2021-42278"
+   ],
+   "title": "noPac（sAMAccountName 伪装 + 无 PAC 票据 → 域管）",
+   "severity": "critical",
+   "cvss": null,
+   "product": "Active Directory (Windows Server 2016/2019/2022)",
+   "versions": "2021-11 补丁前",
+   "ports": [
+    88,
+    389,
+    445
+   ],
+   "keywords": [
+    "nopac",
+    "samaccountname",
+    "kerberos",
+    "golden-ticket",
+    "cve-2021-42278"
+   ],
+   "entry": "",
+   "verified": false,
+   "source_url": "https://github.com/FJNB5/fujiang-pojia/blob/cf086fc329011c6f8eeb3b67f0adbcc3f005debb/plugin/knowledge/exchange-ad/cve-2021-42287-nopac.md",
+   "source_version": "0.20.13",
+   "slug": "fujiang-cve-2021-42287-plus2"
+  },
+  {
+   "origin": "cve-catalog",
+   "src_dir": "exchange-ad",
+   "src_file": "exchange-ad/cve-2021-42321-exchange-deser.md",
+   "cve": [
+    "CVE-2021-42321"
+   ],
+   "title": "Exchange 认证后反序列化 RCE（CVE-2021-42321）",
+   "severity": "critical",
+   "cvss": null,
+   "product": "Microsoft Exchange Server 2016 / 2019（EWS）",
+   "versions": "2019 CU10/CU11、2016 CU21/CU22（2021-11 补丁前）",
+   "ports": [
+    443
+   ],
+   "keywords": [
+    "exchange",
+    "2021-42321",
+    "反序列化",
+    "ews",
+    "rce"
+   ],
+   "entry": "",
+   "verified": false,
+   "source_url": "https://github.com/FJNB5/fujiang-pojia/blob/cf086fc329011c6f8eeb3b67f0adbcc3f005debb/plugin/knowledge/exchange-ad/cve-2021-42321-exchange-deser.md",
+   "source_version": "0.20.13",
+   "slug": "fujiang-cve-2021-42321"
+  },
+  {
+   "origin": "cve-catalog",
+   "src_dir": "exchange-ad",
+   "src_file": "exchange-ad/cve-2022-30190-follina.md",
+   "cve": [
+    "CVE-2022-30190"
+   ],
+   "title": "MSDT 协议远程代码执行（Follina）",
+   "severity": "critical",
+   "cvss": null,
+   "product": "Microsoft Windows（MSDT / ms-msdt 协议）",
+   "versions": "Windows 10/11、Server 2016-2022（2022-06 补丁前）",
+   "ports": [],
+   "keywords": [
+    "follina",
+    "msdt",
+    "30190",
+    "word",
+    "rtf",
+    "钓鱼"
+   ],
+   "entry": "",
+   "verified": false,
+   "source_url": "https://github.com/FJNB5/fujiang-pojia/blob/cf086fc329011c6f8eeb3b67f0adbcc3f005debb/plugin/knowledge/exchange-ad/cve-2022-30190-follina.md",
+   "source_version": "0.20.13",
+   "slug": "fujiang-cve-2022-30190"
+  },
+  {
+   "origin": "cve-catalog",
+   "src_dir": "exchange-ad",
+   "src_file": "exchange-ad/cve-2022-41040-proxynotshell.md",
+   "cve": [
+    "CVE-2022-41040",
+    "CVE-2022-41082"
+   ],
+   "title": "Exchange ProxyNotShell（SSRF + PowerShell 远程）",
+   "severity": "critical",
+   "cvss": null,
+   "product": "Microsoft Exchange Server",
+   "versions": "2013 CU23、2016 CU22/23、2019 CU11/12（2022-11 补丁前）",
+   "ports": [
+    443
+   ],
+   "keywords": [
+    "exchange",
+    "proxynotshell",
+    "owassrf",
+    "ssrf",
+    "powershell"
+   ],
+   "entry": "",
+   "verified": false,
+   "source_url": "https://github.com/FJNB5/fujiang-pojia/blob/cf086fc329011c6f8eeb3b67f0adbcc3f005debb/plugin/knowledge/exchange-ad/cve-2022-41040-proxynotshell.md",
+   "source_version": "0.20.13",
+   "slug": "fujiang-cve-2022-41040-plus2"
+  },
+  {
+   "origin": "cve-catalog",
+   "src_dir": "exchange-ad",
+   "src_file": "exchange-ad/cve-2024-21410-exchange-ntlm-relay.md",
+   "cve": [
+    "CVE-2024-21410"
+   ],
+   "title": "Exchange EWS NTLM 中继提权（CVE-2024-21410）",
+   "severity": "critical",
+   "cvss": null,
+   "product": "Microsoft Exchange Server 2016 / 2019",
+   "versions": "2019 CU12-CU14、2016 CU23（2024-02 补丁前）",
+   "ports": [
+    443
+   ],
+   "keywords": [
+    "exchange",
+    "ews",
+    "2024-21410",
+    "ntlm",
+    "relay",
+    "提权"
+   ],
+   "entry": "",
+   "verified": false,
+   "source_url": "https://github.com/FJNB5/fujiang-pojia/blob/cf086fc329011c6f8eeb3b67f0adbcc3f005debb/plugin/knowledge/exchange-ad/cve-2024-21410-exchange-ntlm-relay.md",
+   "source_version": "0.20.13",
+   "slug": "fujiang-cve-2024-21410"
+  },
+  {
+   "origin": "cve-catalog",
+   "src_dir": "exchange-ad",
+   "src_file": "exchange-ad/cve-2024-21413-outlook-monikerlink.md",
+   "cve": [
+    "CVE-2024-21413"
+   ],
+   "title": "Outlook MonikerLink 绕过与 NTLM 泄露（CVE-2024-21413）",
+   "severity": "critical",
+   "cvss": null,
+   "product": "Microsoft Outlook（Office 2016-2021 / 365 桌面版）",
+   "versions": "2024-02 补丁前",
+   "ports": [
+    25,
+    445,
+    443
+   ],
+   "keywords": [
+    "outlook",
+    "monikerlink",
+    "2024-21413",
+    "ntlm",
+    "钓鱼"
+   ],
+   "entry": "",
+   "verified": false,
+   "source_url": "https://github.com/FJNB5/fujiang-pojia/blob/cf086fc329011c6f8eeb3b67f0adbcc3f005debb/plugin/knowledge/exchange-ad/cve-2024-21413-outlook-monikerlink.md",
+   "source_version": "0.20.13",
+   "slug": "fujiang-cve-2024-21413"
+  },
+  {
+   "origin": "cve-catalog",
+   "src_dir": "exchange-ad",
+   "src_file": "exchange-ad/cve-2024-45519-zimbra-postjournal.md",
+   "cve": [
+    "CVE-2024-45519"
+   ],
+   "title": "Zimbra postjournal 未授权命令执行（CVE-2024-45519）",
+   "severity": "critical",
+   "cvss": null,
+   "product": "Zimbra Collaboration（ZCS 8.8.15 / 9.0 / 10.0）",
+   "versions": "8.8.15 < P46、9.0 < P41、10.0 < 10.0.9、10.1 < 10.1.1",
+   "ports": [
+    25,
+    7025,
+    7071
+   ],
+   "keywords": [
+    "zimbra",
+    "2024-45519",
+    "postjournal",
+    "未授权",
+    "rce",
+    "邮件"
+   ],
+   "entry": "",
+   "verified": false,
+   "source_url": "https://github.com/FJNB5/fujiang-pojia/blob/cf086fc329011c6f8eeb3b67f0adbcc3f005debb/plugin/knowledge/exchange-ad/cve-2024-45519-zimbra-postjournal.md",
+   "source_version": "0.20.13",
+   "slug": "fujiang-cve-2024-45519"
+  },
+  {
+   "origin": "cve-catalog",
+   "src_dir": "java-deser",
+   "src_file": "java-deser/cve-2015-4852-weblogic-t3.md",
+   "cve": [
+    "CVE-2015-4852"
+   ],
+   "title": "WebLogic T3 反序列化（CommonsCollections）",
+   "severity": "critical",
+   "cvss": null,
+   "product": "Oracle WebLogic Server",
+   "versions": "10.3.6.0、12.1.2、12.1.3、12.2.1（未打 CPU）",
+   "ports": [
+    7001,
+    7002
+   ],
+   "keywords": [
+    "weblogic",
+    "t3",
+    "deserialization",
+    "commonscollections",
+    "ysoserial"
+   ],
+   "entry": "",
+   "verified": false,
+   "source_url": "https://github.com/FJNB5/fujiang-pojia/blob/cf086fc329011c6f8eeb3b67f0adbcc3f005debb/plugin/knowledge/java-deser/cve-2015-4852-weblogic-t3.md",
+   "source_version": "0.20.13",
+   "slug": "fujiang-cve-2015-4852"
+  },
+  {
+   "origin": "cve-catalog",
+   "src_dir": "java-deser",
+   "src_file": "java-deser/cve-2016-4437-shiro-rememberme.md",
+   "cve": [
+    "CVE-2016-4437"
+   ],
+   "title": "Shiro rememberMe 默认密钥反序列化 RCE（CVE-2016-4437）",
+   "severity": "critical",
+   "cvss": null,
+   "product": "Apache Shiro <= 1.2.4（或仍用默认 key 的版本）",
+   "versions": "1.2.4 及更早；1.2.5+ 需仍用默认/弱 key",
+   "ports": [
+    80,
+    443,
+    8080
+   ],
+   "keywords": [
+    "shiro",
+    "rememberme",
+    "反序列化",
+    "默认密钥",
+    "java"
+   ],
+   "entry": "",
+   "verified": false,
+   "source_url": "https://github.com/FJNB5/fujiang-pojia/blob/cf086fc329011c6f8eeb3b67f0adbcc3f005debb/plugin/knowledge/java-deser/cve-2016-4437-shiro-rememberme.md",
+   "source_version": "0.20.13",
+   "slug": "fujiang-cve-2016-4437"
+  },
+  {
+   "origin": "cve-catalog",
+   "src_dir": "java-deser",
+   "src_file": "java-deser/cve-2017-10271-weblogic-wls-wsat.md",
+   "cve": [
+    "CVE-2017-10271"
+   ],
+   "title": "WebLogic wls-wsat XMLDecoder 反序列化 RCE",
+   "severity": "critical",
+   "cvss": null,
+   "product": "Oracle WebLogic Server",
+   "versions": "10.3.6.0、12.1.3、12.2.1-12.2.1",
+   "ports": [
+    7001,
+    7002
+   ],
+   "keywords": [
+    "weblogic",
+    "wls-wsat",
+    "xmldecoder",
+    "soap",
+    "coordinatorporttype"
+   ],
+   "entry": "",
+   "verified": false,
+   "source_url": "https://github.com/FJNB5/fujiang-pojia/blob/cf086fc329011c6f8eeb3b67f0adbcc3f005debb/plugin/knowledge/java-deser/cve-2017-10271-weblogic-wls-wsat.md",
+   "source_version": "0.20.13",
+   "slug": "fujiang-cve-2017-10271"
+  },
+  {
+   "origin": "cve-catalog",
+   "src_dir": "java-deser",
+   "src_file": "java-deser/cve-2017-5638-struts2-s2-045.md",
+   "cve": [
+    "CVE-2017-5638"
+   ],
+   "title": "Struts2 S2-045 Content-Type OGNL 注入",
+   "severity": "critical",
+   "cvss": null,
+   "product": "Apache Struts2",
+   "versions": "2.3.5-2.3.31、2.5-2.5.10",
+   "ports": [
+    8080,
+    8443
+   ],
+   "keywords": [
+    "struts2",
+    "s2-045",
+    "ognl",
+    "multipart",
+    "content-type"
+   ],
+   "entry": "",
+   "verified": false,
+   "source_url": "https://github.com/FJNB5/fujiang-pojia/blob/cf086fc329011c6f8eeb3b67f0adbcc3f005debb/plugin/knowledge/java-deser/cve-2017-5638-struts2-s2-045.md",
+   "source_version": "0.20.13",
+   "slug": "fujiang-cve-2017-5638"
+  },
+  {
+   "origin": "cve-catalog",
+   "src_dir": "java-deser",
+   "src_file": "java-deser/cve-2021-44228-log4shell.md",
+   "cve": [
+    "CVE-2021-44228"
+   ],
+   "title": "Apache Log4j2 JNDI 注入（Log4Shell）",
+   "severity": "critical",
+   "cvss": null,
+   "product": "Apache Log4j2",
+   "versions": "[2.0-beta9, 2.3.1) ∪ [2.4, 2.12.2) ∪ [2.13.0, 2.15.0)",
+   "ports": [
+    8080,
+    8443,
+    443,
+    9200,
+    8983
+   ],
+   "keywords": [
+    "log4j",
+    "log4shell",
+    "jndi",
+    "ldap",
+    "rmi",
+    "dnslog",
+    "log4j-core"
+   ],
+   "entry": "",
+   "verified": false,
+   "source_url": "https://github.com/FJNB5/fujiang-pojia/blob/cf086fc329011c6f8eeb3b67f0adbcc3f005debb/plugin/knowledge/java-deser/cve-2021-44228-log4shell.md",
+   "source_version": "0.20.13",
+   "slug": "fujiang-cve-2021-44228"
+  },
+  {
+   "origin": "cve-catalog",
+   "src_dir": "java-deser",
+   "src_file": "java-deser/cve-2022-1471-snakeyaml.md",
+   "cve": [
+    "CVE-2022-1471"
+   ],
+   "title": "SnakeYAML 反序列化 RCE（CVE-2022-1471）",
+   "severity": "critical",
+   "cvss": null,
+   "product": "SnakeYAML（Spring Boot 的 YAML 解析、各类 Java 应用）",
+   "versions": "<= 1.33（2.0 需 Constructor 才不安全）",
+   "ports": [
+    8080,
+    443
+   ],
+   "keywords": [
+    "snakeyaml",
+    "yaml",
+    "2022-1471",
+    "反序列化",
+    "rce",
+    "java"
+   ],
+   "entry": "",
+   "verified": false,
+   "source_url": "https://github.com/FJNB5/fujiang-pojia/blob/cf086fc329011c6f8eeb3b67f0adbcc3f005debb/plugin/knowledge/java-deser/cve-2022-1471-snakeyaml.md",
+   "source_version": "0.20.13",
+   "slug": "fujiang-cve-2022-1471"
+  },
+  {
+   "origin": "cve-catalog",
+   "src_dir": "java-deser",
+   "src_file": "java-deser/cve-2022-21449-psychic-signatures.md",
+   "cve": [
+    "CVE-2022-21449"
+   ],
+   "title": "Java ECDSA 空签名绕过（Psychic Signatures）",
+   "severity": "high",
+   "cvss": null,
+   "product": "Oracle JDK / OpenJDK",
+   "versions": "15 - 15.0.6、17 - 17.0.2、18 - 18.0.1",
+   "ports": [
+    443,
+    8080
+   ],
+   "keywords": [
+    "ecdsa",
+    "psychic-signatures",
+    "jwt",
+    "es256",
+    "saml",
+    "签名绕过"
+   ],
+   "entry": "",
+   "verified": false,
+   "source_url": "https://github.com/FJNB5/fujiang-pojia/blob/cf086fc329011c6f8eeb3b67f0adbcc3f005debb/plugin/knowledge/java-deser/cve-2022-21449-psychic-signatures.md",
+   "source_version": "0.20.13",
+   "slug": "fujiang-cve-2022-21449"
+  },
+  {
+   "origin": "cve-catalog",
+   "src_dir": "java-deser",
+   "src_file": "java-deser/cve-2022-22965-spring4shell.md",
+   "cve": [
+    "CVE-2022-22965"
+   ],
+   "title": "Spring Framework 数据绑定 RCE（Spring4Shell）",
+   "severity": "critical",
+   "cvss": null,
+   "product": "Spring Framework + Tomcat (WAR 部署)",
+   "versions": "5.3.0-5.3.17、5.2.0-5.2.19，JDK 9+",
+   "ports": [
+    8080,
+    8443
+   ],
+   "keywords": [
+    "spring",
+    "spring4shell",
+    "classloader",
+    "tomcat",
+    "accessLogValve"
+   ],
+   "entry": "",
+   "verified": false,
+   "source_url": "https://github.com/FJNB5/fujiang-pojia/blob/cf086fc329011c6f8eeb3b67f0adbcc3f005debb/plugin/knowledge/java-deser/cve-2022-22965-spring4shell.md",
+   "source_version": "0.20.13",
+   "slug": "fujiang-cve-2022-22965"
+  },
+  {
+   "origin": "cve-catalog",
+   "src_dir": "java-deser",
+   "src_file": "java-deser/cve-2022-25845-fastjson-autotype.md",
+   "cve": [
+    "CVE-2022-25845"
+   ],
+   "title": "Fastjson autoType 反序列化 RCE",
+   "severity": "high",
+   "cvss": null,
+   "product": "com.alibaba:fastjson",
+   "versions": "<= 1.2.80（另 CVE-2017-18349 等历史链）",
+   "ports": [
+    8080,
+    8443
+   ],
+   "keywords": [
+    "fastjson",
+    "autotype",
+    "jdbcrowsetimpl",
+    "jndi",
+    "json"
+   ],
+   "entry": "",
+   "verified": false,
+   "source_url": "https://github.com/FJNB5/fujiang-pojia/blob/cf086fc329011c6f8eeb3b67f0adbcc3f005debb/plugin/knowledge/java-deser/cve-2022-25845-fastjson-autotype.md",
+   "source_version": "0.20.13",
+   "slug": "fujiang-cve-2022-25845"
+  },
+  {
+   "origin": "cve-catalog",
+   "src_dir": "java-web",
+   "src_file": "java-web/cve-2017-12615-tomcat-put.md",
+   "cve": [
+    "CVE-2017-12615"
+   ],
+   "title": "Tomcat PUT 任意文件写入（JSP 落地）",
+   "severity": "critical",
+   "cvss": null,
+   "product": "Apache Tomcat（Windows 部署 + readonly=false）",
+   "versions": "7.0.0 - 7.0.79",
+   "ports": [
+    8080,
+    8009
+   ],
+   "keywords": [
+    "tomcat",
+    "put",
+    "jsp",
+    "readonly",
+    "windows",
+    "12615"
+   ],
+   "entry": "",
+   "verified": false,
+   "source_url": "https://github.com/FJNB5/fujiang-pojia/blob/cf086fc329011c6f8eeb3b67f0adbcc3f005debb/plugin/knowledge/java-web/cve-2017-12615-tomcat-put.md",
+   "source_version": "0.20.13",
+   "slug": "fujiang-cve-2017-12615"
+  },
+  {
+   "origin": "cve-catalog",
+   "src_dir": "java-web",
+   "src_file": "java-web/cve-2019-17558-solr-velocity.md",
+   "cve": [
+    "CVE-2019-17558"
+   ],
+   "title": "Apache Solr Velocity 模板注入 RCE",
+   "severity": "high",
+   "cvss": null,
+   "product": "Apache Solr",
+   "versions": "5.0.0 - 8.3.1",
+   "ports": [
+    8983
+   ],
+   "keywords": [
+    "solr",
+    "velocity",
+    "params.resource.loader",
+    "template",
+    "cve-2019-17558"
+   ],
+   "entry": "",
+   "verified": false,
+   "source_url": "https://github.com/FJNB5/fujiang-pojia/blob/cf086fc329011c6f8eeb3b67f0adbcc3f005debb/plugin/knowledge/java-web/cve-2019-17558-solr-velocity.md",
+   "source_version": "0.20.13",
+   "slug": "fujiang-cve-2019-17558"
+  },
+  {
+   "origin": "cve-catalog",
+   "src_dir": "java-web",
+   "src_file": "java-web/cve-2019-2725-weblogic-async.md",
+   "cve": [
+    "CVE-2019-2725"
+   ],
+   "title": "WebLogic wls9_async_response 未授权 RCE（2019 在野）",
+   "severity": "critical",
+   "cvss": null,
+   "product": "Oracle WebLogic Server",
+   "versions": "10.3.6.0、12.1.3（2019-04 CPU 前）",
+   "ports": [
+    7001,
+    7002
+   ],
+   "keywords": [
+    "weblogic",
+    "2725",
+    "wls9_async",
+    "xmldecoder",
+    "未授权"
+   ],
+   "entry": "",
+   "verified": false,
+   "source_url": "https://github.com/FJNB5/fujiang-pojia/blob/cf086fc329011c6f8eeb3b67f0adbcc3f005debb/plugin/knowledge/java-web/cve-2019-2725-weblogic-async.md",
+   "source_version": "0.20.13",
+   "slug": "fujiang-cve-2019-2725"
+  },
+  {
+   "origin": "cve-catalog",
+   "src_dir": "java-web",
+   "src_file": "java-web/cve-2020-14882-weblogic-console.md",
+   "cve": [
+    "CVE-2020-14882"
+   ],
+   "title": "WebLogic 控制台未授权 RCE（console.portal 路径穿越）",
+   "severity": "critical",
+   "cvss": null,
+   "product": "Oracle WebLogic Server",
+   "versions": "10.3.6.0、12.1.3、12.2.1、14.1.1（2020-10 CPU 前）",
+   "ports": [
+    7001,
+    7002
+   ],
+   "keywords": [
+    "weblogic",
+    "console",
+    "path traversal",
+    "shellsession",
+    "mvel"
+   ],
+   "entry": "",
+   "verified": false,
+   "source_url": "https://github.com/FJNB5/fujiang-pojia/blob/cf086fc329011c6f8eeb3b67f0adbcc3f005debb/plugin/knowledge/java-web/cve-2020-14882-weblogic-console.md",
+   "source_version": "0.20.13",
+   "slug": "fujiang-cve-2020-14882"
+  },
+  {
+   "origin": "cve-catalog",
+   "src_dir": "java-web",
+   "src_file": "java-web/cve-2020-1938-tomcat-ajp-ghostcat.md",
+   "cve": [
+    "CVE-2020-1938"
+   ],
+   "title": "Tomcat AJP 文件读取 / 包含（Ghostcat）",
+   "severity": "critical",
+   "cvss": null,
+   "product": "Apache Tomcat",
+   "versions": "6.x、7.x < 7.0.100、8.5.x < 8.5.51、9.x < 9.0.31",
+   "ports": [
+    8009,
+    8080
+   ],
+   "keywords": [
+    "tomcat",
+    "ajp",
+    "ghostcat",
+    "web.xml",
+    "文件包含"
+   ],
+   "entry": "",
+   "verified": false,
+   "source_url": "https://github.com/FJNB5/fujiang-pojia/blob/cf086fc329011c6f8eeb3b67f0adbcc3f005debb/plugin/knowledge/java-web/cve-2020-1938-tomcat-ajp-ghostcat.md",
+   "source_version": "0.20.13",
+   "slug": "fujiang-cve-2020-1938"
+  },
+  {
+   "origin": "cve-catalog",
+   "src_dir": "java-web",
+   "src_file": "java-web/cve-2021-25646-druid-rce.md",
+   "cve": [
+    "CVE-2021-25646"
+   ],
+   "title": "Apache Druid 未授权 RCE（CVE-2021-25646）",
+   "severity": "critical",
+   "cvss": null,
+   "product": "Apache Druid",
+   "versions": "<= 0.20.0（0.20.1 修复）",
+   "ports": [
+    8888,
+    8082
+   ],
+   "keywords": [
+    "druid",
+    "apache",
+    "2021-25646",
+    "未授权",
+    "rce",
+    "时序库"
+   ],
+   "entry": "",
+   "verified": false,
+   "source_url": "https://github.com/FJNB5/fujiang-pojia/blob/cf086fc329011c6f8eeb3b67f0adbcc3f005debb/plugin/knowledge/java-web/cve-2021-25646-druid-rce.md",
+   "source_version": "0.20.13",
+   "slug": "fujiang-cve-2021-25646"
+  },
+  {
+   "origin": "cve-catalog",
+   "src_dir": "java-web",
+   "src_file": "java-web/cve-2021-26084-confluence-ognl-preauth.md",
+   "cve": [
+    "CVE-2021-26084"
+   ],
+   "title": "Confluence 未授权 OGNL 注入（pre-auth，ENCODED_TOKEN）",
+   "severity": "critical",
+   "cvss": null,
+   "product": "Atlassian Confluence Server / Data Center",
+   "versions": "6.1.0 - 6.13.23、7.4.0 - 7.4.10、7.11.0 - 7.11.5、7.12.0 - 7.12.4",
+   "ports": [
+    8090,
+    8443
+   ],
+   "keywords": [
+    "confluence",
+    "ognl",
+    "pre-auth",
+    "queryString",
+    "doenterpagevariables"
+   ],
+   "entry": "",
+   "verified": false,
+   "source_url": "https://github.com/FJNB5/fujiang-pojia/blob/cf086fc329011c6f8eeb3b67f0adbcc3f005debb/plugin/knowledge/java-web/cve-2021-26084-confluence-ognl-preauth.md",
+   "source_version": "0.20.13",
+   "slug": "fujiang-cve-2021-26084"
+  },
+  {
+   "origin": "cve-catalog",
+   "src_dir": "java-web",
+   "src_file": "java-web/cve-2022-22947-gateway-spel.md",
+   "cve": [
+    "CVE-2022-22947"
+   ],
+   "title": "Spring Cloud Gateway Actuator SpEL 注入 RCE（CVE-2022-22947）",
+   "severity": "critical",
+   "cvss": null,
+   "product": "Spring Cloud Gateway（Actuator 暴露且可写）",
+   "versions": "3.1.0 / 3.0.0 - 3.0.6 / 2.2.x - 2.2.9 及更早",
+   "ports": [
+    8080,
+    8443,
+    443
+   ],
+   "keywords": [
+    "spring",
+    "gateway",
+    "actuator",
+    "spel",
+    "2022-22947",
+    "rce"
+   ],
+   "entry": "",
+   "verified": false,
+   "source_url": "https://github.com/FJNB5/fujiang-pojia/blob/cf086fc329011c6f8eeb3b67f0adbcc3f005debb/plugin/knowledge/java-web/cve-2022-22947-gateway-spel.md",
+   "source_version": "0.20.13",
+   "slug": "fujiang-cve-2022-22947"
+  },
+  {
+   "origin": "cve-catalog",
+   "src_dir": "java-web",
+   "src_file": "java-web/cve-2022-22963-spring-cloud-function.md",
+   "cve": [
+    "CVE-2022-22963"
+   ],
+   "title": "Spring Cloud Function SpEL 注入 RCE（CVE-2022-22963）",
+   "severity": "critical",
+   "cvss": null,
+   "product": "Spring Cloud Function 3.2.0 - 3.2.2 / 3.1.6",
+   "versions": "3.1.0-3.1.6、3.2.0-3.2.2",
+   "ports": [
+    8080,
+    443
+   ],
+   "keywords": [
+    "spring",
+    "cloud",
+    "function",
+    "2022-22963",
+    "spel",
+    "rce"
+   ],
+   "entry": "",
+   "verified": false,
+   "source_url": "https://github.com/FJNB5/fujiang-pojia/blob/cf086fc329011c6f8eeb3b67f0adbcc3f005debb/plugin/knowledge/java-web/cve-2022-22963-spring-cloud-function.md",
+   "source_version": "0.20.13",
+   "slug": "fujiang-cve-2022-22963"
+  },
+  {
+   "origin": "cve-catalog",
+   "src_dir": "java-web",
+   "src_file": "java-web/cve-2022-26134-confluence-ognl.md",
+   "cve": [
+    "CVE-2022-26134"
+   ],
+   "title": "Confluence 未授权 OGNL 注入（Confluence OGNL RCE）",
+   "severity": "critical",
+   "cvss": null,
+   "product": "Atlassian Confluence Server / Data Center",
+   "versions": "1.3.0 - 7.4.17、7.13.0 - 7.13.7、7.14.0 - 7.14.3、7.15.0 - 7.15.2、7.16.0 - 7.16.4、7.17.0 - 7.17.4、7.18.0 - 7.18.1",
+   "ports": [
+    8090,
+    8443
+   ],
+   "keywords": [
+    "confluence",
+    "ognl",
+    "cve-2022-26134",
+    "atlassian",
+    "rce"
+   ],
+   "entry": "",
+   "verified": false,
+   "source_url": "https://github.com/FJNB5/fujiang-pojia/blob/cf086fc329011c6f8eeb3b67f0adbcc3f005debb/plugin/knowledge/java-web/cve-2022-26134-confluence-ognl.md",
+   "source_version": "0.20.13",
+   "slug": "fujiang-cve-2022-26134"
+  },
+  {
+   "origin": "cve-catalog",
+   "src_dir": "java-web",
+   "src_file": "java-web/cve-2023-22515-confluence-admin.md",
+   "cve": [
+    "CVE-2023-22515"
+   ],
+   "title": "Confluence 未授权管理员接管（setup 流程未关）",
+   "severity": "critical",
+   "cvss": null,
+   "product": "Atlassian Confluence Data Center / Server",
+   "versions": "8.0.0 - 8.5.1（8.5.2 修复）",
+   "ports": [
+    8090,
+    8443
+   ],
+   "keywords": [
+    "confluence",
+    "22515",
+    "setupadministrator",
+    "未授权",
+    "管理员"
+   ],
+   "entry": "",
+   "verified": false,
+   "source_url": "https://github.com/FJNB5/fujiang-pojia/blob/cf086fc329011c6f8eeb3b67f0adbcc3f005debb/plugin/knowledge/java-web/cve-2023-22515-confluence-admin.md",
+   "source_version": "0.20.13",
+   "slug": "fujiang-cve-2023-22515"
+  },
+  {
+   "origin": "cve-catalog",
+   "src_dir": "java-web",
+   "src_file": "java-web/cve-2023-22518-confluence-setup-restore.md",
+   "cve": [
+    "CVE-2023-22518"
+   ],
+   "title": "Confluence 未授权恢复导致管理员接管",
+   "severity": "critical",
+   "cvss": null,
+   "product": "Atlassian Confluence Data Center / Server",
+   "versions": "7.19.x < 7.19.16、8.0-8.5.3 及更早未修版本",
+   "ports": [
+    8090,
+    8443
+   ],
+   "keywords": [
+    "confluence",
+    "setup-restore",
+    "未授权",
+    "管理员接管"
+   ],
+   "entry": "",
+   "verified": false,
+   "source_url": "https://github.com/FJNB5/fujiang-pojia/blob/cf086fc329011c6f8eeb3b67f0adbcc3f005debb/plugin/knowledge/java-web/cve-2023-22518-confluence-setup-restore.md",
+   "source_version": "0.20.13",
+   "slug": "fujiang-cve-2023-22518"
+  },
+  {
+   "origin": "cve-catalog",
+   "src_dir": "java-web",
+   "src_file": "java-web/cve-2023-22527-confluence-ssti.md",
+   "cve": [
+    "CVE-2023-22527"
+   ],
+   "title": "Confluence 模板注入 RCE（text-inline.vm）",
+   "severity": "critical",
+   "cvss": null,
+   "product": "Atlassian Confluence Data Center / Server",
+   "versions": "8.0.x、8.1.x、8.2.x、8.3.x、8.4.x、8.5.0-8.5.3（8.5.4+ 修复）",
+   "ports": [
+    8090,
+    8443
+   ],
+   "keywords": [
+    "confluence",
+    "ssti",
+    "velocity",
+    "text-inline",
+    "cve-2023-22527"
+   ],
+   "entry": "",
+   "verified": false,
+   "source_url": "https://github.com/FJNB5/fujiang-pojia/blob/cf086fc329011c6f8eeb3b67f0adbcc3f005debb/plugin/knowledge/java-web/cve-2023-22527-confluence-ssti.md",
+   "source_version": "0.20.13",
+   "slug": "fujiang-cve-2023-22527"
+  },
+  {
+   "origin": "cve-catalog",
+   "src_dir": "java-web",
+   "src_file": "java-web/cve-2023-27350-papercut-setup-bypass.md",
+   "cve": [
+    "CVE-2023-27350"
+   ],
+   "title": "PaperCut NG/MF 认证绕过 → RCE（CVE-2023-27350）",
+   "severity": "critical",
+   "cvss": null,
+   "product": "PaperCut NG / PaperCut MF",
+   "versions": "8.0.0 - 20.1.6、21.0.0 - 21.2.10、22.0.0 - 22.0.8（22.0.9+ 修复）",
+   "ports": [
+    9191,
+    9192
+   ],
+   "keywords": [
+    "papercut",
+    "2023-27350",
+    "auth bypass",
+    "setup",
+    "打印"
+   ],
+   "entry": "",
+   "verified": false,
+   "source_url": "https://github.com/FJNB5/fujiang-pojia/blob/cf086fc329011c6f8eeb3b67f0adbcc3f005debb/plugin/knowledge/java-web/cve-2023-27350-papercut-setup-bypass.md",
+   "source_version": "0.20.13",
+   "slug": "fujiang-cve-2023-27350"
+  },
+  {
+   "origin": "cve-catalog",
+   "src_dir": "java-web",
+   "src_file": "java-web/cve-2023-42793-teamcity-auth-bypass.md",
+   "cve": [
+    "CVE-2023-42793"
+   ],
+   "title": "TeamCity 认证绕过 → 管理员令牌 → RCE",
+   "severity": "critical",
+   "cvss": null,
+   "product": "JetBrains TeamCity",
+   "versions": "2017.1 - 2023.05.3（2023.05.4 修复）",
+   "ports": [
+    8111
+   ],
+   "keywords": [
+    "teamcity",
+    "auth-bypass",
+    "token",
+    "cve-2023-42793"
+   ],
+   "entry": "",
+   "verified": false,
+   "source_url": "https://github.com/FJNB5/fujiang-pojia/blob/cf086fc329011c6f8eeb3b67f0adbcc3f005debb/plugin/knowledge/java-web/cve-2023-42793-teamcity-auth-bypass.md",
+   "source_version": "0.20.13",
+   "slug": "fujiang-cve-2023-42793"
+  },
+  {
+   "origin": "cve-catalog",
+   "src_dir": "java-web",
+   "src_file": "java-web/cve-2023-46604-activemq-openwire.md",
+   "cve": [
+    "CVE-2023-46604"
+   ],
+   "title": "Apache ActiveMQ OpenWire 反序列化 RCE",
+   "severity": "critical",
+   "cvss": null,
+   "product": "Apache ActiveMQ / ActiveMQ Artemis",
+   "versions": "5.15.0-5.15.15、5.16.0-5.16.6、5.17.0-5.17.5、5.18.0-5.18.2",
+   "ports": [
+    61616,
+    61613,
+    8161
+   ],
+   "keywords": [
+    "activemq",
+    "openwire",
+    "deserialization",
+    "classinfo",
+    "61616"
+   ],
+   "entry": "",
+   "verified": false,
+   "source_url": "https://github.com/FJNB5/fujiang-pojia/blob/cf086fc329011c6f8eeb3b67f0adbcc3f005debb/plugin/knowledge/java-web/cve-2023-46604-activemq-openwire.md",
+   "source_version": "0.20.13",
+   "slug": "fujiang-cve-2023-46604"
+  },
+  {
+   "origin": "cve-catalog",
+   "src_dir": "java-web",
+   "src_file": "java-web/cve-2023-50164-struts2-s2-066.md",
+   "cve": [
+    "CVE-2023-50164"
+   ],
+   "title": "Struts2 文件上传路径穿越（S2-066）",
+   "severity": "critical",
+   "cvss": null,
+   "product": "Apache Struts2",
+   "versions": "2.0.0 - 2.3.37、2.5.0 - 2.5.32、6.0.0 - 6.3.0",
+   "ports": [
+    8080,
+    8443
+   ],
+   "keywords": [
+    "struts2",
+    "s2-066",
+    "upload",
+    "path-traversal",
+    "filename"
+   ],
+   "entry": "",
+   "verified": false,
+   "source_url": "https://github.com/FJNB5/fujiang-pojia/blob/cf086fc329011c6f8eeb3b67f0adbcc3f005debb/plugin/knowledge/java-web/cve-2023-50164-struts2-s2-066.md",
+   "source_version": "0.20.13",
+   "slug": "fujiang-cve-2023-50164"
+  },
+  {
+   "origin": "cve-catalog",
+   "src_dir": "java-web",
+   "src_file": "java-web/cve-2023-7028-gitlab-takeover.md",
+   "cve": [
+    "CVE-2023-7028"
+   ],
+   "title": "GitLab 任意账号接管（CVE-2023-7028）",
+   "severity": "critical",
+   "cvss": null,
+   "product": "GitLab CE / EE",
+   "versions": "16.1.0-16.1.5、16.2.0-16.2.8、16.3.0-16.3.6、16.4.0-16.4.3、16.5.0-16.5.5、16.6.0-16.6.1、16.7.0-16.7.1",
+   "ports": [
+    80,
+    443
+   ],
+   "keywords": [
+    "gitlab",
+    "2023-7028",
+    "账号接管",
+    "密码重置"
+   ],
+   "entry": "",
+   "verified": false,
+   "source_url": "https://github.com/FJNB5/fujiang-pojia/blob/cf086fc329011c6f8eeb3b67f0adbcc3f005debb/plugin/knowledge/java-web/cve-2023-7028-gitlab-takeover.md",
+   "source_version": "0.20.13",
+   "slug": "fujiang-cve-2023-7028"
+  },
+  {
+   "origin": "cve-catalog",
+   "src_dir": "java-web",
+   "src_file": "java-web/cve-2024-23897-jenkins-file-read.md",
+   "cve": [
+    "CVE-2024-23897"
+   ],
+   "title": "Jenkins CLI 任意文件读取",
+   "severity": "high",
+   "cvss": null,
+   "product": "Jenkins (weekly <= 2.441, LTS <= 2.426.2)",
+   "versions": "2.441 及以下、LTS 2.426.2 及以下",
+   "ports": [
+    8080,
+    8443
+   ],
+   "keywords": [
+    "jenkins",
+    "cli",
+    "args4j",
+    "file-read",
+    "cve-2024-23897"
+   ],
+   "entry": "",
+   "verified": false,
+   "source_url": "https://github.com/FJNB5/fujiang-pojia/blob/cf086fc329011c6f8eeb3b67f0adbcc3f005debb/plugin/knowledge/java-web/cve-2024-23897-jenkins-file-read.md",
+   "source_version": "0.20.13",
+   "slug": "fujiang-cve-2024-23897"
+  },
+  {
+   "origin": "cve-catalog",
+   "src_dir": "java-web",
+   "src_file": "java-web/cve-2024-27198-teamcity-bypass.md",
+   "cve": [
+    "CVE-2024-27198"
+   ],
+   "title": "TeamCity 鉴权绕过（;.jsp 路径参数）",
+   "severity": "critical",
+   "cvss": null,
+   "product": "JetBrains TeamCity",
+   "versions": "< 2023.11.4",
+   "ports": [
+    8111
+   ],
+   "keywords": [
+    "teamcity",
+    "auth bypass",
+    "27198",
+    "rest",
+    "token"
+   ],
+   "entry": "",
+   "verified": false,
+   "source_url": "https://github.com/FJNB5/fujiang-pojia/blob/cf086fc329011c6f8eeb3b67f0adbcc3f005debb/plugin/knowledge/java-web/cve-2024-27198-teamcity-bypass.md",
+   "source_version": "0.20.13",
+   "slug": "fujiang-cve-2024-27198"
+  },
+  {
+   "origin": "cve-catalog",
+   "src_dir": "java-web",
+   "src_file": "java-web/cve-2024-38856-ofbiz-unauth-rce.md",
+   "cve": [
+    "CVE-2024-38856"
+   ],
+   "title": "Apache OFBiz 未授权 RCE（CVE-2024-38856）",
+   "severity": "critical",
+   "cvss": null,
+   "product": "Apache OFBiz",
+   "versions": "< 18.12.15（18.12.15 修复）",
+   "ports": [
+    8443,
+    8080
+   ],
+   "keywords": [
+    "ofbiz",
+    "2024-38856",
+    "未授权",
+    "rce",
+    "电商"
+   ],
+   "entry": "",
+   "verified": false,
+   "source_url": "https://github.com/FJNB5/fujiang-pojia/blob/cf086fc329011c6f8eeb3b67f0adbcc3f005debb/plugin/knowledge/java-web/cve-2024-38856-ofbiz-unauth-rce.md",
+   "source_version": "0.20.13",
+   "slug": "fujiang-cve-2024-38856"
+  },
+  {
+   "origin": "cve-catalog",
+   "src_dir": "java-web",
+   "src_file": "java-web/cve-2024-53677-struts2-s2-067.md",
+   "cve": [
+    "CVE-2024-53677"
+   ],
+   "title": "Struts2 文件上传路径穿越 → RCE（S2-067，CVE-2024-53677）",
+   "severity": "critical",
+   "cvss": null,
+   "product": "Apache Struts 2",
+   "versions": "旧 FileUploadInterceptor：2.0.0 至 6.3.0（按维护分支）；至少升级至 6.4.0 并迁移新文件上传机制",
+   "ports": [
+    8080,
+    443,
+    80
+   ],
+   "keywords": [
+    "struts2",
+    "s2-067",
+    "2024-53677",
+    "文件上传",
+    "路径穿越",
+    "rce"
+   ],
+   "entry": "",
+   "verified": false,
+   "source_url": "https://github.com/FJNB5/fujiang-pojia/blob/cf086fc329011c6f8eeb3b67f0adbcc3f005debb/plugin/knowledge/java-web/cve-2024-53677-struts2-s2-067.md",
+   "source_version": "0.20.13",
+   "slug": "fujiang-cve-2024-53677"
+  },
+  {
+   "origin": "cve-catalog",
+   "src_dir": "linux-priv",
+   "src_file": "linux-priv/cve-2021-3156-baron-samedit.md",
+   "cve": [
+    "CVE-2021-3156"
+   ],
+   "title": "Baron Samedit（sudo 堆溢出提权）",
+   "severity": "high",
+   "cvss": null,
+   "product": "sudo",
+   "versions": "1.8.2 - 1.8.31p2、1.9.0 - 1.9.5p1",
+   "ports": [],
+   "keywords": [
+    "sudo",
+    "baron-samedit",
+    "sudoedit",
+    "heap-overflow",
+    "cve-2021-3156"
+   ],
+   "entry": "",
+   "verified": false,
+   "source_url": "https://github.com/FJNB5/fujiang-pojia/blob/cf086fc329011c6f8eeb3b67f0adbcc3f005debb/plugin/knowledge/linux-priv/cve-2021-3156-baron-samedit.md",
+   "source_version": "0.20.13",
+   "slug": "fujiang-cve-2021-3156"
+  },
+  {
+   "origin": "cve-catalog",
+   "src_dir": "linux-priv",
+   "src_file": "linux-priv/cve-2021-3493-ubuntu-overlayfs.md",
+   "cve": [
+    "CVE-2021-3493"
+   ],
+   "title": "Ubuntu overlayfs 本地提权（2021）",
+   "severity": "high",
+   "cvss": null,
+   "product": "Ubuntu Linux kernel（overlayfs）",
+   "versions": "Ubuntu 14.04 - 20.10（2021-04 前内核）",
+   "ports": [],
+   "keywords": [
+    "ubuntu",
+    "overlayfs",
+    "3493",
+    "userns",
+    "setuid"
+   ],
+   "entry": "",
+   "verified": false,
+   "source_url": "https://github.com/FJNB5/fujiang-pojia/blob/cf086fc329011c6f8eeb3b67f0adbcc3f005debb/plugin/knowledge/linux-priv/cve-2021-3493-ubuntu-overlayfs.md",
+   "source_version": "0.20.13",
+   "slug": "fujiang-cve-2021-3493"
+  },
+  {
+   "origin": "cve-catalog",
+   "src_dir": "linux-priv",
+   "src_file": "linux-priv/cve-2021-4034-pwnkit.md",
+   "cve": [
+    "CVE-2021-4034"
+   ],
+   "title": "PwnKit（polkit pkexec 本地提权）",
+   "severity": "high",
+   "cvss": null,
+   "product": "polkit (pkexec)",
+   "versions": "2009 - 2021（几乎所有发行版默认安装）",
+   "ports": [],
+   "keywords": [
+    "pwnkit",
+    "pkexec",
+    "polkit",
+    "suid",
+    "cve-2021-4034"
+   ],
+   "entry": "",
+   "verified": false,
+   "source_url": "https://github.com/FJNB5/fujiang-pojia/blob/cf086fc329011c6f8eeb3b67f0adbcc3f005debb/plugin/knowledge/linux-priv/cve-2021-4034-pwnkit.md",
+   "source_version": "0.20.13",
+   "slug": "fujiang-cve-2021-4034"
+  },
+  {
+   "origin": "cve-catalog",
+   "src_dir": "linux-priv",
+   "src_file": "linux-priv/cve-2022-0185-fs-context-overflow.md",
+   "cve": [
+    "CVE-2022-0185"
+   ],
+   "title": "fs_context 堆溢出提权（legacy_parse_param）",
+   "severity": "high",
+   "cvss": null,
+   "product": "Linux kernel",
+   "versions": "5.4 - 5.16.1（含多数发行版 LTS）",
+   "ports": [],
+   "keywords": [
+    "fs_context",
+    "heap overflow",
+    "unshare",
+    "userns",
+    "cap_sys_admin"
+   ],
+   "entry": "",
+   "verified": false,
+   "source_url": "https://github.com/FJNB5/fujiang-pojia/blob/cf086fc329011c6f8eeb3b67f0adbcc3f005debb/plugin/knowledge/linux-priv/cve-2022-0185-fs-context-overflow.md",
+   "source_version": "0.20.13",
+   "slug": "fujiang-cve-2022-0185"
+  },
+  {
+   "origin": "cve-catalog",
+   "src_dir": "linux-priv",
+   "src_file": "linux-priv/cve-2022-0847-dirtypipe.md",
+   "cve": [
+    "CVE-2022-0847"
+   ],
+   "title": "Dirty Pipe（页缓存写覆盖提权）",
+   "severity": "high",
+   "cvss": null,
+   "product": "Linux kernel",
+   "versions": "5.8 - 5.16.11、5.15.25、5.10.102 之前",
+   "ports": [],
+   "keywords": [
+    "dirtypipe",
+    "page-cache",
+    "splice",
+    "cve-2022-0847"
+   ],
+   "entry": "",
+   "verified": false,
+   "source_url": "https://github.com/FJNB5/fujiang-pojia/blob/cf086fc329011c6f8eeb3b67f0adbcc3f005debb/plugin/knowledge/linux-priv/cve-2022-0847-dirtypipe.md",
+   "source_version": "0.20.13",
+   "slug": "fujiang-cve-2022-0847"
+  },
+  {
+   "origin": "cve-catalog",
+   "src_dir": "linux-priv",
+   "src_file": "linux-priv/cve-2023-0386-overlayfs.md",
+   "cve": [
+    "CVE-2023-0386"
+   ],
+   "title": "overlayfs copy-up 权限绕过提权",
+   "severity": "high",
+   "cvss": null,
+   "product": "Linux kernel overlayfs",
+   "versions": "5.11 - 6.2（Ubuntu 22.04、Debian 12 等）",
+   "ports": [],
+   "keywords": [
+    "overlayfs",
+    "copy-up",
+    "setuid",
+    "unshare",
+    "cve-2023-0386"
+   ],
+   "entry": "",
+   "verified": false,
+   "source_url": "https://github.com/FJNB5/fujiang-pojia/blob/cf086fc329011c6f8eeb3b67f0adbcc3f005debb/plugin/knowledge/linux-priv/cve-2023-0386-overlayfs.md",
+   "source_version": "0.20.13",
+   "slug": "fujiang-cve-2023-0386"
+  },
+  {
+   "origin": "cve-catalog",
+   "src_dir": "linux-priv",
+   "src_file": "linux-priv/cve-2023-22809-sudo-edit.md",
+   "cve": [
+    "CVE-2023-22809"
+   ],
+   "title": "sudoedit 环境变量注入提权（EDITOR 带 --）",
+   "severity": "high",
+   "cvss": null,
+   "product": "sudo",
+   "versions": "1.8.0 - 1.9.12p1",
+   "ports": [],
+   "keywords": [
+    "sudo",
+    "sudoedit",
+    "editor",
+    "22809",
+    "提权"
+   ],
+   "entry": "",
+   "verified": false,
+   "source_url": "https://github.com/FJNB5/fujiang-pojia/blob/cf086fc329011c6f8eeb3b67f0adbcc3f005debb/plugin/knowledge/linux-priv/cve-2023-22809-sudo-edit.md",
+   "source_version": "0.20.13",
+   "slug": "fujiang-cve-2023-22809"
+  },
+  {
+   "origin": "cve-catalog",
+   "src_dir": "linux-priv",
+   "src_file": "linux-priv/cve-2023-2640-gameoverlay.md",
+   "cve": [
+    "CVE-2023-2640",
+    "CVE-2023-32629"
+   ],
+   "title": "Ubuntu overlayfs 权限提升（GameOver(lay)）",
+   "severity": "high",
+   "cvss": null,
+   "product": "Ubuntu Linux kernel（overlayfs）",
+   "versions": "Ubuntu 22.04（5.15/5.19）、23.04（6.2）等未打版",
+   "ports": [],
+   "keywords": [
+    "ubuntu",
+    "overlayfs",
+    "gameoverlay",
+    "xattr",
+    "setuid",
+    "提权"
+   ],
+   "entry": "",
+   "verified": false,
+   "source_url": "https://github.com/FJNB5/fujiang-pojia/blob/cf086fc329011c6f8eeb3b67f0adbcc3f005debb/plugin/knowledge/linux-priv/cve-2023-2640-gameoverlay.md",
+   "source_version": "0.20.13",
+   "slug": "fujiang-cve-2023-2640-plus2"
+  },
+  {
+   "origin": "cve-catalog",
+   "src_dir": "linux-priv",
+   "src_file": "linux-priv/cve-2023-32233-nftables.md",
+   "cve": [
+    "CVE-2023-32233"
+   ],
+   "title": "nf_tables 释放后重用提权（2023）",
+   "severity": "high",
+   "cvss": null,
+   "product": "Linux kernel（netfilter nf_tables）",
+   "versions": "<= 6.3.1（多数发行版 2023-05 前内核）",
+   "ports": [],
+   "keywords": [
+    "nftables",
+    "netfilter",
+    "uaf",
+    "32233",
+    "unshare"
+   ],
+   "entry": "",
+   "verified": false,
+   "source_url": "https://github.com/FJNB5/fujiang-pojia/blob/cf086fc329011c6f8eeb3b67f0adbcc3f005debb/plugin/knowledge/linux-priv/cve-2023-32233-nftables.md",
+   "source_version": "0.20.13",
+   "slug": "fujiang-cve-2023-32233"
+  },
+  {
+   "origin": "cve-catalog",
+   "src_dir": "linux-priv",
+   "src_file": "linux-priv/cve-2024-0582-io-uring-uaf.md",
+   "cve": [
+    "CVE-2024-0582"
+   ],
+   "title": "Linux io_uring 本地提权（CVE-2024-0582）",
+   "severity": "high",
+   "cvss": null,
+   "product": "Linux 内核 io_uring（IORING_OP_FIXED_FILES）",
+   "versions": "6.4 - 6.6.4（6.6.5 / 6.7 修复）",
+   "ports": [],
+   "keywords": [
+    "linux",
+    "io_uring",
+    "2024-0582",
+    "uaf",
+    "本地提权"
+   ],
+   "entry": "",
+   "verified": false,
+   "source_url": "https://github.com/FJNB5/fujiang-pojia/blob/cf086fc329011c6f8eeb3b67f0adbcc3f005debb/plugin/knowledge/linux-priv/cve-2024-0582-io-uring-uaf.md",
+   "source_version": "0.20.13",
+   "slug": "fujiang-cve-2024-0582"
+  },
+  {
+   "origin": "cve-catalog",
+   "src_dir": "linux-priv",
+   "src_file": "linux-priv/cve-2024-1086-nftables.md",
+   "cve": [
+    "CVE-2024-1086"
+   ],
+   "title": "nf_tables 释放后重用提权",
+   "severity": "high",
+   "cvss": null,
+   "product": "Linux kernel netfilter",
+   "versions": "5.14 - 6.6（多数发行版 2024-01 前内核）",
+   "ports": [],
+   "keywords": [
+    "nftables",
+    "netfilter",
+    "uaf",
+    "unshare",
+    "cve-2024-1086"
+   ],
+   "entry": "",
+   "verified": false,
+   "source_url": "https://github.com/FJNB5/fujiang-pojia/blob/cf086fc329011c6f8eeb3b67f0adbcc3f005debb/plugin/knowledge/linux-priv/cve-2024-1086-nftables.md",
+   "source_version": "0.20.13",
+   "slug": "fujiang-cve-2024-1086"
+  },
+  {
+   "origin": "cve-catalog",
+   "src_dir": "web-cms",
+   "src_file": "web-cms/command-injection.md",
+   "cve": [],
+   "title": "命令注入（分号 / 反引号 / $() 与盲注外带）",
+   "severity": "critical",
+   "cvss": null,
+   "product": "任何调用 shell 的功能（ping/traceroute/转换/压缩）",
+   "versions": "任意",
+   "ports": [
+    80,
+    443
+   ],
+   "keywords": [
+    "命令注入",
+    "rce",
+    "ping",
+    "反引号",
+    "盲注",
+    "shell"
+   ],
+   "entry": "",
+   "verified": false,
+   "source_url": "https://github.com/FJNB5/fujiang-pojia/blob/cf086fc329011c6f8eeb3b67f0adbcc3f005debb/plugin/knowledge/web-cms/command-injection.md",
+   "source_version": "0.20.13",
+   "slug": "fujiang-web-cms-fc7b661a"
+  },
+  {
+   "origin": "cve-catalog",
+   "src_dir": "web-cms",
+   "src_file": "web-cms/cve-2017-9841-phpunit.md",
+   "cve": [
+    "CVE-2017-9841"
+   ],
+   "title": "PHPUnit eval-stdin 远程代码执行",
+   "severity": "critical",
+   "cvss": null,
+   "product": "PHPUnit（vendor 目录随项目部署）",
+   "versions": "4.8.19-4.8.27、5.0.10-5.6.2",
+   "ports": [
+    80,
+    443
+   ],
+   "keywords": [
+    "phpunit",
+    "eval-stdin",
+    "vendor",
+    "9841",
+    "rce"
+   ],
+   "entry": "",
+   "verified": false,
+   "source_url": "https://github.com/FJNB5/fujiang-pojia/blob/cf086fc329011c6f8eeb3b67f0adbcc3f005debb/plugin/knowledge/web-cms/cve-2017-9841-phpunit.md",
+   "source_version": "0.20.13",
+   "slug": "fujiang-cve-2017-9841"
+  },
+  {
+   "origin": "cve-catalog",
+   "src_dir": "web-cms",
+   "src_file": "web-cms/cve-2018-7600-drupalgeddon2.md",
+   "cve": [
+    "CVE-2018-7600"
+   ],
+   "title": "Drupal 表单 API 远程代码执行（Drupalgeddon2）",
+   "severity": "critical",
+   "cvss": null,
+   "product": "Drupal 7.x / 8.x",
+   "versions": "7.x < 7.58、8.3.x < 8.3.9、8.4.x < 8.4.6、8.5.x < 8.5.1",
+   "ports": [
+    80,
+    443
+   ],
+   "keywords": [
+    "drupal",
+    "drupalgeddon2",
+    "form-api",
+    "post_render",
+    "cve-2018-7600"
+   ],
+   "entry": "",
+   "verified": false,
+   "source_url": "https://github.com/FJNB5/fujiang-pojia/blob/cf086fc329011c6f8eeb3b67f0adbcc3f005debb/plugin/knowledge/web-cms/cve-2018-7600-drupalgeddon2.md",
+   "source_version": "0.20.13",
+   "slug": "fujiang-cve-2018-7600"
+  },
+  {
+   "origin": "cve-catalog",
+   "src_dir": "web-cms",
+   "src_file": "web-cms/cve-2019-11043-phpfpm-underflow.md",
+   "cve": [
+    "CVE-2019-11043"
+   ],
+   "title": "PHP-FPM 路径信息下溢 RCE",
+   "severity": "critical",
+   "cvss": null,
+   "product": "PHP-FPM + Nginx（特定 fastcgi_split_path_info 配置）",
+   "versions": "PHP 7.1.x < 7.1.33、7.2.x < 7.2.24、7.3.x < 7.3.11",
+   "ports": [
+    80,
+    443
+   ],
+   "keywords": [
+    "phpfpm",
+    "nginx",
+    "fastcgi",
+    "cve-2019-11043",
+    "phuip-fpizdam"
+   ],
+   "entry": "",
+   "verified": false,
+   "source_url": "https://github.com/FJNB5/fujiang-pojia/blob/cf086fc329011c6f8eeb3b67f0adbcc3f005debb/plugin/knowledge/web-cms/cve-2019-11043-phpfpm-underflow.md",
+   "source_version": "0.20.13",
+   "slug": "fujiang-cve-2019-11043"
+  },
+  {
+   "origin": "cve-catalog",
+   "src_dir": "web-cms",
+   "src_file": "web-cms/cve-2019-16759-vbulletin.md",
+   "cve": [
+    "CVE-2019-16759"
+   ],
+   "title": "vBulletin widget 配置代码执行",
+   "severity": "critical",
+   "cvss": null,
+   "product": "vBulletin 5.x",
+   "versions": "5.0.0 - 5.5.4",
+   "ports": [
+    80,
+    443
+   ],
+   "keywords": [
+    "vbulletin",
+    "widget_php",
+    "preg_replace",
+    "cve-2019-16759"
+   ],
+   "entry": "",
+   "verified": false,
+   "source_url": "https://github.com/FJNB5/fujiang-pojia/blob/cf086fc329011c6f8eeb3b67f0adbcc3f005debb/plugin/knowledge/web-cms/cve-2019-16759-vbulletin.md",
+   "source_version": "0.20.13",
+   "slug": "fujiang-cve-2019-16759"
+  },
+  {
+   "origin": "cve-catalog",
+   "src_dir": "web-cms",
+   "src_file": "web-cms/cve-2021-3129-laravel-ignition.md",
+   "cve": [
+    "CVE-2021-3129"
+   ],
+   "title": "Laravel Ignition 调试模式任意文件读 → RCE（CVE-2021-3129）",
+   "severity": "critical",
+   "cvss": null,
+   "product": "Laravel <= 8.4.2 + facade/ignition < 2.5.2",
+   "versions": "Laravel <= 8.4.2（APP_DEBUG=true）",
+   "ports": [
+    80,
+    443
+   ],
+   "keywords": [
+    "laravel",
+    "ignition",
+    "2021-3129",
+    "rce",
+    "debug",
+    "php"
+   ],
+   "entry": "",
+   "verified": false,
+   "source_url": "https://github.com/FJNB5/fujiang-pojia/blob/cf086fc329011c6f8eeb3b67f0adbcc3f005debb/plugin/knowledge/web-cms/cve-2021-3129-laravel-ignition.md",
+   "source_version": "0.20.13",
+   "slug": "fujiang-cve-2021-3129"
+  },
+  {
+   "origin": "cve-catalog",
+   "src_dir": "web-cms",
+   "src_file": "web-cms/cve-2021-41773-apache-path-traversal.md",
+   "cve": [
+    "CVE-2021-41773",
+    "CVE-2021-42013"
+   ],
+   "title": "Apache HTTP Server 路径穿越 / CGI RCE",
+   "severity": "critical",
+   "cvss": null,
+   "product": "Apache HTTP Server",
+   "versions": "CVE-2021-41773：2.4.49；CVE-2021-42013：2.4.49、2.4.50（2.4.51 修复）",
+   "ports": [
+    80,
+    443
+   ],
+   "keywords": [
+    "httpd",
+    "apache",
+    "path traversal",
+    "cgi",
+    "mod_cgi",
+    "printf"
+   ],
+   "entry": "",
+   "verified": false,
+   "source_url": "https://github.com/FJNB5/fujiang-pojia/blob/cf086fc329011c6f8eeb3b67f0adbcc3f005debb/plugin/knowledge/web-cms/cve-2021-41773-apache-path-traversal.md",
+   "source_version": "0.20.13",
+   "slug": "fujiang-cve-2021-41773-plus2"
+  },
+  {
+   "origin": "cve-catalog",
+   "src_dir": "web-cms",
+   "src_file": "web-cms/cve-2023-23752-joomla-config-leak.md",
+   "cve": [
+    "CVE-2023-23752"
+   ],
+   "title": "Joomla 未授权配置泄露（API）",
+   "severity": "medium",
+   "cvss": null,
+   "product": "Joomla!",
+   "versions": "4.0.0 - 4.2.7",
+   "ports": [
+    80,
+    443
+   ],
+   "keywords": [
+    "joomla",
+    "api",
+    "config leak",
+    "数据库口令"
+   ],
+   "entry": "",
+   "verified": false,
+   "source_url": "https://github.com/FJNB5/fujiang-pojia/blob/cf086fc329011c6f8eeb3b67f0adbcc3f005debb/plugin/knowledge/web-cms/cve-2023-23752-joomla-config-leak.md",
+   "source_version": "0.20.13",
+   "slug": "fujiang-cve-2023-23752"
+  },
+  {
+   "origin": "cve-catalog",
+   "src_dir": "web-cms",
+   "src_file": "web-cms/cve-2023-6553-backup-migration-rce.md",
+   "cve": [
+    "CVE-2023-6553"
+   ],
+   "title": "WordPress Backup Migration 未授权 RCE（CVE-2023-6553）",
+   "severity": "critical",
+   "cvss": null,
+   "product": "WordPress 插件 Backup Migration",
+   "versions": "<= 1.3.7（1.3.8 修复）",
+   "ports": [
+    80,
+    443
+   ],
+   "keywords": [
+    "wordpress",
+    "backup-migration",
+    "2023-6553",
+    "未授权",
+    "rce"
+   ],
+   "entry": "",
+   "verified": false,
+   "source_url": "https://github.com/FJNB5/fujiang-pojia/blob/cf086fc329011c6f8eeb3b67f0adbcc3f005debb/plugin/knowledge/web-cms/cve-2023-6553-backup-migration-rce.md",
+   "source_version": "0.20.13",
+   "slug": "fujiang-cve-2023-6553"
+  },
+  {
+   "origin": "cve-catalog",
+   "src_dir": "web-cms",
+   "src_file": "web-cms/cve-2024-25600-bricks-rce.md",
+   "cve": [
+    "CVE-2024-25600"
+   ],
+   "title": "WordPress Bricks 未授权 RCE（CVE-2024-25600）",
+   "severity": "critical",
+   "cvss": null,
+   "product": "WordPress 插件 Bricks Builder",
+   "versions": "<= 1.9.6（1.9.6 修复）",
+   "ports": [
+    80,
+    443
+   ],
+   "keywords": [
+    "wordpress",
+    "bricks",
+    "2024-25600",
+    "未授权",
+    "rce"
+   ],
+   "entry": "",
+   "verified": false,
+   "source_url": "https://github.com/FJNB5/fujiang-pojia/blob/cf086fc329011c6f8eeb3b67f0adbcc3f005debb/plugin/knowledge/web-cms/cve-2024-25600-bricks-rce.md",
+   "source_version": "0.20.13",
+   "slug": "fujiang-cve-2024-25600"
+  },
+  {
+   "origin": "cve-catalog",
+   "src_dir": "web-cms",
+   "src_file": "web-cms/cve-2024-27956-wp-automatic-sqli.md",
+   "cve": [
+    "CVE-2024-27956"
+   ],
+   "title": "WordPress WP-Automatic 未授权 SQL 注入（CVE-2024-27956）",
+   "severity": "critical",
+   "cvss": null,
+   "product": "WordPress 插件 WP-Automatic",
+   "versions": "<= 3.92.0（3.92.1 修复）",
+   "ports": [
+    80,
+    443
+   ],
+   "keywords": [
+    "wordpress",
+    "wp-automatic",
+    "2024-27956",
+    "sqli",
+    "未授权"
+   ],
+   "entry": "",
+   "verified": false,
+   "source_url": "https://github.com/FJNB5/fujiang-pojia/blob/cf086fc329011c6f8eeb3b67f0adbcc3f005debb/plugin/knowledge/web-cms/cve-2024-27956-wp-automatic-sqli.md",
+   "source_version": "0.20.13",
+   "slug": "fujiang-cve-2024-27956"
+  },
+  {
+   "origin": "cve-catalog",
+   "src_dir": "web-cms",
+   "src_file": "web-cms/cve-2024-4577-phpcgi-windows.md",
+   "cve": [
+    "CVE-2024-4577"
+   ],
+   "title": "PHP-CGI Windows 参数注入（best-fit 编码）",
+   "severity": "critical",
+   "cvss": null,
+   "product": "PHP on Windows（CGI/php-cgi）",
+   "versions": "8.3.x < 8.3.8、8.2.x < 8.2.20、8.1.x < 8.1.29",
+   "ports": [
+    80,
+    443
+   ],
+   "keywords": [
+    "php",
+    "cgi",
+    "windows",
+    "best-fit",
+    "cve-2024-4577"
+   ],
+   "entry": "",
+   "verified": false,
+   "source_url": "https://github.com/FJNB5/fujiang-pojia/blob/cf086fc329011c6f8eeb3b67f0adbcc3f005debb/plugin/knowledge/web-cms/cve-2024-4577-phpcgi-windows.md",
+   "source_version": "0.20.13",
+   "slug": "fujiang-cve-2024-4577"
+  },
+  {
+   "origin": "cve-catalog",
+   "src_dir": "web-cms",
+   "src_file": "web-cms/lfi-to-rce.md",
+   "cve": [],
+   "title": "本地文件包含 → RCE（日志包含 / pearcmd / PHP filter chain）",
+   "severity": "critical",
+   "cvss": null,
+   "product": "PHP 应用（include/require 带用户输入）",
+   "versions": "任意",
+   "ports": [
+    80,
+    443
+   ],
+   "keywords": [
+    "lfi",
+    "文件包含",
+    "日志包含",
+    "pearcmd",
+    "filter chain",
+    "rce"
+   ],
+   "entry": "",
+   "verified": false,
+   "source_url": "https://github.com/FJNB5/fujiang-pojia/blob/cf086fc329011c6f8eeb3b67f0adbcc3f005debb/plugin/knowledge/web-cms/lfi-to-rce.md",
+   "source_version": "0.20.13",
+   "slug": "fujiang-web-cms-e2998ea3"
+  },
+  {
+   "origin": "cve-catalog",
+   "src_dir": "web-cms",
+   "src_file": "web-cms/nginx-alias-traversal.md",
+   "cve": [],
+   "title": "Nginx alias 路径穿越（读任意文件/源码泄露）",
+   "severity": "high",
+   "cvss": null,
+   "product": "Nginx（location alias 缺尾斜杠）",
+   "versions": "任意",
+   "ports": [
+    80,
+    443
+   ],
+   "keywords": [
+    "nginx",
+    "alias",
+    "穿越",
+    "目录",
+    "源码",
+    "配置"
+   ],
+   "entry": "",
+   "verified": false,
+   "source_url": "https://github.com/FJNB5/fujiang-pojia/blob/cf086fc329011c6f8eeb3b67f0adbcc3f005debb/plugin/knowledge/web-cms/nginx-alias-traversal.md",
+   "source_version": "0.20.13",
+   "slug": "fujiang-web-cms-8b06abba"
+  },
+  {
+   "origin": "cve-catalog",
+   "src_dir": "web-cms",
+   "src_file": "web-cms/php-object-injection.md",
+   "cve": [],
+   "title": "PHP 反序列化（POP 链 → RCE / phar 触发）",
+   "severity": "critical",
+   "cvss": null,
+   "product": "Laravel / Symfony / ThinkPHP / 自研 PHP",
+   "versions": "任意",
+   "ports": [
+    80,
+    443
+   ],
+   "keywords": [
+    "php",
+    "反序列化",
+    "pop链",
+    "phar",
+    "unserialize",
+    "rce"
+   ],
+   "entry": "",
+   "verified": false,
+   "source_url": "https://github.com/FJNB5/fujiang-pojia/blob/cf086fc329011c6f8eeb3b67f0adbcc3f005debb/plugin/knowledge/web-cms/php-object-injection.md",
+   "source_version": "0.20.13",
+   "slug": "fujiang-web-cms-3986d73b"
+  },
+  {
+   "origin": "cve-catalog",
+   "src_dir": "web-cms",
+   "src_file": "web-cms/sqli-union-error.md",
+   "cve": [],
+   "title": "SQL 注入（报错 / UNION / 堆叠）通用打法",
+   "severity": "critical",
+   "cvss": null,
+   "product": "任何带 SQL 查询的接口",
+   "versions": "任意",
+   "ports": [
+    80,
+    443
+   ],
+   "keywords": [
+    "sqli",
+    "sql注入",
+    "union",
+    "报错",
+    "堆叠",
+    "sqlmap"
+   ],
+   "entry": "",
+   "verified": false,
+   "source_url": "https://github.com/FJNB5/fujiang-pojia/blob/cf086fc329011c6f8eeb3b67f0adbcc3f005debb/plugin/knowledge/web-cms/sqli-union-error.md",
+   "source_version": "0.20.13",
+   "slug": "fujiang-web-cms-0280c2e0"
+  },
+  {
+   "origin": "cve-catalog",
+   "src_dir": "web-cms",
+   "src_file": "web-cms/ssti-rce.md",
+   "cve": [],
+   "title": "SSTI 模板注入 → RCE（Jinja2 / Twig / Freemarker）",
+   "severity": "critical",
+   "cvss": null,
+   "product": "模板引擎（Python/Java/PHP 服务端渲染）",
+   "versions": "任意",
+   "ports": [
+    80,
+    443
+   ],
+   "keywords": [
+    "ssti",
+    "模板注入",
+    "jinja2",
+    "twig",
+    "freemarker",
+    "rce"
+   ],
+   "entry": "",
+   "verified": false,
+   "source_url": "https://github.com/FJNB5/fujiang-pojia/blob/cf086fc329011c6f8eeb3b67f0adbcc3f005debb/plugin/knowledge/web-cms/ssti-rce.md",
+   "source_version": "0.20.13",
+   "slug": "fujiang-web-cms-2439a0f4"
+  },
+  {
+   "origin": "cve-catalog",
+   "src_dir": "web-cms",
+   "src_file": "web-cms/thinkphp5-rce.md",
+   "cve": [
+    "CVE-2018-20062",
+    "CVE-2019-9082"
+   ],
+   "title": "ThinkPHP 5.x 方法注入 / 路由 RCE",
+   "severity": "critical",
+   "cvss": null,
+   "product": "ThinkPHP 5.0.x / 5.1.x",
+   "versions": "5.0.5 - 5.0.23、5.1.0 - 5.1.30（未打补丁）",
+   "ports": [
+    80,
+    443
+   ],
+   "keywords": [
+    "thinkphp",
+    "invokefunction",
+    "_method",
+    "__construct",
+    "filter",
+    "rce"
+   ],
+   "entry": "",
+   "verified": false,
+   "source_url": "https://github.com/FJNB5/fujiang-pojia/blob/cf086fc329011c6f8eeb3b67f0adbcc3f005debb/plugin/knowledge/web-cms/thinkphp5-rce.md",
+   "source_version": "0.20.13",
+   "slug": "fujiang-cve-2018-20062-plus2"
+  },
+  {
+   "origin": "cve-catalog",
+   "src_dir": "web-cms",
+   "src_file": "web-cms/xxe-file-read.md",
+   "cve": [],
+   "title": "XXE 外部实体注入（读文件 / SSRF / OOB 外带）",
+   "severity": "high",
+   "cvss": null,
+   "product": "任何解析 XML 的接口（SOAP、上传 DOCX/SVG、SAML）",
+   "versions": "任意",
+   "ports": [
+    80,
+    443
+   ],
+   "keywords": [
+    "xxe",
+    "xml",
+    "外部实体",
+    "文件读取",
+    "oob",
+    "saml"
+   ],
+   "entry": "",
+   "verified": false,
+   "source_url": "https://github.com/FJNB5/fujiang-pojia/blob/cf086fc329011c6f8eeb3b67f0adbcc3f005debb/plugin/knowledge/web-cms/xxe-file-read.md",
+   "source_version": "0.20.13",
+   "slug": "fujiang-web-cms-1b19f77e"
+  },
+  {
+   "origin": "gray-market",
+   "src_dir": "gray-market",
+   "src_file": "gray-market/admin-api-unauthenticated.md",
+   "cve": [],
+   "title": "后台管理 API 未授权（只在前端隐藏菜单）",
+   "severity": "critical",
+   "cvss": 9.1,
+   "product": "自研包网/代理后台",
+   "versions": "任意",
+   "ports": [
+    80,
+    443
+   ],
+   "keywords": [
+    "admin api",
+    "未授权",
+    "越权",
+    "前端隐藏",
+    "菜单"
+   ],
+   "entry": "普通 token 直接打 /api/admin/*",
+   "verified": false,
+   "source_url": "https://github.com/FJNB5/fujiang-pojia/blob/HEAD/plugin/knowledge/gray-market/admin-api-unauthenticated.md",
+   "source_version": "0.20.13",
+   "slug": "fujiang-gray-market-c28f79db"
+  },
+  {
+   "origin": "gray-market",
+   "src_dir": "gray-market",
+   "src_file": "gray-market/admin-ip-whitelist-bypass.md",
+   "cve": [],
+   "title": "后台 IP 白名单绕过（X-Forwarded-For 伪造内网来源）",
+   "severity": "high",
+   "cvss": 8.4,
+   "product": "自研后台网关（只校验 XFF 或只查首段 IP）",
+   "versions": "任意",
+   "ports": [
+    80,
+    443
+   ],
+   "keywords": [
+    "白名单",
+    "ip",
+    "xff",
+    "绕过",
+    "后台",
+    "内网"
+   ],
+   "entry": "403 页面 + 只允许 127.0.0.1/内网段",
+   "verified": false,
+   "source_url": "https://github.com/FJNB5/fujiang-pojia/blob/HEAD/plugin/knowledge/gray-market/admin-ip-whitelist-bypass.md",
+   "source_version": "0.20.13",
+   "slug": "fujiang-gray-market-2ef09faa"
+  },
+  {
+   "origin": "gray-market",
+   "src_dir": "gray-market",
+   "src_file": "gray-market/admin-reset-any-user.md",
+   "cve": [],
+   "title": "后台“重置任意用户密码”接口越权（直接接管会员/管理员）",
+   "severity": "critical",
+   "cvss": 9.2,
+   "product": "自研后台（会员管理/代理管理）",
+   "versions": "任意",
+   "ports": [
+    80,
+    443
+   ],
+   "keywords": [
+    "重置密码",
+    "任意用户",
+    "越权",
+    "后台",
+    "接管"
+   ],
+   "entry": "/api/admin/user/resetPassword  /api/agent/resetPwd",
+   "verified": false,
+   "source_url": "https://github.com/FJNB5/fujiang-pojia/blob/HEAD/plugin/knowledge/gray-market/admin-reset-any-user.md",
+   "source_version": "0.20.13",
+   "slug": "fujiang-gray-market-cc7b3103"
+  },
+  {
+   "origin": "gray-market",
+   "src_dir": "gray-market",
+   "src_file": "gray-market/agent-hierarchy-privilege.md",
+   "cve": [],
+   "title": "代理层级越权（读全站下级 / 改佣金比例）",
+   "severity": "critical",
+   "cvss": 8.8,
+   "product": "博彩包网 / 代理分销系统",
+   "versions": "任意",
+   "ports": [
+    80,
+    443
+   ],
+   "keywords": [
+    "代理",
+    "agentId",
+    "层级越权",
+    "佣金",
+    "返水",
+    "会员列表"
+   ],
+   "entry": "改 agentId 读他人下级，改 rate 提佣金",
+   "verified": false,
+   "source_url": "https://github.com/FJNB5/fujiang-pojia/blob/HEAD/plugin/knowledge/gray-market/agent-hierarchy-privilege.md",
+   "source_version": "0.20.13",
+   "slug": "fujiang-gray-market-300fe1f8"
+  },
+  {
+   "origin": "gray-market",
+   "src_dir": "gray-market",
+   "src_file": "gray-market/api-idor-bola.md",
+   "cve": [],
+   "title": "接口越权 / BOLA（读他人订单、流水、提现）",
+   "severity": "high",
+   "cvss": 8.1,
+   "product": "自研 API（博彩/代理/跑分平台高发）",
+   "versions": "任意",
+   "ports": [
+    80,
+    443
+   ],
+   "keywords": [
+    "idor",
+    "bola",
+    "越权",
+    "水平越权",
+    "orderNo",
+    "uid",
+    "代理后台"
+   ],
+   "entry": "",
+   "verified": false,
+   "source_url": "https://github.com/FJNB5/fujiang-pojia/blob/HEAD/plugin/knowledge/gray-market/api-idor-bola.md",
+   "source_version": "0.20.13",
+   "slug": "fujiang-gray-market-214935b4"
+  },
+  {
+   "origin": "gray-market",
+   "src_dir": "gray-market",
+   "src_file": "gray-market/api-replay-nonce-missing.md",
+   "cve": [],
+   "title": "接口无 nonce / 时间戳 → 请求重放（充值、领奖、下注）",
+   "severity": "high",
+   "cvss": 8.2,
+   "product": "自研 App/小程序 API",
+   "versions": "任意",
+   "ports": [
+    80,
+    443
+   ],
+   "keywords": [
+    "重放",
+    "replay",
+    "nonce",
+    "时间戳",
+    "签名",
+    "幂等"
+   ],
+   "entry": "充值/领奖/下注接口缺 nonce 校验",
+   "verified": false,
+   "source_url": "https://github.com/FJNB5/fujiang-pojia/blob/HEAD/plugin/knowledge/gray-market/api-replay-nonce-missing.md",
+   "source_version": "0.20.13",
+   "slug": "fujiang-gray-market-5fd82b60"
+  },
+  {
+   "origin": "gray-market",
+   "src_dir": "gray-market",
+   "src_file": "gray-market/bet-history-idor.md",
+   "cve": [],
+   "title": "注单 / 流水接口越权批量拉取（全站会员数据）",
+   "severity": "high",
+   "cvss": 8.6,
+   "product": "自研注单与报表接口（博彩）",
+   "versions": "任意",
+   "ports": [
+    80,
+    443
+   ],
+   "keywords": [
+    "注单",
+    "流水",
+    "idor",
+    "越权",
+    "批量",
+    "报表"
+   ],
+   "entry": "/api/bet/list?uid=  /api/report/bet",
+   "verified": false,
+   "source_url": "https://github.com/FJNB5/fujiang-pojia/blob/HEAD/plugin/knowledge/gray-market/bet-history-idor.md",
+   "source_version": "0.20.13",
+   "slug": "fujiang-gray-market-d967e600"
+  },
+  {
+   "origin": "gray-market",
+   "src_dir": "gray-market",
+   "src_file": "gray-market/bet-odds-tampering.md",
+   "cve": [],
+   "title": "下注/结算赔率与倍数篡改（资金面）",
+   "severity": "critical",
+   "cvss": 9,
+   "product": "博彩/彩票投注接口",
+   "versions": "任意",
+   "ports": [
+    80,
+    443
+   ],
+   "keywords": [
+    "bet",
+    "odds",
+    "赔率",
+    "倍数",
+    "结算",
+    "篡改"
+   ],
+   "entry": "下注体里改 odds/multiple",
+   "verified": false,
+   "source_url": "https://github.com/FJNB5/fujiang-pojia/blob/HEAD/plugin/knowledge/gray-market/bet-odds-tampering.md",
+   "source_version": "0.20.13",
+   "slug": "fujiang-gray-market-269a4e2e"
+  },
+  {
+   "origin": "gray-market",
+   "src_dir": "gray-market",
+   "src_file": "gray-market/callback-url-ssrf.md",
+   "cve": [],
+   "title": "支付 / 回调地址可控 → 内网 SSRF（含云元数据）",
+   "severity": "high",
+   "cvss": 8.5,
+   "product": "自研支付与通知模块",
+   "versions": "任意",
+   "ports": [
+    80,
+    443
+   ],
+   "keywords": [
+    "回调",
+    "支付",
+    "ssrf",
+    "内网",
+    "元数据",
+    "notify"
+   ],
+   "entry": "支付配置/回调 URL/代理推广链接检测",
+   "verified": false,
+   "source_url": "https://github.com/FJNB5/fujiang-pojia/blob/HEAD/plugin/knowledge/gray-market/callback-url-ssrf.md",
+   "source_version": "0.20.13",
+   "slug": "fujiang-gray-market-a1c33d56"
+  },
+  {
+   "origin": "gray-market",
+   "src_dir": "gray-market",
+   "src_file": "gray-market/client-side-signature-forgery.md",
+   "cve": [],
+   "title": "前端签名 / 加密可逆（伪造请求绕过风控）",
+   "severity": "high",
+   "cvss": 8.1,
+   "product": "H5 / App 自研接口（自定义 sign、AES 请求体）",
+   "versions": "任意",
+   "ports": [
+    80,
+    443
+   ],
+   "keywords": [
+    "sign",
+    "hmac",
+    "aes",
+    "前端加密",
+    "可逆",
+    "nonce",
+    "timestamp",
+    "风控"
+   ],
+   "entry": "app.js 里抄出算法与 key，重算 sign",
+   "verified": false,
+   "source_url": "https://github.com/FJNB5/fujiang-pojia/blob/HEAD/plugin/knowledge/gray-market/client-side-signature-forgery.md",
+   "source_version": "0.20.13",
+   "slug": "fujiang-gray-market-a8e64394"
+  },
+  {
+   "origin": "gray-market",
+   "src_dir": "gray-market",
+   "src_file": "gray-market/cors-misconfig-credential.md",
+   "cve": [],
+   "title": "CORS 配置错误（带凭据读他人接口数据）",
+   "severity": "high",
+   "cvss": 8.1,
+   "product": "自研 API（回显 Origin + ACAC:true）",
+   "versions": "任意",
+   "ports": [
+    80,
+    443
+   ],
+   "keywords": [
+    "cors",
+    "跨域",
+    "带凭据",
+    "origin",
+    "泄露"
+   ],
+   "entry": "反射 Origin 且 Allow-Credentials: true",
+   "verified": false,
+   "source_url": "https://github.com/FJNB5/fujiang-pojia/blob/HEAD/plugin/knowledge/gray-market/cors-misconfig-credential.md",
+   "source_version": "0.20.13",
+   "slug": "fujiang-gray-market-086e458d"
+  },
+  {
+   "origin": "gray-market",
+   "src_dir": "gray-market",
+   "src_file": "gray-market/coupon-code-enumeration.md",
+   "cve": [],
+   "title": "券码 / 彩金码可枚举（批量领取与套现）",
+   "severity": "high",
+   "cvss": 8.3,
+   "product": "自研活动/兑换码系统",
+   "versions": "任意",
+   "ports": [
+    80,
+    443
+   ],
+   "keywords": [
+    "券码",
+    "彩金",
+    "兑换",
+    "枚举",
+    "coupon",
+    "领取"
+   ],
+   "entry": "/api/coupon/redeem  /api/promo/exchange",
+   "verified": false,
+   "source_url": "https://github.com/FJNB5/fujiang-pojia/blob/HEAD/plugin/knowledge/gray-market/coupon-code-enumeration.md",
+   "source_version": "0.20.13",
+   "slug": "fujiang-gray-market-76e00ef0"
+  },
+  {
+   "origin": "gray-market",
+   "src_dir": "gray-market",
+   "src_file": "gray-market/cs-chat-export-unauth.md",
+   "cve": [],
+   "title": "客服聊天记录导出未鉴权（全站会话与身份材料）",
+   "severity": "high",
+   "cvss": 8.4,
+   "product": "自研客服系统（在线客服 / 工单 / IM）",
+   "versions": "任意",
+   "ports": [
+    80,
+    443
+   ],
+   "keywords": [
+    "客服",
+    "聊天记录",
+    "导出",
+    "未鉴权",
+    "会话",
+    "im"
+   ],
+   "entry": "/api/cs/history/export  /api/im/sessions",
+   "verified": false,
+   "source_url": "https://github.com/FJNB5/fujiang-pojia/blob/HEAD/plugin/knowledge/gray-market/cs-chat-export-unauth.md",
+   "source_version": "0.20.13",
+   "slug": "fujiang-gray-market-49c0a3f1"
+  },
+  {
+   "origin": "gray-market",
+   "src_dir": "gray-market",
+   "src_file": "gray-market/csrf-transfer.md",
+   "cve": [],
+   "title": "CSRF（无 token 的提现/改密/绑卡）",
+   "severity": "high",
+   "cvss": 8,
+   "product": "自研会员中心（Cookie 会话）",
+   "versions": "任意",
+   "ports": [
+    80,
+    443
+   ],
+   "keywords": [
+    "csrf",
+    "跨站",
+    "提现",
+    "改密",
+    "绑卡",
+    "token"
+   ],
+   "entry": "关键操作缺 CSRF token 且 SameSite 未设",
+   "verified": false,
+   "source_url": "https://github.com/FJNB5/fujiang-pojia/blob/HEAD/plugin/knowledge/gray-market/csrf-transfer.md",
+   "source_version": "0.20.13",
+   "slug": "fujiang-gray-market-fa5aed6d"
+  },
+  {
+   "origin": "gray-market",
+   "src_dir": "gray-market",
+   "src_file": "gray-market/daily-reward-farming.md",
+   "cve": [],
+   "title": "签到 / 任务奖励批量刷取（缺幂等与频率控制）",
+   "severity": "high",
+   "cvss": 7.8,
+   "product": "自研活动系统（博彩/包网）",
+   "versions": "任意",
+   "ports": [
+    80,
+    443
+   ],
+   "keywords": [
+    "签到",
+    "任务",
+    "奖励",
+    "刷取",
+    "幂等",
+    "并发"
+   ],
+   "entry": "/api/activity/sign、/api/task/claim",
+   "verified": false,
+   "source_url": "https://github.com/FJNB5/fujiang-pojia/blob/HEAD/plugin/knowledge/gray-market/daily-reward-farming.md",
+   "source_version": "0.20.13",
+   "slug": "fujiang-gray-market-77e09490"
+  },
+  {
+   "origin": "gray-market",
+   "src_dir": "gray-market",
+   "src_file": "gray-market/db-admin-tool-exposed.md",
+   "cve": [],
+   "title": "phpMyAdmin / Adminer 暴露（弱口令直进数据库）",
+   "severity": "critical",
+   "cvss": 9,
+   "product": "phpMyAdmin / Adminer / 宝塔 pma",
+   "versions": "任意",
+   "ports": [
+    80,
+    443,
+    888,
+    8080
+   ],
+   "keywords": [
+    "phpmyadmin",
+    "adminer",
+    "pma",
+    "数据库",
+    "弱口令",
+    "脱库"
+   ],
+   "entry": "/phpmyadmin/  /pma/  /adminer.php",
+   "verified": false,
+   "source_url": "https://github.com/FJNB5/fujiang-pojia/blob/HEAD/plugin/knowledge/gray-market/db-admin-tool-exposed.md",
+   "source_version": "0.20.13",
+   "slug": "fujiang-gray-market-387d2767"
+  },
+  {
+   "origin": "gray-market",
+   "src_dir": "gray-market",
+   "src_file": "gray-market/druid-monitor-unauth.md",
+   "cve": [],
+   "title": "Druid 监控未授权 → session 泄露/后台接管（若依系必备）",
+   "severity": "critical",
+   "cvss": 9,
+   "product": "Alibaba Druid 连接池监控（若依/jeecg 等）",
+   "versions": "任意",
+   "ports": [
+    80,
+    443,
+    8080
+   ],
+   "keywords": [
+    "druid",
+    "监控",
+    "session",
+    "未授权",
+    "若依",
+    "jeecg"
+   ],
+   "entry": "/druid/index.html  /druid/websession.html",
+   "verified": false,
+   "source_url": "https://github.com/FJNB5/fujiang-pojia/blob/HEAD/plugin/knowledge/gray-market/druid-monitor-unauth.md",
+   "source_version": "0.20.13",
+   "slug": "fujiang-gray-market-893b29b8"
+  },
+  {
+   "origin": "gray-market",
+   "src_dir": "gray-market",
+   "src_file": "gray-market/export-file-read.md",
+   "cve": [],
+   "title": "导出 / 下载接口任意文件读取",
+   "severity": "high",
+   "cvss": 8.6,
+   "product": "对账单 / 报表导出 / 凭证下载",
+   "versions": "任意",
+   "ports": [
+    80,
+    443
+   ],
+   "keywords": [
+    "任意文件读",
+    "download",
+    "export",
+    "path traversal",
+    "对账单"
+   ],
+   "entry": "/api/report/export?file=../../../../etc/passwd",
+   "verified": false,
+   "source_url": "https://github.com/FJNB5/fujiang-pojia/blob/HEAD/plugin/knowledge/gray-market/export-file-read.md",
+   "source_version": "0.20.13",
+   "slug": "fujiang-gray-market-508fca6b"
+  },
+  {
+   "origin": "gray-market",
+   "src_dir": "gray-market",
+   "src_file": "gray-market/finance-export-pii.md",
+   "cve": [],
+   "title": "财务导出接口越权（银行卡 + 身份证批量导出）",
+   "severity": "critical",
+   "cvss": 9,
+   "product": "自研财务/提现模块（资金面）",
+   "versions": "任意",
+   "ports": [
+    80,
+    443
+   ],
+   "keywords": [
+    "财务",
+    "导出",
+    "银行卡",
+    "身份证",
+    "提现",
+    "越权"
+   ],
+   "entry": "/api/finance/export  /api/withdraw/export",
+   "verified": false,
+   "source_url": "https://github.com/FJNB5/fujiang-pojia/blob/HEAD/plugin/knowledge/gray-market/finance-export-pii.md",
+   "source_version": "0.20.13",
+   "slug": "fujiang-gray-market-6416fd1c"
+  },
+  {
+   "origin": "gray-market",
+   "src_dir": "gray-market",
+   "src_file": "gray-market/game-vendor-api-forgery.md",
+   "cve": [],
+   "title": "三方游戏 / 视讯接口 key 泄露与回调伪造",
+   "severity": "critical",
+   "cvss": 8.8,
+   "product": "接入 AG / BBIN / OB 等供应商的包网站",
+   "versions": "任意",
+   "ports": [
+    80,
+    443
+   ],
+   "keywords": [
+    "game vendor",
+    "api key",
+    "视讯",
+    "上分",
+    "callback",
+    "transfer"
+   ],
+   "entry": "前端拿 vendor key，伪造 /api/game/callback 上分",
+   "verified": false,
+   "source_url": "https://github.com/FJNB5/fujiang-pojia/blob/HEAD/plugin/knowledge/gray-market/game-vendor-api-forgery.md",
+   "source_version": "0.20.13",
+   "slug": "fujiang-gray-market-dbf31f8d"
+  },
+  {
+   "origin": "gray-market",
+   "src_dir": "gray-market",
+   "src_file": "gray-market/host-header-poisoning.md",
+   "cve": [],
+   "title": "Host 头投毒（密码重置链接被劫持 → 任意账号接管）",
+   "severity": "critical",
+   "cvss": 9.1,
+   "product": "自研找回密码/邀请链接（用 Host 拼 URL）",
+   "versions": "任意",
+   "ports": [
+    80,
+    443
+   ],
+   "keywords": [
+    "host",
+    "头",
+    "投毒",
+    "密码重置",
+    "链接",
+    "劫持"
+   ],
+   "entry": "POST /api/user/findpwd 的 Host / X-Forwarded-Host",
+   "verified": false,
+   "source_url": "https://github.com/FJNB5/fujiang-pojia/blob/HEAD/plugin/knowledge/gray-market/host-header-poisoning.md",
+   "source_version": "0.20.13",
+   "slug": "fujiang-gray-market-fade6caf"
+  },
+  {
+   "origin": "gray-market",
+   "src_dir": "gray-market",
+   "src_file": "gray-market/im-websocket-unauth.md",
+   "cve": [],
+   "title": "客服 IM / WebSocket 未鉴权（订阅他人会话）",
+   "severity": "high",
+   "cvss": 8.2,
+   "product": "自研客服系统 / socket.io / 原生 WS",
+   "versions": "任意",
+   "ports": [
+    80,
+    443
+   ],
+   "keywords": [
+    "websocket",
+    "socket.io",
+    "im",
+    "客服",
+    "未鉴权",
+    "room",
+    "订阅"
+   ],
+   "entry": "ws://host/ws 无 token 直接订阅 room",
+   "verified": false,
+   "source_url": "https://github.com/FJNB5/fujiang-pojia/blob/HEAD/plugin/knowledge/gray-market/im-websocket-unauth.md",
+   "source_version": "0.20.13",
+   "slug": "fujiang-gray-market-4f6d3954"
+  },
+  {
+   "origin": "gray-market",
+   "src_dir": "gray-market",
+   "src_file": "gray-market/impersonate-switch-user.md",
+   "cve": [],
+   "title": "后台\"切换用户/代登录\"接口越权（任意账号接管）",
+   "severity": "critical",
+   "cvss": 9.1,
+   "product": "自研客服/代理后台",
+   "versions": "任意",
+   "ports": [
+    80,
+    443
+   ],
+   "keywords": [
+    "impersonate",
+    "switch",
+    "代登录",
+    "客服",
+    "越权",
+    "接管"
+   ],
+   "entry": "/api/admin/user/loginAs?uid=1",
+   "verified": false,
+   "source_url": "https://github.com/FJNB5/fujiang-pojia/blob/HEAD/plugin/knowledge/gray-market/impersonate-switch-user.md",
+   "source_version": "0.20.13",
+   "slug": "fujiang-gray-market-4a9998a4"
+  },
+  {
+   "origin": "gray-market",
+   "src_dir": "gray-market",
+   "src_file": "gray-market/invite-referral-selfdealing.md",
+   "cve": [],
+   "title": "邀请返水自邀循环（小号矩阵刷返水）",
+   "severity": "high",
+   "cvss": 8,
+   "product": "自研代理/邀请体系",
+   "versions": "任意",
+   "ports": [
+    80,
+    443
+   ],
+   "keywords": [
+    "邀请",
+    "返水",
+    "代理",
+    "自邀",
+    "循环",
+    "佣金"
+   ],
+   "entry": "/api/user/invite 或注册时的 inviteCode",
+   "verified": false,
+   "source_url": "https://github.com/FJNB5/fujiang-pojia/blob/HEAD/plugin/knowledge/gray-market/invite-referral-selfdealing.md",
+   "source_version": "0.20.13",
+   "slug": "fujiang-gray-market-dc82f024"
+  },
+  {
+   "origin": "gray-market",
+   "src_dir": "gray-market",
+   "src_file": "gray-market/jwt-none-and-weak-key.md",
+   "cve": [],
+   "title": "JWT 实现缺陷（alg:none / 弱密钥 / 可预测 / kid 注入）",
+   "severity": "high",
+   "cvss": 8.1,
+   "product": "自研 Web/App 后端（JJWT、java-jwt、PyJWT 等）",
+   "versions": "任意",
+   "ports": [
+    80,
+    443
+   ],
+   "keywords": [
+    "jwt",
+    "alg none",
+    "hmac",
+    "hashcat 16500",
+    "kid",
+    "越权",
+    "提权"
+   ],
+   "entry": "",
+   "verified": false,
+   "source_url": "https://github.com/FJNB5/fujiang-pojia/blob/HEAD/plugin/knowledge/gray-market/jwt-none-and-weak-key.md",
+   "source_version": "0.20.13",
+   "slug": "fujiang-gray-market-39a60016"
+  },
+  {
+   "origin": "gray-market",
+   "src_dir": "gray-market",
+   "src_file": "gray-market/lottery-prng-predictable.md",
+   "cve": [],
+   "title": "开奖结果可预测（弱 PRNG / 客户端算法 / 固定种子）",
+   "severity": "critical",
+   "cvss": 9.1,
+   "product": "自营彩票 / 快三 / 28 类玩法",
+   "versions": "任意",
+   "ports": [
+    80,
+    443
+   ],
+   "keywords": [
+    "lottery",
+    "prng",
+    "开奖",
+    "可预测",
+    "种子",
+    "快三",
+    "时时彩"
+   ],
+   "entry": "历史期号统计 + 前端 JS 算法复现",
+   "verified": false,
+   "source_url": "https://github.com/FJNB5/fujiang-pojia/blob/HEAD/plugin/knowledge/gray-market/lottery-prng-predictable.md",
+   "source_version": "0.20.13",
+   "slug": "fujiang-gray-market-61cc5c65"
+  },
+  {
+   "origin": "gray-market",
+   "src_dir": "gray-market",
+   "src_file": "gray-market/mass-assignment-role.md",
+   "cve": [],
+   "title": "Mass Assignment（注册/资料接口注入 role / vip / balance / agentId）",
+   "severity": "high",
+   "cvss": 8.8,
+   "product": "自研用户/代理接口",
+   "versions": "任意",
+   "ports": [
+    80,
+    443
+   ],
+   "keywords": [
+    "mass assignment",
+    "批量赋值",
+    "role",
+    "vip",
+    "balance",
+    "agentId"
+   ],
+   "entry": "注册体里多带一个 role=admin",
+   "verified": false,
+   "source_url": "https://github.com/FJNB5/fujiang-pojia/blob/HEAD/plugin/knowledge/gray-market/mass-assignment-role.md",
+   "source_version": "0.20.13",
+   "slug": "fujiang-gray-market-d4dc739a"
+  },
+  {
+   "origin": "gray-market",
+   "src_dir": "gray-market",
+   "src_file": "gray-market/member-data-enumeration.md",
+   "cve": [],
+   "title": "会员隐私批量查询 / 账号枚举（手机号、银行卡）",
+   "severity": "high",
+   "cvss": 7.5,
+   "product": "客服查询 / 代理报表 / 会员中心接口",
+   "versions": "任意",
+   "ports": [
+    80,
+    443
+   ],
+   "keywords": [
+    "member",
+    "enumeration",
+    "手机号",
+    "银行卡",
+    "隐私",
+    "批量查询"
+   ],
+   "entry": "/api/member/info?phone= 逐个返回他人资料",
+   "verified": false,
+   "source_url": "https://github.com/FJNB5/fujiang-pojia/blob/HEAD/plugin/knowledge/gray-market/member-data-enumeration.md",
+   "source_version": "0.20.13",
+   "slug": "fujiang-gray-market-9811f67d"
+  },
+  {
+   "origin": "gray-market",
+   "src_dir": "gray-market",
+   "src_file": "gray-market/multi-tenant-cross-site.md",
+   "cve": [],
+   "title": "包网多租户越权（tenantId/siteId 遍历，横穿几十个站点）",
+   "severity": "critical",
+   "cvss": 9.2,
+   "product": "包网/白标系统（一套后台托管多站点）",
+   "versions": "任意",
+   "ports": [
+    80,
+    443
+   ],
+   "keywords": [
+    "多租户",
+    "tenant",
+    "siteId",
+    "包网",
+    "白标",
+    "越权"
+   ],
+   "entry": "请求体或 Header 里的 tenantId / siteId / merchantId",
+   "verified": false,
+   "source_url": "https://github.com/FJNB5/fujiang-pojia/blob/HEAD/plugin/knowledge/gray-market/multi-tenant-cross-site.md",
+   "source_version": "0.20.13",
+   "slug": "fujiang-gray-market-e1ef8859"
+  },
+  {
+   "origin": "gray-market",
+   "src_dir": "gray-market",
+   "src_file": "gray-market/notification-template-ssti.md",
+   "cve": [],
+   "title": "通知模板注入（标题/正文模板未转义 → SSTI / 存储型 XSS）",
+   "severity": "critical",
+   "cvss": 9,
+   "product": "自研消息中心（站内信/邮件/短信模板）",
+   "versions": "任意",
+   "ports": [
+    80,
+    443
+   ],
+   "keywords": [
+    "模板",
+    "ssti",
+    "通知",
+    "站内信",
+    "短信",
+    "注入"
+   ],
+   "entry": "后台模板编辑 / 会员自定义通知标题",
+   "verified": false,
+   "source_url": "https://github.com/FJNB5/fujiang-pojia/blob/HEAD/plugin/knowledge/gray-market/notification-template-ssti.md",
+   "source_version": "0.20.13",
+   "slug": "fujiang-gray-market-793b8a5c"
+  },
+  {
+   "origin": "gray-market",
+   "src_dir": "gray-market",
+   "src_file": "gray-market/oauth-redirect-uri.md",
+   "cve": [],
+   "title": "OAuth redirect_uri 劫持 / state 缺失（账号接管）",
+   "severity": "high",
+   "cvss": 8.6,
+   "product": "自研三方登录（Google/微信/Telegram）",
+   "versions": "任意",
+   "ports": [
+    80,
+    443
+   ],
+   "keywords": [
+    "oauth",
+    "redirect_uri",
+    "state",
+    "登录",
+    "接管",
+    "sso"
+   ],
+   "entry": "/oauth/authorize?redirect_uri= 可篡改",
+   "verified": false,
+   "source_url": "https://github.com/FJNB5/fujiang-pojia/blob/HEAD/plugin/knowledge/gray-market/oauth-redirect-uri.md",
+   "source_version": "0.20.13",
+   "slug": "fujiang-gray-market-bfcbf2a8"
+  },
+  {
+   "origin": "gray-market",
+   "src_dir": "gray-market",
+   "src_file": "gray-market/object-storage-datastore-exposure.md",
+   "cve": [],
+   "title": "对象存储与数据存储裸露（OSS / S3 / MinIO / MySQL / MongoDB）",
+   "severity": "high",
+   "cvss": 8.6,
+   "product": "阿里云 OSS / 腾讯云 COS / AWS S3 / MinIO / MySQL / MongoDB",
+   "versions": "任意",
+   "ports": [
+    80,
+    443,
+    9000,
+    3306,
+    27017
+   ],
+   "keywords": [
+    "oss",
+    "s3",
+    "bucket",
+    "minio",
+    "mongodb",
+    "mysql",
+    "弱口令",
+    "列举",
+    "kyc"
+   ],
+   "entry": "",
+   "verified": false,
+   "source_url": "https://github.com/FJNB5/fujiang-pojia/blob/HEAD/plugin/knowledge/gray-market/object-storage-datastore-exposure.md",
+   "source_version": "0.20.13",
+   "slug": "fujiang-gray-market-e7b37cd6"
+  },
+  {
+   "origin": "gray-market",
+   "src_dir": "gray-market",
+   "src_file": "gray-market/operator-backend-weak-login.md",
+   "cve": [],
+   "title": "运营后台弱口令 + 验证码复用（博彩站点最常见入口）",
+   "severity": "critical",
+   "cvss": 9.1,
+   "product": "自研运营/代理后台（包网系统）",
+   "versions": "任意",
+   "ports": [
+    80,
+    443,
+    8080,
+    8443
+   ],
+   "keywords": [
+    "弱口令",
+    "后台",
+    "验证码复用",
+    "运营商",
+    "包网",
+    "登录"
+   ],
+   "entry": "/admin /manage /agent 的登录接口",
+   "verified": false,
+   "source_url": "https://github.com/FJNB5/fujiang-pojia/blob/HEAD/plugin/knowledge/gray-market/operator-backend-weak-login.md",
+   "source_version": "0.20.13",
+   "slug": "fujiang-gray-market-1217f1c1"
+  },
+  {
+   "origin": "gray-market",
+   "src_dir": "gray-market",
+   "src_file": "gray-market/order-status-tamper.md",
+   "cve": [],
+   "title": "订单状态机篡改（未支付改成已支付 / 已取消再入账）",
+   "severity": "critical",
+   "cvss": 9.3,
+   "product": "自研充值/订单系统（资金面）",
+   "versions": "任意",
+   "ports": [
+    80,
+    443
+   ],
+   "keywords": [
+    "订单",
+    "状态机",
+    "篡改",
+    "未支付",
+    "充值",
+    "资金"
+   ],
+   "entry": "/api/order/status  /api/recharge/confirm",
+   "verified": false,
+   "source_url": "https://github.com/FJNB5/fujiang-pojia/blob/HEAD/plugin/knowledge/gray-market/order-status-tamper.md",
+   "source_version": "0.20.13",
+   "slug": "fujiang-gray-market-679fc3c8"
+  },
+  {
+   "origin": "gray-market",
+   "src_dir": "gray-market",
+   "src_file": "gray-market/origin-ip-leak-waf-bypass.md",
+   "cve": [],
+   "title": "源站 IP 泄露 → 绕过 WAF 直打（博彩站必看）",
+   "severity": "critical",
+   "cvss": 9,
+   "product": "任何套 CDN/WAF 的站点",
+   "versions": "任意",
+   "ports": [
+    80,
+    443,
+    8080
+   ],
+   "keywords": [
+    "源站",
+    "cdn",
+    "waf",
+    "绕过",
+    "真实ip",
+    "回源"
+   ],
+   "entry": "子域/邮件头/证书历史/SSRF 泄露的 origin",
+   "verified": false,
+   "source_url": "https://github.com/FJNB5/fujiang-pojia/blob/HEAD/plugin/knowledge/gray-market/origin-ip-leak-waf-bypass.md",
+   "source_version": "0.20.13",
+   "slug": "fujiang-gray-market-d6cabfd5"
+  },
+  {
+   "origin": "gray-market",
+   "src_dir": "gray-market",
+   "src_file": "gray-market/panel-bt-1panel.md",
+   "cve": [],
+   "title": "宝塔 / 1Panel 面板弱口令与未授权（黑灰站最常见后台）",
+   "severity": "critical",
+   "cvss": 9.2,
+   "product": "宝塔面板（BT-Panel）/ 1Panel / 小皮 phpstudy",
+   "versions": "任意",
+   "ports": [
+    8888,
+    888,
+    8443,
+    2087,
+    9999
+   ],
+   "keywords": [
+    "宝塔",
+    "bt",
+    "1panel",
+    "面板",
+    "弱口令",
+    "未授权",
+    "服务器"
+   ],
+   "entry": ":8888/<随机入口> 或 :8888/login",
+   "verified": false,
+   "source_url": "https://github.com/FJNB5/fujiang-pojia/blob/HEAD/plugin/knowledge/gray-market/panel-bt-1panel.md",
+   "source_version": "0.20.13",
+   "slug": "fujiang-gray-market-db6d779c"
+  },
+  {
+   "origin": "gray-market",
+   "src_dir": "gray-market",
+   "src_file": "gray-market/password-reset-token-abuse.md",
+   "cve": [],
+   "title": "密码重置 token 可预测 / 未绑定用户（任意用户改密）",
+   "severity": "critical",
+   "cvss": 9.1,
+   "product": "自研找回密码流程",
+   "versions": "任意",
+   "ports": [
+    80,
+    443
+   ],
+   "keywords": [
+    "reset",
+    "token",
+    "找回密码",
+    "任意用户",
+    "越权"
+   ],
+   "entry": "token = md5(uid) / 响应回显 / 不校验 uid",
+   "verified": false,
+   "source_url": "https://github.com/FJNB5/fujiang-pojia/blob/HEAD/plugin/knowledge/gray-market/password-reset-token-abuse.md",
+   "source_version": "0.20.13",
+   "slug": "fujiang-gray-market-0e1a7416"
+  },
+  {
+   "origin": "gray-market",
+   "src_dir": "gray-market",
+   "src_file": "gray-market/payment-channel-swap.md",
+   "cve": [],
+   "title": "支付通道 / 商户号篡改（充值进攻击者账户）",
+   "severity": "critical",
+   "cvss": 9.4,
+   "product": "自研充值/支付路由（博彩包网）",
+   "versions": "任意",
+   "ports": [
+    80,
+    443
+   ],
+   "keywords": [
+    "支付通道",
+    "商户号",
+    "充值",
+    "路由",
+    "篡改",
+    "资金"
+   ],
+   "entry": "/api/pay/create 的 channelId / merchantId / notifyUrl",
+   "verified": false,
+   "source_url": "https://github.com/FJNB5/fujiang-pojia/blob/HEAD/plugin/knowledge/gray-market/payment-channel-swap.md",
+   "source_version": "0.20.13",
+   "slug": "fujiang-gray-market-5a2545a6"
+  },
+  {
+   "origin": "gray-market",
+   "src_dir": "gray-market",
+   "src_file": "gray-market/payment-notify-forgery.md",
+   "cve": [],
+   "title": "支付回调伪造与金额篡改（资金面）",
+   "severity": "critical",
+   "cvss": 9.1,
+   "product": "自研充值/代付回调（博彩、跑分、发卡站高发）",
+   "versions": "任意",
+   "ports": [
+    80,
+    443
+   ],
+   "keywords": [
+    "notify",
+    "callback",
+    "伪造回调",
+    "金额篡改",
+    "重放",
+    "验签",
+    "跑分"
+   ],
+   "entry": "",
+   "verified": false,
+   "source_url": "https://github.com/FJNB5/fujiang-pojia/blob/HEAD/plugin/knowledge/gray-market/payment-notify-forgery.md",
+   "source_version": "0.20.13",
+   "slug": "fujiang-gray-market-66d638f4"
+  },
+  {
+   "origin": "gray-market",
+   "src_dir": "gray-market",
+   "src_file": "gray-market/promotion-abuse.md",
+   "cve": [],
+   "title": "活动 / 彩金 / 返水无限领取（幂等缺失）",
+   "severity": "high",
+   "cvss": 7.9,
+   "product": "促销活动与奖励接口",
+   "versions": "任意",
+   "ports": [
+    80,
+    443
+   ],
+   "keywords": [
+    "promotion",
+    "bonus",
+    "彩金",
+    "返水",
+    "幂等",
+    "并发领取",
+    "活动滥用"
+   ],
+   "entry": "/api/promotion/receive 重复或并发领取",
+   "verified": false,
+   "source_url": "https://github.com/FJNB5/fujiang-pojia/blob/HEAD/plugin/knowledge/gray-market/promotion-abuse.md",
+   "source_version": "0.20.13",
+   "slug": "fujiang-gray-market-c68b2427"
+  },
+  {
+   "origin": "gray-market",
+   "src_dir": "gray-market",
+   "src_file": "gray-market/race-condition-balance.md",
+   "cve": [],
+   "title": "余额并发与负数（竞态 / 金额符号）",
+   "severity": "critical",
+   "cvss": 9,
+   "product": "自研钱包与投注接口",
+   "versions": "任意",
+   "ports": [
+    80,
+    443
+   ],
+   "keywords": [
+    "竞态",
+    "race condition",
+    "并发提现",
+    "负数",
+    "金额校验",
+    "幂等"
+   ],
+   "entry": "同一请求并发 20 次 / amount=-100",
+   "verified": false,
+   "source_url": "https://github.com/FJNB5/fujiang-pojia/blob/HEAD/plugin/knowledge/gray-market/race-condition-balance.md",
+   "source_version": "0.20.13",
+   "slug": "fujiang-gray-market-8e14e2e4"
+  },
+  {
+   "origin": "gray-market",
+   "src_dir": "gray-market",
+   "src_file": "gray-market/redis-session-forgery.md",
+   "cve": [],
+   "title": "Redis 未授权 → 偷后台 session / token 直接进后台",
+   "severity": "critical",
+   "cvss": 9.1,
+   "product": "自研后台（session/token 存 Redis）",
+   "versions": "任意",
+   "ports": [
+    6379
+   ],
+   "keywords": [
+    "redis",
+    "未授权",
+    "session",
+    "token",
+    "后台",
+    "接管"
+   ],
+   "entry": "Redis 里的 login/session/token 键",
+   "verified": false,
+   "source_url": "https://github.com/FJNB5/fujiang-pojia/blob/HEAD/plugin/knowledge/gray-market/redis-session-forgery.md",
+   "source_version": "0.20.13",
+   "slug": "fujiang-gray-market-e418b17b"
+  },
+  {
+   "origin": "gray-market",
+   "src_dir": "gray-market",
+   "src_file": "gray-market/repo-config-backup-leak.md",
+   "cve": [],
+   "title": "源码 / 备份 / 配置泄露",
+   "severity": "high",
+   "cvss": 7.5,
+   "product": "通用 Web（PHP/Java/Node 自研站）",
+   "versions": "任意",
+   "ports": [
+    80,
+    443,
+    8080
+   ],
+   "keywords": [
+    ".git",
+    ".svn",
+    "env",
+    "backup",
+    "zip",
+    "sourcemap",
+    "swagger",
+    "源码泄露"
+   ],
+   "entry": "",
+   "verified": false,
+   "source_url": "https://github.com/FJNB5/fujiang-pojia/blob/HEAD/plugin/knowledge/gray-market/repo-config-backup-leak.md",
+   "source_version": "0.20.13",
+   "slug": "fujiang-gray-market-f63dd78c"
+  },
+  {
+   "origin": "gray-market",
+   "src_dir": "gray-market",
+   "src_file": "gray-market/report-api-unauth.md",
+   "cve": [],
+   "title": "报表/财务接口未授权（全站流水与代理佣金）",
+   "severity": "high",
+   "cvss": 8.6,
+   "product": "包网/代理后台报表模块",
+   "versions": "任意",
+   "ports": [
+    80,
+    443
+   ],
+   "keywords": [
+    "report",
+    "finance",
+    "报表",
+    "流水",
+    "佣金",
+    "未授权"
+   ],
+   "entry": "/api/report/* 免认证或普通 token",
+   "verified": false,
+   "source_url": "https://github.com/FJNB5/fujiang-pojia/blob/HEAD/plugin/knowledge/gray-market/report-api-unauth.md",
+   "source_version": "0.20.13",
+   "slug": "fujiang-gray-market-1a807271"
+  },
+  {
+   "origin": "gray-market",
+   "src_dir": "gray-market",
+   "src_file": "gray-market/ruoyi-admin-unauth.md",
+   "cve": [],
+   "title": "若依（RuoYi）系后台默认口令 / Druid / 定时任务 RCE",
+   "severity": "critical",
+   "cvss": 9,
+   "product": "若依 RuoYi（及二开的包网/代理后台）",
+   "versions": "4.x / 3.x / 二开变体",
+   "ports": [
+    80,
+    443,
+    8080,
+    9090
+   ],
+   "keywords": [
+    "ruoyi",
+    "若依",
+    "druid",
+    "admin123",
+    "quartz",
+    "定时任务",
+    "prod-api"
+   ],
+   "entry": "",
+   "verified": false,
+   "source_url": "https://github.com/FJNB5/fujiang-pojia/blob/HEAD/plugin/knowledge/gray-market/ruoyi-admin-unauth.md",
+   "source_version": "0.20.13",
+   "slug": "fujiang-gray-market-e7ff5ae1"
+  },
+  {
+   "origin": "gray-market",
+   "src_dir": "gray-market",
+   "src_file": "gray-market/scheduled-task-injection.md",
+   "cve": [],
+   "title": "后台定时任务 / 计划任务注入（Quartz、XXL-JOB、若依）",
+   "severity": "critical",
+   "cvss": 9.1,
+   "product": "若依/XXL-JOB/Quartz 管理后台",
+   "versions": "任意",
+   "ports": [
+    80,
+    443,
+    8080
+   ],
+   "keywords": [
+    "定时任务",
+    "quartz",
+    "xxl-job",
+    "若依",
+    "rce",
+    "计划任务"
+   ],
+   "entry": "任务执行内容 / cron 表达式可写",
+   "verified": false,
+   "source_url": "https://github.com/FJNB5/fujiang-pojia/blob/HEAD/plugin/knowledge/gray-market/scheduled-task-injection.md",
+   "source_version": "0.20.13",
+   "slug": "fujiang-gray-market-91afaa10"
+  },
+  {
+   "origin": "gray-market",
+   "src_dir": "gray-market",
+   "src_file": "gray-market/sms-bomb-and-enum.md",
+   "cve": [],
+   "title": "短信轰炸与账号枚举（验证码面）",
+   "severity": "medium",
+   "cvss": 5.3,
+   "product": "自研注册/登录/找回接口",
+   "versions": "任意",
+   "ports": [
+    80,
+    443
+   ],
+   "keywords": [
+    "sms",
+    "轰炸",
+    "枚举",
+    "验证码爆破",
+    "频控",
+    "user enumeration"
+   ],
+   "entry": "",
+   "verified": false,
+   "source_url": "https://github.com/FJNB5/fujiang-pojia/blob/HEAD/plugin/knowledge/gray-market/sms-bomb-and-enum.md",
+   "source_version": "0.20.13",
+   "slug": "fujiang-gray-market-a7909e0a"
+  },
+  {
+   "origin": "gray-market",
+   "src_dir": "gray-market",
+   "src_file": "gray-market/sms-code-reuse-and-bruteforce.md",
+   "cve": [],
+   "title": "短信验证码回显 / 复用 / 爆破（任意账号接管）",
+   "severity": "critical",
+   "cvss": 9.1,
+   "product": "自研注册/登录/改密接口",
+   "versions": "任意",
+   "ports": [
+    80,
+    443
+   ],
+   "keywords": [
+    "sms",
+    "code",
+    "验证码回显",
+    "复用",
+    "爆破",
+    "接管"
+   ],
+   "entry": "响应里带 code / 同码复用 / 4 位爆破",
+   "verified": false,
+   "source_url": "https://github.com/FJNB5/fujiang-pojia/blob/HEAD/plugin/knowledge/gray-market/sms-code-reuse-and-bruteforce.md",
+   "source_version": "0.20.13",
+   "slug": "fujiang-gray-market-f9c739b1"
+  },
+  {
+   "origin": "gray-market",
+   "src_dir": "gray-market",
+   "src_file": "gray-market/sourcemap-js-secret-leak.md",
+   "cve": [],
+   "title": "sourcemap / 前端 JS 泄露接口与密钥（SPA 包网站第一入口）",
+   "severity": "high",
+   "cvss": 8.6,
+   "product": "前后端分离站点（Vue/React/uni-app）",
+   "versions": "任意",
+   "ports": [
+    80,
+    443
+   ],
+   "keywords": [
+    "sourcemap",
+    "js",
+    "前端",
+    "密钥",
+    "接口",
+    "泄露",
+    "spa"
+   ],
+   "entry": "/static/js/*.js.map 与打包进 bundle 的 AK/secret",
+   "verified": false,
+   "source_url": "https://github.com/FJNB5/fujiang-pojia/blob/HEAD/plugin/knowledge/gray-market/sourcemap-js-secret-leak.md",
+   "source_version": "0.20.13",
+   "slug": "fujiang-gray-market-dd337e8b"
+  },
+  {
+   "origin": "gray-market",
+   "src_dir": "gray-market",
+   "src_file": "gray-market/spring-actuator-exposure.md",
+   "cve": [
+    "CVE-2022-22947"
+   ],
+   "title": "Spring Boot Actuator 未授权（heapdump / Jolokia / Gateway）",
+   "severity": "critical",
+   "cvss": 9,
+   "product": "Spring Boot 2.x/3.x",
+   "versions": "任意（端点暴露且无鉴权）",
+   "ports": [
+    8080,
+    8443,
+    9090
+   ],
+   "keywords": [
+    "actuator",
+    "heapdump",
+    "jolokia",
+    "env",
+    "gateway",
+    "spring"
+   ],
+   "entry": "",
+   "verified": false,
+   "source_url": "https://github.com/FJNB5/fujiang-pojia/blob/HEAD/plugin/knowledge/gray-market/spring-actuator-exposure.md",
+   "source_version": "0.20.13",
+   "slug": "fujiang-cve-2022-22947-2"
+  },
+  {
+   "origin": "gray-market",
+   "src_dir": "gray-market",
+   "src_file": "gray-market/sql-injection-business-api.md",
+   "cve": [],
+   "title": "业务接口 SQL 注入（报表 / 订单 / 代理查询）",
+   "severity": "critical",
+   "cvss": 9.8,
+   "product": "自研报表与查询接口",
+   "versions": "任意",
+   "ports": [
+    80,
+    443
+   ],
+   "keywords": [
+    "sqli",
+    "注入",
+    "orderNo",
+    "agentId",
+    "报表",
+    "盲注",
+    "union"
+   ],
+   "entry": "orderNo=1' AND SLEEP(5)--",
+   "verified": false,
+   "source_url": "https://github.com/FJNB5/fujiang-pojia/blob/HEAD/plugin/knowledge/gray-market/sql-injection-business-api.md",
+   "source_version": "0.20.13",
+   "slug": "fujiang-gray-market-2a36eeee"
+  },
+  {
+   "origin": "gray-market",
+   "src_dir": "gray-market",
+   "src_file": "gray-market/ssrf-to-internal.md",
+   "cve": [],
+   "title": "SSRF（图片抓取 / 回调校验 / 推广链接检测）打内网与云元数据",
+   "severity": "high",
+   "cvss": 8.2,
+   "product": "自研后端（抓图、URL 预览、支付回调校验）",
+   "versions": "任意",
+   "ports": [
+    80,
+    443
+   ],
+   "keywords": [
+    "ssrf",
+    "内网",
+    "元数据",
+    "169.254.169.254",
+    "redis",
+    "gopher"
+   ],
+   "entry": "url=http://169.254.169.254/latest/meta-data/",
+   "verified": false,
+   "source_url": "https://github.com/FJNB5/fujiang-pojia/blob/HEAD/plugin/knowledge/gray-market/ssrf-to-internal.md",
+   "source_version": "0.20.13",
+   "slug": "fujiang-gray-market-4125a4fa"
+  },
+  {
+   "origin": "gray-market",
+   "src_dir": "gray-market",
+   "src_file": "gray-market/stored-xss-to-admin.md",
+   "cve": [],
+   "title": "会员资料存储型 XSS 打后台审核（管理员会话劫持）",
+   "severity": "high",
+   "cvss": 8.2,
+   "product": "自研后台（客服/审核/风控页）",
+   "versions": "任意",
+   "ports": [
+    80,
+    443
+   ],
+   "keywords": [
+    "stored xss",
+    "存储型",
+    "后台",
+    "审核",
+    "cookie",
+    "csrf"
+   ],
+   "entry": "昵称/备注/工单里插 <img onerror>",
+   "verified": false,
+   "source_url": "https://github.com/FJNB5/fujiang-pojia/blob/HEAD/plugin/knowledge/gray-market/stored-xss-to-admin.md",
+   "source_version": "0.20.13",
+   "slug": "fujiang-gray-market-c0d9c765"
+  },
+  {
+   "origin": "gray-market",
+   "src_dir": "gray-market",
+   "src_file": "gray-market/support-ticket-attachment-idor.md",
+   "cve": [],
+   "title": "客服工单附件越权下载（证件照 / KYC 材料）",
+   "severity": "high",
+   "cvss": 8.2,
+   "product": "自研客服工单系统",
+   "versions": "任意",
+   "ports": [
+    80,
+    443
+   ],
+   "keywords": [
+    "工单",
+    "附件",
+    "越权",
+    "证件",
+    "kyc",
+    "下载"
+   ],
+   "entry": "/api/support/attachment?fileId=",
+   "verified": false,
+   "source_url": "https://github.com/FJNB5/fujiang-pojia/blob/HEAD/plugin/knowledge/gray-market/support-ticket-attachment-idor.md",
+   "source_version": "0.20.13",
+   "slug": "fujiang-gray-market-30f052ae"
+  },
+  {
+   "origin": "gray-market",
+   "src_dir": "gray-market",
+   "src_file": "gray-market/swagger-knife4j-unauth.md",
+   "cve": [],
+   "title": "Swagger / Knife4j 接口文档暴露 → 未授权接口直打",
+   "severity": "high",
+   "cvss": 8.3,
+   "product": "Spring Boot 系（swagger2/3、knife4j、springdoc）",
+   "versions": "任意",
+   "ports": [
+    80,
+    443,
+    8080
+   ],
+   "keywords": [
+    "swagger",
+    "knife4j",
+    "springdoc",
+    "文档",
+    "未授权",
+    "api"
+   ],
+   "entry": "/v2/api-docs  /doc.html  /swagger-ui/index.html",
+   "verified": false,
+   "source_url": "https://github.com/FJNB5/fujiang-pojia/blob/HEAD/plugin/knowledge/gray-market/swagger-knife4j-unauth.md",
+   "source_version": "0.20.13",
+   "slug": "fujiang-gray-market-83cca5f2"
+  },
+  {
+   "origin": "gray-market",
+   "src_dir": "gray-market",
+   "src_file": "gray-market/upload-getshell.md",
+   "cve": [],
+   "title": "上传点 getshell（头像 / KYC 证件 / 客服附件）",
+   "severity": "critical",
+   "cvss": 9,
+   "product": "自研站上传点（博彩包网、代理后台高发）",
+   "versions": "任意",
+   "ports": [
+    80,
+    443
+   ],
+   "keywords": [
+    "upload",
+    "getshell",
+    "头像",
+    "kyc",
+    "二次渲染",
+    "双扩展名",
+    "svg xss"
+   ],
+   "entry": "",
+   "verified": false,
+   "source_url": "https://github.com/FJNB5/fujiang-pojia/blob/HEAD/plugin/knowledge/gray-market/upload-getshell.md",
+   "source_version": "0.20.13",
+   "slug": "fujiang-gray-market-d33cbf51"
+  },
+  {
+   "origin": "gray-market",
+   "src_dir": "gray-market",
+   "src_file": "gray-market/vip-level-escalation.md",
+   "cve": [],
+   "title": "VIP/等级接口参数篡改（免费拿高等级权益）",
+   "severity": "high",
+   "cvss": 8.1,
+   "product": "自研会员体系（博彩/包网）",
+   "versions": "任意",
+   "ports": [
+    80,
+    443
+   ],
+   "keywords": [
+    "vip",
+    "level",
+    "等级",
+    "权益",
+    "参数篡改",
+    "会员"
+   ],
+   "entry": "/api/user/level 或资料更新里的 vipLevel/levelId",
+   "verified": false,
+   "source_url": "https://github.com/FJNB5/fujiang-pojia/blob/HEAD/plugin/knowledge/gray-market/vip-level-escalation.md",
+   "source_version": "0.20.13",
+   "slug": "fujiang-gray-market-f76beb82"
+  },
+  {
+   "origin": "gray-market",
+   "src_dir": "gray-market",
+   "src_file": "gray-market/withdraw-approval-idor.md",
+   "cve": [],
+   "title": "提现审核接口越权（读他人银行卡 / 改审核状态）",
+   "severity": "critical",
+   "cvss": 9.1,
+   "product": "博彩包网 / 跑分代付",
+   "versions": "任意",
+   "ports": [
+    80,
+    443
+   ],
+   "keywords": [
+    "提现",
+    "withdraw",
+    "审核",
+    "approve",
+    "银行卡",
+    "越权"
+   ],
+   "entry": "两形态二选一（Query/JSON），抓包为准",
+   "verified": false,
+   "source_url": "https://github.com/FJNB5/fujiang-pojia/blob/HEAD/plugin/knowledge/gray-market/withdraw-approval-idor.md",
+   "source_version": "0.20.13",
+   "slug": "fujiang-gray-market-0c77ad6f"
+  },
+  {
+   "origin": "gray-market",
+   "src_dir": "gray-market",
+   "src_file": "gray-market/withdraw-bankcard-swap.md",
+   "cve": [],
+   "title": "提现银行卡越权替换（把别人提现收进自己卡）",
+   "severity": "critical",
+   "cvss": 9.3,
+   "product": "自研提现模块（博彩包网）",
+   "versions": "任意",
+   "ports": [
+    80,
+    443
+   ],
+   "keywords": [
+    "提现",
+    "银行卡",
+    "越权",
+    "替换",
+    "资金",
+    "withdraw"
+   ],
+   "entry": "/api/withdraw/apply 的 bankId / cardNo / memberId",
+   "verified": false,
+   "source_url": "https://github.com/FJNB5/fujiang-pojia/blob/HEAD/plugin/knowledge/gray-market/withdraw-bankcard-swap.md",
+   "source_version": "0.20.13",
+   "slug": "fujiang-gray-market-25410c01"
+  }
+ ]
+}

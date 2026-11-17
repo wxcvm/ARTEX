@@ -1,6 +1,6 @@
 # 知识库索引
 
-共 **508** 条，其中已验证 **378** 条。数据源 `knowledge.db`（SQLite + FTS5，`knowledge_dir` 直接加载）。
+共 **672** 条，其中已验证 **378** 条。数据源 `knowledge.db`（SQLite + FTS5，`knowledge_dir` 直接加载）。
 
 生成：`python knowledge/tools/export_docs.py`；体检：`python knowledge/tools/kb_check.py`
 
@@ -11,17 +11,25 @@
 | `info-leak` | 86 |
 | `auth-bypass` | 74 |
 | `absorbed` | 60 |
+| `gray-market` | 59 |
 | `unauthorized` | 57 |
 | `rce` | 42 |
 | `recon` | 32 |
 | `methodology` | 23 |
+| `java-web` | 22 |
 | `file-upload` | 20 |
+| `web-cms` | 19 |
 | `weak-password` | 18 |
 | `frontend-reverse` | 16 |
+| `edge-device` | 16 |
 | `app-audit` | 15 |
+| `cloud-container` | 14 |
+| `exchange-ad` | 14 |
 | `env` | 11 |
+| `linux-priv` | 11 |
 | `waf` | 10 |
 | `path-traversal` | 9 |
+| `java-deser` | 9 |
 | `ssrf` | 8 |
 | `tunnel` | 8 |
 | `sqli` | 6 |
@@ -34,10 +42,10 @@
 | kind | 条数 |
 |---|---|
 | `script` | 217 |
+| `markdown` | 201 |
 | `poc` | 150 |
 | `exp` | 46 |
 | `template` | 44 |
-| `markdown` | 37 |
 | `payload` | 8 |
 | `http` | 6 |
 
@@ -553,3 +561,167 @@
 | 515 | 代理分流造假样本-target30.example.com-经-7892-返回伪造-502-404-hello | absorbed | script |  | 代理分流造假样本,target30.example.com,7892,返回伪造,502,404,hello |
 | 516 | 博彩-phpwind-站群实战结论集-203.0.113.1-24-判死路线-8-条可复用判据 | absorbed | http |  | 博彩,phpwind,站群实战结论集,203.0.113.1,24,判死路线,条可复用判据 |
 | 517 | 博彩-phpwind-站群实战结论集-203.0.113.27-24-判死路线-8-条可复用判据 | absorbed | http |  | 博彩,phpwind,站群实战结论集,203.0.113.27,24,判死路线,条可复用判据 |
+| 518 | Nexus Repository 未授权 RCE（CVE-2019-7238） | cloud-container | markdown |  | nexus,sonatype,2019-7238,未授权,rce,供应链,cloud-container,fujiang |
+| 519 | PostgreSQL COPY PROGRAM 权限边界（CVE-2019-9193，厂商认定非漏洞） | cloud-container | markdown |  | postgresql,postgres,copy,program,命令执行,数据库,cloud-container,fujiang |
+| 520 | vCenter Server 未授权上传 → RCE（vROPS 插件） | cloud-container | markdown |  | vcenter,vrops,uploadova,21972,未授权,cloud-container,fujiang |
+| 521 | Nacos 认证绕过（User-Agent 白名单） | cloud-container | markdown |  | nacos,user-agent,auth-bypass,cve-2021-29441,cloud-container,fujiang |
+| 522 | Grafana 插件路径穿越任意文件读（CVE-2021-43798） | cloud-container | markdown |  | grafana,2021-43798,路径穿越,文件读取,监控,cloud-container,fujiang |
+| 523 | cgroups release_agent 容器逃逸 | cloud-container | markdown |  | cgroup,release_agent,escape,cap_sys_admin,container,cloud-container,fu |
+| 524 | VMware Workspace ONE Access 模板注入 RCE | cloud-container | markdown |  | workspace one,freemarker,ssti,22954,未授权,cloud-container,fujiang |
+| 525 | Veeam Backup 凭据泄露（CVE-2023-27532） | cloud-container | markdown |  | veeam,2023-27532,凭据,备份,cloud-container,fujiang |
+| 526 | runc 文件描述符泄露逃逸（Leaky Vessels） | cloud-container | markdown |  | runc,leaky vessels,fd leak,workdir,escape,docker build,Docker,containe |
+| 527 | VMware ESXi 认证绕过 → hypervisor 失守（CVE-2024-37085） | cloud-container | markdown |  | esxi,vmware,2024-37085,ad,认证绕过,勒索,cloud-container,fujiang |
+| 528 | Veeam Backup 未认证 RCE（CVE-2024-40711） | cloud-container | markdown |  | veeam,2024-40711,反序列化,未认证,rce,cloud-container,fujiang |
+| 529 | Docker Remote API 未授权（直接拿宿主） | cloud-container | markdown |  | docker,api,2375,privileged,escape,cloud-container,fujiang |
+| 530 | MongoDB 未授权访问（直接拖库） | cloud-container | markdown |  | mongodb,未授权,拖库,数据库,nosql,cloud-container,fujiang |
+| 531 | Redis 未授权（写文件 / 模块加载 / 主从复制） | cloud-container | markdown |  | redis,unauth,config-set,rdb,cron,module-load,replica,cloud-container,f |
+| 532 | FortiOS SSL VPN 路径穿越（凭据读取） | edge-device | markdown |  | fortinet,fortigate,fortios,sslvpn,path-traversal,fgt_lang,edge-device, |
+| 533 | Pulse Secure 任意文件读取（凭据与会话） | edge-device | markdown |  | pulse,ivanti,file-read,session,凭据,edge-device,fujiang |
+| 534 | Citrix ADC 路径穿越 → 模板注入 RCE | edge-device | markdown |  | citrix,netscaler,path-traversal,newbm,cve-2019-19781,edge-device,fujia |
+| 535 | FortiOS SSL VPN 双因素绕过（用户名大小写） | edge-device | markdown |  | fortigate,fortios,sslvpn,2fa bypass,ldap,大小写,edge-device,fujiang |
+| 536 | F5 BIG-IP TMUI 未授权 RCE（..;/ 路径穿越） | edge-device | markdown |  | f5,bigip,tmui,5902,tmsh,路径穿越,edge-device,fujiang |
+| 537 | F5 iControl REST 未授权 RCE（2021 变体） | edge-device | markdown |  | f5,icontrol,22986,bash,未授权,edge-device,fujiang |
+| 538 | F5 BIG-IP iControl REST 认证绕过 → 命令执行 | edge-device | markdown |  | f5,bigip,icontrol,auth-bypass,tmsh,cve-2022-1388,edge-device,fujiang |
+| 539 | FortiOS / FortiProxy 管理面认证绕过（假 Forwarded 头） | edge-device | markdown |  | fortinet,fortios,fortiproxy,auth bypass,forwarded header,edge-device,f |
+| 540 | Ivanti EPMM 认证绕过（CVE-2023-35078） | edge-device | markdown |  | ivanti,epmm,mobileiron,2023-35078,auth bypass,edge-device,fujiang |
+| 541 | Ivanti Connect Secure 认证绕过 + 命令注入（串联） | edge-device | markdown |  | ivanti,pulse,authentication-bypass,command-injection,cve-2024-21887,ed |
+| 542 | FortiClient EMS SQL 注入 → 未认证 RCE（CVE-2023-48788） | edge-device | markdown |  | forticlient,ems,sqli,2023-48788,未授权,edge-device,fujiang |
+| 543 | PAN-OS 管理面认证绕过 → root RCE（CVE-2024-0012 + CVE-2024-9474） | edge-device | markdown |  | panos,paloalto,2024-0012,2024-9474,auth bypass,管理面,edge-device,fujiang |
+| 544 | GoAnywhere MFT 认证绕过 → 新建管理员（CVE-2024-0204） | edge-device | markdown |  | goanywhere,mft,2024-0204,认证绕过,管理员,edge-device,fujiang |
+| 545 | Check Point Quantum 安全网关任意文件读（CVE-2024-24919） | edge-device | markdown |  | checkpoint,quantum,2024-24919,文件读取,vpn,网关,edge-device,fujiang |
+| 546 | PAN-OS GlobalProtect 命令注入 | edge-device | markdown |  | panos,globalprotect,sessid,command-injection,cve-2024-3400,edge-device |
+| 547 | FortiManager 未认证 RCE（FortiJump，CVE-2024-47575） | edge-device | markdown |  | fortimanager,fortijump,2024-47575,fgfm,未认证,edge-device,fujiang |
+| 548 | AD CS 证书滥用（ESC1 / ESC8 等） | exchange-ad | markdown |  | adcs,esc1,esc8,certipy,pki,certificate-template,exchange-ad,fujiang |
+| 549 | EternalBlue（MS17-010 SMBv1 远程溢出） | exchange-ad | markdown |  | eternalblue,ms17-010,smbv1,doublepulsar,cve-2017-0144,exchange-ad,fuji |
+| 550 | Exchange ViewState 反序列化（静态 machineKey） | exchange-ad | markdown |  | exchange,viewstate,machinekey,ysoserial.net,ecp,exchange-ad,fujiang |
+| 551 | Zerologon（Netlogon 密钥置零 → 域控接管） | exchange-ad | markdown |  | zerologon,netlogon,dcsync,cve-2020-1472,domain-controller,exchange-ad, |
+| 552 | Exchange ProxyLogon（SSRF + 任意文件写入 → RCE） | exchange-ad | markdown |  | exchange,proxylogon,ssrf,ecp,autodiscover,cve-2021-26855,exchange-ad,f |
+| 553 | Exchange ProxyShell（三个洞串联 → RCE） | exchange-ad | markdown |  | exchange,proxyshell,autodiscover,ews,mailboxexport,cve-2021-34473,exch |
+| 554 | PrintNightmare（打印后台服务任意 DLL 加载） | exchange-ad | markdown |  | printnightmare,spooler,rpcaddprinterdriverex,dll,cve-2021-34527,exchan |
+| 555 | noPac（sAMAccountName 伪装 + 无 PAC 票据 → 域管） | exchange-ad | markdown |  | nopac,samaccountname,kerberos,golden-ticket,cve-2021-42278,exchange-ad |
+| 556 | Exchange 认证后反序列化 RCE（CVE-2021-42321） | exchange-ad | markdown |  | exchange,2021-42321,反序列化,ews,rce,exchange-ad,fujiang |
+| 557 | MSDT 协议远程代码执行（Follina） | exchange-ad | markdown |  | follina,msdt,30190,word,rtf,钓鱼,exchange-ad,fujiang |
+| 558 | Exchange ProxyNotShell（SSRF + PowerShell 远程） | exchange-ad | markdown |  | exchange,proxynotshell,owassrf,ssrf,powershell,exchange-ad,fujiang |
+| 559 | Exchange EWS NTLM 中继提权（CVE-2024-21410） | exchange-ad | markdown |  | exchange,ews,2024-21410,ntlm,relay,提权,exchange-ad,fujiang |
+| 560 | Outlook MonikerLink 绕过与 NTLM 泄露（CVE-2024-21413） | exchange-ad | markdown |  | outlook,monikerlink,2024-21413,ntlm,钓鱼,exchange-ad,fujiang |
+| 561 | Zimbra postjournal 未授权命令执行（CVE-2024-45519） | exchange-ad | markdown |  | zimbra,2024-45519,postjournal,未授权,rce,邮件,exchange-ad,fujiang |
+| 562 | WebLogic T3 反序列化（CommonsCollections） | java-deser | markdown |  | weblogic,t3,deserialization,commonscollections,ysoserial,java-deser,fu |
+| 563 | Shiro rememberMe 默认密钥反序列化 RCE（CVE-2016-4437） | java-deser | markdown |  | shiro,rememberme,反序列化,默认密钥,java,java-deser,fujiang |
+| 564 | WebLogic wls-wsat XMLDecoder 反序列化 RCE | java-deser | markdown |  | weblogic,wls-wsat,xmldecoder,soap,coordinatorporttype,java-deser,fujia |
+| 565 | Struts2 S2-045 Content-Type OGNL 注入 | java-deser | markdown |  | struts2,s2-045,ognl,multipart,content-type,java-deser,fujiang |
+| 566 | Apache Log4j2 JNDI 注入（Log4Shell） | java-deser | markdown |  | log4j,log4shell,jndi,ldap,rmi,dnslog,log4j-core,java-deser,fujiang |
+| 567 | SnakeYAML 反序列化 RCE（CVE-2022-1471） | java-deser | markdown |  | snakeyaml,yaml,2022-1471,反序列化,rce,java,java-deser,fujiang |
+| 568 | Java ECDSA 空签名绕过（Psychic Signatures） | java-deser | markdown |  | ecdsa,psychic-signatures,jwt,es256,saml,签名绕过,java-deser,fujiang |
+| 569 | Spring Framework 数据绑定 RCE（Spring4Shell） | java-deser | markdown |  | spring,spring4shell,classloader,tomcat,accessLogValve,java-deser,fujia |
+| 570 | Fastjson autoType 反序列化 RCE | java-deser | markdown |  | fastjson,autotype,jdbcrowsetimpl,jndi,json,java-deser,fujiang |
+| 571 | Tomcat PUT 任意文件写入（JSP 落地） | java-web | markdown |  | tomcat,put,jsp,readonly,windows,12615,java-web,fujiang |
+| 572 | Apache Solr Velocity 模板注入 RCE | java-web | markdown |  | solr,velocity,params.resource.loader,template,cve-2019-17558,java-web, |
+| 573 | WebLogic wls9_async_response 未授权 RCE（2019 在野） | java-web | markdown |  | weblogic,2725,wls9_async,xmldecoder,未授权,java-web,fujiang |
+| 574 | WebLogic 控制台未授权 RCE（console.portal 路径穿越） | java-web | markdown |  | weblogic,console,path traversal,shellsession,mvel,java-web,fujiang |
+| 575 | Tomcat AJP 文件读取 / 包含（Ghostcat） | java-web | markdown |  | tomcat,ajp,ghostcat,web.xml,文件包含,java-web,fujiang |
+| 576 | Apache Druid 未授权 RCE（CVE-2021-25646） | java-web | markdown |  | druid,apache,2021-25646,未授权,rce,时序库,java-web,fujiang |
+| 577 | Confluence 未授权 OGNL 注入（pre-auth，ENCODED_TOKEN） | java-web | markdown |  | confluence,ognl,pre-auth,queryString,doenterpagevariables,java-web,fuj |
+| 578 | Spring Cloud Gateway Actuator SpEL 注入 RCE（CVE-2022-22947） | java-web | markdown |  | spring,gateway,actuator,spel,2022-22947,rce,java-web,fujiang |
+| 579 | Spring Cloud Function SpEL 注入 RCE（CVE-2022-22963） | java-web | markdown |  | spring,cloud,function,2022-22963,spel,rce,java-web,fujiang |
+| 580 | Confluence 未授权 OGNL 注入（Confluence OGNL RCE） | java-web | markdown |  | confluence,ognl,cve-2022-26134,atlassian,rce,java-web,fujiang |
+| 581 | Confluence 未授权管理员接管（setup 流程未关） | java-web | markdown |  | confluence,22515,setupadministrator,未授权,管理员,java-web,fujiang |
+| 582 | Confluence 未授权恢复导致管理员接管 | java-web | markdown |  | confluence,setup-restore,未授权,管理员接管,java-web,fujiang |
+| 583 | Confluence 模板注入 RCE（text-inline.vm） | java-web | markdown |  | confluence,ssti,velocity,text-inline,cve-2023-22527,java-web,fujiang |
+| 584 | PaperCut NG/MF 认证绕过 → RCE（CVE-2023-27350） | java-web | markdown |  | papercut,2023-27350,auth bypass,setup,打印,java-web,fujiang |
+| 585 | TeamCity 认证绕过 → 管理员令牌 → RCE | java-web | markdown |  | teamcity,auth-bypass,token,cve-2023-42793,java-web,fujiang |
+| 586 | Apache ActiveMQ OpenWire 反序列化 RCE | java-web | markdown |  | activemq,openwire,deserialization,classinfo,61616,java-web,fujiang |
+| 587 | Struts2 文件上传路径穿越（S2-066） | java-web | markdown |  | struts2,s2-066,upload,path-traversal,filename,java-web,fujiang |
+| 588 | GitLab 任意账号接管（CVE-2023-7028） | java-web | markdown |  | gitlab,2023-7028,账号接管,密码重置,java-web,fujiang |
+| 589 | Jenkins CLI 任意文件读取 | java-web | markdown |  | jenkins,cli,args4j,file-read,cve-2024-23897,java-web,fujiang |
+| 590 | TeamCity 鉴权绕过（;.jsp 路径参数） | java-web | markdown |  | teamcity,auth bypass,27198,rest,token,java-web,fujiang |
+| 591 | Apache OFBiz 未授权 RCE（CVE-2024-38856） | java-web | markdown |  | ofbiz,2024-38856,未授权,rce,电商,java-web,fujiang |
+| 592 | Struts2 文件上传路径穿越 → RCE（S2-067，CVE-2024-53677） | java-web | markdown |  | struts2,s2-067,2024-53677,文件上传,路径穿越,rce,java-web,fujiang |
+| 593 | Baron Samedit（sudo 堆溢出提权） | linux-priv | markdown |  | sudo,baron-samedit,sudoedit,heap-overflow,cve-2021-3156,linux-priv,fuj |
+| 594 | Ubuntu overlayfs 本地提权（2021） | linux-priv | markdown |  | ubuntu,overlayfs,3493,userns,setuid,linux-priv,fujiang |
+| 595 | PwnKit（polkit pkexec 本地提权） | linux-priv | markdown |  | pwnkit,pkexec,polkit,suid,cve-2021-4034,linux-priv,fujiang |
+| 596 | fs_context 堆溢出提权（legacy_parse_param） | linux-priv | markdown |  | fs_context,heap overflow,unshare,userns,cap_sys_admin,linux-priv,fujia |
+| 597 | Dirty Pipe（页缓存写覆盖提权） | linux-priv | markdown |  | dirtypipe,page-cache,splice,cve-2022-0847,linux-priv,fujiang |
+| 598 | overlayfs copy-up 权限绕过提权 | linux-priv | markdown |  | overlayfs,copy-up,setuid,unshare,cve-2023-0386,linux-priv,fujiang |
+| 599 | sudoedit 环境变量注入提权（EDITOR 带 --） | linux-priv | markdown |  | sudo,sudoedit,editor,22809,提权,linux-priv,fujiang |
+| 600 | Ubuntu overlayfs 权限提升（GameOver(lay)） | linux-priv | markdown |  | ubuntu,overlayfs,gameoverlay,xattr,setuid,提权,linux-priv,fujiang |
+| 601 | nf_tables 释放后重用提权（2023） | linux-priv | markdown |  | nftables,netfilter,uaf,32233,unshare,linux-priv,fujiang |
+| 602 | Linux io_uring 本地提权（CVE-2024-0582） | linux-priv | markdown |  | linux,io_uring,2024-0582,uaf,本地提权,linux-priv,fujiang |
+| 603 | nf_tables 释放后重用提权 | linux-priv | markdown |  | nftables,netfilter,uaf,unshare,cve-2024-1086,linux-priv,fujiang |
+| 604 | 命令注入（分号 / 反引号 / $() 与盲注外带） | web-cms | markdown |  | 命令注入,rce,ping,反引号,盲注,shell,web-cms,fujiang |
+| 605 | PHPUnit eval-stdin 远程代码执行 | web-cms | markdown |  | phpunit,eval-stdin,vendor,9841,rce,web-cms,fujiang |
+| 606 | Drupal 表单 API 远程代码执行（Drupalgeddon2） | web-cms | markdown |  | drupal,drupalgeddon2,form-api,post_render,cve-2018-7600,web-cms,fujian |
+| 607 | PHP-FPM 路径信息下溢 RCE | web-cms | markdown |  | phpfpm,nginx,fastcgi,cve-2019-11043,phuip-fpizdam,web-cms,fujiang |
+| 608 | vBulletin widget 配置代码执行 | web-cms | markdown |  | vbulletin,widget_php,preg_replace,cve-2019-16759,web-cms,fujiang |
+| 609 | Laravel Ignition 调试模式任意文件读 → RCE（CVE-2021-3129） | web-cms | markdown |  | laravel,ignition,2021-3129,rce,debug,php,web-cms,fujiang |
+| 610 | Apache HTTP Server 路径穿越 / CGI RCE | web-cms | markdown |  | httpd,apache,path traversal,cgi,mod_cgi,printf,web-cms,fujiang |
+| 611 | Joomla 未授权配置泄露（API） | web-cms | markdown |  | joomla,api,config leak,数据库口令,web-cms,fujiang |
+| 612 | WordPress Backup Migration 未授权 RCE（CVE-2023-6553） | web-cms | markdown |  | wordpress,backup-migration,2023-6553,未授权,rce,web-cms,fujiang |
+| 613 | WordPress Bricks 未授权 RCE（CVE-2024-25600） | web-cms | markdown |  | wordpress,bricks,2024-25600,未授权,rce,web-cms,fujiang |
+| 614 | WordPress WP-Automatic 未授权 SQL 注入（CVE-2024-27956） | web-cms | markdown |  | wordpress,wp-automatic,2024-27956,sqli,未授权,web-cms,fujiang |
+| 615 | PHP-CGI Windows 参数注入（best-fit 编码） | web-cms | markdown |  | php,cgi,windows,best-fit,cve-2024-4577,web-cms,fujiang |
+| 616 | 本地文件包含 → RCE（日志包含 / pearcmd / PHP filter chain） | web-cms | markdown |  | lfi,文件包含,日志包含,pearcmd,filter chain,rce,web-cms,fujiang |
+| 617 | Nginx alias 路径穿越（读任意文件/源码泄露） | web-cms | markdown |  | nginx,alias,穿越,目录,源码,配置,web-cms,fujiang |
+| 618 | PHP 反序列化（POP 链 → RCE / phar 触发） | web-cms | markdown |  | php,反序列化,pop链,phar,unserialize,rce,web-cms,fujiang |
+| 619 | SQL 注入（报错 / UNION / 堆叠）通用打法 | web-cms | markdown |  | sqli,sql注入,union,报错,堆叠,sqlmap,web-cms,fujiang |
+| 620 | SSTI 模板注入 → RCE（Jinja2 / Twig / Freemarker） | web-cms | markdown |  | ssti,模板注入,jinja2,twig,freemarker,rce,web-cms,fujiang |
+| 621 | ThinkPHP 5.x 方法注入 / 路由 RCE | web-cms | markdown |  | thinkphp,invokefunction,_method,__construct,filter,rce,web-cms,fujiang |
+| 622 | XXE 外部实体注入（读文件 / SSRF / OOB 外带） | web-cms | markdown |  | xxe,xml,外部实体,文件读取,oob,saml,web-cms,fujiang |
+| 623 | 后台管理 API 未授权（只在前端隐藏菜单） | gray-market | markdown |  | admin api,未授权,越权,前端隐藏,菜单,gray-market,fujiang |
+| 624 | 后台 IP 白名单绕过（X-Forwarded-For 伪造内网来源） | gray-market | markdown |  | 白名单,ip,xff,绕过,后台,内网,gray-market,fujiang |
+| 625 | 后台“重置任意用户密码”接口越权（直接接管会员/管理员） | gray-market | markdown |  | 重置密码,任意用户,越权,后台,接管,gray-market,fujiang |
+| 626 | 代理层级越权（读全站下级 / 改佣金比例） | gray-market | markdown |  | 代理,agentId,层级越权,佣金,返水,会员列表,gray-market,fujiang |
+| 627 | 接口越权 / BOLA（读他人订单、流水、提现） | gray-market | markdown |  | idor,bola,越权,水平越权,orderNo,uid,代理后台,gray-market,fujiang |
+| 628 | 接口无 nonce / 时间戳 → 请求重放（充值、领奖、下注） | gray-market | markdown |  | 重放,replay,nonce,时间戳,签名,幂等,gray-market,fujiang |
+| 629 | 注单 / 流水接口越权批量拉取（全站会员数据） | gray-market | markdown |  | 注单,流水,idor,越权,批量,报表,gray-market,fujiang |
+| 630 | 下注/结算赔率与倍数篡改（资金面） | gray-market | markdown |  | bet,odds,赔率,倍数,结算,篡改,gray-market,fujiang |
+| 631 | 支付 / 回调地址可控 → 内网 SSRF（含云元数据） | gray-market | markdown |  | 回调,支付,ssrf,内网,元数据,notify,gray-market,fujiang |
+| 632 | 前端签名 / 加密可逆（伪造请求绕过风控） | gray-market | markdown |  | sign,hmac,aes,前端加密,可逆,nonce,timestamp,风控,gray-market,fujiang |
+| 633 | CORS 配置错误（带凭据读他人接口数据） | gray-market | markdown |  | cors,跨域,带凭据,origin,泄露,gray-market,fujiang |
+| 634 | 券码 / 彩金码可枚举（批量领取与套现） | gray-market | markdown |  | 券码,彩金,兑换,枚举,coupon,领取,gray-market,fujiang |
+| 635 | 客服聊天记录导出未鉴权（全站会话与身份材料） | gray-market | markdown |  | 客服,聊天记录,导出,未鉴权,会话,im,gray-market,fujiang |
+| 636 | CSRF（无 token 的提现/改密/绑卡） | gray-market | markdown |  | csrf,跨站,提现,改密,绑卡,token,gray-market,fujiang |
+| 637 | 签到 / 任务奖励批量刷取（缺幂等与频率控制） | gray-market | markdown |  | 签到,任务,奖励,刷取,幂等,并发,gray-market,fujiang |
+| 638 | phpMyAdmin / Adminer 暴露（弱口令直进数据库） | gray-market | markdown |  | phpmyadmin,adminer,pma,数据库,弱口令,脱库,gray-market,fujiang |
+| 639 | Druid 监控未授权 → session 泄露/后台接管（若依系必备） | gray-market | markdown |  | druid,监控,session,未授权,若依,jeecg,gray-market,fujiang |
+| 640 | 导出 / 下载接口任意文件读取 | gray-market | markdown |  | 任意文件读,download,export,path traversal,对账单,gray-market,fujiang |
+| 641 | 财务导出接口越权（银行卡 + 身份证批量导出） | gray-market | markdown |  | 财务,导出,银行卡,身份证,提现,越权,gray-market,fujiang |
+| 642 | 三方游戏 / 视讯接口 key 泄露与回调伪造 | gray-market | markdown |  | game vendor,api key,视讯,上分,callback,transfer,gray-market,fujiang |
+| 643 | Host 头投毒（密码重置链接被劫持 → 任意账号接管） | gray-market | markdown |  | host,头,投毒,密码重置,链接,劫持,gray-market,fujiang |
+| 644 | 客服 IM / WebSocket 未鉴权（订阅他人会话） | gray-market | markdown |  | websocket,socket.io,im,客服,未鉴权,room,订阅,gray-market,fujiang |
+| 645 | 后台"切换用户/代登录"接口越权（任意账号接管） | gray-market | markdown |  | impersonate,switch,代登录,客服,越权,接管,gray-market,fujiang |
+| 646 | 邀请返水自邀循环（小号矩阵刷返水） | gray-market | markdown |  | 邀请,返水,代理,自邀,循环,佣金,gray-market,fujiang |
+| 647 | JWT 实现缺陷（alg:none / 弱密钥 / 可预测 / kid 注入） | gray-market | markdown |  | jwt,alg none,hmac,hashcat 16500,kid,越权,提权,gray-market,fujiang |
+| 648 | 开奖结果可预测（弱 PRNG / 客户端算法 / 固定种子） | gray-market | markdown |  | lottery,prng,开奖,可预测,种子,快三,时时彩,gray-market,fujiang |
+| 649 | Mass Assignment（注册/资料接口注入 role / vip / balance / agentId） | gray-market | markdown |  | mass assignment,批量赋值,role,vip,balance,agentId,gray-market,fujiang |
+| 650 | 会员隐私批量查询 / 账号枚举（手机号、银行卡） | gray-market | markdown |  | member,enumeration,手机号,银行卡,隐私,批量查询,gray-market,fujiang |
+| 651 | 包网多租户越权（tenantId/siteId 遍历，横穿几十个站点） | gray-market | markdown |  | 多租户,tenant,siteId,包网,白标,越权,gray-market,fujiang |
+| 652 | 通知模板注入（标题/正文模板未转义 → SSTI / 存储型 XSS） | gray-market | markdown |  | 模板,ssti,通知,站内信,短信,注入,gray-market,fujiang |
+| 653 | OAuth redirect_uri 劫持 / state 缺失（账号接管） | gray-market | markdown |  | oauth,redirect_uri,state,登录,接管,sso,gray-market,fujiang |
+| 654 | 对象存储与数据存储裸露（OSS / S3 / MinIO / MySQL / MongoDB） | gray-market | markdown |  | oss,s3,bucket,minio,mongodb,mysql,弱口令,列举,kyc,gray-market,fujiang |
+| 655 | 运营后台弱口令 + 验证码复用（博彩站点最常见入口） | gray-market | markdown |  | 弱口令,后台,验证码复用,运营商,包网,登录,gray-market,fujiang |
+| 656 | 订单状态机篡改（未支付改成已支付 / 已取消再入账） | gray-market | markdown |  | 订单,状态机,篡改,未支付,充值,资金,gray-market,fujiang |
+| 657 | 源站 IP 泄露 → 绕过 WAF 直打（博彩站必看） | gray-market | markdown |  | 源站,cdn,waf,绕过,真实ip,回源,gray-market,fujiang |
+| 658 | 宝塔 / 1Panel 面板弱口令与未授权（黑灰站最常见后台） | gray-market | markdown |  | 宝塔,bt,1panel,面板,弱口令,未授权,服务器,gray-market,fujiang |
+| 659 | 密码重置 token 可预测 / 未绑定用户（任意用户改密） | gray-market | markdown |  | reset,token,找回密码,任意用户,越权,gray-market,fujiang |
+| 660 | 支付通道 / 商户号篡改（充值进攻击者账户） | gray-market | markdown |  | 支付通道,商户号,充值,路由,篡改,资金,gray-market,fujiang |
+| 661 | 支付回调伪造与金额篡改（资金面） | gray-market | markdown |  | notify,callback,伪造回调,金额篡改,重放,验签,跑分,gray-market,fujiang |
+| 662 | 活动 / 彩金 / 返水无限领取（幂等缺失） | gray-market | markdown |  | promotion,bonus,彩金,返水,幂等,并发领取,活动滥用,gray-market,fujiang |
+| 663 | 余额并发与负数（竞态 / 金额符号） | gray-market | markdown |  | 竞态,race condition,并发提现,负数,金额校验,幂等,gray-market,fujiang |
+| 664 | Redis 未授权 → 偷后台 session / token 直接进后台 | gray-market | markdown |  | redis,未授权,session,token,后台,接管,gray-market,fujiang |
+| 665 | 源码 / 备份 / 配置泄露 | gray-market | markdown |  | .git,.svn,env,backup,zip,sourcemap,swagger,源码泄露,gray-market,fujiang |
+| 666 | 报表/财务接口未授权（全站流水与代理佣金） | gray-market | markdown |  | report,finance,报表,流水,佣金,未授权,gray-market,fujiang |
+| 667 | 若依（RuoYi）系后台默认口令 / Druid / 定时任务 RCE | gray-market | markdown |  | ruoyi,若依,druid,admin123,quartz,定时任务,prod-api,gray-market,fujiang |
+| 668 | 后台定时任务 / 计划任务注入（Quartz、XXL-JOB、若依） | gray-market | markdown |  | 定时任务,quartz,xxl-job,若依,rce,计划任务,gray-market,fujiang |
+| 669 | 短信轰炸与账号枚举（验证码面） | gray-market | markdown |  | sms,轰炸,枚举,验证码爆破,频控,user enumeration,gray-market,fujiang |
+| 670 | 短信验证码回显 / 复用 / 爆破（任意账号接管） | gray-market | markdown |  | sms,code,验证码回显,复用,爆破,接管,gray-market,fujiang |
+| 671 | sourcemap / 前端 JS 泄露接口与密钥（SPA 包网站第一入口） | gray-market | markdown |  | sourcemap,js,前端,密钥,接口,泄露,spa,gray-market,fujiang |
+| 672 | Spring Boot Actuator 未授权（heapdump / Jolokia / Gateway） | gray-market | markdown |  | actuator,heapdump,jolokia,env,gateway,spring,gray-market,fujiang |
+| 673 | 业务接口 SQL 注入（报表 / 订单 / 代理查询） | gray-market | markdown |  | sqli,注入,orderNo,agentId,报表,盲注,union,gray-market,fujiang |
+| 674 | SSRF（图片抓取 / 回调校验 / 推广链接检测）打内网与云元数据 | gray-market | markdown |  | ssrf,内网,元数据,169.254.169.254,redis,gopher,gray-market,fujiang |
+| 675 | 会员资料存储型 XSS 打后台审核（管理员会话劫持） | gray-market | markdown |  | stored xss,存储型,后台,审核,cookie,csrf,gray-market,fujiang |
+| 676 | 客服工单附件越权下载（证件照 / KYC 材料） | gray-market | markdown |  | 工单,附件,越权,证件,kyc,下载,gray-market,fujiang |
+| 677 | Swagger / Knife4j 接口文档暴露 → 未授权接口直打 | gray-market | markdown |  | swagger,knife4j,springdoc,文档,未授权,api,gray-market,fujiang |
+| 678 | 上传点 getshell（头像 / KYC 证件 / 客服附件） | gray-market | markdown |  | upload,getshell,头像,kyc,二次渲染,双扩展名,svg xss,gray-market,fujiang |
+| 679 | VIP/等级接口参数篡改（免费拿高等级权益） | gray-market | markdown |  | vip,level,等级,权益,参数篡改,会员,gray-market,fujiang |
+| 680 | 提现审核接口越权（读他人银行卡 / 改审核状态） | gray-market | markdown |  | 提现,withdraw,审核,approve,银行卡,越权,gray-market,fujiang |
+| 681 | 提现银行卡越权替换（把别人提现收进自己卡） | gray-market | markdown |  | 提现,银行卡,越权,替换,资金,withdraw,gray-market,fujiang |
