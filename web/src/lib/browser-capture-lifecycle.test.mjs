@@ -59,7 +59,7 @@ function fixture() {
       request: { method: "GET", url: `https://example.test/${id}`, headers: {} },
     });
     events.event({ tabId: 7 }, "Network.responseReceived", {
-      requestId: String(id), response: { status: 200, headers: [] },
+      requestId: String(id), response: { status: 200, headers: { "Content-Type": "text/plain" } },
     });
     events.event({ tabId: 7 }, "Network.loadingFinished", { requestId: String(id) });
   };
@@ -161,6 +161,25 @@ test("each capture gets a new group and previously queued records keep their ori
 });
 
 
+
+test("Chrome CDP response header objects are ingested and normalized", async () => {
+  const x = fixture();
+  await x.message("start");
+  x.events.event({ tabId: 7 }, "Network.requestWillBeSent", {
+    requestId: "cdp-headers", request: { method: "GET", url: "https://example.test/headers", headers: { Accept: "text/plain" } },
+  });
+  x.events.event({ tabId: 7 }, "Network.responseReceived", {
+    requestId: "cdp-headers", response: { status: 201, headers: { "Content-Type": "text/plain", "X-Trace": "ok" } },
+  });
+  x.events.event({ tabId: 7 }, "Network.loadingFinished", { requestId: "cdp-headers" });
+  await x.message("stop");
+  const [e] = x.calls.uploads.flat();
+  assert.equal(e.status, 201);
+  assert.equal(e.responseHeaders["content-type"], "text/plain");
+  assert.equal(e.responseHeaders["x-trace"], "ok");
+  assert.equal(e.responseBody, "response-cdp-headers");
+});
+
 test("stop retains requests without terminal events, without inventing successful responses", async () => {
   const x = fixture();
   await x.message("start");
@@ -170,7 +189,7 @@ test("stop retains requests without terminal events, without inventing successfu
     });
   }
   x.events.event({ tabId: 7 }, "Network.responseReceived", {
-    requestId: "headers-seen", response: { status: 202, headers: [{ name: "content-type", value: "text/plain" }] },
+    requestId: "headers-seen", response: { status: 202, headers: { "Content-Type": "text/plain" } },
   });
   const stopped = await x.message("stop");
   assert.equal(stopped.queued, 0);
