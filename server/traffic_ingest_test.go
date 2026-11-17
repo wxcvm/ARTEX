@@ -189,3 +189,26 @@ func TestTrafficCaptureGroupsAPI(t *testing.T) {
 		t.Fatalf("second group page: %d %s", page.Code, page.Body)
 	}
 }
+
+func TestTrafficIngestReceiptDeduplicatesLostReply(t *testing.T) {
+	s,request:=ingestServer(t)
+	body:=`{"exchanges":[
+		{"captureId":"group-retry","exchangeId":"request-one","method":"GET","url":"https://example.invalid/a","status":0},
+		{"captureId":"group-retry","exchangeId":"request-two","method":"GET","url":"https://example.invalid/b","status":404}
+	]}`
+	check:=func(wantIngested,wantDuplicates int){
+		t.Helper()
+		w:=request("POST","/api/traffic/ingest",body)
+		if w.Code!=200{t.Fatalf("ingest status=%d %s",w.Code,w.Body)}
+		var result struct{Ingested int `json:"ingested"`;Duplicates int `json:"duplicates"`;Failed int `json:"failed"`}
+		if err:=json.Unmarshal(w.Body.Bytes(),&result);err!=nil{t.Fatal(err)}
+		if result.Ingested!=wantIngested||result.Duplicates!=wantDuplicates||result.Failed!=0{t.Fatalf("receipt: %+v",result)}
+	}
+	check(2,0)
+	check(0,2)
+	if n,err:=s.m.Traffic().Count();err!=nil||n!=2{t.Fatalf("retry duplicated evidence: %d %v",n,err)}
+	groups,_,err:=s.m.Traffic().CaptureGroups(0,10)
+	if err!=nil||len(groups)!=1||groups[0].Count!=2||groups[0].UnknownStatuses!=1||groups[0].ErrorResponses!=1{
+		t.Fatalf("capture group after retry: %+v %v",groups,err)
+	}
+}

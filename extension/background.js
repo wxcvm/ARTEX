@@ -121,14 +121,14 @@ function truncate(s) {
   return s.slice(0, MAX_BODY) + "\n... [truncated by extension]";
 }
 
-async function queueExchange(info, response) {
+async function queueExchange(info, response, skipResponseBody = false) {
   const respHeaders = {};
   for (const h of response.headers || []) respHeaders[h.name.toLowerCase()] = h.value;
   const mime = respHeaders["content-type"] || "";
 
-  let reqBody = info.postData || "";
+  let reqBody = truncate(info.postData || "");
   let respBody = "";
-  if (!skipBody(mime)) {
+  if (!skipResponseBody && !skipBody(mime)) {
     try {
       const body = await chrome.debugger.sendCommand(
         { tabId: session.tabId },
@@ -136,7 +136,6 @@ async function queueExchange(info, response) {
         { requestId: info.requestId }
       );
       if (body && !body.base64Encoded) {
-        reqBody = truncate(reqBody);
         respBody = truncate(body.body || "");
       }
     } catch (_) {
@@ -146,6 +145,7 @@ async function queueExchange(info, response) {
 
   session.queue.push({
     captureId: info.captureId,
+    exchangeId: String(info.requestId),
     method: info.method,
     url: info.url,
     status: response.status || 0,
@@ -183,17 +183,25 @@ async function flushBatches() {
       });
       if (!res.ok) throw new Error(`HTTP ${res.status}: ${(await res.text()).slice(0, 200)}`);
       const out = await res.json();
-      session.ingested += out.ingested || 0;
+      if ((out.ingested || 0) + (out.duplicates || 0) + (out.failed || 0) !== batch.length) {
+        throw new Error("server receipt does not account for every exchange");
+      }
+      session.ingested += (out.ingested || 0) + (out.duplicates || 0);
       session.failed += out.failed || 0;
       session.lastError = out.failed ? `${out.failed} entries rejected by the server` : "";
     } catch (e) {
       // Preserve unsent entries for manual retry without persisting bodies to disk.
-      session.queue = batch.concat(session.queue).slice(0, 200);
+      session.queue = batch.concat(session.queue);
       session.lastError = e.message;
       break;
     }
   }
   await saveState();
+}
+
+function trackPending(promise) {
+  pendingResponses.add(promise);
+  void promise.finally(() => pendingResponses.delete(promise));
 }
 
 chrome.debugger.onEvent.addListener((source, method, params) => {
@@ -210,16 +218,19 @@ chrome.debugger.onEvent.addListener((source, method, params) => {
   } else if (method === "Network.responseReceived") {
     const info = session.requests.get(params.requestId);
     if (info) info.response = params.response;
-  } else if (method === "Network.loadingFinished") {
+  } else if (method === "Network.loadingFinished" || method === "Network.loadingFailed") {
     const info = session.requests.get(params.requestId);
     session.requests.delete(params.requestId);
-    if (!info || !info.response) return;
-    const pending = queueExchange(info, info.response).catch((e) => {
+    if (!info) return;
+    // Preserve failed/cancelled requests without inventing a 200 response.
+    // If a status was actually observed before the failure, retain it.
+    const failed = method === "Network.loadingFailed";
+    const response = info.response || { status: 0, headers: [] };
+    const pending = queueExchange(info, response, failed).catch((e) => {
       session.lastError = e.message;
       return saveState();
     });
-    pendingResponses.add(pending);
-    void pending.finally(() => pendingResponses.delete(pending));
+    trackPending(pending);
   }
 });
 
