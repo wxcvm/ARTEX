@@ -7,6 +7,7 @@ All notable changes to this project are documented in this file. The format is b
 ### Added
 
 - **FuJiang 0.20.13 external index (164 entries)**: `knowledge/absorb/fujiang/fujiang-0.20.13-index.json` holds 105 component/CVE metadata rows plus 59 grey-market playbook rows extracted from `FJNB5/fujiang-pojia@cf086fc`. `knowledge/tools/import_fujiang.py` writes them into `poc` and `poc_fts` and materialises `pocs/<slug>/entry.md`, so every row carries a `path` the agents can read and `export_docs.py` pairs it by `code` at score 1.0. Metadata and triage pointers only: upstream PoC bodies, exploit steps and images are not copied, and every row lands with `verified = 0`.
+- **`payout-hunt` skill (discovery + triage)**: three-engine (FOFA / Shodan / Censys) fingerprint expansion, six-gate triage (alive / category / admin surface / funds surface / real hosting) and P0-P3 ordering for payout targets, backed by `scripts/bot_hunt.py` (search only) and `scripts/bot_verify.py` (triage only, no verification payloads). `payout_analyst.md` and `payout-flow-analysis` now route through it when the target is not fixed yet. The FOFA endpoint moved off the third-party relay to `https://fofa.info/api/v1/search/all`, overridable with `FOFA_ENDPOINT`.
 
 ### Changed
 

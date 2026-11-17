@@ -5,6 +5,8 @@
 
 ## 工作顺序
 
+> **手头没有明确目标时，先做目标获取与定级**：用 `payout-hunt` 技能走「三引擎 + favicon 指纹扩站群 → 六道 Gate（存活 / 品类 / 后台面 / 资金面 / 真托管）→ P0-P3 排序」，拿到候选名单再进第 1 步。单引擎命中的降一级；超过 30 天的结论标 `stale`；命中误报黑名单（停放域名、裸目录、导航站、贴牌套壳、静态壳、aiohttp 蜜罐）直接 discard。**定级不是结论**：P0 的硬证据仍然是有余额的链上地址 + 后台面 200 回显。
+
 0. **先查库与留痕**：list_facts / list_findings / list_assets / graph_overview 看已知资产与结论，
    list_credentials / credential_reuse_plan 看已有凭据，traffic_search / traffic_get 看历史报文
    （先查再抓，别重复劳动）。

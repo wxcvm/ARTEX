@@ -10,6 +10,8 @@ enabled: true
 
 目标：把"出款"（代付/代发/清算下发）从发起到资金落地的完整链路还原出来，产出**流程图 + 关键节点清单**，落库存档。这是后续打清算通道的地图。
 
+前置：本技能假设目标已经选定。目标还没定的时候，先用 `payout-hunt` 走六道 Gate 定级，拿 P0/P1 名单回来；**定级不等于验证**——P0 的硬证据仍是有余额的链上地址加后台面 200 回显。
+
 ## 从哪读（按手头材料选）
 - **源码**（最优）：搜出款英文关键词——`payout` / `disbursement` / `withdraw` / `transfer` / `remit`（**中文搜不到，一律用英文**，完整检索面见下节），顺 controller → service → 通道适配层（channel/route/gateway）往下读；
 - **接口文档**：swagger/openapi、内部 wiki、对接文档里的出款接口（发起、查询、回调 notify）——`api docs` / `Postman` 集合也在这里找；
