@@ -162,8 +162,9 @@ func DecomposeGoalsWithProvider(ctx context.Context, prov llm.Provider, dataDir,
 		DisableBackgroundTasks: true,
 		// 3 steps (extract constraints → register scope → decompose goals) each need one tool call; give enough turns so set_goals is not missed before wrap-up.
 		MaxTurns:     8,
-		NonStreaming: nonStreaming, // when this profile selects non-streaming, use Provider.Complete
-		MaxTokens:    maxTokens,    // 0 = send no cap, the server's default decides
+		NonStreaming:           nonStreaming, // when this profile selects non-streaming, use Provider.Complete
+		MaxTokens:              maxTokens,    // 0 = send no cap, the server's default decides
+		UntrustedOutputBoundary: untrustedBoundaryEnabled(),
 	}, userMsg, captureEmit)
 	// set_goals persisted the goals directly; read them back so the caller sees what
 	// was written (empty slice ⇒ the LLM produced nothing ⇒ caller falls back).
