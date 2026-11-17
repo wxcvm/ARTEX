@@ -21,6 +21,7 @@ All notable changes to this project are documented in this file. The format is b
 
 - 跨平台命令行 ZIP、Windows 桌面便携包及安装器均打包 `extension/` 浏览器捕获扩展；扩展需在 Chrome/Edge 中手动以已解压方式安装，不自动修改浏览器。见 #150。
 - **Purge × ARTEX 协同发行**：本版计划与独立发布的 Purge `1.1.92-wxcvm.10` 配套交付。ARTEX 沿用自身 Windows Setup/便携版与跨平台 ZIP；Purge 是需另行授权获取的私有 Harness 插件，不随 ARTEX 安装器打包。现有本机健康检查、工具目录复用等联动在最终 Windows 实机组合验收后再认定兼容，不将 CI 通过等同于联动验收。
+- **联动操作修复**：配对后在 ARTEX 情报页预选已关联公司，概览的发现数量与实际可读取发现保持相同的公司归属口径（#156）；`/function/sync?tab=purge-intel` 可直达 Purge 情报页（#160），与 Purge 联动工作台的对应入口配套。独立配对令牌只访问该公司的受限接口，不是管理登录令牌；两端安装/配对实机验收仍待完成。
 
 ### 稳定性修复
 
