@@ -148,7 +148,7 @@ func TestRankedKnowledgeDocumentSearch(t *testing.T){
 }
 
 
-// Exercise all 27 shipped references through the same scoped tools
+// Exercise all 45 shipped references through the same scoped tools
 // exposed to the agent, not merely the manifest or the database insert.
 func TestCyberStrikeReferenceToolRetrieval(t *testing.T) {
 	s,f,_:=trafficEvidenceServer(t)
@@ -191,6 +191,24 @@ func TestCyberStrikeReferenceToolRetrieval(t *testing.T) {
 		{"GV.RM-06","GV.RM-06"},{"GV.SC-07","GV.SC-07"},{"ID.RA-06","ID.RA-06"},
 		{"ID.RA-07","ID.RA-07"},{"PR.DS-02","PR.DS-02"},{"PR.PS-04","PR.PS-04"},
 		{"DE.CM-09","DE.CM-09"},{"RS.AN-06","RS.AN-06"},{"RC.CO-03","RC.CO-03"},
+		{"GV.OC-01","GV.OC-01"},
+		{"GV.OC-02","GV.OC-02"},
+		{"GV.OC-03","GV.OC-03"},
+		{"ID.AM-04","ID.AM-04"},
+		{"ID.AM-05","ID.AM-05"},
+		{"PR.AA-01","PR.AA-01"},
+		{"PR.AA-02","PR.AA-02"},
+		{"PR.AA-04","PR.AA-04"},
+		{"PR.PS-01","PR.PS-01"},
+		{"DE.AE-01","DE.AE-01"},
+		{"DE.AE-02","DE.AE-02"},
+		{"DE.AE-04","DE.AE-04"},
+		{"DE.AE-05","DE.AE-05"},
+		{"RS.AN-01","RS.AN-01"},
+		{"RS.AN-03","RS.AN-03"},
+		{"RC.RP-01","RC.RP-01"},
+		{"RC.RP-03","RC.RP-03"},
+		{"RC.RP-04","RC.RP-04"},
 	}{
 		hits:=search(tc.q,1)
 		if len(hits)!=1||hits[0].Scope!="global"||!strings.HasPrefix(hits[0].Title,tc.code+" ")||hits[0].DocumentID==""||!strings.HasPrefix(hits[0].SourceFilename,".cyberstrike/skill/NIST/CSF_v2.0/"){

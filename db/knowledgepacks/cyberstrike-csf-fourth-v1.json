@@ -1,0 +1,155 @@
+{
+  "id": "cyberstrike-csf-fourth-v1",
+  "framework": "NIST CSF 2.0",
+  "authority": "https://doi.org/10.6028/NIST.CSWP.29",
+  "upstream": "https://github.com/CyberStrikeus/CyberStrike",
+  "revision": "9303b210ab82bd6362d7ad7fbd2b2c8f2e335450",
+  "upstream_license": "AGPL-3.0",
+  "category": "defensive-csf",
+  "entries": [
+    {
+      "code": "GV.OC-01",
+      "title": "GV.OC-01 组织使命与网络安全目标 / Mission-aligned security goals",
+      "source_path": ".cyberstrike/skill/NIST/CSF_v2.0/GV_govern/GV.OC-01_gvoc-01/SKILL.md",
+      "source_blob": "2ef6dada8d9fd503ac7a5d36f23f8e1ceeadf35f",
+      "keywords": "组织使命,业务目标,风险治理,mission,cybersecurity strategy",
+      "body": "目标：确保网络安全工作有明确业务背景。核对经批准的组织目标、关键服务及风险容忍度，列出与安全目标相关的业务责任人和影响路径。证据：保留战略文件版本、确认日期及目标到控制措施的映射；区分管理层期望与实际实施。ARTEX：将任务范围与业务优先级联系起来，不因单个技术告警推断组织风险已被接受。"
+    },
+    {
+      "code": "GV.OC-02",
+      "title": "GV.OC-02 利益相关方与安全期望 / Stakeholder expectations",
+      "source_path": ".cyberstrike/skill/NIST/CSF_v2.0/GV_govern/GV.OC-02_gvoc-02/SKILL.md",
+      "source_blob": "0a80e76832ad577bb6faac604c27a9e615859fa5",
+      "keywords": "利益相关方,业务需求,安全期望,stakeholder,expectations",
+      "body": "目标：识别受安全风险影响或参与决策的内部和外部人员。检查业务部门、供应商、客户、法律与运营接口的要求，明确需求来源、承诺、例外和沟通责任。证据：记录需求文件、会议决议、版本与未解决分歧。ARTEX：在报告中区分已确认需求与假定需求，避免将通用标准自动当作合同义务。"
+    },
+    {
+      "code": "GV.OC-03",
+      "title": "GV.OC-03 法规合同与隐私责任 / Legal and privacy obligations",
+      "source_path": ".cyberstrike/skill/NIST/CSF_v2.0/GV_govern/GV.OC-03_gvoc-03/SKILL.md",
+      "source_blob": "bb31a536c5f4c5aaad2ad0280f1b6249f0021e9e",
+      "keywords": "法规,合同,隐私,数据保护,compliance,privacy,contract",
+      "body": "目标：使安全审计范围与实际适用的法律、行业规则、合同及隐私义务对应。核对地域、数据类别、保留与访问条件，并向合适责任人确认适用性。证据：保留条款出处、适用判断、更新时间和例外审批。ARTEX：将合规缺口标为待核查事项，不凭技术输出替代法律判断，也不默认导出个人数据。"
+    },
+    {
+      "code": "ID.AM-04",
+      "title": "ID.AM-04 供应商服务清单 / Supplier service inventory",
+      "source_path": ".cyberstrike/skill/NIST/CSF_v2.0/ID_identify/ID.AM-04_idam-04/SKILL.md",
+      "source_blob": "802a0ccf4d9dd4b305916847b0c17e358906ed83",
+      "keywords": "供应商服务,云服务,外包,资产,service inventory,supplier",
+      "body": "目标：维护供应商实际提供且仍被使用的服务清单。核对合同、采购目录、云账户和服务配置，标注责任人、服务边界、关键依赖和终止日期。证据：记录服务标识、提供方、用途、数据流及最近核对时间；对无法确认归属的服务保持未知状态。ARTEX：按来源关联资产和报告，不把供应商名称等同于具体服务实例。"
+    },
+    {
+      "code": "ID.AM-05",
+      "title": "ID.AM-05 资产关键性与优先级 / Asset criticality",
+      "source_path": ".cyberstrike/skill/NIST/CSF_v2.0/ID_identify/ID.AM-05_idam-05/SKILL.md",
+      "source_blob": "f240756e6cdf0cc0f853eaceececc5a2b72d0f54",
+      "keywords": "资产分级,业务影响,关键资产,criticality,priority",
+      "body": "目标：根据业务使命、信息分类、依赖和中断影响为资产分级。对照既有业务影响分析和运营负责人确认，区分技术暴露程度与服务关键性。证据：保存分级规则、适用资产、例外原因和复核时间。ARTEX：使用任务范围、资产和已验证证据排序复核，避免只凭 IP 或漏洞数量决定业务优先级。"
+    },
+    {
+      "code": "PR.AA-01",
+      "title": "PR.AA-01 账户和凭据生命周期 / Credential lifecycle",
+      "source_path": ".cyberstrike/skill/NIST/CSF_v2.0/PR_protect/PR.AA-01_praa-01/SKILL.md",
+      "source_blob": "4183f91ab667b2fdd68070ca8c7ab07306843421",
+      "keywords": "身份,凭据,服务账户,密钥轮换,identity,credential lifecycle",
+      "body": "目标：确认人员、服务和硬件身份都有可追溯的创建、变更、停用及凭据轮换流程。核查获准访问的身份台账、责任人、有效期及紧急访问记录，区分共享标识与唯一身份。证据：保存脱敏身份引用、策略版本、操作时间与审批依据。ARTEX：按已有授权范围整理配置证据，不记录明文秘密或自动撤销实际账户。"
+    },
+    {
+      "code": "PR.AA-02",
+      "title": "PR.AA-02 身份核验与凭据绑定 / Identity proofing",
+      "source_path": ".cyberstrike/skill/NIST/CSF_v2.0/PR_protect/PR.AA-02_praa-02/SKILL.md",
+      "source_blob": "9e99cb38f7fc2234029e82e904f3df18e00ad599",
+      "keywords": "身份核验,注册,凭据绑定,identity proofing,enrollment",
+      "body": "目标：验证身份注册和凭据发放所采用的核验过程适合实际交互风险。检查入职、设备注册、恢复访问及重新绑定凭据流程中由谁核对身份、使用何种凭证及如何记录异常。证据：保留制度、抽样工单、审批人和有效期。ARTEX：将已核对与仅有流程描述分开，不以登录成功证明身份核验质量。"
+    },
+    {
+      "code": "PR.AA-04",
+      "title": "PR.AA-04 身份声明保护与验证 / Identity assertion integrity",
+      "source_path": ".cyberstrike/skill/NIST/CSF_v2.0/PR_protect/PR.AA-04_praa-04/SKILL.md",
+      "source_blob": "2b6e958473fef2c4da002818e7980db172737838",
+      "keywords": "身份声明,令牌,信任边界,assertion,federation,token validation",
+      "body": "目标：核查身份声明在签发、传输、验证和失效过程中能否被正确识别。审阅获准查看的单点登录、信任方和证书配置，确认受众、有效期、签名验真及错误处理策略。证据：记录配置版本、信任关系和已脱敏的验证结果。ARTEX：用离线配置和已保存请求证据支持结论，避免收集或重放真实会话令牌。"
+    },
+    {
+      "code": "PR.PS-01",
+      "title": "PR.PS-01 安全配置基线与变更 / Secure configuration baselines",
+      "source_path": ".cyberstrike/skill/NIST/CSF_v2.0/PR_protect/PR.PS-01_prps-01/SKILL.md",
+      "source_blob": "3ec7f5f3d15c89c2fefb88d99184a14be95cda60",
+      "keywords": "配置管理,基线,变更,漂移,configuration management,baseline",
+      "body": "目标：识别操作系统、云资源及应用配置是否有批准的安全基线和变更机制。核对环境区分、配置审查、漂移告警、例外和回滚记录。证据：保存基线版本、适用范围、差异摘要与复核结论。ARTEX：复用流量差异、已有配置材料及复核记录，不把无基线差异自动当成安全缺陷。"
+    },
+    {
+      "code": "DE.AE-01",
+      "title": "DE.AE-01 网络与数据流行为基线 / Expected network flows",
+      "source_path": ".cyberstrike/skill/NIST/CSF_v2.0/DE_detect/DE.AE-01_deae-01/SKILL.md",
+      "source_blob": "e386f075888eac3b3cb223e62732cadc1ee632a0",
+      "keywords": "数据流,网络基线,正常行为,flow baseline,network operations",
+      "body": "目标：建立能解释的预期服务通信和业务数据流清单。对照架构图、网络策略、运行日志和环境差异，记录来源、目标、协议、用途及观察时段。证据：注明采样覆盖、过滤规则和缺失采集点。ARTEX：从现有流量和 HAR 证据归纳观察到的模式，不将少量抓包等同于完整网络基线。"
+    },
+    {
+      "code": "DE.AE-02",
+      "title": "DE.AE-02 异常事件关联分析 / Adverse event analysis",
+      "source_path": ".cyberstrike/skill/NIST/CSF_v2.0/DE_detect/DE.AE-02_deae-02/SKILL.md",
+      "source_blob": "1afa5a88a1236c50d28e1dec0e309555fbd7433c",
+      "keywords": "事件关联,异常分析,调查,correlation,adverse events",
+      "body": "目标：对潜在异常事件开展多源证据核查。把时间、资产、操作上下文及相邻事件关联，区分确认的事件、误报、未知与数据缺口。证据：保留原始告警引用、分析步骤、矛盾证据和结论版本。ARTEX：使用已有流量、报告及不可变证据快照，避免将 HTTP 4xx/5xx 或未知状态直接解释为攻击。"
+    },
+    {
+      "code": "DE.AE-04",
+      "title": "DE.AE-04 事件影响范围与不确定性 / Event impact scope",
+      "source_path": ".cyberstrike/skill/NIST/CSF_v2.0/DE_detect/DE.AE-04_deae-04/SKILL.md",
+      "source_blob": "8ebf1de008501dca12067b24edc03b81f70540a6",
+      "keywords": "影响评估,范围,受影响资产,impact,scope",
+      "body": "目标：评估异常事件可能影响的资产、数据和业务流程。结合既有资产关系、可用证据、权限和时间窗，明确已确认影响与合理但未证实的推断。证据：记录估算依据、未覆盖资产、信息来源及复核日期。ARTEX：以覆盖账本和证据版本组织报告，避免将单个主机异常直接外推到整个业务。"
+    },
+    {
+      "code": "DE.AE-05",
+      "title": "DE.AE-05 告警阈值与响应分流 / Alert thresholds",
+      "source_path": ".cyberstrike/skill/NIST/CSF_v2.0/DE_detect/DE.AE-05_deae-05/SKILL.md",
+      "source_blob": "f461254997d8ec494506debda571b7c44a9d16f1",
+      "keywords": "告警阈值,分流,误报,alert threshold,triage",
+      "body": "目标：检查事件告警阈值是否可解释、可调优且有明确响应责任。核对检测规则版本、历史误报、未检出样本和升级路径，区分指标阈值与事件严重程度。证据：保存阈值变更、审批、抽样结果与复核反馈。ARTEX：复用现有状态与运行证据辅助人工分流，不将规则触发自动认定为已确认安全事件。"
+    },
+    {
+      "code": "RS.AN-01",
+      "title": "RS.AN-01 检测告警调查与反馈 / Alert investigation",
+      "source_path": ".cyberstrike/skill/NIST/CSF_v2.0/RS_respond/RS.AN-01_rsan-01/SKILL.md",
+      "source_blob": "4e88834098b86542083301a71fc89b0b0c6a7b58",
+      "keywords": "告警调查,调查回执,误报,incident triage,notification",
+      "body": "目标：确保检测系统的通知有明确受理、调查及关闭依据。抽查告警的接收时间、处理责任、证据获取、升级和反馈记录。证据：保留告警标识、状态变化、分析人和未确认事项。ARTEX：将复核回执关联原始发现与证据，避免单凭工单状态判断威胁已消除。"
+    },
+    {
+      "code": "RS.AN-03",
+      "title": "RS.AN-03 事件根因分析与时间线 / Root cause analysis",
+      "source_path": ".cyberstrike/skill/NIST/CSF_v2.0/RS_respond/RS.AN-03_rsan-03/SKILL.md",
+      "source_blob": "2442d3c2ab963202bc3b64275e70079b589c81ea",
+      "keywords": "根因分析,事件时间线,因果,root cause,timeline",
+      "body": "目标：重建事件发生顺序并确定证据支持的直接原因和系统性因素。区分事件发生、采集与处理时间，逐项验证可替代假设及相反证据。证据：保存来源、时间偏差、关键结论与置信程度；未知根因保持未确定。ARTEX：结合不可变证据、报告版本和后续复验构建可追溯结论，不以时间相邻自动证明因果。"
+    },
+    {
+      "code": "RC.RP-01",
+      "title": "RC.RP-01 响应到恢复的计划交接 / Recovery plan handoff",
+      "source_path": ".cyberstrike/skill/NIST/CSF_v2.0/RC_recover/RC.RP-01_rcrp-01/SKILL.md",
+      "source_blob": "93896f5adb11238de56d6c88d2d767af5331e99b",
+      "keywords": "恢复计划,交接,处置,恢复,restoration,handoff",
+      "body": "目标：确认事件响应满足启动恢复流程的必要条件。核查业务恢复负责人、受影响资产、修复状态、优先顺序和授权决策。证据：记录触发时间、恢复目标、依赖项、执行人员及尚未解决风险。ARTEX：保留处置与恢复的不同状态和版本，避免将响应结束等同于系统完全恢复。"
+    },
+    {
+      "code": "RC.RP-03",
+      "title": "RC.RP-03 恢复前备份完整性验证 / Backup integrity verification",
+      "source_path": ".cyberstrike/skill/NIST/CSF_v2.0/RC_recover/RC.RP-03_rcrp-03/SKILL.md",
+      "source_blob": "47cdffbfe4b43d70369c3ba0db1e1841f562d9cc",
+      "keywords": "备份完整性,恢复资产,隔离检查,backup integrity,restore validation",
+      "body": "目标：在使用备份或其他恢复材料前验证其来源、可读性和完整性。核对备份链、访问权限、既有校验和批准的隔离恢复结果，识别损坏、缺页或版本不匹配。证据：保存备份标识、核验方法、结果和责任人。ARTEX：用归档及复验记录证明已检查的范围，不把文件存在或任务成功提示等同于恢复可用。"
+    },
+    {
+      "code": "RC.RP-04",
+      "title": "RC.RP-04 恢复后的运行基线 / Post-incident operating baseline",
+      "source_path": ".cyberstrike/skill/NIST/CSF_v2.0/RC_recover/RC.RP-04_rcrp-04/SKILL.md",
+      "source_blob": "e5ae48a4a85dca87a82e85b4eeae45da21c2dc9b",
+      "keywords": "恢复后基线,关键业务,风险复评,post incident,operational baseline",
+      "body": "目标：结合关键业务使命和残余网络安全风险确认事件后可接受的运行状态。核对服务依赖、监控恢复、临时缓解措施、业务验收与待解决问题。证据：记录复开时间、实际可用性、残余风险的决策者和复评计划。ARTEX：关联恢复前后状态与任务报告，区分部分恢复、已验证恢复和仍需复测。"
+    }
+  ]
+}

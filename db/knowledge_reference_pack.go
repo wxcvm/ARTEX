@@ -17,6 +17,9 @@ var cyberStrikeSupplementPackJSON []byte
 //go:embed knowledgepacks/cyberstrike-csf-third-v1.json
 var cyberStrikeThirdPackJSON []byte
 
+//go:embed knowledgepacks/cyberstrike-csf-fourth-v1.json
+var cyberStrikeFourthPackJSON []byte
+
 type knowledgeReferencePack struct {
 	ID string `json:"id"`
 	Framework string `json:"framework"`
@@ -55,7 +58,7 @@ func referenceDocumentContent(pack knowledgeReferencePack, entry knowledgeRefere
 // into the existing global document library. Existing edits and deletions
 // remain authoritative; starting ARTEX again never reinstalls the pack.
 func (d *DB) SeedCyberStrikeReferencePack() error {
-	for _, raw := range [][]byte{cyberStrikeReferencePackJSON, cyberStrikeSupplementPackJSON, cyberStrikeThirdPackJSON} {
+	for _, raw := range [][]byte{cyberStrikeReferencePackJSON, cyberStrikeSupplementPackJSON, cyberStrikeThirdPackJSON, cyberStrikeFourthPackJSON} {
 		var pack knowledgeReferencePack
 		if err := json.Unmarshal(raw, &pack); err != nil {
 			return fmt.Errorf("decode CyberStrike reference pack: %w", err)
