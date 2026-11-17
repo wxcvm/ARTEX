@@ -69,6 +69,7 @@ posture-runs/
 benchmark-results/
 # knowledge base is versioned on purpose (see knowledge/absorb/INDEX.md)
 !/knowledge/knowledge.db
+/knowledge/knowledge.db.bak-*
 
 # .NET onboarding/layout test build products
 /tests/**/bin/
