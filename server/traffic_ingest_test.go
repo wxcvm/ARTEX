@@ -105,3 +105,17 @@ func TestTrafficIngestRequiresAuth(t *testing.T) {
 		t.Fatalf("unauthenticated ingest status = %d, want 401", w.Code)
 	}
 }
+
+func TestTrafficIngestCaptureGroup(t *testing.T) {
+    s,request:=ingestServer(t)
+    id:="00000000-0000-4000-8000-000000000099"
+    body:=`{"exchanges":[{"captureId":"`+id+`","method":"GET","url":"https://browser.example.test/record","status":200,"responseBody":"captured"}]}`
+    w:=request("POST","/api/traffic/ingest",body)
+    if w.Code!=200||!strings.Contains(w.Body.String(),`"ingested":1`){t.Fatalf("ingest: %d %s",w.Code,w.Body)}
+    rows,total,err:=s.m.Traffic().Page(traffic.PageQuery{Host:"browser.example.test",RespMin:-1,RespMax:-1},0,10)
+    if err!=nil||total!=1||len(rows)!=1{t.Fatalf("rows: %+v %d %v",rows,total,err)}
+    if err:=s.m.Traffic().ReadEvidence(context.Background(),[]string{rows[0].ID},func(e traffic.EvidenceExchange)error{
+        if e.CaptureID!=id{t.Fatalf("capture ID lost on HTTP ingest: %q",e.CaptureID)}
+        return nil
+    });err!=nil{t.Fatal(err)}
+}

@@ -164,6 +164,7 @@ export function FindingTrafficPanel({
                       : b.snapshot.har_page_state === "unknown" ? tr("未知页面引用", "Unknown page reference")
                       : tr("页面归属未观测", "Page attribution unobserved")}</span>
                   )}
+                  {b.snapshot.capture_id && <span className="text-xs text-muted-foreground" title={b.snapshot.capture_id}>{tr("捕获批次", "Capture group")} {b.snapshot.capture_id.slice(0, 8)}…</span>}
                   <span className="text-xs text-muted-foreground">{tr("证据", "Evidence")} #{b.id}</span>
                 </div>
                 <Button

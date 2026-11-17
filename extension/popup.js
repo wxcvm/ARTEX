@@ -7,6 +7,7 @@ async function refreshState() {
     ? `● Recording tab ${st.tabId}`
     : "○ Not recording");
   lines.push(`ingested: ${st.ingested} · queued: ${st.queued} · failed: ${st.failed}`);
+  if (st.captureId) lines.push(`Capture group: ${st.captureId}`);
   if (st.lastError) lines.push(st.lastError);
   $("status").textContent = lines.join("\n");
   $("error").textContent = st.capturing ? "" : (st.lastError || "");

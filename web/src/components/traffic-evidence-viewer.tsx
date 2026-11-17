@@ -90,6 +90,12 @@ export function TrafficEvidenceViewer({
             : tr("页面归属未观测", "Page attribution unobserved")}
             {" · "}{tr("仅为原始文件关联，不代表浏览器身份。", "File-local attribution only, not browser identity.")}</p>
         )}
+        {detail?.binding.snapshot.capture_id && (
+          <p className="break-all text-xs text-muted-foreground">
+            {tr("捕获批次", "Capture group")}: <code>{detail.binding.snapshot.capture_id}</code>
+            {" · "}{tr("仅为扩展提供的关联标识，不代表已验证的浏览器身份。", "Extension-supplied correlation, not verified browser identity.")}
+          </p>
+        )}
         {error ? (
           <Alert variant="destructive">
             <AlertDescription>{error}</AlertDescription>

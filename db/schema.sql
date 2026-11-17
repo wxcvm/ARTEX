@@ -1225,6 +1225,7 @@ CREATE TABLE IF NOT EXISTS traffic_evidence_snapshots (
 );
 ALTER TABLE traffic_evidence_snapshots ADD COLUMN IF NOT EXISTS har_page_state TEXT NOT NULL DEFAULT '';
 ALTER TABLE traffic_evidence_snapshots ADD COLUMN IF NOT EXISTS har_page_ordinal INTEGER NOT NULL DEFAULT 0;
+ALTER TABLE traffic_evidence_snapshots ADD COLUMN IF NOT EXISTS capture_id TEXT NOT NULL DEFAULT '';
 CREATE TABLE IF NOT EXISTS finding_traffic_bindings (
     id BIGSERIAL PRIMARY KEY,
     finding_id BIGINT NOT NULL REFERENCES findings(id) ON DELETE CASCADE,

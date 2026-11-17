@@ -169,6 +169,7 @@ func (s *Store) prepare(ctx context.Context, refs []db.TrafficRef) ([]db.Prepare
 		}
 		v := db.TrafficEvidenceSnapshot{SourceTrafficID: e.ID, CapturedAt: e.TS, URL: e.URL, Method: e.Method, Status: e.Status, ContentType: e.ContentType,
 			ReqHead: e.ReqHead, RespHead: e.RespHead, ReqHash: rh, RespHash: ph, ReqLen: e.ReqLen, RespLen: e.RespLen}
+		v.CaptureID=e.CaptureID
 		if e.HARPage != nil {
 			v.HARPageState, v.HARPageOrdinal = e.HARPage.State, e.HARPage.Ordinal
 		}
