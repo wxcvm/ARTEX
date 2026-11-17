@@ -17,6 +17,7 @@ import { Label } from "@/components/ui/label";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { api } from "@/lib/api";
+import { assetSyncTabFromSearch } from "@/lib/asset-sync-tab";
 import { PurgeIntelPanel } from "./purge-intel-panel";
 import type { SSProject, SSTask } from "@/lib/types";
 
@@ -42,7 +43,7 @@ export default function AssetSyncPage() {
   const tr = (zh: string, en: string) => uiText(locale, zh, en);
   const [tab, setTab] = React.useState("scopesentry");
   React.useEffect(() => {
-    if (new URLSearchParams(window.location.search).get("tab") === "purge-intel") setTab("purge-intel");
+    setTab(assetSyncTabFromSearch(window.location.search));
   }, []);
   return (
     <div className="p-4 md:p-6">
