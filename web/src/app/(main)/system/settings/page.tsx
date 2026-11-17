@@ -35,6 +35,7 @@ export default function SystemSettingsPage() {
   const [savingProxy, setSavingProxy] = React.useState(false);
   const [globalProxyInput, setGlobalProxyInput] = React.useState("");
   const [savingGlobalProxy, setSavingGlobalProxy] = React.useState(false);
+  const [testingGlobalProxy, setTestingGlobalProxy] = React.useState(false);
   const [testing, setTesting] = React.useState(false);
   const [loaded, setLoaded] = React.useState(false);
   const [saving, setSaving] = React.useState(false);
@@ -236,6 +237,20 @@ export default function SystemSettingsPage() {
       .finally(() => setSavingGlobalProxy(false));
   };
 
+  const runGlobalProxyTest = () => {
+    setTestingGlobalProxy(true);
+    api.testGlobalProxy({ global_proxy: globalProxyInput.trim() })
+      .then((result) => {
+        if (result.ok) {
+          toast.success(t(`代理连通 · 出口 IP ${result.egress_ip} · ${result.latency_ms ?? 0} 毫秒`, `Proxy connected · egress IP ${result.egress_ip} · ${result.latency_ms ?? 0} ms`));
+        } else {
+          toast.error(t("代理测试失败：", "Proxy test failed: ") + (result.error ?? ""));
+        }
+      })
+      .catch((e) => toast.error(t("代理测试失败：", "Proxy test failed: ") + (e as Error).message))
+      .finally(() => setTestingGlobalProxy(false));
+  };
+
   // Run a real "test" search ("test") against the CURRENT form values (backend +
   // proxy + entered key), falling back to saved values server-side. Toasts result.
   const runTest = () => {
@@ -363,6 +378,9 @@ export default function SystemSettingsPage() {
                 disabled={!loaded || savingGlobalProxy}
                 onChange={(e) => setGlobalProxyInput(e.target.value)}
               />
+              <Button type="button" variant="outline" onClick={runGlobalProxyTest} disabled={!loaded || testingGlobalProxy || !globalProxyInput.trim()}>
+                {testingGlobalProxy ? t("检测中…", "Testing…") : t("测试出口", "Test egress")}
+              </Button>
               <Button type="button" onClick={saveGlobalProxy} disabled={!loaded || savingGlobalProxy}>
                 {t("保存", "Save")}
               </Button>

@@ -947,6 +947,8 @@ export const api = {
   settings: () => get<Settings>(`/settings`),
   setSettings: (patch: Partial<Settings>) => put<Settings>(`/settings`, patch),
   // Run a real "test" search with the given (or saved) config to verify it works.
+  testGlobalProxy: (patch: { global_proxy: string }) =>
+    post<{ ok: boolean; error?: string; egress_ip?: string; latency_ms?: number }>(`/settings/global-proxy/test`, patch),
   testWebSearch: (patch: {
     web_search_backend?: string;
     web_search_proxy?: string;
