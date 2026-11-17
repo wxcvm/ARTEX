@@ -3,6 +3,10 @@ package traffic
 import (
 	"fmt"
 	"log"
+	"crypto/sha256"
+	"database/sql"
+	"encoding/hex"
+	"errors"
 	"net/url"
 	"strings"
 	"time"
@@ -17,6 +21,7 @@ import (
 // extension, not handled here).
 type ExternalExchange struct {
 	CaptureID string `json:"captureId,omitempty"`
+	ExchangeID string `json:"exchangeId,omitempty"` // source request ID, scoped by capture ID
 	Method          string            `json:"method"`
 	URL             string            `json:"url"`
 	Status          int               `json:"status"`
@@ -31,14 +36,21 @@ type ExternalExchange struct {
 // indistinguishable from proxy-captured ones on the Traffic page and in
 // full-text search.
 func (t *Traffic) RecordExternal(e ExternalExchange) error {
+	_, err := t.RecordExternalWithReceipt(e)
+	return false, err
+}
+
+// RecordExternalWithReceipt acknowledges a previously persisted browser request
+// without overwriting its bodies, status or attribution after an upload retry.
+func (t *Traffic) RecordExternalWithReceipt(e ExternalExchange) (duplicate bool, err error) {
 	u, err := url.Parse(e.URL)
 	if err != nil || u.Host == "" {
-		return fmt.Errorf("invalid url %q", e.URL)
+		return false, fmt.Errorf("invalid url %q", e.URL)
 	}
-	if len(e.CaptureID) > 128 { return fmt.Errorf("capture ID too long") }
+	if len(e.CaptureID) > 128 { return false, fmt.Errorf("capture ID too long") }
 	method := strings.ToUpper(strings.TrimSpace(e.Method))
 	if method == "" {
-		return fmt.Errorf("empty method for %q", e.URL)
+		return false, fmt.Errorf("empty method for %q", e.URL)
 	}
 	// Status 0 means the external recorder did not observe an HTTP status.
 	// Preserve that uncertainty rather than fabricating a successful response.
@@ -55,19 +67,34 @@ func (t *Traffic) RecordExternal(e ExternalExchange) error {
 	t.wmu.Lock()
 	defer t.wmu.Unlock()
 
+	// Network.requestId is stable within a browser capture. Replayed batches
+	// must not overwrite a previously committed exchange when the HTTP
+	// acknowledgement was lost. Old clients without IDs retain old behavior.
+	id := ""
+	if e.CaptureID != "" && e.ExchangeID != "" {
+		sum := sha256.Sum256([]byte("artex-browser-v1\\x00" + e.CaptureID + "\\x00" + e.ExchangeID))
+		id = "ext-" + hex.EncodeToString(sum[:])
+		var present int
+		err := t.db.QueryRow(`SELECT 1 FROM exchanges WHERE id=?`, id).Scan(&present)
+		if err == nil { return true, nil }
+		if !errors.Is(err, sql.ErrNoRows) { return false, fmt.Errorf("read captured exchange id: %w", err) }
+	}
+
 	// Bodies are spilled before the transaction opens, matching record().
 	reqB := t.spill([]byte(e.RequestBody), e.RequestHeaders["content-type"])
 	respB := t.spill([]byte(e.ResponseBody), respCT)
 
-	n := t.seq.Add(1)
 	now := time.Now()
-	id := fmt.Sprintf("%d-%04d", now.Unix(), n%10000)
+	if id == "" {
+		n := t.seq.Add(1)
+		id = fmt.Sprintf("%d-%04d", now.Unix(), n%10000)
+	}
 
 	if err := t.insertExchangeWithContext(id, now.Unix(), host, method, db.TemplatePath(u.EscapedPath()), u.String(), status, respCT, len(e.RequestBody), len(e.ResponseBody), reqHead, reqB, respHead, respB, nil, e.CaptureID); err != nil {
 		log.Printf("[traffic] failed to ingest %s: %v", u.String(), err)
-		return err
+		return false, err
 	}
-	return nil
+	return false, nil
 }
 
 // insertExchange writes the index row, the body row, blob references and the

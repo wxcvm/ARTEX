@@ -41,17 +41,18 @@ func (s *Server) ingestTraffic(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	ingested, failed := 0, 0
+	ingested, duplicates, failed := 0, 0
 	for _, e := range req.Exchanges {
 		e.RequestBody = truncateBody(e.RequestBody)
 		e.ResponseBody = truncateBody(e.ResponseBody)
-		if err := tr.RecordExternal(e); err != nil {
+		duplicate, err := tr.RecordExternalWithReceipt(e)
+		if err != nil {
 			failed++
 			continue
 		}
-		ingested++
+		if duplicate { duplicates++ } else { ingested++ }
 	}
-	writeJSON(w, 200, map[string]any{"ingested": ingested, "failed": failed})
+	writeJSON(w, 200, map[string]any{"ingested": ingested, "duplicates": duplicates, "failed": failed})
 }
 
 func truncateBody(s string) string {

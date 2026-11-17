@@ -108,3 +108,27 @@ func TestRecordExternalPreservesUnobservedStatus(t *testing.T) {
 		t.Fatalf("2xx must exclude unknown status: rows=%+v total=%d", rows, total)
 	}
 }
+
+func TestRecordExternalIdempotentCaptureRetry(t *testing.T) {
+	tr,_:=openTraffic(t)
+	e:=ExternalExchange{
+		CaptureID:"00000000-0000-4000-8000-000000000999",ExchangeID:"421.17",
+		Method:"GET",URL:"https://example.invalid/failed",Status:0,ResponseBody:"first evidence",
+	}
+	duplicate,err:=tr.RecordExternalWithReceipt(e)
+	if err!=nil||duplicate{t.Fatalf("initial capture: duplicate=%v err=%v",duplicate,err)}
+	rows,total,err:=tr.Page(PageQuery{CaptureID:e.CaptureID,RespMin:-1,RespMax:-1},0,10)
+	if err!=nil||total!=1||len(rows)!=1{t.Fatalf("initial index: %+v %v",rows,err)}
+	firstID:=rows[0].ID
+	e.ResponseBody="different payload from accidental retry"
+	duplicate,err=tr.RecordExternalWithReceipt(e)
+	if err!=nil||!duplicate{t.Fatalf("replay: duplicate=%v err=%v",duplicate,err)}
+	rows,total,err=tr.Page(PageQuery{CaptureID:e.CaptureID,RespMin:-1,RespMax:-1},0,10)
+	if err!=nil||total!=1||len(rows)!=1||rows[0].ID!=firstID||rows[0].Status!=0{t.Fatalf("replay mutated stored evidence: %+v %v",rows,err)}
+	_,response,err:=tr.Get(firstID)
+	if err!=nil||!strings.Contains(response,"first evidence")||strings.Contains(response,"different payload"){t.Fatalf("replay overwrote body: %q %v",response,err)}
+	e.ExchangeID="421.18"
+	duplicate,err=tr.RecordExternalWithReceipt(e)
+	if err!=nil||duplicate{t.Fatalf("distinct request: %v %v",duplicate,err)}
+	if n,err:=tr.Count();err!=nil||n!=2{t.Fatalf("count after distinct request: %d %v",n,err)}
+}

@@ -13,6 +13,7 @@ function fixture() {
   let tabId = 7;
   let rejectEnable = false;
   let rejectUpload = false;
+  let loseResponse = false;
   let uuidSequence = 0;
   let listener;
   const chrome = {
@@ -43,7 +44,8 @@ function fixture() {
     if (rejectUpload) throw new Error("injected offline");
     const data = JSON.parse(options.body);
     calls.uploads.push(data.exchanges);
-    return { ok: true, json: async () => ({ ingested: data.exchanges.length, failed: 0 }) };
+    if (loseResponse) throw new Error("injected lost response");
+    return { ok: true, json: async () => ({ ingested: data.exchanges.length, duplicates: 0, failed: 0 }) };
   };
   vm.runInNewContext(workerCode, { chrome, fetch, crypto: { randomUUID: () => `00000000-0000-4000-8000-${String(++uuidSequence).padStart(12, "0")}` } }, { filename: "extension/background.js" });
   const message = (type) => new Promise((resolve, reject) => {
@@ -66,6 +68,7 @@ function fixture() {
     setTab: (id) => { tabId = id; },
     setEnableFailure: (value) => { rejectEnable = value; },
     setUploadFailure: (value) => { rejectUpload = value; },
+    setLostResponse: (value) => { loseResponse = value; },
   };
 }
 
@@ -155,4 +158,41 @@ test("each capture gets a new group and previously queued records keep their ori
   assert.equal(entries.length, 2);
   assert.equal(entries[0].captureId, first);
   assert.equal(entries[1].captureId, second);
+});
+
+test("failed network requests are recorded with unobserved status rather than silently discarded", async () => {
+  const x = fixture();
+  await x.message("start");
+  const id = (await x.message("getState")).captureId;
+  x.events.event({ tabId: 7 }, "Network.requestWillBeSent", {
+    requestId: "failed-1", request: { method: "GET", url: "https://example.test/offline", headers: {} },
+  });
+  x.events.event({ tabId: 7 }, "Network.loadingFailed", {
+    requestId: "failed-1", errorText: "net::ERR_CONNECTION_REFUSED",
+  });
+  const stopped = await x.message("stop");
+  assert.equal(stopped.ok, true);
+  const recorded = x.calls.uploads.flat();
+  assert.equal(recorded.length, 1);
+  assert.equal(recorded[0].captureId, id);
+  assert.equal(recorded[0].exchangeId, "failed-1");
+  assert.equal(recorded[0].status, 0);
+  assert.equal(recorded[0].responseBody, "");
+});
+
+test("failed transfer with lost HTTP reply retains stable request identity for manual retry", async () => {
+  const x = fixture();
+  await x.message("start");
+  x.setLostResponse(true);
+  x.entry(9);
+  const stopped = await x.message("stop");
+  assert.equal(stopped.queued, 1);
+  assert.equal(x.calls.uploads.length, 1);
+  x.setLostResponse(false);
+  await x.message("start");
+  await x.message("stop");
+  assert.equal(x.calls.uploads.length, 2);
+  assert.equal(x.calls.uploads[0][0].exchangeId, x.calls.uploads[1][0].exchangeId);
+  assert.equal(x.calls.uploads[0][0].captureId, x.calls.uploads[1][0].captureId);
+  assert.equal((await x.message("getState")).queued, 0);
 });

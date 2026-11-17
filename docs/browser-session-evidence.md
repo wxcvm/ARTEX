@@ -51,3 +51,26 @@ The finding's evidence detail also offers **View group traffic** to open the pre
 The **Traffic → Capture groups** picker fetches records only when opened. `GET /api/traffic/groups?page=0&size=20` returns groups ordered by latest recorded exchange, including request count, distinct hosts, first/last timestamp, HTTP 4xx/5xx count and status-0 (unobserved) count. The `has_more` field supports paging without a second global distinct-count query. Selecting a group applies the existing exact filter without clearing other filters.
 
 Summaries include only persisted traffic. A group disappears when its last recorded exchange is deleted; immutable finding evidence can still preserve its old group ID. Status 0 is never counted as success. Client-supplied group IDs are not authenticated browser or Playwright identities.
+
+
+## Unobserved browser failures and retry receipts
+
+The extension also records `Network.loadingFailed` requests and completed requests
+that lack a `Network.responseReceived` event. They use HTTP status **0**
+(unobserved), not an invented 2xx response; any actually observed status is retained.
+This preserves evidence that a request was attempted without claiming it succeeded.
+
+Each extension exchange now carries its debugger request ID under `exchangeId`,
+paired with the existing random `captureId`. ARTEX derives a stable, namespaced
+storage key from that pair. If an HTTP upload succeeded but its response was lost,
+replaying the same batch acknowledges an already stored record rather than replacing
+the original response body or inserting a duplicate. `POST /api/traffic/ingest`
+responds with `ingested`, `duplicates`, and `failed` counts. Older clients
+without `exchangeId` retain their prior write behavior. The popup counts new and
+already-ingested records as confirmed, not as separate requests.
+
+Failed network uploads keep unsent entries in the session's in-memory queue instead
+of silently discarding entries above a fixed restore slice. This is not persistent
+offline storage: Chrome terminating the worker can still lose unsent data. This
+does not establish a Playwright authenticated session identity or guarantee that
+the debugger saw every attempted network call.
