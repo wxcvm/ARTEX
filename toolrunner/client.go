@@ -57,7 +57,7 @@ func (c *Client) post(ctx context.Context, endpoint string, request any, respons
 	if response == nil {
 		return nil
 	}
-	return json.NewDecoder(io.LimitReader(resp.Body, maxRequestBytes)).Decode(response)
+	return json.NewDecoder(resp.Body).Decode(response)
 }
 
 func (c *Client) Call(ctx context.Context, req Request) (tool.Result, error) {
