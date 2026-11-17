@@ -90,9 +90,9 @@ async function stop() {
   // Freeze ingestion before waiting for outstanding body reads and upload.
   session.capturing = false;
   session.tabId = null;
-  session.requests.clear();
+  const unfinished = retainUnfinishedRequests();
   try {
-    await Promise.allSettled([...pendingResponses]);
+    await Promise.allSettled([...pendingResponses, ...unfinished]);
     if (tabId != null) {
       try {
         await chrome.debugger.sendCommand({ tabId }, "Network.disable", {});
@@ -122,8 +122,10 @@ function truncate(s) {
 }
 
 async function queueExchange(info, response, skipResponseBody = false) {
-  const respHeaders = {};
-  for (const h of response.headers || []) respHeaders[h.name.toLowerCase()] = h.value;
+  // Chrome CDP Network.Headers is a JSON object, not a HAR header array.
+  const respHeaders = Object.fromEntries(
+    Object.entries(response.headers || {}).map(([name, value]) => [name.toLowerCase(), String(value)])
+  );
   const mime = respHeaders["content-type"] || "";
 
   let reqBody = truncate(info.postData || "");
@@ -204,6 +206,18 @@ function trackPending(promise) {
   void promise.finally(() => pendingResponses.delete(promise));
 }
 
+// Stop and debugger detach have no terminal Network event for requests still
+// in flight. Keep the attempted exchange, but never invent a response status
+// or body. A status observed earlier is preserved as such.
+function retainUnfinishedRequests() {
+  const unfinished = [...session.requests.values()];
+  session.requests.clear();
+  return unfinished.map((info) =>
+    queueExchange(info, info.response || { status: 0, headers: {} }, true)
+      .catch((e) => { session.lastError = e.message; })
+  );
+}
+
 chrome.debugger.onEvent.addListener((source, method, params) => {
   if (!session.capturing || !source.tabId || source.tabId !== session.tabId) return;
   if (method === "Network.requestWillBeSent") {
@@ -225,7 +239,7 @@ chrome.debugger.onEvent.addListener((source, method, params) => {
     // Preserve failed/cancelled requests without inventing a 200 response.
     // If a status was actually observed before the failure, retain it.
     const failed = method === "Network.loadingFailed";
-    const response = info.response || { status: 0, headers: [] };
+    const response = info.response || { status: 0, headers: {} };
     const pending = queueExchange(info, response, failed).catch((e) => {
       session.lastError = e.message;
       return saveState();
@@ -240,10 +254,10 @@ chrome.debugger.onDetach.addListener((source) => {
     // cleanly instead of silently dropping events.
     session.capturing = false;
     session.tabId = null;
-    session.requests.clear();
+    const unfinished = retainUnfinishedRequests();
     session.lastError = "debugger detached (DevTools opened?)";
     chrome.action.setBadgeText({ text: "" });
-    void Promise.allSettled([...pendingResponses]).then(async () => {
+    void Promise.allSettled([...pendingResponses, ...unfinished]).then(async () => {
       await flush();
       // A successful upload must not erase why capture unexpectedly ended.
       if (!session.lastError) session.lastError = "debugger detached (DevTools opened?)";

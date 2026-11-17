@@ -59,7 +59,7 @@ function fixture() {
       request: { method: "GET", url: `https://example.test/${id}`, headers: {} },
     });
     events.event({ tabId: 7 }, "Network.responseReceived", {
-      requestId: String(id), response: { status: 200, headers: [] },
+      requestId: String(id), response: { status: 200, headers: { "Content-Type": "text/plain" } },
     });
     events.event({ tabId: 7 }, "Network.loadingFinished", { requestId: String(id) });
   };
@@ -158,6 +158,62 @@ test("each capture gets a new group and previously queued records keep their ori
   assert.equal(entries.length, 2);
   assert.equal(entries[0].captureId, first);
   assert.equal(entries[1].captureId, second);
+});
+
+
+
+test("Chrome CDP response header objects are ingested and normalized", async () => {
+  const x = fixture();
+  await x.message("start");
+  x.events.event({ tabId: 7 }, "Network.requestWillBeSent", {
+    requestId: "cdp-headers", request: { method: "GET", url: "https://example.test/headers", headers: { Accept: "text/plain" } },
+  });
+  x.events.event({ tabId: 7 }, "Network.responseReceived", {
+    requestId: "cdp-headers", response: { status: 201, headers: { "Content-Type": "text/plain", "X-Trace": "ok" } },
+  });
+  x.events.event({ tabId: 7 }, "Network.loadingFinished", { requestId: "cdp-headers" });
+  await x.message("stop");
+  const [e] = x.calls.uploads.flat();
+  assert.equal(e.status, 201);
+  assert.equal(e.responseHeaders["content-type"], "text/plain");
+  assert.equal(e.responseHeaders["x-trace"], "ok");
+  assert.equal(e.responseBody, "response-cdp-headers");
+});
+
+test("stop retains requests without terminal events, without inventing successful responses", async () => {
+  const x = fixture();
+  await x.message("start");
+  for (const requestId of ["no-headers", "headers-seen"]) {
+    x.events.event({ tabId: 7 }, "Network.requestWillBeSent", {
+      requestId, request: { method: "POST", url: `https://example.test/${requestId}`, headers: {}, postData: "started" },
+    });
+  }
+  x.events.event({ tabId: 7 }, "Network.responseReceived", {
+    requestId: "headers-seen", response: { status: 202, headers: { "Content-Type": "text/plain" } },
+  });
+  const stopped = await x.message("stop");
+  assert.equal(stopped.queued, 0);
+  const entries = x.calls.uploads.flat();
+  assert.equal(entries.length, 2);
+  assert.equal(entries.find(e => e.exchangeId === "no-headers").status, 0);
+  assert.equal(entries.find(e => e.exchangeId === "headers-seen").status, 202);
+  assert.ok(entries.every(e => e.responseBody === ""));
+  assert.ok(entries.every(e => e.requestBody === "started"));
+  assert.equal((await x.message("getState")).ingested, 2);
+});
+
+test("unexpected debugger detach also retains requests still in flight", async () => {
+  const x = fixture();
+  await x.message("start");
+  x.events.event({ tabId: 7 }, "Network.requestWillBeSent", {
+    requestId: "detached", request: { method: "GET", url: "https://example.test/pending", headers: {} },
+  });
+  x.events.detach({ tabId: 7 });
+  await new Promise(resolve => setImmediate(resolve));
+  assert.equal(x.calls.uploads.flat().length, 1);
+  assert.equal(x.calls.uploads.flat()[0].status, 0);
+  assert.equal(x.calls.uploads.flat()[0].exchangeId, "detached");
+  assert.match((await x.message("getState")).lastError, /debugger detached/);
 });
 
 test("failed network requests are recorded with unobserved status rather than silently discarded", async () => {
