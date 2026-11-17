@@ -936,6 +936,12 @@ export interface TrafficExchange {
   resp_len: number;
 }
 
+export interface TrafficMatchSnippet {
+  before: string;
+  match: string;
+  after: string;
+}
+
 export interface TrafficResp {
   enabled: boolean;
   proxy?: string;
@@ -945,6 +951,7 @@ export interface TrafficResp {
   size?: number;
   exchanges?: TrafficExchange[];
   status_buckets?: Record<string, number>; // 0=unobserved, 1..5=HTTP class; all filtered rows, not just the page
+  match_snippets?: Record<string, TrafficMatchSnippet>; // plain-text context for body search, only on this page
 }
 
 // Read-only summaries of persisted extension-supplied capture groups.

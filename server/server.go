@@ -3386,6 +3386,10 @@ func (s *Server) getTraffic(w http.ResponseWriter, r *http.Request) {
 		writeErr(w, 500, err.Error())
 		return
 	}
+	var snippets map[string]traffic.MatchSnippet
+	if strings.TrimSpace(filter.Body) != "" {
+		snippets = tr.BodyMatchSnippets(ex, filter.Body)
+	}
 	count := matched // task view: only scoped matches, not all other tasks' captures
 	if !scoped {
 		count, err = tr.Count()
@@ -3403,6 +3407,7 @@ func (s *Server) getTraffic(w http.ResponseWriter, r *http.Request) {
 		"size":      size,
 		"exchanges": trafficDTOs(ex),
 		"status_buckets": buckets,
+		"match_snippets": snippets,
 	})
 }
 
