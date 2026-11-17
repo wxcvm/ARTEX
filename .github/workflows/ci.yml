@@ -46,6 +46,8 @@ jobs:
       - run: go vet ./...
       - name: Docker runner isolation smoke (fake credentials only)
         run: bash scripts/ci/runner-isolation-smoke.sh
+      - name: Docker runner proxy relay and network separation smoke
+        run: bash scripts/ci/runner-relay-smoke.sh
       # Skipped tests, tracked in issue #9:
       # - TestGraphOverviewExpandsAssociatedCompanyScope,
       #   TestCaptureApprovalLifecycle: fail on unmodified upstream code with a

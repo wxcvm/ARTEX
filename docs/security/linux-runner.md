@@ -56,6 +56,8 @@ docker compose -f docker-compose.yml -f docker-compose.runner.yml exec -T tool-r
 '
 ```
 
+CI 还会通过 `scripts/ci/runner-relay-smoke.sh` 使用两个临时 Docker 网络和真实 `artex` 代理转发二进制验证：执行网络经指定 relay 能访问模拟控制端代理，不能直接访问控制端。这是网络路径的容器回归，**不代表正式 Compose 及真实流量抓包已验收**。
+
 还需运行真实 ARTEX 任务，确认 Bash/文件操作、任务后台输出、交互式 Shell、代理抓包与安装的工具包能正常工作；只通过以上静态检查**不等于完成隔离验收**。
 
 ## 目前明确的限制
