@@ -76,6 +76,7 @@ CREATE TABLE IF NOT EXISTS capture_attribution (
   exchange_id TEXT PRIMARY KEY,
   capture_id TEXT NOT NULL
 );
+CREATE INDEX IF NOT EXISTS idx_capture_attribution_group ON capture_attribution(capture_id);
 CREATE TABLE IF NOT EXISTS blob_refs (
   hash        TEXT NOT NULL,
   exchange_id TEXT NOT NULL,
@@ -825,6 +826,7 @@ func ftsQuote(s string) string {
 // newest-first by timestamp.
 type PageQuery struct {
 	Host    string // host substring
+	CaptureID string // exact optional extension-supplied capture group
 	Method  string // exact method (case-insensitive)
 	Query   string // broad search box: metadata columns OR captured text
 	Body    string // content box: captured request/response text only (full-text)
@@ -885,6 +887,9 @@ func (t *Traffic) Page(f PageQuery, page, size int) (rows []ExchangeMeta, total 
 	}
 	if h := strings.TrimSpace(f.Host); h != "" {
 		add("host LIKE ?", "%"+h+"%")
+	}
+	if group := strings.TrimSpace(f.CaptureID); group != "" {
+		add("id IN (SELECT exchange_id FROM capture_attribution WHERE capture_id=?)",group)
 	}
 	if m := strings.TrimSpace(f.Method); m != "" {
 		add("method=?", strings.ToUpper(m))

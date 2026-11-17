@@ -140,6 +140,16 @@ export default function TrafficPage() {
   // select applies immediately.
   const [body, setBody] = React.useState("");
   const [bodyQ, setBodyQ] = React.useState("");
+  const [captureId, setCaptureId] = React.useState("");
+  const [captureIdQ, setCaptureIdQ] = React.useState("");
+  // A finding evidence detail can open this page scoped to its capture group.
+  React.useEffect(() => {
+    const linkedGroup = new URLSearchParams(window.location.search).get("capture_id");
+    if (linkedGroup) {
+      setCaptureId(linkedGroup);
+      setCaptureIdQ(linkedGroup);
+    }
+  }, []);
   const [path, setPath] = React.useState("");
   const [pathQ, setPathQ] = React.useState("");
   const [statusFilter, setStatusFilter] = React.useState("all");
@@ -173,6 +183,10 @@ export default function TrafficPage() {
     return () => clearTimeout(t);
   }, [query]);
   React.useEffect(() => {
+    const t = setTimeout(() => setCaptureIdQ(captureId.trim()), 300);
+    return () => clearTimeout(t);
+  }, [captureId]);
+  React.useEffect(() => {
     const t = setTimeout(() => setBodyQ(body.trim()), 300);
     return () => clearTimeout(t);
   }, [body]);
@@ -189,10 +203,12 @@ export default function TrafficPage() {
     return () => clearTimeout(t);
   }, [respMax]);
 
-  const hasAdvancedFilter = Boolean(bodyQ || pathQ || respMinQ || respMaxQ) || statusFilter !== "all";
+  const hasAdvancedFilter = Boolean(bodyQ || captureIdQ || pathQ || respMinQ || respMaxQ) || statusFilter !== "all";
   const resetAdvancedFilters = () => {
     setBody("");
     setBodyQ("");
+    setCaptureId("");
+    setCaptureIdQ("");
     setPath("");
     setPathQ("");
     setStatusFilter("all");
@@ -206,7 +222,7 @@ export default function TrafficPage() {
   // biome-ignore lint/correctness/useExhaustiveDependencies: these values intentionally trigger a page reset.
   React.useEffect(() => {
     setPage(0);
-  }, [hostQ, queryQ, method, size, bodyQ, pathQ, statusFilter, respMinQ, respMaxQ, sort]);
+  }, [hostQ, queryQ, method, size, bodyQ, captureIdQ, pathQ, statusFilter, respMinQ, respMaxQ, sort]);
 
   // Load the current page. Auto-refresh only on page 0 (newest) so paging back
   // through history isn't yanked out from under the user.
@@ -217,6 +233,7 @@ export default function TrafficPage() {
       api
         .traffic(page, size, hostQ, method, queryQ, {
           body: bodyQ,
+          captureId: captureIdQ,
           path: pathQ,
           status: statusFilter,
           respMin: respMinQ,
@@ -248,7 +265,7 @@ export default function TrafficPage() {
       alive = false;
       clearInterval(t);
     };
-  }, [page, size, hostQ, method, queryQ, bodyQ, pathQ, statusFilter, respMinQ, respMaxQ, sort, reloadTick]);
+  }, [page, size, hostQ, method, queryQ, bodyQ, captureIdQ, pathQ, statusFilter, respMinQ, respMaxQ, sort, reloadTick]);
 
   // Delete traffic for the current host filter (substring) or the checked
   // hosts (exact batch), then refetch.
@@ -575,6 +592,15 @@ export default function TrafficPage() {
             value={path}
             onChange={(e) => setPath(e.target.value)}
             className="h-8"
+          />
+        </div>
+        <div className="relative w-64">
+          <Input
+            aria-label={tr("捕获批次 ID", "Capture group ID")}
+            placeholder={tr("捕获批次 ID（精确匹配）", "Capture group ID (exact)")}
+            value={captureId}
+            onChange={(e) => setCaptureId(e.target.value)}
+            className="h-8 font-mono text-xs"
           />
         </div>
         <Select value={statusFilter} onValueChange={setStatusFilter}>

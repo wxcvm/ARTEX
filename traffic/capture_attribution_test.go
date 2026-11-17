@@ -48,3 +48,29 @@ func TestCaptureAttributionOptionalAndLength(t *testing.T) {
     });err!=nil{t.Fatal(err)}
     if err:=tr.RecordExternal(ExternalExchange{Method:"GET",URL:"https://example.invalid/invalid",CaptureID:strings.Repeat("x",129)});err==nil{t.Fatal("accepted unbounded capture ID")}
 }
+
+
+func TestCaptureGroupPageFilter(t *testing.T) {
+    tr,_:=openTraffic(t)
+    for _,tc:=range []struct{id,host string}{
+        {"batch-a","one.example.invalid"},{"batch-a","two.example.invalid"},
+        {"batch-b","one.example.invalid"},{"","one.example.invalid"},
+    }{
+        if err:=tr.RecordExternal(ExternalExchange{
+            CaptureID:tc.id,Method:"GET",URL:"https://"+tc.host+"/",Status:200,
+        });err!=nil{t.Fatal(err)}
+    }
+    q:=PageQuery{CaptureID:"batch-a",RespMin:-1,RespMax:-1}
+    rows,total,err:=tr.Page(q,0,20)
+    if err!=nil||total!=2||len(rows)!=2{t.Fatalf("batch filter: %+v %d %v",rows,total,err)}
+    q.Host="one.example.invalid"
+    rows,total,err=tr.Page(q,0,20)
+    if err!=nil||total!=1||len(rows)!=1{t.Fatalf("combined filters: %+v %d %v",rows,total,err)}
+    q.Host=""
+    q.CaptureID="does-not-exist"
+    rows,total,err=tr.Page(q,0,20)
+    if err!=nil||total!=0||len(rows)!=0{t.Fatalf("unknown batch: %+v %d %v",rows,total,err)}
+    q.CaptureID=""
+    rows,total,err=tr.Page(q,0,20)
+    if err!=nil||total!=4||len(rows)!=4{t.Fatalf("unfiltered legacy rows: %+v %d %v",rows,total,err)}
+}

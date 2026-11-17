@@ -910,6 +910,7 @@ export const api = {
     q = "",
     opts: {
       body?: string;
+      captureId?: string;
       path?: string;
       status?: string;
       respMin?: string;
@@ -924,6 +925,7 @@ export const api = {
         (method && method !== "all" ? `&method=${encodeURIComponent(method)}` : "") +
         (q ? `&q=${encodeURIComponent(q)}` : "") +
         (opts.body ? `&body=${encodeURIComponent(opts.body)}` : "") +
+        (opts.captureId ? `&capture_id=${encodeURIComponent(opts.captureId)}` : "") +
         (opts.path ? `&path=${encodeURIComponent(opts.path)}` : "") +
         (opts.status && opts.status !== "all" ? `&status=${encodeURIComponent(opts.status)}` : "") +
         (opts.respMin ? `&resp_min=${encodeURIComponent(opts.respMin)}` : "") +

@@ -4,6 +4,7 @@ import { useUiLocale } from "@/lib/ui-locale.client";
 import { uiText } from "@/lib/ui-locale";
 
 import * as React from "react";
+import Link from "next/link";
 
 import { toast } from "sonner";
 
@@ -93,6 +94,12 @@ export function TrafficEvidenceViewer({
         {detail?.binding.snapshot.capture_id && (
           <p className="break-all text-xs text-muted-foreground">
             {tr("捕获批次", "Capture group")}: <code>{detail.binding.snapshot.capture_id}</code>
+            <Link
+              className="ml-2 underline underline-offset-2"
+              href={`/function/traffic?capture_id=${encodeURIComponent(detail.binding.snapshot.capture_id)}`}
+            >
+              {tr("查看同批流量", "View group traffic")}
+            </Link>
             {" · "}{tr("仅为扩展提供的关联标识，不代表已验证的浏览器身份。", "Extension-supplied correlation, not verified browser identity.")}
           </p>
         )}
