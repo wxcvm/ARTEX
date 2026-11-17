@@ -87,3 +87,58 @@ func TestCaptureGroupPageFilter(t *testing.T) {
     for _,row:=range searched{seen[row.CaptureID]++}
     if seen["batch-a"]!=1||seen["batch-b"]!=1||seen[""]!=1{t.Fatalf("search attribution lost: %+v",seen)}
 }
+
+func TestCaptureGroupSummaryPagingAndFidelity(t *testing.T) {
+	tr, _ := openTraffic(t)
+	for _, tc := range []struct {
+		id, host string
+		status int
+	}{
+		{"group-a", "one.example.invalid", 200},
+		{"group-a", "one.example.invalid", 404},
+		{"group-a", "two.example.invalid", 0},
+		{"group-b", "three.example.invalid", 201},
+		{"", "legacy.example.invalid", 200},
+	} {
+		if err := tr.RecordExternal(ExternalExchange{
+			CaptureID: tc.id, Method: "GET", URL: "https://" + tc.host + "/item", Status: tc.status,
+		}); err != nil {
+			t.Fatal(err)
+		}
+	}
+	groups, more, err := tr.CaptureGroups(0, 20)
+	if err != nil || more || len(groups) != 2 {
+		t.Fatalf("groups: %+v more=%v err=%v", groups, more, err)
+	}
+	byID := map[string]CaptureGroupSummary{}
+	for _, g := range groups {
+		byID[g.CaptureID] = g
+	}
+	if a := byID["group-a"]; a.Count != 3 || a.Hosts != 2 ||
+		a.ErrorResponses != 1 || a.UnknownStatuses != 1 || a.LastTS < a.FirstTS {
+		t.Fatalf("group a summary: %+v", a)
+	}
+	if b := byID["group-b"]; b.Count != 1 || b.Hosts != 1 ||
+		b.ErrorResponses != 0 || b.UnknownStatuses != 0 {
+		t.Fatalf("group b summary: %+v", b)
+	}
+	first, more, err := tr.CaptureGroups(0, 1)
+	if err != nil || !more || len(first) != 1 {
+		t.Fatalf("first page: %+v more=%v err=%v", first, more, err)
+	}
+	second, more, err := tr.CaptureGroups(1, 1)
+	if err != nil || more || len(second) != 1 || second[0].CaptureID == first[0].CaptureID {
+		t.Fatalf("second page: %+v more=%v err=%v", second, more, err)
+	}
+	end, more, err := tr.CaptureGroups(2, 1)
+	if err != nil || more || len(end) != 0 {
+		t.Fatalf("end page: %+v more=%v err=%v", end, more, err)
+	}
+	if n, err := tr.DeleteHost("three.example.invalid"); err != nil || n != 1 {
+		t.Fatalf("delete group b host: %d %v", n, err)
+	}
+	after, more, err := tr.CaptureGroups(0, 20)
+	if err != nil || more || len(after) != 1 || after[0].CaptureID != "group-a" {
+		t.Fatalf("deleted group persisted: %+v more=%v err=%v", after, more, err)
+	}
+}
