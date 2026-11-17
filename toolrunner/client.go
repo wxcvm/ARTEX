@@ -77,6 +77,28 @@ func (c *Client) CloseSession(ctx context.Context, session string) error {
 	}{Session: session}, nil)
 }
 
+// runnerToolEnv only forwards transport configuration. The control plane may
+// hold database passwords, provider keys and other secrets in its environment;
+// an execution runner must never inherit extra BashEnv entries by accident.
+// ARTEX's current proxyEnv uses these exact proxy/CA variables.
+func runnerToolEnv(env []string) []string {
+	allowed := map[string]bool{
+		"HTTP_PROXY": true, "HTTPS_PROXY": true, "ALL_PROXY": true, "NO_PROXY": true,
+		"http_proxy": true, "https_proxy": true, "all_proxy": true, "no_proxy": true,
+		"SSL_CERT_FILE": true, "CURL_CA_BUNDLE": true,
+		"REQUESTS_CA_BUNDLE": true, "NODE_EXTRA_CA_CERTS": true,
+		"GIT_SSL_CAINFO": true,
+	}
+	var out []string
+	for _, item := range env {
+		key, _, found := strings.Cut(item, "=")
+		if found && allowed[key] {
+			out = append(out, item)
+		}
+	}
+	return out
+}
+
 type remoteTool struct {
 	tool.CoreTool // permissions/schema/name remain those of the original SDK tool
 	client  *Client
@@ -89,7 +111,7 @@ func (r remoteTool) Call(ctx context.Context, input json.RawMessage, tc *tool.To
 		request.WorkingDir = tc.WorkingDir
 		request.OutputDir = tc.OutputDir
 		request.MaxOutputChars = tc.MaxOutputChars
-		request.Env = append([]string(nil), tc.Env...)
+		request.Env = runnerToolEnv(tc.Env)
 	}
 	// Preserve existing traffic recording through the Compose-only relay.
 	if proxy := os.Getenv("ARTEX_RUNNER_PROXY_ADDR"); proxy != "" {
