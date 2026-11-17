@@ -50,6 +50,8 @@ jobs:
         run: bash scripts/ci/runner-relay-smoke.sh
       - name: Docker broker and tool executor isolation smoke
         run: bash scripts/ci/runner-broker-smoke.sh
+      - name: Docker Compose broker/executor startup smoke
+        run: bash scripts/ci/runner-compose-smoke.sh
       # Skipped tests, tracked in issue #9:
       # - TestGraphOverviewExpandsAssociatedCompanyScope,
       #   TestCaptureApprovalLifecycle: fail on unmodified upstream code with a
