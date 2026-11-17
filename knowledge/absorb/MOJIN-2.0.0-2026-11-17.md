@@ -19,8 +19,9 @@
 
 1. `skills/ai-llm-app-security/SKILL.md`：为 AI 应用、RAG、MCP 与 Agent 工具调用增加**证据驱动的检查方法**，避免只靠提示词回显判断成功。
 2. `skills/component-advisory-triage/SKILL.md`：按组件版本、官方公告、受影响范围和实际证据进行漏洞情报核验；与现有 `finding-triage`、`patch-diff` 协同。
+3. `skills/blockchain-contract-review/SKILL.md`：覆盖智能合约/DeFi 授权、资产会计、预言机、签名、升级和跨链信任边界的源码审查方法；复用现有 `codeaudit` 与 `finding-triage`。
 
-两份文件都为 ARTEX 重写，只借鉴**主题与检查维度**；未直接复制原包的指令、脚本或风险配置。它们是可检索的 Skill 文档，不新增工具执行器、不装软件、不修改主程序、不改变批准策略或任务范围。
+三份 Skill 都为 ARTEX 重写，只借鉴**主题与检查维度**；未直接复制原包的指令、脚本或风险配置。它们是可检索的 Skill 文档，不新增工具执行器、不装软件、不修改主程序、不改变批准策略或任务范围。
 
 ## 未直接吸收的内容
 
