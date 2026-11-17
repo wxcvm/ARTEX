@@ -132,9 +132,9 @@ Sync asset data directly from [ScopeSentry](https://github.com/Autumn-27/ScopeSe
 
 This fork carries the practical knowledge layer alongside the code:
 
-- `knowledge/knowledge.db` — 508-entry SQLite ledger (`poc` table + FTS5 index): verified flag, category, component, kind, tags, full text. Point `knowledge_dir` in `config.json` at `knowledge/` and the agents start searching it ("弹药 / 打法 / 负面情报" three tiers).
-- `knowledge/pocs/` — 429 per-entry directories (`poc.sh` / `poc.py` / `*.md` / `*.http`). The title of each entry *is* the conclusion, including the negative ones (`…-判死-…`): a dead end recorded once is not explored again.
-- `knowledge/INDEX.md` — flat table of all 508 entries.
+- `knowledge/knowledge.db` — 672-entry SQLite ledger (`poc` table + FTS5 index): verified flag, category, component, kind, tags, full text. Point `knowledge_dir` in `config.json` at `knowledge/` and the agents start searching it ("弹药 / 打法 / 负面情报" three tiers).
+- `knowledge/pocs/` — 593 per-entry directories (`poc.sh` / `poc.py` / `*.md` / `*.http`). The title of each entry *is* the conclusion, including the negative ones (`…-判死-…`): a dead end recorded once is not explored again.
+- `knowledge/INDEX.md` — flat table of all 672 entries.
 - `knowledge/prompts/` — the 14 agent role prompts (planner / worker / verifier / retester / exploit / pentest / cloud / avevasion / payout_analyst / kb_curator / goals / mainagent / auto / worker.intranet) plus the 4 armor presets under `prompts/armor/`.
 - `skills/` — 54 skills; `chains-*/refs/*.md` are 52 decision-chain documents (30–80 KB each) covering web / AD / priv-esc / recon / app / meta / pivot / reverse.
 
@@ -142,7 +142,7 @@ Provenance and the desensitisation rules applied before these assets entered the
 
 Two more indexes:
 
-- [`knowledge/MAP.md`](knowledge/MAP.md) — one-to-one mapping between the 508 ledger rows and the 429 POC directories, with the unmatched rows on both sides listed.
+- [`knowledge/MAP.md`](knowledge/MAP.md) — one-to-one mapping between the 672 ledger rows and the 593 POC directories, with the unmatched rows on both sides listed.
 - [`knowledge/ops/INDEX.md`](knowledge/ops/INDEX.md) — operator runbooks: hardening, deployment, troubleshooting, upgrade, Linux variant, package changelog.
 
 Knowledge runtime is live: `knowledge_dir` / `ARTEX_KB_DIR`, the read-only `kb` package over `knowledge/knowledge.db` (FTS5 `AND` → `OR` → `LIKE`, tiers ammo / playbook / negative / reference) and the `kb_search` / `kb_get` tools on planner + worker. Startup logs `[kb] knowledge base: … (fts=true)`; a missing database only leaves the tools unregistered.

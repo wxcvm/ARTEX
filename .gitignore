@@ -3,6 +3,7 @@
 *.db
 *.db-wal
 *.db-shm
+*.db.bak-*
 config.json
 scheduler_state.json
 __pycache__/

@@ -2,9 +2,9 @@
 
 | 项 | 数量 |
 |---|---|
-| `knowledge.db` 条目 | **508** |
-| `pocs/` 原文目录 | **429** |
-| 已配对 | **428** |
+| `knowledge.db` 条目 | **672** |
+| `pocs/` 原文目录 | **593** |
+| 已配对 | **592** |
 | 仅有台账（正文在 db 的 `content`） | **80** |
 | 仅有目录（db 无条目） | **1** |
 
@@ -529,3 +529,167 @@
 | 515 | 代理分流造假样本-target30.example.com-经-7892-返回伪造-502-404-hello | absorbed | `代理分流造假样本-target30.example.com-经-7892-返回伪造-502-404-hello` | code | 1.0 |
 | 516 | 博彩-phpwind-站群实战结论集-203.0.113.1-24-判死路线-8-条可复用判据 | absorbed | `博彩-phpwind-站群实战结论集-203.0.113.1-24-判死路线-8-条可复用判据` | code | 1.0 |
 | 517 | 博彩-phpwind-站群实战结论集-203.0.113.27-24-判死路线-8-条可复用判据 | absorbed | `博彩-phpwind-站群实战结论集-203.0.113.27-24-判死路线-8-条可复用判据` | code | 1.0 |
+| 518 | Nexus Repository 未授权 RCE（CVE-2019-7238） | cloud-container | `fujiang-cve-2019-7238` | code | 1.0 |
+| 519 | PostgreSQL COPY PROGRAM 权限边界（CVE-2019-9193，厂商认定非漏洞） | cloud-container | `fujiang-cve-2019-9193` | code | 1.0 |
+| 520 | vCenter Server 未授权上传 → RCE（vROPS 插件） | cloud-container | `fujiang-cve-2021-21972` | code | 1.0 |
+| 521 | Nacos 认证绕过（User-Agent 白名单） | cloud-container | `fujiang-cve-2021-29441` | code | 1.0 |
+| 522 | Grafana 插件路径穿越任意文件读（CVE-2021-43798） | cloud-container | `fujiang-cve-2021-43798` | code | 1.0 |
+| 523 | cgroups release_agent 容器逃逸 | cloud-container | `fujiang-cve-2022-0492` | code | 1.0 |
+| 524 | VMware Workspace ONE Access 模板注入 RCE | cloud-container | `fujiang-cve-2022-22954` | code | 1.0 |
+| 525 | Veeam Backup 凭据泄露（CVE-2023-27532） | cloud-container | `fujiang-cve-2023-27532` | code | 1.0 |
+| 526 | runc 文件描述符泄露逃逸（Leaky Vessels） | cloud-container | `fujiang-cve-2024-21626` | code | 1.0 |
+| 527 | VMware ESXi 认证绕过 → hypervisor 失守（CVE-2024-37085） | cloud-container | `fujiang-cve-2024-37085` | code | 1.0 |
+| 528 | Veeam Backup 未认证 RCE（CVE-2024-40711） | cloud-container | `fujiang-cve-2024-40711` | code | 1.0 |
+| 529 | Docker Remote API 未授权（直接拿宿主） | cloud-container | `fujiang-cloud-container-615246bd` | code | 1.0 |
+| 530 | MongoDB 未授权访问（直接拖库） | cloud-container | `fujiang-cloud-container-0b0a3d30` | code | 1.0 |
+| 531 | Redis 未授权（写文件 / 模块加载 / 主从复制） | cloud-container | `fujiang-cve-2022-0543` | code | 1.0 |
+| 532 | FortiOS SSL VPN 路径穿越（凭据读取） | edge-device | `fujiang-cve-2018-13379` | code | 1.0 |
+| 533 | Pulse Secure 任意文件读取（凭据与会话） | edge-device | `fujiang-cve-2019-11510` | code | 1.0 |
+| 534 | Citrix ADC 路径穿越 → 模板注入 RCE | edge-device | `fujiang-cve-2019-19781` | code | 1.0 |
+| 535 | FortiOS SSL VPN 双因素绕过（用户名大小写） | edge-device | `fujiang-cve-2020-12812` | code | 1.0 |
+| 536 | F5 BIG-IP TMUI 未授权 RCE（..;/ 路径穿越） | edge-device | `fujiang-cve-2020-5902` | code | 1.0 |
+| 537 | F5 iControl REST 未授权 RCE（2021 变体） | edge-device | `fujiang-cve-2021-22986` | code | 1.0 |
+| 538 | F5 BIG-IP iControl REST 认证绕过 → 命令执行 | edge-device | `fujiang-cve-2022-1388` | code | 1.0 |
+| 539 | FortiOS / FortiProxy 管理面认证绕过（假 Forwarded 头） | edge-device | `fujiang-cve-2022-40684` | code | 1.0 |
+| 540 | Ivanti EPMM 认证绕过（CVE-2023-35078） | edge-device | `fujiang-cve-2023-35078` | code | 1.0 |
+| 541 | Ivanti Connect Secure 认证绕过 + 命令注入（串联） | edge-device | `fujiang-cve-2023-46805-plus2` | code | 1.0 |
+| 542 | FortiClient EMS SQL 注入 → 未认证 RCE（CVE-2023-48788） | edge-device | `fujiang-cve-2023-48788` | code | 1.0 |
+| 543 | PAN-OS 管理面认证绕过 → root RCE（CVE-2024-0012 + CVE-2024-9474） | edge-device | `fujiang-cve-2024-0012-plus2` | code | 1.0 |
+| 544 | GoAnywhere MFT 认证绕过 → 新建管理员（CVE-2024-0204） | edge-device | `fujiang-cve-2024-0204` | code | 1.0 |
+| 545 | Check Point Quantum 安全网关任意文件读（CVE-2024-24919） | edge-device | `fujiang-cve-2024-24919` | code | 1.0 |
+| 546 | PAN-OS GlobalProtect 命令注入 | edge-device | `fujiang-cve-2024-3400` | code | 1.0 |
+| 547 | FortiManager 未认证 RCE（FortiJump，CVE-2024-47575） | edge-device | `fujiang-cve-2024-47575` | code | 1.0 |
+| 548 | AD CS 证书滥用（ESC1 / ESC8 等） | exchange-ad | `fujiang-exchange-ad-e6e03808` | code | 1.0 |
+| 549 | EternalBlue（MS17-010 SMBv1 远程溢出） | exchange-ad | `fujiang-cve-2017-0144` | code | 1.0 |
+| 550 | Exchange ViewState 反序列化（静态 machineKey） | exchange-ad | `fujiang-cve-2020-0688` | code | 1.0 |
+| 551 | Zerologon（Netlogon 密钥置零 → 域控接管） | exchange-ad | `fujiang-cve-2020-1472` | code | 1.0 |
+| 552 | Exchange ProxyLogon（SSRF + 任意文件写入 → RCE） | exchange-ad | `fujiang-cve-2021-26855` | code | 1.0 |
+| 553 | Exchange ProxyShell（三个洞串联 → RCE） | exchange-ad | `fujiang-cve-2021-34473` | code | 1.0 |
+| 554 | PrintNightmare（打印后台服务任意 DLL 加载） | exchange-ad | `fujiang-cve-2021-34527` | code | 1.0 |
+| 555 | noPac（sAMAccountName 伪装 + 无 PAC 票据 → 域管） | exchange-ad | `fujiang-cve-2021-42287-plus2` | code | 1.0 |
+| 556 | Exchange 认证后反序列化 RCE（CVE-2021-42321） | exchange-ad | `fujiang-cve-2021-42321` | code | 1.0 |
+| 557 | MSDT 协议远程代码执行（Follina） | exchange-ad | `fujiang-cve-2022-30190` | code | 1.0 |
+| 558 | Exchange ProxyNotShell（SSRF + PowerShell 远程） | exchange-ad | `fujiang-cve-2022-41040-plus2` | code | 1.0 |
+| 559 | Exchange EWS NTLM 中继提权（CVE-2024-21410） | exchange-ad | `fujiang-cve-2024-21410` | code | 1.0 |
+| 560 | Outlook MonikerLink 绕过与 NTLM 泄露（CVE-2024-21413） | exchange-ad | `fujiang-cve-2024-21413` | code | 1.0 |
+| 561 | Zimbra postjournal 未授权命令执行（CVE-2024-45519） | exchange-ad | `fujiang-cve-2024-45519` | code | 1.0 |
+| 562 | WebLogic T3 反序列化（CommonsCollections） | java-deser | `fujiang-cve-2015-4852` | code | 1.0 |
+| 563 | Shiro rememberMe 默认密钥反序列化 RCE（CVE-2016-4437） | java-deser | `fujiang-cve-2016-4437` | code | 1.0 |
+| 564 | WebLogic wls-wsat XMLDecoder 反序列化 RCE | java-deser | `fujiang-cve-2017-10271` | code | 1.0 |
+| 565 | Struts2 S2-045 Content-Type OGNL 注入 | java-deser | `fujiang-cve-2017-5638` | code | 1.0 |
+| 566 | Apache Log4j2 JNDI 注入（Log4Shell） | java-deser | `fujiang-cve-2021-44228` | code | 1.0 |
+| 567 | SnakeYAML 反序列化 RCE（CVE-2022-1471） | java-deser | `fujiang-cve-2022-1471` | code | 1.0 |
+| 568 | Java ECDSA 空签名绕过（Psychic Signatures） | java-deser | `fujiang-cve-2022-21449` | code | 1.0 |
+| 569 | Spring Framework 数据绑定 RCE（Spring4Shell） | java-deser | `fujiang-cve-2022-22965` | code | 1.0 |
+| 570 | Fastjson autoType 反序列化 RCE | java-deser | `fujiang-cve-2022-25845` | code | 1.0 |
+| 571 | Tomcat PUT 任意文件写入（JSP 落地） | java-web | `fujiang-cve-2017-12615` | code | 1.0 |
+| 572 | Apache Solr Velocity 模板注入 RCE | java-web | `fujiang-cve-2019-17558` | code | 1.0 |
+| 573 | WebLogic wls9_async_response 未授权 RCE（2019 在野） | java-web | `fujiang-cve-2019-2725` | code | 1.0 |
+| 574 | WebLogic 控制台未授权 RCE（console.portal 路径穿越） | java-web | `fujiang-cve-2020-14882` | code | 1.0 |
+| 575 | Tomcat AJP 文件读取 / 包含（Ghostcat） | java-web | `fujiang-cve-2020-1938` | code | 1.0 |
+| 576 | Apache Druid 未授权 RCE（CVE-2021-25646） | java-web | `fujiang-cve-2021-25646` | code | 1.0 |
+| 577 | Confluence 未授权 OGNL 注入（pre-auth，ENCODED_TOKEN） | java-web | `fujiang-cve-2021-26084` | code | 1.0 |
+| 578 | Spring Cloud Gateway Actuator SpEL 注入 RCE（CVE-2022-22947） | java-web | `fujiang-cve-2022-22947` | code | 1.0 |
+| 579 | Spring Cloud Function SpEL 注入 RCE（CVE-2022-22963） | java-web | `fujiang-cve-2022-22963` | code | 1.0 |
+| 580 | Confluence 未授权 OGNL 注入（Confluence OGNL RCE） | java-web | `fujiang-cve-2022-26134` | code | 1.0 |
+| 581 | Confluence 未授权管理员接管（setup 流程未关） | java-web | `fujiang-cve-2023-22515` | code | 1.0 |
+| 582 | Confluence 未授权恢复导致管理员接管 | java-web | `fujiang-cve-2023-22518` | code | 1.0 |
+| 583 | Confluence 模板注入 RCE（text-inline.vm） | java-web | `fujiang-cve-2023-22527` | code | 1.0 |
+| 584 | PaperCut NG/MF 认证绕过 → RCE（CVE-2023-27350） | java-web | `fujiang-cve-2023-27350` | code | 1.0 |
+| 585 | TeamCity 认证绕过 → 管理员令牌 → RCE | java-web | `fujiang-cve-2023-42793` | code | 1.0 |
+| 586 | Apache ActiveMQ OpenWire 反序列化 RCE | java-web | `fujiang-cve-2023-46604` | code | 1.0 |
+| 587 | Struts2 文件上传路径穿越（S2-066） | java-web | `fujiang-cve-2023-50164` | code | 1.0 |
+| 588 | GitLab 任意账号接管（CVE-2023-7028） | java-web | `fujiang-cve-2023-7028` | code | 1.0 |
+| 589 | Jenkins CLI 任意文件读取 | java-web | `fujiang-cve-2024-23897` | code | 1.0 |
+| 590 | TeamCity 鉴权绕过（;.jsp 路径参数） | java-web | `fujiang-cve-2024-27198` | code | 1.0 |
+| 591 | Apache OFBiz 未授权 RCE（CVE-2024-38856） | java-web | `fujiang-cve-2024-38856` | code | 1.0 |
+| 592 | Struts2 文件上传路径穿越 → RCE（S2-067，CVE-2024-53677） | java-web | `fujiang-cve-2024-53677` | code | 1.0 |
+| 593 | Baron Samedit（sudo 堆溢出提权） | linux-priv | `fujiang-cve-2021-3156` | code | 1.0 |
+| 594 | Ubuntu overlayfs 本地提权（2021） | linux-priv | `fujiang-cve-2021-3493` | code | 1.0 |
+| 595 | PwnKit（polkit pkexec 本地提权） | linux-priv | `fujiang-cve-2021-4034` | code | 1.0 |
+| 596 | fs_context 堆溢出提权（legacy_parse_param） | linux-priv | `fujiang-cve-2022-0185` | code | 1.0 |
+| 597 | Dirty Pipe（页缓存写覆盖提权） | linux-priv | `fujiang-cve-2022-0847` | code | 1.0 |
+| 598 | overlayfs copy-up 权限绕过提权 | linux-priv | `fujiang-cve-2023-0386` | code | 1.0 |
+| 599 | sudoedit 环境变量注入提权（EDITOR 带 --） | linux-priv | `fujiang-cve-2023-22809` | code | 1.0 |
+| 600 | Ubuntu overlayfs 权限提升（GameOver(lay)） | linux-priv | `fujiang-cve-2023-2640-plus2` | code | 1.0 |
+| 601 | nf_tables 释放后重用提权（2023） | linux-priv | `fujiang-cve-2023-32233` | code | 1.0 |
+| 602 | Linux io_uring 本地提权（CVE-2024-0582） | linux-priv | `fujiang-cve-2024-0582` | code | 1.0 |
+| 603 | nf_tables 释放后重用提权 | linux-priv | `fujiang-cve-2024-1086` | code | 1.0 |
+| 604 | 命令注入（分号 / 反引号 / $() 与盲注外带） | web-cms | `fujiang-web-cms-fc7b661a` | code | 1.0 |
+| 605 | PHPUnit eval-stdin 远程代码执行 | web-cms | `fujiang-cve-2017-9841` | code | 1.0 |
+| 606 | Drupal 表单 API 远程代码执行（Drupalgeddon2） | web-cms | `fujiang-cve-2018-7600` | code | 1.0 |
+| 607 | PHP-FPM 路径信息下溢 RCE | web-cms | `fujiang-cve-2019-11043` | code | 1.0 |
+| 608 | vBulletin widget 配置代码执行 | web-cms | `fujiang-cve-2019-16759` | code | 1.0 |
+| 609 | Laravel Ignition 调试模式任意文件读 → RCE（CVE-2021-3129） | web-cms | `fujiang-cve-2021-3129` | code | 1.0 |
+| 610 | Apache HTTP Server 路径穿越 / CGI RCE | web-cms | `fujiang-cve-2021-41773-plus2` | code | 1.0 |
+| 611 | Joomla 未授权配置泄露（API） | web-cms | `fujiang-cve-2023-23752` | code | 1.0 |
+| 612 | WordPress Backup Migration 未授权 RCE（CVE-2023-6553） | web-cms | `fujiang-cve-2023-6553` | code | 1.0 |
+| 613 | WordPress Bricks 未授权 RCE（CVE-2024-25600） | web-cms | `fujiang-cve-2024-25600` | code | 1.0 |
+| 614 | WordPress WP-Automatic 未授权 SQL 注入（CVE-2024-27956） | web-cms | `fujiang-cve-2024-27956` | code | 1.0 |
+| 615 | PHP-CGI Windows 参数注入（best-fit 编码） | web-cms | `fujiang-cve-2024-4577` | code | 1.0 |
+| 616 | 本地文件包含 → RCE（日志包含 / pearcmd / PHP filter chain） | web-cms | `fujiang-web-cms-e2998ea3` | code | 1.0 |
+| 617 | Nginx alias 路径穿越（读任意文件/源码泄露） | web-cms | `fujiang-web-cms-8b06abba` | code | 1.0 |
+| 618 | PHP 反序列化（POP 链 → RCE / phar 触发） | web-cms | `fujiang-web-cms-3986d73b` | code | 1.0 |
+| 619 | SQL 注入（报错 / UNION / 堆叠）通用打法 | web-cms | `fujiang-web-cms-0280c2e0` | code | 1.0 |
+| 620 | SSTI 模板注入 → RCE（Jinja2 / Twig / Freemarker） | web-cms | `fujiang-web-cms-2439a0f4` | code | 1.0 |
+| 621 | ThinkPHP 5.x 方法注入 / 路由 RCE | web-cms | `fujiang-cve-2018-20062-plus2` | code | 1.0 |
+| 622 | XXE 外部实体注入（读文件 / SSRF / OOB 外带） | web-cms | `fujiang-web-cms-1b19f77e` | code | 1.0 |
+| 623 | 后台管理 API 未授权（只在前端隐藏菜单） | gray-market | `fujiang-gray-market-c28f79db` | code | 1.0 |
+| 624 | 后台 IP 白名单绕过（X-Forwarded-For 伪造内网来源） | gray-market | `fujiang-gray-market-2ef09faa` | code | 1.0 |
+| 625 | 后台“重置任意用户密码”接口越权（直接接管会员/管理员） | gray-market | `fujiang-gray-market-cc7b3103` | code | 1.0 |
+| 626 | 代理层级越权（读全站下级 / 改佣金比例） | gray-market | `fujiang-gray-market-300fe1f8` | code | 1.0 |
+| 627 | 接口越权 / BOLA（读他人订单、流水、提现） | gray-market | `fujiang-gray-market-214935b4` | code | 1.0 |
+| 628 | 接口无 nonce / 时间戳 → 请求重放（充值、领奖、下注） | gray-market | `fujiang-gray-market-5fd82b60` | code | 1.0 |
+| 629 | 注单 / 流水接口越权批量拉取（全站会员数据） | gray-market | `fujiang-gray-market-d967e600` | code | 1.0 |
+| 630 | 下注/结算赔率与倍数篡改（资金面） | gray-market | `fujiang-gray-market-269a4e2e` | code | 1.0 |
+| 631 | 支付 / 回调地址可控 → 内网 SSRF（含云元数据） | gray-market | `fujiang-gray-market-a1c33d56` | code | 1.0 |
+| 632 | 前端签名 / 加密可逆（伪造请求绕过风控） | gray-market | `fujiang-gray-market-a8e64394` | code | 1.0 |
+| 633 | CORS 配置错误（带凭据读他人接口数据） | gray-market | `fujiang-gray-market-086e458d` | code | 1.0 |
+| 634 | 券码 / 彩金码可枚举（批量领取与套现） | gray-market | `fujiang-gray-market-76e00ef0` | code | 1.0 |
+| 635 | 客服聊天记录导出未鉴权（全站会话与身份材料） | gray-market | `fujiang-gray-market-49c0a3f1` | code | 1.0 |
+| 636 | CSRF（无 token 的提现/改密/绑卡） | gray-market | `fujiang-gray-market-fa5aed6d` | code | 1.0 |
+| 637 | 签到 / 任务奖励批量刷取（缺幂等与频率控制） | gray-market | `fujiang-gray-market-77e09490` | code | 1.0 |
+| 638 | phpMyAdmin / Adminer 暴露（弱口令直进数据库） | gray-market | `fujiang-gray-market-387d2767` | code | 1.0 |
+| 639 | Druid 监控未授权 → session 泄露/后台接管（若依系必备） | gray-market | `fujiang-gray-market-893b29b8` | code | 1.0 |
+| 640 | 导出 / 下载接口任意文件读取 | gray-market | `fujiang-gray-market-508fca6b` | code | 1.0 |
+| 641 | 财务导出接口越权（银行卡 + 身份证批量导出） | gray-market | `fujiang-gray-market-6416fd1c` | code | 1.0 |
+| 642 | 三方游戏 / 视讯接口 key 泄露与回调伪造 | gray-market | `fujiang-gray-market-dbf31f8d` | code | 1.0 |
+| 643 | Host 头投毒（密码重置链接被劫持 → 任意账号接管） | gray-market | `fujiang-gray-market-fade6caf` | code | 1.0 |
+| 644 | 客服 IM / WebSocket 未鉴权（订阅他人会话） | gray-market | `fujiang-gray-market-4f6d3954` | code | 1.0 |
+| 645 | 后台"切换用户/代登录"接口越权（任意账号接管） | gray-market | `fujiang-gray-market-4a9998a4` | code | 1.0 |
+| 646 | 邀请返水自邀循环（小号矩阵刷返水） | gray-market | `fujiang-gray-market-dc82f024` | code | 1.0 |
+| 647 | JWT 实现缺陷（alg:none / 弱密钥 / 可预测 / kid 注入） | gray-market | `fujiang-gray-market-39a60016` | code | 1.0 |
+| 648 | 开奖结果可预测（弱 PRNG / 客户端算法 / 固定种子） | gray-market | `fujiang-gray-market-61cc5c65` | code | 1.0 |
+| 649 | Mass Assignment（注册/资料接口注入 role / vip / balance / agentId） | gray-market | `fujiang-gray-market-d4dc739a` | code | 1.0 |
+| 650 | 会员隐私批量查询 / 账号枚举（手机号、银行卡） | gray-market | `fujiang-gray-market-9811f67d` | code | 1.0 |
+| 651 | 包网多租户越权（tenantId/siteId 遍历，横穿几十个站点） | gray-market | `fujiang-gray-market-e1ef8859` | code | 1.0 |
+| 652 | 通知模板注入（标题/正文模板未转义 → SSTI / 存储型 XSS） | gray-market | `fujiang-gray-market-793b8a5c` | code | 1.0 |
+| 653 | OAuth redirect_uri 劫持 / state 缺失（账号接管） | gray-market | `fujiang-gray-market-bfcbf2a8` | code | 1.0 |
+| 654 | 对象存储与数据存储裸露（OSS / S3 / MinIO / MySQL / MongoDB） | gray-market | `fujiang-gray-market-e7b37cd6` | code | 1.0 |
+| 655 | 运营后台弱口令 + 验证码复用（博彩站点最常见入口） | gray-market | `fujiang-gray-market-1217f1c1` | code | 1.0 |
+| 656 | 订单状态机篡改（未支付改成已支付 / 已取消再入账） | gray-market | `fujiang-gray-market-679fc3c8` | code | 1.0 |
+| 657 | 源站 IP 泄露 → 绕过 WAF 直打（博彩站必看） | gray-market | `fujiang-gray-market-d6cabfd5` | code | 1.0 |
+| 658 | 宝塔 / 1Panel 面板弱口令与未授权（黑灰站最常见后台） | gray-market | `fujiang-gray-market-db6d779c` | code | 1.0 |
+| 659 | 密码重置 token 可预测 / 未绑定用户（任意用户改密） | gray-market | `fujiang-gray-market-0e1a7416` | code | 1.0 |
+| 660 | 支付通道 / 商户号篡改（充值进攻击者账户） | gray-market | `fujiang-gray-market-5a2545a6` | code | 1.0 |
+| 661 | 支付回调伪造与金额篡改（资金面） | gray-market | `fujiang-gray-market-66d638f4` | code | 1.0 |
+| 662 | 活动 / 彩金 / 返水无限领取（幂等缺失） | gray-market | `fujiang-gray-market-c68b2427` | code | 1.0 |
+| 663 | 余额并发与负数（竞态 / 金额符号） | gray-market | `fujiang-gray-market-8e14e2e4` | code | 1.0 |
+| 664 | Redis 未授权 → 偷后台 session / token 直接进后台 | gray-market | `fujiang-gray-market-e418b17b` | code | 1.0 |
+| 665 | 源码 / 备份 / 配置泄露 | gray-market | `fujiang-gray-market-f63dd78c` | code | 1.0 |
+| 666 | 报表/财务接口未授权（全站流水与代理佣金） | gray-market | `fujiang-gray-market-1a807271` | code | 1.0 |
+| 667 | 若依（RuoYi）系后台默认口令 / Druid / 定时任务 RCE | gray-market | `fujiang-gray-market-e7ff5ae1` | code | 1.0 |
+| 668 | 后台定时任务 / 计划任务注入（Quartz、XXL-JOB、若依） | gray-market | `fujiang-gray-market-91afaa10` | code | 1.0 |
+| 669 | 短信轰炸与账号枚举（验证码面） | gray-market | `fujiang-gray-market-a7909e0a` | code | 1.0 |
+| 670 | 短信验证码回显 / 复用 / 爆破（任意账号接管） | gray-market | `fujiang-gray-market-f9c739b1` | code | 1.0 |
+| 671 | sourcemap / 前端 JS 泄露接口与密钥（SPA 包网站第一入口） | gray-market | `fujiang-gray-market-dd337e8b` | code | 1.0 |
+| 672 | Spring Boot Actuator 未授权（heapdump / Jolokia / Gateway） | gray-market | `fujiang-cve-2022-22947-2` | code | 1.0 |
+| 673 | 业务接口 SQL 注入（报表 / 订单 / 代理查询） | gray-market | `fujiang-gray-market-2a36eeee` | code | 1.0 |
+| 674 | SSRF（图片抓取 / 回调校验 / 推广链接检测）打内网与云元数据 | gray-market | `fujiang-gray-market-4125a4fa` | code | 1.0 |
+| 675 | 会员资料存储型 XSS 打后台审核（管理员会话劫持） | gray-market | `fujiang-gray-market-c0d9c765` | code | 1.0 |
+| 676 | 客服工单附件越权下载（证件照 / KYC 材料） | gray-market | `fujiang-gray-market-30f052ae` | code | 1.0 |
+| 677 | Swagger / Knife4j 接口文档暴露 → 未授权接口直打 | gray-market | `fujiang-gray-market-83cca5f2` | code | 1.0 |
+| 678 | 上传点 getshell（头像 / KYC 证件 / 客服附件） | gray-market | `fujiang-gray-market-d33cbf51` | code | 1.0 |
+| 679 | VIP/等级接口参数篡改（免费拿高等级权益） | gray-market | `fujiang-gray-market-f76beb82` | code | 1.0 |
+| 680 | 提现审核接口越权（读他人银行卡 / 改审核状态） | gray-market | `fujiang-gray-market-0c77ad6f` | code | 1.0 |
+| 681 | 提现银行卡越权替换（把别人提现收进自己卡） | gray-market | `fujiang-gray-market-25410c01` | code | 1.0 |

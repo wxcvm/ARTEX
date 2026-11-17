@@ -4,6 +4,15 @@ All notable changes to this project are documented in this file. The format is b
 
 ## [Unreleased]
 
+### Added
+
+- **FuJiang 0.20.13 external index (164 entries)**: `knowledge/absorb/fujiang/fujiang-0.20.13-index.json` holds 105 component/CVE metadata rows plus 59 grey-market playbook rows extracted from `FJNB5/fujiang-pojia@cf086fc`. `knowledge/tools/import_fujiang.py` writes them into `poc` and `poc_fts` and materialises `pocs/<slug>/entry.md`, so every row carries a `path` the agents can read and `export_docs.py` pairs it by `code` at score 1.0. Metadata and triage pointers only: upstream PoC bodies, exploit steps and images are not copied, and every row lands with `verified = 0`.
+
+### Changed
+
+- **Knowledge ledger 508 → 672 entries (FTS 672)**: `pocs/` grows 429 → 593 directories. `MAP.md` keeps its 80 text-only entries and 1 known naming variant unchanged, because all 164 new rows pair one-to-one with their own directory.
+- `knowledge/QA.md` regenerated: `poc_dirs 593` / `poc_files 596` / `db_rows 672` / `fts_rows 672`, P1 none.
+
 ## [0.5.0] - 2026-11-14
 
 ### Added

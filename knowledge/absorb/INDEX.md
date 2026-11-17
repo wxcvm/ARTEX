@@ -63,6 +63,23 @@
 - 分档分布：ammo 356 / reference 60 / negative 31 / playbook 1
 - 编译与运行验证需要本地 `go build`（本机无 Go 工具链）
 
+## 第四期：富江 0.20.13 外源索引（2026-11-17）
+
+| 产出 | 路径 | 规模 |
+|---|---|---|
+| 外源索引 | `knowledge/absorb/fujiang/fujiang-0.20.13-index.json` | 164 条（105 组件/CVE + 59 灰产手法） |
+| 导入器 | `knowledge/tools/import_fujiang.py` | `--dry` 报告 / 幂等重跑 / 写前备份 |
+| 落盘条目 | `knowledge/pocs/fujiang-*/entry.md` | 164 目录，每条一个定位要点页 |
+| 台账 | `knowledge/knowledge.db`（`poc` + `poc_fts`） | 508 → 672 条 |
+| 过程记录 | [`ABSORB-2026-11-17-fujiang.md`](ABSORB-2026-11-17-fujiang.md) | 字段映射与取舍 |
+
+来源：[`FJNB5/fujiang-pojia`](https://github.com/FJNB5/fujiang-pojia) 固定提交 `cf086fc` 的 `plugin/knowledge/`，经 dsh-purge `f806b96` 的 `lib/redteam/cve-catalog/*.json` 结构化后取用。
+
+- 只取**元数据与判定要点**：标题、CVE、严重度、产品、影响版本、端口、关键词、一句话触发点、原始链接；上游 PoC 正文、利用步骤与图片不复制。
+- 全部 164 条 `verified = 0`、`source = kb`、`created_by = fujiang-import`，导入器按该标记先删后插，可重复执行。
+- 8 个来源型 category 直接沿用源目录名（`cloud-container` / `edge-device` / `exchange-ad` / `java-deser` / `java-web` / `linux-priv` / `web-cms` / `gray-market`），与既有 `absorbed` 同风格。
+- 与库内既有条目只有 1 条 CVE 重叠（CVE-2020-1938 Ghostcat），按「实战条目与索引条目并存」保留，不做去重。
+
 ## 未吸收清单（明确不做）
 
 | 项 | 体量 | 原因 |
