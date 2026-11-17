@@ -74,8 +74,19 @@ func (g *Guard) preToolUse(ctx context.Context, ev hook.Event) hook.Result {
 		_ = json.Unmarshal(ev.Input, &in)
 		cmd = in.Text
 	}
-	g.record(ev.ToolName, "allow", "", cmd)
-	return g.applyIntercept(ctx, ev)
+	result := g.applyIntercept(ctx, ev)
+	g.recordToolDecision(ev.ToolName, cmd, result)
+	return result
+}
+
+// recordToolDecision records the final hook verdict exactly once, retaining the
+// original command even when a rule or operator approval blocks the call.
+func (g *Guard) recordToolDecision(tool, cmd string, result hook.Result) {
+	if result.Decision == "block" {
+		g.record(tool, "block", result.Message, cmd)
+		return
+	}
+	g.record(tool, "allow", "", cmd)
 }
 
 // applyIntercept evaluates user-configured intercept rules against the tool call.
@@ -102,7 +113,7 @@ func (g *Guard) applyIntercept(ctx context.Context, ev hook.Event) hook.Result {
 	case "deny":
 		// Note: a deny hit does not block for approval; it directly logs a denied entry (visible on the history / task interception pages).
 		g.interceptor.Log(ctx, intercept.ConvIDFromContext(ctx), dec, ev.ToolName, ev.Input, "denied")
-		return g.block(ev.ToolName, systemBlockMessage(dec.Message), "")
+		return g.block(systemBlockMessage(dec.Message))
 	case "allow":
 		// Record explicit rule and model approvals so review details remain auditable.
 		g.interceptor.Log(ctx, intercept.ConvIDFromContext(ctx), dec, ev.ToolName, ev.Input, "allowed")
@@ -112,11 +123,11 @@ func (g *Guard) applyIntercept(ctx context.Context, ev hook.Event) hook.Result {
 		// immediately without creating a pending record — avoids orphaned DB entries
 		// and makes execOne complete fast, reducing the race against drainSynthetic.
 		if ctx.Err() != nil {
-			return g.block(ev.ToolName, systemBlockMessage("work cancelled; platform safety controls blocked execution"), "")
+			return g.block(systemBlockMessage("work cancelled; platform safety controls blocked execution"))
 		}
 		convID := intercept.ConvIDFromContext(ctx)
 		if !g.interceptor.HandleAsk(ctx, convID, dec, ev.ToolName, ev.Input) {
-			return g.block(ev.ToolName, systemBlockMessage("manual approval not granted (user rejected or approval timed out)"), "")
+			return g.block(systemBlockMessage("manual approval not granted (user rejected or approval timed out)"))
 		}
 		return hook.Result{}
 	}
@@ -173,8 +184,7 @@ func (g *Guard) Attributions() map[string]int {
 	return out
 }
 
-func (g *Guard) block(tool, reason, cmd string) hook.Result {
-	g.record(tool, "block", reason, cmd)
+func (g *Guard) block(reason string) hook.Result {
 	return hook.Result{Decision: "block", Message: reason}
 }
 
