@@ -3381,6 +3381,11 @@ func (s *Server) getTraffic(w http.ResponseWriter, r *http.Request) {
 		writeErr(w, 500, err.Error())
 		return
 	}
+	buckets, err := tr.StatusBuckets(filter)
+	if err != nil {
+		writeErr(w, 500, err.Error())
+		return
+	}
 	count := matched // task view: only scoped matches, not all other tasks' captures
 	if !scoped {
 		count, err = tr.Count()
@@ -3397,6 +3402,7 @@ func (s *Server) getTraffic(w http.ResponseWriter, r *http.Request) {
 		"page":      page,
 		"size":      size,
 		"exchanges": trafficDTOs(ex),
+		"status_buckets": buckets,
 	})
 }
 

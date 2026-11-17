@@ -871,13 +871,9 @@ func statusFilter(s string) (cond string, args []any, ok bool) {
 // Body narrows to exchanges whose captured text matches, via that same index.
 // Also returns the total number of rows matching the filter (for the UI's
 // pagination). Bodies are never included in the rows.
-func (t *Traffic) Page(f PageQuery, page, size int) (rows []ExchangeMeta, total int, err error) {
-	if size <= 0 || size > 500 {
-		size = 100
-	}
-	if page < 0 {
-		page = 0
-	}
+// pageWhere is the single source of truth for matching traffic queries.
+// Page and StatusBuckets must not drift as filters are added.
+func (t *Traffic) pageWhere(f PageQuery) (string, []any) {
 	where := ""
 	var args []any
 	add := func(cond string, vs ...any) {
@@ -941,6 +937,38 @@ func (t *Traffic) Page(f PageQuery, page, size int) (rows []ExchangeMeta, total 
 			add(cond, arg)
 		}
 	}
+	return where, args
+}
+
+// StatusBuckets summarizes every matching exchange, independent of pagination.
+// Bucket 0 denotes unobserved/invalid HTTP responses; 1..5 denote HTTP classes.
+func (t *Traffic) StatusBuckets(f PageQuery) (map[int]int, error) {
+	where, args := t.pageWhere(f)
+	rows, err := t.db.Query(`SELECT CASE WHEN status BETWEEN 100 AND 599 THEN status / 100 ELSE 0 END AS bucket,
+COUNT(*) FROM exchanges` + where + ` GROUP BY bucket`, args...)
+	if err != nil {
+		return nil, err
+	}
+	defer rows.Close()
+	counts := make(map[int]int)
+	for rows.Next() {
+		var bucket, count int
+		if err := rows.Scan(&bucket, &count); err != nil {
+			return nil, err
+		}
+		counts[bucket] = count
+	}
+	return counts, rows.Err()
+}
+
+func (t *Traffic) Page(f PageQuery, page, size int) (rows []ExchangeMeta, total int, err error) {
+	if size <= 0 || size > 500 {
+		size = 100
+	}
+	if page < 0 {
+		page = 0
+	}
+	where, args := t.pageWhere(f)
 	if err = t.db.QueryRow(`SELECT COUNT(*) FROM exchanges`+where, args...).Scan(&total); err != nil {
 		return nil, 0, err
 	}
