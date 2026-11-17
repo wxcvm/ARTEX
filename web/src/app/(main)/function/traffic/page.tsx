@@ -434,6 +434,18 @@ export default function TrafficPage() {
           <span className="text-xs text-muted-foreground">
             {tr(`共 ${traffic?.count ?? 0} 条`, `${traffic?.count ?? 0} total`)}
           </span>
+          {traffic?.status_buckets && Object.entries(traffic.status_buckets)
+            .filter(([, count]) => count > 0)
+            .sort(([a], [b]) => Number(a) - Number(b))
+            .map(([bucket, count]) => (
+              <span
+                key={bucket}
+                title={tr("当前筛选范围的全部记录，不仅是当前页", "All matching records, not just this page")}
+                className="rounded-md border border-border/70 bg-muted/50 px-2 py-0.5 font-mono text-[11px] tabular-nums text-muted-foreground"
+              >
+                {bucket === "0" ? tr("未观测", "Unobserved") : `${bucket}xx`}: {count}
+              </span>
+            ))}
         </div>
       </header>
 

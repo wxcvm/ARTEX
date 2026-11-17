@@ -944,6 +944,7 @@ export interface TrafficResp {
   page?: number;
   size?: number;
   exchanges?: TrafficExchange[];
+  status_buckets?: Record<string, number>; // 0=unobserved, 1..5=HTTP class; all filtered rows, not just the page
 }
 
 // Read-only summaries of persisted extension-supplied capture groups.
