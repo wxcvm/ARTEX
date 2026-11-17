@@ -85,6 +85,7 @@ type TrafficEvidenceSnapshot struct {
 	RespHash        string    `json:"resp_hash"`
 	ReqLen          int64     `json:"req_len"`
 	RespLen         int64     `json:"resp_len"`
+	CaptureID string `json:"capture_id,omitempty"`
 	HARPageState string `json:"har_page_state,omitempty"`
 	HARPageOrdinal int `json:"har_page_ordinal,omitempty"`
 	CreatedAt       time.Time `json:"created_at"`
@@ -121,6 +122,7 @@ type PreparedTrafficEvidence struct {
 // matches the bytes that actually land in the table.
 func (s TrafficEvidenceSnapshot) Normalize() TrafficEvidenceSnapshot {
 	s.SourceTrafficID = utf8Clean(s.SourceTrafficID)
+	s.CaptureID = utf8Clean(s.CaptureID)
 	s.URL = utf8Clean(s.URL)
 	s.Method = utf8Clean(s.Method)
 	s.ContentType = utf8Clean(s.ContentType)
@@ -206,9 +208,9 @@ func InsertEvidenceSnapshotTx(tx *sql.Tx, s TrafficEvidenceSnapshot) error {
 		s.CreatedAt = time.Now().UTC()
 	}
 	_, err := tx.Exec(`INSERT INTO traffic_evidence_snapshots
-(id,source_traffic_id,captured_at,url,method,status,content_type,req_head,resp_head,req_hash,resp_hash,req_len,resp_len,created_at,har_page_state,har_page_ordinal)
-VALUES($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15,$16) ON CONFLICT(id) DO NOTHING`,
-		s.ID, s.SourceTrafficID, s.CapturedAt, s.URL, s.Method, s.Status, s.ContentType, s.ReqHead, s.RespHead, s.ReqHash, s.RespHash, s.ReqLen, s.RespLen, s.CreatedAt, s.HARPageState, s.HARPageOrdinal)
+(id,source_traffic_id,captured_at,url,method,status,content_type,req_head,resp_head,req_hash,resp_hash,req_len,resp_len,created_at,har_page_state,har_page_ordinal,capture_id)
+VALUES($1,$2,$3,$4,$5,$6,$7,$8,$9,$10,$11,$12,$13,$14,$15,$16,$17) ON CONFLICT(id) DO NOTHING`,
+		s.ID, s.SourceTrafficID, s.CapturedAt, s.URL, s.Method, s.Status, s.ContentType, s.ReqHead, s.RespHead, s.ReqHash, s.RespHash, s.ReqLen, s.RespLen, s.CreatedAt, s.HARPageState, s.HARPageOrdinal,s.CaptureID)
 	return err
 }
 

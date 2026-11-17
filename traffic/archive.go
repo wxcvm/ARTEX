@@ -40,6 +40,7 @@ type ArchiveExchange struct {
 	RespBody    []byte `json:"resp_body,omitempty"`
 	RespBlob    string `json:"resp_blob,omitempty"`
 	HARPage *HARPageAttribution `json:"har_page,omitempty"`
+	CaptureID string `json:"capture_id,omitempty"`
 }
 
 // ExportHosts writes an exact-host snapshot to dir. It holds the traffic writer
@@ -94,7 +95,13 @@ FROM exchange_bodies WHERE id=?`, item.ID).Scan(&item.ReqHead, &item.ReqBody, &r
 		}
 		item.HARPage, err = t.readHARPage(item.ID)
 		if err != nil { return 0, err }
+		item.CaptureID,err=t.readCaptureID(item.ID)
+		if err != nil { return 0,err }
 		item.ReqBlob, item.RespBlob = reqBlob.String, respBlob.String
+		if len(item.CaptureID)>128 { return imported,fmt.Errorf("archived capture ID too long") }
+		if item.CaptureID!="" {
+			if _,err:=tx.Exec(`INSERT INTO capture_attribution(exchange_id,capture_id) VALUES(?,?)`,item.ID,item.CaptureID);err!=nil{return imported,err}
+		}
 		for _, hash := range []string{item.ReqBlob, item.RespBlob} {
 			if hash != "" {
 				blobs[hash] = struct{}{}

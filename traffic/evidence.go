@@ -25,6 +25,7 @@ type EvidenceExchange struct {
 	ReqHash, RespHash            string
 	Request, Response            io.Reader
 	HARPage *HARPageAttribution
+	CaptureID string
 }
 
 func (t *Traffic) ReadEvidence(ctx context.Context, ids []string, consume func(EvidenceExchange) error) error {
@@ -54,6 +55,8 @@ func (t *Traffic) readEvidence(id string, consume func(EvidenceExchange) error) 
 	page, err := t.readHARPage(id)
 	if err != nil { return err }
 	e.HARPage = page
+	e.CaptureID,err=t.readCaptureID(id)
+	if err != nil { return err }
 	var req, resp []byte
 	var reqBlob, respBlob sql.NullString
 	err = t.db.QueryRow(`SELECT req_head,req_body,req_blob,resp_head,resp_body,resp_blob FROM exchange_bodies WHERE id=?`, id).
@@ -138,4 +141,12 @@ func (t *Traffic) readHARPage(id string) (*HARPageAttribution, error) {
 	if err != nil { return nil,err }
 	if !p.valid() { return nil,errors.New("invalid stored HAR page attribution") }
 	return &p,nil
+}
+
+// readCaptureID returns an optional extension-supplied capture group, not an authenticated browser identity.
+func (t *Traffic) readCaptureID(id string)(string,error){
+	var captureID string
+	err:=t.db.QueryRow(`SELECT capture_id FROM capture_attribution WHERE exchange_id=?`,id).Scan(&captureID)
+	if errors.Is(err,sql.ErrNoRows){return "",nil}
+	return captureID,err
 }

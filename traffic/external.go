@@ -16,6 +16,7 @@ import (
 // casing is accepted; bodies are raw text (binary capture is skipped by the
 // extension, not handled here).
 type ExternalExchange struct {
+	CaptureID string `json:"captureId,omitempty"`
 	Method          string            `json:"method"`
 	URL             string            `json:"url"`
 	Status          int               `json:"status"`
@@ -34,6 +35,7 @@ func (t *Traffic) RecordExternal(e ExternalExchange) error {
 	if err != nil || u.Host == "" {
 		return fmt.Errorf("invalid url %q", e.URL)
 	}
+	if len(e.CaptureID) > 128 { return fmt.Errorf("capture ID too long") }
 	method := strings.ToUpper(strings.TrimSpace(e.Method))
 	if method == "" {
 		return fmt.Errorf("empty method for %q", e.URL)
@@ -61,7 +63,7 @@ func (t *Traffic) RecordExternal(e ExternalExchange) error {
 	now := time.Now()
 	id := fmt.Sprintf("%d-%04d", now.Unix(), n%10000)
 
-	if err := t.insertExchange(id, now.Unix(), host, method, db.TemplatePath(u.EscapedPath()), u.String(), status, respCT, len(e.RequestBody), len(e.ResponseBody), reqHead, reqB, respHead, respB); err != nil {
+	if err := t.insertExchangeWithContext(id, now.Unix(), host, method, db.TemplatePath(u.EscapedPath()), u.String(), status, respCT, len(e.RequestBody), len(e.ResponseBody), reqHead, reqB, respHead, respB, nil, e.CaptureID); err != nil {
 		log.Printf("[traffic] failed to ingest %s: %v", u.String(), err)
 		return err
 	}
@@ -76,6 +78,10 @@ func (t *Traffic) insertExchange(id string, ts int64, host, method, urlTemplate,
 }
 
 func (t *Traffic) insertExchangeWithPage(id string, ts int64, host, method, urlTemplate, rawURL string, status int, contentType string, reqLen, respLen int, reqHead string, reqB storedBody, respHead string, respB storedBody, page *HARPageAttribution) error {
+	return t.insertExchangeWithContext(id,ts,host,method,urlTemplate,rawURL,status,contentType,reqLen,respLen,reqHead,reqB,respHead,respB,page,"")
+}
+
+func (t *Traffic) insertExchangeWithContext(id string, ts int64, host, method, urlTemplate, rawURL string, status int, contentType string, reqLen, respLen int, reqHead string, reqB storedBody, respHead string, respB storedBody, page *HARPageAttribution, captureID string) error {
 	tx, err := t.db.Begin()
 	if err != nil {
 		return fmt.Errorf("beginning transaction: %w", err)
@@ -122,6 +128,11 @@ VALUES(?,?,?,?,?,?,?)`,
 		}
 	}
 
+	if captureID != "" {
+		if _,err:=tx.Exec(`INSERT INTO capture_attribution(exchange_id,capture_id) VALUES(?,?)`,id,captureID);err!=nil{
+			return fmt.Errorf("writing capture attribution: %w",err)
+		}
+	}
 	if err := tx.Commit(); err != nil {
 		return fmt.Errorf("committing: %w", err)
 	}
