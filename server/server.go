@@ -883,6 +883,7 @@ func (s *Server) Handler() http.Handler {
 	mux.HandleFunc("GET /api/notify/deliveries", s.notifyListDeliveries)
 	mux.HandleFunc("POST /api/notify/deliveries/{id}/retry", s.notifyRetryDelivery)
 	mux.HandleFunc("POST /api/settings/web-search/test", s.testWebSearch)
+	mux.HandleFunc("POST /api/settings/global-proxy/test", s.testGlobalProxy)
 	mux.HandleFunc("GET /api/report", s.getReport)
 	s.registerReportTemplates(mux)
 	s.registerReportSnapshots(mux)
