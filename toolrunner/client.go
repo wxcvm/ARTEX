@@ -156,6 +156,9 @@ func Configure(opts *agentcore.Options) func() {
 	if opts.SessionID == "" {
 		opts.SessionID = uuid.NewString()
 	}
+	if opts.Tools == nil {
+		opts.Tools = tool.DefaultTools()
+	}
 	c := NewClient(socket)
 	for i, t := range opts.Tools {
 		if runnerTools[t.Name()] {
