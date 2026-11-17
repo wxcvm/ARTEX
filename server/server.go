@@ -854,6 +854,7 @@ func (s *Server) Handler() http.Handler {
 	mux.HandleFunc("POST /api/gc", s.gc)
 	mux.HandleFunc("GET /api/traffic", s.getTraffic)
 	mux.HandleFunc("GET /api/traffic/hosts", s.getTrafficHosts)
+	mux.HandleFunc("GET /api/traffic/groups", s.getTrafficGroups)
 	mux.HandleFunc("DELETE /api/traffic", s.deleteTraffic)
 	mux.HandleFunc("DELETE /api/traffic/hosts", s.deleteTrafficHosts)
 	mux.HandleFunc("DELETE /api/traffic/all", s.deleteAllTraffic)
@@ -3370,6 +3371,34 @@ func (s *Server) getTrafficHosts(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 	writeJSON(w, 200, map[string]any{"hosts": hosts})
+}
+
+// getTrafficGroups summarizes persisted capture groups, not verified browser sessions.
+func (s *Server) getTrafficGroups(w http.ResponseWriter, r *http.Request) {
+	q := r.URL.Query()
+	page := atoiDefault(q.Get("page"), 0)
+	size := atoiDefault(q.Get("size"), 20)
+	if page < 0 {
+		page = 0
+	}
+	if size <= 0 || size > 100 {
+		size = 20
+	}
+	tr := s.m.Traffic()
+	if tr == nil {
+		writeJSON(w, 200, map[string]any{
+			"groups": []traffic.CaptureGroupSummary{}, "has_more": false, "page": page, "size": size,
+		})
+		return
+	}
+	groups, hasMore, err := tr.CaptureGroups(page, size)
+	if err != nil {
+		writeErr(w, 500, err.Error())
+		return
+	}
+	writeJSON(w, 200, map[string]any{
+		"groups": groups, "has_more": hasMore, "page": page, "size": size,
+	})
 }
 
 // deleteTraffic removes recorded traffic for every host containing the query's

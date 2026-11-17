@@ -2,6 +2,7 @@ package server
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
 	"net/http/httptest"
 	"path/filepath"
@@ -142,4 +143,49 @@ func TestTrafficListCaptureGroupFilter(t *testing.T) {
             t.Fatalf("filter %q: %d %s",tc.query,w.Code,w.Body)
         }
     }
+}
+
+func TestTrafficCaptureGroupsAPI(t *testing.T) {
+	_, request := ingestServer(t)
+	payload := `{"exchanges":[
+		{"captureId":"group-one","method":"GET","url":"https://one.example.invalid/a","status":200},
+		{"captureId":"group-one","method":"GET","url":"https://two.example.invalid/b","status":404},
+		{"captureId":"group-two","method":"GET","url":"https://two.example.invalid/c","status":0},
+		{"method":"GET","url":"https://legacy.example.invalid/d","status":200}
+	]}`
+	if w := request("POST", "/api/traffic/ingest", payload); w.Code != 200 {
+		t.Fatalf("ingest: %d %s", w.Code, w.Body)
+	}
+	w := request("GET", "/api/traffic/groups?size=10", "")
+	if w.Code != 200 {
+		t.Fatalf("groups API: %d %s", w.Code, w.Body)
+	}
+	var result struct {
+		Groups  []traffic.CaptureGroupSummary `json:"groups"`
+		HasMore bool                          `json:"has_more"`
+	}
+	if err := json.Unmarshal(w.Body.Bytes(), &result); err != nil {
+		t.Fatal(err)
+	}
+	if result.HasMore || len(result.Groups) != 2 {
+		t.Fatalf("groups response: %+v", result)
+	}
+	byID := map[string]traffic.CaptureGroupSummary{}
+	for _, g := range result.Groups {
+		byID[g.CaptureID] = g
+	}
+	if g := byID["group-one"]; g.Count != 2 || g.Hosts != 2 || g.ErrorResponses != 1 || g.UnknownStatuses != 0 {
+		t.Fatalf("group one: %+v", g)
+	}
+	if g := byID["group-two"]; g.Count != 1 || g.UnknownStatuses != 1 {
+		t.Fatalf("group two: %+v", g)
+	}
+	page := request("GET", "/api/traffic/groups?size=1&page=0", "")
+	if page.Code != 200 || !strings.Contains(page.Body.String(), `"has_more":true`) {
+		t.Fatalf("first group page: %d %s", page.Code, page.Body)
+	}
+	page = request("GET", "/api/traffic/groups?size=1&page=1", "")
+	if page.Code != 200 || !strings.Contains(page.Body.String(), `"has_more":false`) {
+		t.Fatalf("second group page: %d %s", page.Code, page.Body)
+	}
 }

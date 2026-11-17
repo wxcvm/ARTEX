@@ -13,6 +13,7 @@ import {
   EraserIcon,
   FilterXIcon,
   ListChecksIcon,
+  Layers3Icon,
   Loader2Icon,
   RadioTowerIcon,
   SearchIcon,
@@ -48,7 +49,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Tooltip, TooltipContent, TooltipTrigger } from "@/components/ui/tooltip";
 import { api } from "@/lib/api";
 import { useStoredSortPreference } from "@/lib/sort-preference";
-import type { TrafficDetail, TrafficExchange, TrafficHost, TrafficResp } from "@/lib/types";
+import type { CaptureGroupSummary, TrafficDetail, TrafficExchange, TrafficHost, TrafficResp } from "@/lib/types";
 import { cn, copyText } from "@/lib/utils";
 
 function fmtTime(ts: string) {
@@ -164,6 +165,13 @@ export default function TrafficPage() {
   const [detail, setDetail] = React.useState<TrafficDetail | null>(null);
   const [detailLoading, setDetailLoading] = React.useState(false);
 
+  const [groupPickerOpen, setGroupPickerOpen] = React.useState(false);
+  const [groupPage, setGroupPage] = React.useState(0);
+  const [captureGroups, setCaptureGroups] = React.useState<CaptureGroupSummary[]>([]);
+  const [groupHasMore, setGroupHasMore] = React.useState(false);
+  const [groupsLoading, setGroupsLoading] = React.useState(false);
+  const [groupsError, setGroupsError] = React.useState("");
+
   const [hosts, setHosts] = React.useState<TrafficHost[]>([]); // target picker
   const [selectedHosts, setSelectedHosts] = React.useState<string[]>([]); // checked in picker
   const [pickerOpen, setPickerOpen] = React.useState(false);
@@ -266,6 +274,27 @@ export default function TrafficPage() {
       clearInterval(t);
     };
   }, [page, size, hostQ, method, queryQ, bodyQ, captureIdQ, pathQ, statusFilter, respMinQ, respMaxQ, sort, reloadTick]);
+
+  // Group summaries are requested only when the picker is open, not on traffic polling.
+  React.useEffect(() => {
+    if (!groupPickerOpen) return;
+    let alive = true;
+    setGroupsLoading(true);
+    setGroupsError("");
+    api.trafficGroups(groupPage, 20)
+      .then((r) => {
+        if (!alive) return;
+        setCaptureGroups(r.groups ?? []);
+        setGroupHasMore(r.has_more);
+      })
+      .catch((e: Error) => {
+        if (alive) setGroupsError(e.message);
+      })
+      .finally(() => {
+        if (alive) setGroupsLoading(false);
+      });
+    return () => { alive = false; };
+  }, [groupPickerOpen, groupPage, reloadTick]);
 
   // Delete traffic for the current host filter (substring) or the checked
   // hosts (exact batch), then refetch.
@@ -482,6 +511,74 @@ export default function TrafficPage() {
               >
                 {tr(`删除选中项（${selectedHosts.length}）`, `Delete selected (${selectedHosts.length})`)}
               </Button>
+            </div>
+          </PopoverContent>
+        </Popover>
+        <Popover
+          open={groupPickerOpen}
+          onOpenChange={(open) => {
+            setGroupPickerOpen(open);
+            if (open) setGroupPage(0);
+          }}
+        >
+          <PopoverTrigger asChild>
+            <Button variant="outline" size="sm" className="h-8">
+              <Layers3Icon className="size-3.5" />
+              {tr("捕获批次", "Capture groups")}
+            </Button>
+          </PopoverTrigger>
+          <PopoverContent className="w-[calc(100vw-2rem)] p-0 sm:w-96" align="start" collisionPadding={16}>
+            <div className="border-b px-3 py-2 text-xs font-medium text-muted-foreground">
+              {tr("已保存的捕获批次（最近优先）", "Recorded capture groups (newest first)")}
+            </div>
+            <div className="max-h-72 overflow-y-auto">
+              {groupsLoading ? (
+                <div className="px-3 py-6 text-center text-xs text-muted-foreground">
+                  {tr("正在加载批次…", "Loading capture groups…")}
+                </div>
+              ) : groupsError ? (
+                <div role="alert" className="px-3 py-6 text-xs text-destructive">{groupsError}</div>
+              ) : captureGroups.length === 0 ? (
+                <div className="px-3 py-6 text-center text-xs text-muted-foreground">
+                  {tr("暂无已保存的捕获批次", "No recorded capture groups")}
+                </div>
+              ) : (
+                captureGroups.map((g) => (
+                  <button
+                    key={g.capture_id}
+                    type="button"
+                    className="flex w-full flex-col gap-1 border-b px-3 py-2 text-left text-xs hover:bg-accent"
+                    title={g.capture_id}
+                    onClick={() => {
+                      setCaptureId(g.capture_id);
+                      setCaptureIdQ(g.capture_id);
+                      setGroupPickerOpen(false);
+                    }}
+                  >
+                    <span className="w-full truncate font-mono">{g.capture_id}</span>
+                    <span className="flex flex-wrap gap-x-3 gap-y-1 text-muted-foreground">
+                      <span>{tr(`请求 ${g.count}`, `${g.count} requests`)}</span>
+                      <span>{tr(`主机 ${g.hosts}`, `${g.hosts} hosts`)}</span>
+                      <span>{tr(`4xx/5xx ${g.error_responses}`, `${g.error_responses} HTTP 4xx/5xx`)}</span>
+                      <span>{tr(`未观测 ${g.unknown_statuses}`, `${g.unknown_statuses} unobserved`)}</span>
+                    </span>
+                    <span className="text-muted-foreground">{fmtTime(new Date(g.last_ts * 1000).toISOString())}</span>
+                  </button>
+                ))
+              )}
+            </div>
+            <div className="flex items-center justify-between border-t px-3 py-2">
+              <span className="text-xs text-muted-foreground">
+                {tr(`第 ${groupPage + 1} 页`, `Page ${groupPage + 1}`)}
+              </span>
+              <div className="flex items-center gap-2">
+                <Button variant="outline" size="sm" disabled={groupsLoading || groupPage === 0} onClick={() => setGroupPage((p) => p - 1)}>
+                  {tr("上一页", "Previous")}
+                </Button>
+                <Button variant="outline" size="sm" disabled={groupsLoading || !groupHasMore} onClick={() => setGroupPage((p) => p + 1)}>
+                  {tr("下一页", "Next")}
+                </Button>
+              </div>
             </div>
           </PopoverContent>
         </Popover>

@@ -115,6 +115,7 @@ import type {
   TrafficEvidenceRef,
   TrafficEvidenceRole,
   TrafficHost,
+  TrafficGroupsResp,
   TrafficResp,
   UsageStats,
   WorkspaceFile,
@@ -935,6 +936,7 @@ export const api = {
     ),
   trafficExchange: (id: string) => get<TrafficDetail>(`/traffic/exchange?id=${encodeURIComponent(id)}`),
   trafficHosts: () => get<{ hosts: TrafficHost[] }>(`/traffic/hosts`),
+  trafficGroups: (page = 0, size = 20) => get<TrafficGroupsResp>(`/traffic/groups?page=${page}&size=${size}`),
   trafficDeleteHost: (host: string) => del<{ deleted: number }>(`/traffic?host=${encodeURIComponent(host)}`),
   trafficDeleteHosts: (hosts: string[]) => del<{ deleted: number }>(`/traffic/hosts`, { hosts }),
   // Purges every exchange and compacts the index; `reclaimed` is the bytes of

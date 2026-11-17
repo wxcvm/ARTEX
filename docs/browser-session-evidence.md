@@ -45,3 +45,9 @@ The finding's evidence detail also offers **View group traffic** to open the pre
 ## Locate capture groups in traffic
 
 `Page`, `Search`, and agent-side traffic queries return an optional `capture_id` per exchange. The **Capture group** column shows a shortened ID; hover for the full value or click it to apply the existing exact-group filter while preserving other active filters. Unattributed legacy rows display a dash rather than an inferred identity. Groups are extension-supplied correlation hints, not a verified Playwright browser session or user identity.
+
+## Browse recorded capture groups
+
+The **Traffic → Capture groups** picker fetches records only when opened. `GET /api/traffic/groups?page=0&size=20` returns groups ordered by latest recorded exchange, including request count, distinct hosts, first/last timestamp, HTTP 4xx/5xx count and status-0 (unobserved) count. The `has_more` field supports paging without a second global distinct-count query. Selecting a group applies the existing exact filter without clearing other filters.
+
+Summaries include only persisted traffic. A group disappears when its last recorded exchange is deleted; immutable finding evidence can still preserve its old group ID. Status 0 is never counted as success. Client-supplied group IDs are not authenticated browser or Playwright identities.

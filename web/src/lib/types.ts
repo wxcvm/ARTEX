@@ -946,6 +946,24 @@ export interface TrafficResp {
   exchanges?: TrafficExchange[];
 }
 
+// Read-only summaries of persisted extension-supplied capture groups.
+export interface CaptureGroupSummary {
+  capture_id: string;
+  count: number;
+  first_ts: number;
+  last_ts: number;
+  hosts: number;
+  error_responses: number;
+  unknown_statuses: number;
+}
+
+export interface TrafficGroupsResp {
+  groups: CaptureGroupSummary[];
+  has_more: boolean;
+  page: number;
+  size: number;
+}
+
 // Full raw request/response of one exchange (lazy-loaded on row select).
 export interface TrafficDetail {
   req: string;

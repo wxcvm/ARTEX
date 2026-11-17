@@ -1029,6 +1029,57 @@ func (t *Traffic) Hosts() ([]HostCount, error) {
 	return out, rows.Err()
 }
 
+// CaptureGroupSummary covers persisted client-supplied capture groups.
+// Status zero is unobserved, not a successful HTTP response.
+type CaptureGroupSummary struct {
+	CaptureID       string `json:"capture_id"`
+	Count           int    `json:"count"`
+	FirstTS         int64  `json:"first_ts"`
+	LastTS          int64  `json:"last_ts"`
+	Hosts           int    `json:"hosts"`
+	ErrorResponses  int    `json:"error_responses"`
+	UnknownStatuses int    `json:"unknown_statuses"`
+}
+
+// CaptureGroups reads summaries on demand, without a second distinct-count scan.
+func (t *Traffic) CaptureGroups(page, size int) ([]CaptureGroupSummary, bool, error) {
+	if page < 0 {
+		page = 0
+	}
+	if size <= 0 || size > 100 {
+		size = 20
+	}
+	rows, err := t.db.Query(`
+SELECT c.capture_id, COUNT(*), MIN(e.ts), MAX(e.ts), COUNT(DISTINCT e.host),
+       SUM(CASE WHEN e.status BETWEEN 400 AND 599 THEN 1 ELSE 0 END),
+       SUM(CASE WHEN e.status = 0 THEN 1 ELSE 0 END)
+FROM capture_attribution c JOIN exchanges e ON e.id = c.exchange_id
+GROUP BY c.capture_id
+ORDER BY MAX(e.ts) DESC, c.capture_id DESC
+LIMIT ? OFFSET ?`, size+1, page*size)
+	if err != nil {
+		return nil, false, err
+	}
+	defer rows.Close()
+	groups := make([]CaptureGroupSummary, 0, size)
+	for rows.Next() {
+		var group CaptureGroupSummary
+		if err := rows.Scan(&group.CaptureID, &group.Count, &group.FirstTS, &group.LastTS,
+			&group.Hosts, &group.ErrorResponses, &group.UnknownStatuses); err != nil {
+			return nil, false, err
+		}
+		groups = append(groups, group)
+	}
+	if err := rows.Err(); err != nil {
+		return nil, false, err
+	}
+	hasMore := len(groups) > size
+	if hasMore {
+		groups = groups[:size]
+	}
+	return groups, hasMore, nil
+}
+
 // Count returns total recorded exchanges.
 func (t *Traffic) Count() (int, error) {
 	var n int
