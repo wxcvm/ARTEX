@@ -13,6 +13,7 @@ function fixture() {
   let tabId = 7;
   let rejectEnable = false;
   let rejectUpload = false;
+  let uuidSequence = 0;
   let listener;
   const chrome = {
     storage: {
@@ -44,7 +45,7 @@ function fixture() {
     calls.uploads.push(data.exchanges);
     return { ok: true, json: async () => ({ ingested: data.exchanges.length, failed: 0 }) };
   };
-  vm.runInNewContext(workerCode, { chrome, fetch }, { filename: "extension/background.js" });
+  vm.runInNewContext(workerCode, { chrome, fetch, crypto: { randomUUID: () => `00000000-0000-4000-8000-${String(++uuidSequence).padStart(12, "0")}` } }, { filename: "extension/background.js" });
   const message = (type) => new Promise((resolve, reject) => {
     try {
       if (listener({ type }, {}, resolve) !== true) reject(new Error("message listener not async"));
@@ -134,4 +135,24 @@ test("unexpected debugger detach stops capture and flushes pending evidence", as
   assert.equal(state.capturing, false);
   assert.match(state.lastError, /debugger detached/);
   assert.equal(x.calls.uploads.flat().length, 1);
+});
+
+test("each capture gets a new group and previously queued records keep their original attribution", async () => {
+  const x = fixture();
+  await x.message("start");
+  const first = (await x.message("getState")).captureId;
+  x.setUploadFailure(true);
+  x.entry(1);
+  await x.message("stop");
+  assert.equal((await x.message("getState")).queued, 1);
+  x.setUploadFailure(false);
+  await x.message("start");
+  const second = (await x.message("getState")).captureId;
+  assert.notEqual(first, second);
+  x.entry(2);
+  await x.message("stop");
+  const entries = x.calls.uploads.flat();
+  assert.equal(entries.length, 2);
+  assert.equal(entries[0].captureId, first);
+  assert.equal(entries[1].captureId, second);
 });

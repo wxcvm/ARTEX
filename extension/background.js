@@ -18,6 +18,7 @@ let stopping = false;
 let session = {
   capturing: false,
   tabId: null,
+  captureId: "",
   queue: [], // pending ExternalExchange objects
   requests: new Map(), // debugger requestId -> partial request info
   ingested: 0,
@@ -29,6 +30,7 @@ async function saveState() {
   await chrome.storage.session.set({
     capturing: session.capturing,
     tabId: session.tabId,
+    captureId: session.captureId,
     ingested: session.ingested,
     failed: session.failed,
     lastError: session.lastError,
@@ -74,7 +76,7 @@ async function start() {
   }
   // Unsent entries are intentionally kept in memory until flushed; starting
   // another tab must not silently discard evidence from the previous capture.
-  session = { ...session, capturing: true, tabId, requests: new Map(), ingested: 0, failed: 0, lastError: "" };
+  session = { ...session, capturing: true, tabId, captureId: crypto.randomUUID(), requests: new Map(), ingested: 0, failed: 0, lastError: "" };
   chrome.action.setBadgeText({ text: "REC" });
   chrome.action.setBadgeBackgroundColor({ color: "#c2410c" });
   await saveState();
@@ -143,6 +145,7 @@ async function queueExchange(info, response) {
   }
 
   session.queue.push({
+    captureId: info.captureId,
     method: info.method,
     url: info.url,
     status: response.status || 0,
@@ -198,6 +201,7 @@ chrome.debugger.onEvent.addListener((source, method, params) => {
   if (method === "Network.requestWillBeSent") {
     session.requests.set(params.requestId, {
       requestId: params.requestId,
+      captureId: session.captureId,
       method: params.request.method,
       url: params.request.url,
       headers: params.request.headers,
@@ -244,6 +248,7 @@ chrome.runtime.onMessage.addListener((msg, _sender, sendResponse) => {
         sendResponse({
           capturing: session.capturing,
           tabId: session.tabId,
+          captureId: session.captureId,
           ingested: session.ingested,
           failed: session.failed,
           queued: session.queue.length,
@@ -273,6 +278,7 @@ async function stateSnapshot() {
   return {
     capturing: session.capturing,
     tabId: session.tabId,
+    captureId: session.captureId,
     ingested: session.ingested,
     failed: session.failed,
     queued: session.queue.length,

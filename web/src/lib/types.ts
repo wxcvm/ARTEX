@@ -1645,6 +1645,7 @@ export interface TrafficEvidenceRef {
   note?: string;
 }
 export interface TrafficEvidenceSnapshot {
+  capture_id?: string;
   har_page_state?: "unique" | "missing" | "unknown" | "ambiguous";
   har_page_ordinal?: number;
   id: string;

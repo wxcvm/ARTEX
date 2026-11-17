@@ -24,3 +24,11 @@ Do not treat a successful browser event or a queued exchange as persisted eviden
 ## Scope
 
 This stage fixes capture **lifecycle reliability** and provides regression coverage through the existing web `npm test` command. It does not claim Playwright-to-ARTEX session provenance, durable offline queuing, automatic browser restart recovery, or independently managed browser profiles in the ARTEX UI. These require a separate evidence metadata contract and explicit lifecycle integration.
+
+## Capture group provenance
+
+Each successful Start in the Chrome extension creates a new random capture group UUID. Every request is tagged when the Network request event arrives, so in-flight body reads and retries keep the original group even if the next capture starts. The extension displays the latest group in its popup; the ingest endpoint persists it as optional **client-provided** metadata, independent of the request URL or headers.
+
+The traffic index stores capture IDs in an optional auxiliary row alongside HAR page attribution. Traffic archive export/import preserves the capture group; normal traffic deletion removes it. When an ingested exchange is linked to a finding, the immutable snapshot copies the group and includes it in its identity hash. Old snapshots without a group retain their previous IDs. The finding card shows a short group prefix, and the detail viewer shows the full value.
+
+This is **capture-batch correlation**, not the browser's authenticated identity, user identity, cookie state or Playwright's `-s` session name. The API accepts metadata from authorized clients, so the value is not independently attested. Captured bodies remain in memory until successful ingestion; no new persistent browser storage or cross-browser session control is introduced.
