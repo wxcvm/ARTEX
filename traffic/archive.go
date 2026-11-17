@@ -98,10 +98,6 @@ FROM exchange_bodies WHERE id=?`, item.ID).Scan(&item.ReqHead, &item.ReqBody, &r
 		item.CaptureID,err=t.readCaptureID(item.ID)
 		if err != nil { return 0,err }
 		item.ReqBlob, item.RespBlob = reqBlob.String, respBlob.String
-		if len(item.CaptureID)>128 { return imported,fmt.Errorf("archived capture ID too long") }
-		if item.CaptureID!="" {
-			if _,err:=tx.Exec(`INSERT INTO capture_attribution(exchange_id,capture_id) VALUES(?,?)`,item.ID,item.CaptureID);err!=nil{return imported,err}
-		}
 		for _, hash := range []string{item.ReqBlob, item.RespBlob} {
 			if hash != "" {
 				blobs[hash] = struct{}{}
@@ -206,6 +202,10 @@ VALUES(?,?,?,?,?,?,?)`, item.ID, item.ReqHead, item.ReqBody, nullIfEmpty(item.Re
 		if item.HARPage != nil {
 			if !item.HARPage.valid() { return imported, fmt.Errorf("invalid archived HAR page attribution") }
 			if _, err := tx.Exec(`INSERT INTO har_page_attribution(exchange_id,state,ordinal) VALUES(?,?,?)`, item.ID,item.HARPage.State,item.HARPage.Ordinal); err != nil { return imported, err }
+		}
+		if len(item.CaptureID)>128 { return imported,fmt.Errorf("archived capture ID too long") }
+		if item.CaptureID!="" {
+			if _,err:=tx.Exec(`INSERT INTO capture_attribution(exchange_id,capture_id) VALUES(?,?)`,item.ID,item.CaptureID);err!=nil{return imported,err}
 		}
 		for _, hash := range []string{item.ReqBlob, item.RespBlob} {
 			if hash != "" {
