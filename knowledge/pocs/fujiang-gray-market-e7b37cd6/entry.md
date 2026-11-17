@@ -17,4 +17,4 @@
 
 ## 原始资料
 
-https://github.com/FJNB5/fujiang-pojia/blob/HEAD/plugin/knowledge/gray-market/object-storage-datastore-exposure.md
+https://github.com/FJNB5/fujiang-pojia/blob/cf086fc329011c6f8eeb3b67f0adbcc3f005debb/plugin/knowledge/gray-market/object-storage-datastore-exposure.md
