@@ -64,27 +64,11 @@ func (s *logSinkT) SetDB(ctx context.Context, pg *db.DB) {
 		s.dbCh = ch
 		s.mu.Unlock()
 
-		// Restore last 100 rows from DB → prepend to ring as history context.
-		if logs, err := pg.RecentLogs(100); err == nil && len(logs) > 0 {
-			s.mu.Lock()
-			restored := make([]LogLine, 0, len(logs))
-			for _, l := range logs {
-				s.seq++
-				restored = append(restored, LogLine{
-					Seq:   s.seq,
-					DBID:  l.ID,
-					TS:    l.CreatedAt.Format(time.RFC3339),
-					Level: l.Level,
-					Tag:   l.Tag,
-					Text:  l.Text,
-				})
-			}
-			// Prepend history before any in-memory startup logs already in ring.
-			s.ring = append(restored, s.ring...)
-			if len(s.ring) > s.cap {
-				s.ring = s.ring[len(s.ring)-s.cap:]
-			}
-			s.mu.Unlock()
+		// Prepend persisted history without changing startup message IDs.
+		if logs,err:=pg.RecentLogs(100);err==nil&&len(logs)>0{
+			restored:=make([]LogLine,0,len(logs))
+			for _,l:=range logs{restored=append(restored,LogLine{DBID:l.ID,TS:l.CreatedAt.Format(time.RFC3339),Level:l.Level,Tag:l.Tag,Text:l.Text})}
+			s.prependRestored(restored)
 		}
 
 		// Async writer: picks from channel and inserts into server_logs.
@@ -116,6 +100,16 @@ func (s *logSinkT) SetDB(ctx context.Context, pg *db.DB) {
 			}
 		}()
 	})
+}
+
+// prependRestored puts prior-process logs before current-process logs without
+// changing any already published sequence or queued DB write cursor.
+func (s *logSinkT) prependRestored(lines []LogLine){
+	if len(lines)==0{return}
+	s.mu.Lock();defer s.mu.Unlock()
+	for i:=range lines{lines[i].Seq=int64(i-len(lines))}
+	s.ring=append(lines,s.ring...)
+	if len(s.ring)>s.cap{s.ring=s.ring[len(s.ring)-s.cap:]}
 }
 
 // Write implements io.Writer for the log package: one call per log.Printf line.
@@ -168,7 +162,7 @@ func (s *logSinkT) recent(since int64, limit int) (lines []LogLine, cursor int64
 		limit = s.cap
 	}
 	for _, l := range s.ring {
-		if l.Seq > since {
+		if l.Seq > since || (since==0 && l.Seq<0) {
 			lines = append(lines, l)
 		}
 	}
