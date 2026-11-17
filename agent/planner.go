@@ -10,6 +10,7 @@ import (
 	"github.com/Autumn-27/artex/db"
 	"github.com/Autumn-27/artex/guard"
 	"github.com/Autumn-27/artex/intercept"
+	"github.com/Autumn-27/artex/toolrunner"
 	"github.com/Autumn-27/norma/agentcore"
 	"github.com/Autumn-27/norma/llm"
 	"github.com/Autumn-27/norma/permission"
@@ -494,6 +495,8 @@ func (p *Planner) Plan(ctx context.Context, taskID int64, as *db.AssetStore, ts 
 	noaSession := fmt.Sprintf("exp%d-planner", ts.ID())
 	enableNoa(&opts, p.noaEnabledFn, p.workDir, noaSession, noaWarn(noaSession))
 	applyUntrustedCompactionBoundary(&opts)
+	runnerDone := toolrunner.Configure(&opts)
+	defer runnerDone()
 	// The situation (just-finished intents + the full graph) is now spliced into this
 	// round's user input (see input below). The user message also carries the
 	// instruction + cross-wake todos (todos are the model's own planning scratchpad,
