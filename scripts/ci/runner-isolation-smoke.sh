@@ -76,6 +76,18 @@ printf '%s' '{"session":"ci","name":"Write","input":{"file_path":"fixture.txt","
 printf '%s' '{"session":"ci","name":"Read","input":{"file_path":"fixture.txt"},"working_dir":"/app/data/tasks"}' | call > "$tmp/read.json"
 printf '%s' '{"session":"ci","name":"Bash","input":{"command":"test -z \"$(printenv ARTEX_PG_DSN || true)\" && test ! -e /app/controller/jwt.key && printf isolated-runner"},"working_dir":"/app/data/tasks"}' | call > "$tmp/bash.json"
 printf '%s' '{"session":"ci","name":"Read","input":{"file_path":"/app/controller/jwt.key"},"working_dir":"/app/data/tasks"}' | call > "$tmp/secret.json"
+# The same per-session manager must support background launch and retrieval.
+printf '%s' '{"session":"ci","name":"Bash","input":{"command":"printf background-ok; sleep 1","run_in_background":true},"working_dir":"/app/data/tasks"}' | call > "$tmp/background.json"
+task_id="$(python3 - "$tmp/background.json" <<'PY'
+import json, re, sys
+data = json.load(open(sys.argv[1]))
+text = "".join(b.get("text", "") for b in data["result"]["Content"])
+match = re.search(r"task_[0-9]+", text)
+assert match, text
+print(match.group(0))
+PY
+)"
+printf '{"session":"ci","name":"TaskOutput","input":{"task_id":"%s","block":true,"timeout_ms":10000},"working_dir":"/app/data/tasks"}' "$task_id" | call > "$tmp/taskoutput.json"
 
 python3 - "$tmp" <<'PY'
 import json, pathlib, sys
@@ -85,6 +97,7 @@ for name in ("write", "read", "bash"):
     assert not x.get("error") and not x["result"].get("IsError"), (name, x)
 assert "hello-runner" in (p / "read.json").read_text()
 assert "isolated-runner" in (p / "bash.json").read_text()
+assert "background-ok" in (p / "taskoutput.json").read_text()
 secret = json.loads((p / "secret.json").read_text())
 assert secret["result"]["IsError"], secret
 assert "CONTROL_SECRET_CANARY_NOT_FOR_RUNNER" not in str(secret)
