@@ -114,3 +114,23 @@ func TestHARPageSnapshotLegacyHashAndArchive(t *testing.T) {
 	}
 	if got[0].HARPageState!="" || got[1].HARPageState!="unique" || got[1].HARPageOrdinal!=2 { t.Fatal(got) }
 }
+
+func TestCaptureGroupSnapshotHashOptional(t *testing.T) {
+    var legacy TrafficEvidenceSnapshot
+    if err:=json.Unmarshal([]byte(`{"id":"","source_traffic_id":"capture-old","captured_at":1,"url":"https://fixture.local/","method":"GET","status":200,"content_type":"","req_hash":"a","resp_hash":"b","req_len":0,"resp_len":2,"created_at":"0001-01-01T00:00:00Z"}`),&legacy);err!=nil{t.Fatal(err)}
+    legacyID:=TrafficSnapshotID(legacy)
+    raw,err:=json.Marshal(legacy)
+    if err!=nil{t.Fatal(err)}
+    var fields map[string]any
+    if err:=json.Unmarshal(raw,&fields);err!=nil{t.Fatal(err)}
+    if _,ok:=fields["capture_id"];ok{t.Fatal("legacy hash serialized absent capture")}
+    newer:=legacy
+    newer.CaptureID="capture-new"
+    if TrafficSnapshotID(newer)==legacyID{t.Fatal("capture group not covered by snapshot hash")}
+    newer.ID=TrafficSnapshotID(newer)
+    rows,err:=json.Marshal([]TrafficEvidenceSnapshot{newer})
+    if err!=nil{t.Fatal(err)}
+    archive:=&TaskArchiveSnapshot{FormatVersion:3,Tables:map[string]json.RawMessage{"traffic_evidence_snapshots":rows}}
+    got,err:=ArchiveEvidenceSnapshots(archive)
+    if err!=nil||len(got)!=1||got[0].CaptureID!="capture-new"{t.Fatalf("archive: %+v %v",got,err)}
+}

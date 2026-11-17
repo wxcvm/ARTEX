@@ -359,3 +359,30 @@ func TestHAREvidencePageAttributionSurvivesHotCleanup(t *testing.T) {
 		return nil
 	}); err != nil { t.Fatal(err) }
 }
+
+func TestBrowserCaptureGroupInImmutableEvidence(t *testing.T) {
+    s,in,_:=evidenceFixture(t)
+    ctx:=context.Background()
+    captureID:="00000000-0000-4000-8000-000000000051"
+    if err:=s.Traffic.RecordExternal(traffic.ExternalExchange{
+        CaptureID:captureID,Method:"GET",URL:"https://fixture.local/browser-capture",
+        Status:200,ResponseBody:"captured",
+    });err!=nil{t.Fatal(err)}
+    rows,total,err:=s.Traffic.Page(traffic.PageQuery{Host:"fixture.local",RespMin:-1,RespMax:-1},0,10)
+    if err!=nil||total!=1||len(rows)!=1{t.Fatalf("page: %d %+v %v",total,rows,err)}
+    recorded,err:=s.Record(ctx,in,[]db.TrafficRef{{TrafficID:rows[0].ID,Role:"supporting"}})
+    if err!=nil{t.Fatal(err)}
+    if len(recorded.Traffic.Bindings)!=1{t.Fatal("missing evidence binding")}
+    binding:=recorded.Traffic.Bindings[0]
+    if binding.Snapshot.CaptureID!=captureID{t.Fatalf("snapshot lost capture group: %+v",binding.Snapshot)}
+    without:=binding.Snapshot
+    without.CaptureID=""
+    if db.TrafficSnapshotID(without)==binding.Snapshot.ID{t.Fatal("capture ID missing from immutable identity")}
+    if _,err:=s.Traffic.DeleteHost("fixture.local");err!=nil{t.Fatal(err)}
+    if err:=s.WithBinding(ctx,recorded.FindingID,binding.ID,func(saved db.FindingTrafficBinding)error{
+        if saved.Snapshot.CaptureID!=captureID||saved.Snapshot.ID!=binding.Snapshot.ID{
+            t.Fatalf("saved capture group changed: %+v",saved.Snapshot)
+        }
+        return nil
+    });err!=nil{t.Fatal(err)}
+}
