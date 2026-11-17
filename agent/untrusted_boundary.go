@@ -5,11 +5,12 @@ import (
 	"strings"
 )
 
-// untrustedBoundaryEnabled is opt-in; the default agent behavior is unchanged.
+// untrustedBoundaryEnabled frames tool output as data by default.
+// Explicit opt-out preserves the legacy unframed behavior when required.
 func untrustedBoundaryEnabled() bool {
 	switch strings.ToLower(strings.TrimSpace(os.Getenv("ARTEX_UNTRUSTED_BOUNDARY"))) {
-	case "1", "true", "on":
-		return true
+	case "0", "false", "off", "no":
+		return false
 	}
-	return false
+	return true
 }
