@@ -926,6 +926,7 @@ export interface Audit {
 // ---- Traffic ----
 export interface TrafficExchange {
   id: string;
+  capture_id?: string; // extension-supplied correlation, not verified browser identity
   ts: string;
   host: string;
   method: string;
