@@ -41,6 +41,7 @@ for service in (broker, executor):
     assert service.get("read_only") is True
     assert "ALL" in service.get("cap_drop", [])
 assert broker.get("environment", {}).get("ARTEX_RUNNER_REMOTE_PEER_ONLY") == "1"
+assert executor.get("environment", {}).get("ARTEX_RUNNER_REMOTE_PEER_ONLY") == "1"
 assert not broker.get("pid") and not controller.get("pid"), "PID namespace sharing bypasses SO_PEERCRED"
 print("Compose controller/worker sockets, networks and mounts checked")
 PY
