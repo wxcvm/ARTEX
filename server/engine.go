@@ -771,7 +771,9 @@ func (e *Engine) Run(ctx context.Context, t *Task) {
 		t.Notify() // already running — just nudge a planning round
 		return
 	}
-	rt := e.registerTaskRoutines(ctx, t.ID, 1+workers)
+	// Reserve the initial frontier check (and any retry) in the task runtime as
+	// well, so StopTask waits for it before freeing task-owned resources.
+	rt := e.registerTaskRoutines(ctx, t.ID, 2+workers)
 	e.deleteMu.RUnlock()
 	e.touch(t.ID)
 	runTaskRoutine(rt, func(loopCtx context.Context) { e.plannerLoop(loopCtx, t) })
@@ -787,9 +789,12 @@ func (e *Engine) Run(ctx context.Context, t *Task) {
 	// ⚠️ Do not use Frontier (counts only open): a worker claiming (open→running) races with this check and would kick spuriously. After a restart-driven auto-recovery only running intents may remain — skip then too.
 	if has, err := t.Store.HasActiveIntent(); err != nil {
 		log.Printf("[engine] task %s could not inspect active intents before initial planning: %v", t.ID, err)
-		go e.retryInitialPlanning(ctx, t)
-	} else if !has {
-		t.Notify() // kick the first planning round (acted on once LLM is ready)
+		runTaskRoutine(rt, func(loopCtx context.Context) { e.retryInitialPlanning(loopCtx, t) })
+	} else {
+		rt.wg.Done() // the initial check completed; no retry routine was needed
+		if !has && rt.ctx.Err() == nil && !e.IsDeleting(t.ID) {
+			t.Notify() // kick the first planning round (acted on once LLM is ready)
+		}
 	}
 }
 
@@ -805,7 +810,7 @@ func (e *Engine) retryInitialPlanning(ctx context.Context, t *Task) {
 			return
 		case <-ticker.C:
 		}
-		if e.IsDeleting(t.ID) || isTerminalStatus(e.m.TaskStatus(t.ID)) {
+		if ctx.Err() != nil || e.IsDeleting(t.ID) || isTerminalStatus(e.m.TaskStatus(t.ID)) {
 			return
 		}
 		has, err := t.Store.HasActiveIntent()
@@ -867,15 +872,22 @@ func (e *Engine) plannerLoop(ctx context.Context, t *Task) {
 
 	// runRound runs one planning round (with debounce coalescing + the guards). src is only used to tell the trigger source apart in logs.
 	runRound := func(src string) {
-		// debounce: coalesce a burst of changes into one planning round
+		// debounce: coalesce a burst of changes into one planning round.
+		// A stopped/deleted task must not wait out the timer or continue to a DB/model call.
 		timer := time.NewTimer(e.debounce)
+		defer timer.Stop()
 	drain:
 		for {
 			select {
+			case <-ctx.Done():
+				return
 			case <-t.notify:
 			case <-timer.C:
 				break drain
 			}
+		}
+		if ctx.Err() != nil {
+			return
 		}
 		planner, _ := e.snapshotFor(t)
 		if planner == nil {
