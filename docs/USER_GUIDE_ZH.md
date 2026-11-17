@@ -2,7 +2,7 @@
 
 > 适用仓库：[wxcvm/ARTEX](https://github.com/wxcvm/ARTEX) 的 `main` 分支，依据 2026-11-09 的实际代码编写。界面目前主要使用英文，本手册保留按钮原名以便对照。版本升级后若菜单有变化，请优先参考当前界面与仓库源码。
 >
-> **重要：使用的是你的 fork 还是历史上游镜像？** 仓库默认的 `docker-compose.yml` 使用 `autumn27/artex:latest`，**并不自动包含本 fork 新合并的功能**。想使用本文提到的 Skills 缺口、Lesson 经验评估、SARIF 等最新功能，请采用**从本仓库源码构建**的方式，或配置并运行你自行构建的 fork 镜像。不要以为执行 `git pull` 后再运行默认 Docker 镜像就完成了升级。
+> **重要：使用的是你的 fork 还是历史上游镜像？** 当前仓库的 `docker-compose.yml` 默认引用本地镜像 `artex:local`，应先从本仓库源码构建该镜像（例如 `bash scripts/docker-build-fork.sh`）；`git pull` 本身不会自动重建运行中的容器。只有显式设置 `ARTEX_IMAGE` / `ARTEX_TAG` 才会使用别的镜像；历史上游镜像不包含本 fork 的新功能。
 
 ## 目录
 
