@@ -183,6 +183,13 @@ func (l remotePeerOnlyListener) Accept() (net.Conn, error) {
 }
 
 func Serve(ctx context.Context, socket string) error {
+	service := NewService()
+	defer service.Close()
+	return serveOnUnix(ctx, socket, service.Handler())
+}
+
+// serveOnUnix is shared by the legacy direct Runner and the isolated broker.
+func serveOnUnix(ctx context.Context, socket string, handler http.Handler) error {
 	if socket == "" || !filepath.IsAbs(socket) {
 		return errors.New("runner socket must be an absolute path")
 	}
@@ -207,9 +214,11 @@ func Serve(ctx context.Context, socket string) error {
 	if err := os.Chmod(socket, 0600); err != nil {
 		return err
 	}
-	service := NewService()
-	defer service.Close()
-	server := &http.Server{Handler: service.Handler(), ReadHeaderTimeout: 5 * time.Second}
+	return serveHTTP(ctx, ln, handler)
+}
+
+func serveHTTP(ctx context.Context, ln net.Listener, handler http.Handler) error {
+	server := &http.Server{Handler: handler, ReadHeaderTimeout: 5 * time.Second}
 	done := make(chan struct{})
 	go func() {
 		select {
@@ -220,7 +229,7 @@ func Serve(ctx context.Context, socket string) error {
 		case <-done:
 		}
 	}()
-	err = server.Serve(ln)
+	err := server.Serve(ln)
 	close(done)
 	if errors.Is(err, http.ErrServerClosed) {
 		return nil

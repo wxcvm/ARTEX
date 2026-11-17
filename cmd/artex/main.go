@@ -60,22 +60,34 @@ func run() int {
 		checkDB = flag.Bool("check-db", false, "check PostgreSQL connectivity without starting the server or applying schema changes")
 		createDB = flag.Bool("create-db", false, "explicitly create the configured PostgreSQL database if it is missing; do not apply schema")
 		setupAppDB = flag.Bool("setup-app-db", false, "create a dedicated login role and database owned by it (new setups only)")
-		runnerSocket = flag.String("runner-socket", "", "serve isolated SDK tools over a private Unix socket (no database or web listener)")
+		runnerSocket = flag.String("runner-socket", "", "serve isolated SDK tools over a Unix socket (legacy single-process mode)")
+		runnerBrokerSocket = flag.String("runner-broker-socket", "", "serve control-only Unix socket broker")
+		runnerBrokerTarget = flag.String("runner-broker-target", "", "target executor HTTP endpoint for socket broker")
+		runnerExecutorListen = flag.String("runner-executor-listen", "", "listen for SDK tool calls on the private execution network")
 		relayListen = flag.String("runner-relay-listen", "", "fixed-target network proxy relay listen address")
 		relayTarget = flag.String("runner-relay-target", "", "fixed-target proxy endpoint (required with runner-relay-listen)")
 	)
 	flag.Parse()
-	if *runnerSocket != "" || *relayListen != "" {
-		if *runnerSocket != "" && *relayListen != "" {
-			fmt.Fprintln(os.Stderr, "runner and proxy relay modes are mutually exclusive")
+	if *runnerSocket != "" || *relayListen != "" || *runnerBrokerSocket != "" || *runnerExecutorListen != "" {
+		modes := 0
+		for _, v := range []string{*runnerSocket, *relayListen, *runnerBrokerSocket, *runnerExecutorListen} {
+			if v != "" { modes++ }
+		}
+		if modes != 1 {
+			fmt.Fprintln(os.Stderr, "select exactly one runner mode")
 			return 2
 		}
 		ctx, stop := signal.NotifyContext(context.Background(), os.Interrupt, syscall.SIGTERM)
 		defer stop()
 		var err error
-		if *runnerSocket != "" {
+		switch {
+		case *runnerSocket != "":
 			err = toolrunner.Serve(ctx, *runnerSocket)
-		} else {
+		case *runnerBrokerSocket != "":
+			err = toolrunner.ServeBroker(ctx, *runnerBrokerSocket, *runnerBrokerTarget)
+		case *runnerExecutorListen != "":
+			err = toolrunner.ServeExecutor(ctx, *runnerExecutorListen)
+		default:
 			err = toolrunner.Relay(ctx, *relayListen, *relayTarget)
 		}
 		if err != nil {
