@@ -44,6 +44,8 @@ jobs:
           go-version-file: go.mod
       - run: go build ./...
       - run: go vet ./...
+      - name: Docker runner isolation smoke (fake credentials only)
+        run: bash scripts/ci/runner-isolation-smoke.sh
       # Skipped tests, tracked in issue #9:
       # - TestGraphOverviewExpandsAssociatedCompanyScope,
       #   TestCaptureApprovalLifecycle: fail on unmodified upstream code with a

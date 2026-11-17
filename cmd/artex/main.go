@@ -23,6 +23,7 @@ import (
 	"github.com/Autumn-27/artex/db"
 	"github.com/Autumn-27/artex/kb"
 	"github.com/Autumn-27/artex/server"
+	"github.com/Autumn-27/artex/toolrunner"
 )
 
 // version is the build version, injected at release time via
@@ -59,8 +60,30 @@ func run() int {
 		checkDB = flag.Bool("check-db", false, "check PostgreSQL connectivity without starting the server or applying schema changes")
 		createDB = flag.Bool("create-db", false, "explicitly create the configured PostgreSQL database if it is missing; do not apply schema")
 		setupAppDB = flag.Bool("setup-app-db", false, "create a dedicated login role and database owned by it (new setups only)")
+		runnerSocket = flag.String("runner-socket", "", "serve isolated SDK tools over a private Unix socket (no database or web listener)")
+		relayListen = flag.String("runner-relay-listen", "", "fixed-target network proxy relay listen address")
+		relayTarget = flag.String("runner-relay-target", "", "fixed-target proxy endpoint (required with runner-relay-listen)")
 	)
 	flag.Parse()
+	if *runnerSocket != "" || *relayListen != "" {
+		if *runnerSocket != "" && *relayListen != "" {
+			fmt.Fprintln(os.Stderr, "runner and proxy relay modes are mutually exclusive")
+			return 2
+		}
+		ctx, stop := signal.NotifyContext(context.Background(), os.Interrupt, syscall.SIGTERM)
+		defer stop()
+		var err error
+		if *runnerSocket != "" {
+			err = toolrunner.Serve(ctx, *runnerSocket)
+		} else {
+			err = toolrunner.Relay(ctx, *relayListen, *relayTarget)
+		}
+		if err != nil {
+			log.Printf("isolated runner: %v", err)
+			return 1
+		}
+		return 0
+	}
 	if (*checkDB && *createDB) || (*checkDB && *setupAppDB) || (*createDB && *setupAppDB) {
 		fmt.Fprintln(os.Stderr, "use only one database action at a time")
 		return 2
