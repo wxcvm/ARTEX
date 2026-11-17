@@ -197,6 +197,23 @@ func TestPurgeIntelDatabaseRoundTrip(t *testing.T) {
  if fl.Code!=200||!strings.Contains(fl.Body.String(),"paired finding"){t.Fatalf("findings failed %d %s",fl.Code,fl.Body.String())}
  fr:=bridgeRead(fmt.Sprintf("/api/purge/intel-bridge/report?finding=%d",fid),fmt.Sprint(id))
  if fr.Code!=200||!strings.Contains(fr.Body.String(),"fixture report"){t.Fatalf("report failed %d %s",fr.Code,fr.Body.String())}
+ // The overview count must use the same company-readable predicate as the
+ // findings page and report endpoint, including when a finding has a stale
+ // or cross-company asset reference alongside a locally attributed one.
+ visibleCount:=func()int64{
+  t.Helper()
+  got:=bridgeRead("/api/purge/intel-bridge/overview",fmt.Sprint(id))
+  var summary struct{LinkedFindingCount int64 `json:"linked_finding_count"`}
+  if got.Code!=200||json.Unmarshal(got.Body.Bytes(),&summary)!=nil{t.Fatalf("overview count failed: %d %s",got.Code,got.Body.String())}
+  return summary.LinkedFindingCount
+ }
+ beforeCount:=visibleCount()
+ if beforeCount<1{t.Fatal("expected the new finding in the company overview")}
+ if _,err=d.Exec("UPDATE findings SET asset_ids=asset_ids || jsonb_build_array($2::bigint) WHERE id=$1",fid,int64(9223372036854775807));err!=nil{t.Fatal(err)}
+ if got:=bridgeRead(fmt.Sprintf("/api/purge/intel-bridge/findings?task=%d",task.ID),fmt.Sprint(id));got.Code!=200||strings.Contains(got.Body.String(),"paired finding"){
+  t.Fatalf("mixed-attribution finding leaked into list: %d %s",got.Code,got.Body.String())
+ }
+ if afterCount:=visibleCount();afterCount!=beforeCount-1{t.Fatalf("overview count %d must reflect visible findings (previously %d)",afterCount,beforeCount)}
  if got:=bridgeRead(fmt.Sprintf("/api/purge/intel-bridge/report?finding=%d",fid),fmt.Sprint(id+1));got.Code!=409{t.Fatal("other company accepted")}
  if after:=assetSnapshot();after!=beforeDetailAssets{t.Fatal("bridge detail reads changed verified assets")}
  if _,err=d.Exec("UPDATE assets SET company_id=NULL WHERE id=$1",aid);err!=nil{t.Fatal(err)}

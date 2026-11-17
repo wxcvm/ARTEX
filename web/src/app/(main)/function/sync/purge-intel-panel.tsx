@@ -50,7 +50,12 @@ export function PurgeIntelPanel() {
   React.useEffect(() => {
     let live = true;
     http<Pairing>("/purge/intel-pairing").then(p => {
-      if (live) setPair(p);
+      if (!live) return;
+      setPair(p);
+      // Open the existing paired company's history without an extra selection.
+      // Do not replace a company the user has already chosen while loading.
+      if (p.configured && Number.isSafeInteger(p.company_id) && p.company_id > 0)
+        setCompany(current => current || String(p.company_id));
     }).catch(e => { if (live) setPairError(String(e.message || e)); });
     return () => { live = false; };
   }, []);

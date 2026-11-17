@@ -174,7 +174,7 @@ func (s *Server) purgeIntelBridgeOverview(w http.ResponseWriter, r *http.Request
  if err!=nil { writeErr(w,503,"task overview unavailable"); return }
  if err=pg.QueryRowContext(r.Context(), `SELECT count(*) FROM assets WHERE company_id=$1`,id).Scan(&assetCount); err!=nil { writeErr(w,503,"asset overview unavailable"); return }
  // Existing company asset attribution, not all findings of a multi-company task.
- if err=pg.QueryRowContext(r.Context(), `SELECT count(*) FROM findings f WHERE EXISTS (SELECT 1 FROM assets a WHERE a.company_id=$1 AND f.asset_ids @> jsonb_build_array(a.id))`,id).Scan(&findingCount); err!=nil { writeErr(w,503,"finding overview unavailable"); return }
+ if err=pg.QueryRowContext(r.Context(), `SELECT count(*) FROM findings f WHERE `+purgeFindingCompanyWhere,id).Scan(&findingCount); err!=nil { writeErr(w,503,"finding overview unavailable"); return }
  if err=pg.QueryRowContext(r.Context(), `SELECT count(*) FROM purge_intel_snapshots WHERE company_id=$1`,id).Scan(&snapshotCount); err!=nil { writeErr(w,503,"snapshot overview unavailable"); return }
  rows,err=pg.QueryContext(r.Context(),`SELECT id,received_at::text FROM purge_intel_snapshots WHERE company_id=$1 ORDER BY received_at DESC,id DESC LIMIT 20`,id)
  if err!=nil { writeErr(w,503,"snapshot overview unavailable"); return }
