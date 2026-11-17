@@ -103,10 +103,12 @@ type remoteTool struct {
 	tool.CoreTool // permissions/schema/name remain those of the original SDK tool
 	client  *Client
 	session string
+	disableBackground bool
+	disableInteractive bool
 }
 
 func (r remoteTool) Call(ctx context.Context, input json.RawMessage, tc *tool.ToolContext) (tool.Result, error) {
-	request := Request{Session: r.session, Name: r.Name(), Input: input}
+	request := Request{Session: r.session, Name: r.Name(), Input: input, DisableBackground: r.disableBackground, DisableInteractive: r.disableInteractive}
 	if tc != nil {
 		request.WorkingDir = tc.WorkingDir
 		request.OutputDir = tc.OutputDir
@@ -182,19 +184,21 @@ func Configure(opts *agentcore.Options) func() {
 		opts.Tools = tool.DefaultTools()
 	}
 	c := NewClient(socket)
+	backgroundDisabled := opts.DisableBackgroundTasks || tool.BackgroundTasksDisabled()
+	interactiveDisabled := tool.InteractiveShellDisabled()
 	for i, t := range opts.Tools {
 		if runnerTools[t.Name()] {
-			opts.Tools[i] = remoteTool{CoreTool: t, client: c, session: opts.SessionID}
+			opts.Tools[i] = remoteTool{CoreTool: t, client: c, session: opts.SessionID, disableBackground: backgroundDisabled, disableInteractive: interactiveDisabled}
 		}
 	}
-	if !opts.DisableBackgroundTasks {
-		// Otherwise Norma adds local TaskOutput/TaskStop/TaskList/Monitor tools
-		// backed by the controller's task manager, bypassing the remote runner.
-		opts.DisableBackgroundTasks = true
+	// The controller must never create a local background task manager in
+	// runner mode. Only expose remote management tools when previously enabled.
+	opts.DisableBackgroundTasks = true
+	if !backgroundDisabled {
 		for _, t := range []tool.CoreTool{
 			tool.NewTaskOutput(), tool.NewTaskStop(), tool.NewTaskList(), tool.NewMonitor(),
 		} {
-			opts.Tools = append(opts.Tools, remoteTool{CoreTool: t, client: c, session: opts.SessionID})
+			opts.Tools = append(opts.Tools, remoteTool{CoreTool: t, client: c, session: opts.SessionID, disableInteractive: interactiveDisabled})
 		}
 	}
 	return func() {

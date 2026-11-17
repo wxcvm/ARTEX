@@ -14,6 +14,7 @@ import (
 	"net/http"
 	"os"
 	"path/filepath"
+	"strings"
 	"sync"
 	"time"
 
@@ -28,7 +29,9 @@ type Request struct {
 	OutputDir      string          `json:"output_dir"`
 	Env            []string        `json:"env"`
 	MaxOutputChars int             `json:"max_output_chars"`
-	CACertPEM      string          `json:"ca_cert_pem,omitempty"`
+	CACertPEM          string          `json:"ca_cert_pem,omitempty"`
+	DisableBackground bool            `json:"disable_background,omitempty"`
+	DisableInteractive bool           `json:"disable_interactive,omitempty"`
 }
 
 type Response struct {
@@ -143,6 +146,11 @@ func (s *Service) handleCall(w http.ResponseWriter, r *http.Request) {
 		MaxOutputChars: req.MaxOutputChars,
 		Env:            env,
 		Tasks:          m,
+	}
+	// Preserve the controller's existing SDK opt-outs even though the
+	// runner does not inherit control-plane environment variables.
+	if req.DisableBackground || (req.DisableInteractive && strings.HasPrefix(req.Name, "shell_")) {
+		tc.Tasks = nil
 	}
 	result, callErr := t.Call(r.Context(), req.Input, tc)
 	reply := Response{Result: result}

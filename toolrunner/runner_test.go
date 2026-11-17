@@ -3,6 +3,7 @@ package toolrunner
 import (
 	"context"
 	"encoding/json"
+	"net/http/httptest"
 	"os"
 	"path/filepath"
 	"runtime"
@@ -159,5 +160,65 @@ func TestRunnerToolEnvForwardsOnlyProxyAndPublicCA(t *testing.T) {
 		if got[i] != want {
 			t.Fatalf("env[%d]=%q, want %q", i, got[i], want)
 		}
+	}
+}
+
+func TestRunnerPreservesExistingSDKDisableFlags(t *testing.T) {
+	t.Setenv("ARTEX_RUNNER_SOCKET", filepath.Join(t.TempDir(), "missing.sock"))
+	t.Setenv("AGENT_CORE_DISABLE_BACKGROUND_TASKS", "1")
+	t.Setenv("AGENT_CORE_DISABLE_INTERACTIVE_SHELL", "1")
+	opts := agentcore.Options{Tools: tool.DefaultTools()}
+	cleanup := Configure(&opts)
+	defer cleanup()
+	if !opts.DisableBackgroundTasks {
+		t.Fatal("local SDK task manager was enabled")
+	}
+	for _, item := range opts.Tools {
+		if item.Name() == "TaskOutput" || item.Name() == "TaskList" {
+			t.Fatalf("background task tool exposed despite existing global opt-out: %s", item.Name())
+		}
+		if item.Name() == "Bash" {
+			r, ok := item.(remoteTool)
+			if !ok || !r.disableBackground || !r.disableInteractive {
+				t.Fatalf("runner did not preserve SDK tool disabling flags: %+v", item)
+			}
+		}
+	}
+}
+
+func TestRunnerServiceHonorsSDKDisableFlags(t *testing.T) {
+	s := NewService()
+	defer s.Close()
+	root := t.TempDir()
+	call := func(req Request) Response {
+		t.Helper()
+		payload, err := json.Marshal(req)
+		if err != nil {
+			t.Fatal(err)
+		}
+		w := httptest.NewRecorder()
+		s.Handler().ServeHTTP(w, httptest.NewRequest("POST", "/call", strings.NewReader(string(payload))))
+		if w.Code != 200 {
+			t.Fatalf("unexpected runner HTTP %d: %s", w.Code, w.Body.String())
+		}
+		var result Response
+		if err := json.Unmarshal(w.Body.Bytes(), &result); err != nil {
+			t.Fatal(err)
+		}
+		return result
+	}
+	bash := call(Request{
+		Session: "disable-test", Name: "Bash", WorkingDir: root, DisableBackground: true,
+		Input: json.RawMessage(`{"command":"printf sync-only","run_in_background":true}`),
+	})
+	if bash.Result.IsError || !strings.Contains(bash.Result.Flatten(), "sync-only") {
+		t.Fatalf("background opt-out must run synchronously: %+v", bash)
+	}
+	shell := call(Request{
+		Session: "disable-test", Name: "shell_open", WorkingDir: root, DisableInteractive: true,
+		Input: json.RawMessage(`{"command":"printf should-not-start"}`),
+	})
+	if !shell.Result.IsError {
+		t.Fatalf("interactive Shell opt-out was bypassed: %+v", shell)
 	}
 }
