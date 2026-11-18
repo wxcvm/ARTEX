@@ -711,23 +711,32 @@ docker compose logs --tail=100 postgres
 - GET /api/companies/{id}/purge-intel：最近 50 条快照元数据。
 - GET /api/companies/{id}/purge-intel/{snapshot}：读取历史证据，范围变更后不再匹配的快照拒绝返回。
 
-本阶段采用手动 JSON 导入，不需要额外 API Key，不自动传输数据；不包含跨项目后台同步、自动扫描、向智能体注入证据或把历史情报提升为已验证资产。需要安装包含本阶段代码的 ARTEX 版本及 Purge 关联清单功能。
+上述手动 JSON 导入路径不需要额外 API Key，也不会自动传输；下文另有可选的本机配对同步路径。两者均不包含跨项目后台定时同步、自动扫描或把历史情报提升为已验证资产。需要安装包含本阶段代码的 ARTEX 版本及 Purge 关联清单功能。
 
 
-### Purge 本机一键同步
+### Purge 本机配对与一键同步
 
-可选启用独立写入桥接：在 ARTEX 服务端设置 `ARTEX_PURGE_INTEL_TOKEN`（至少 32 字符的独立随机秘密）及 `ARTEX_PURGE_INTEL_COMPANY_ID`（已存在的公司数字 ID）。在 DSH/Purge 宿主设置相同的 `DSH_PURGE_ARTEX_INTEL_TOKEN` 和 `DSH_PURGE_ARTEX_INTEL_COMPANY_ID`，重启两端。Docker Compose 已透传 ARTEX 两个变量。不要复用隐私桥接、总览或安装令牌，不要将秘密提交到仓库。
+**推荐使用现有页面配对，无需编辑环境变量或重启：**
 
-Purge 测绘中心先生成统一关联清单，再检查接收公司、勾选确认并点击「同步至 ARTEX」。发送端只使用 `http://127.0.0.1:8787`，不接受自定义远程 URL。ARTEX 接口 `POST /api/purge/intel-bridge` 使用 X-Artex-Purge-Intel-Token 和 X-Artex-Purge-Intel-Company 两个请求头；接收公司由服务端配置决定，发送端 ID 不匹配则拒绝。复用管理员手动导入的验证及去重逻辑，成功返回快照 ID。令牌不授予任何读取、管理或其他公司写入权限。
+1. 在 ARTEX「资产同步 → Purge 情报」选择已登记授权范围的公司，点击「生成配对令牌」。ARTEX 只在生成时显示完整令牌；轮换或撤销会使旧令牌失效。
+2. 在 Purge「作战台 → 资源 → ARTEX → 本机情报同步 → 配对配置」填写相同公司 ID 与令牌，点击「保存并检测配对」。已保存配对可以直接复用，Purge 不会回显令牌。
+3. 在 Purge 选择当前项目已登记授权的目标，生成关联清单，确认接收公司及条目，勾选确认并点击「同步至 ARTEX」。成功后 ARTEX 保存历史快照，可在「Purge 情报」查看导入历史与离线分析。
+4. ARTEX 运行时，可从 Purge 工作台点击「打开 ARTEX 情报同步」，直达 `http://127.0.0.1:8787/function/sync?tab=purge-intel`；普通「资产同步」入口仍默认显示 ScopeSentry。
 
-仅在同一可信本机使用，保持 ARTEX 管理监听回环或受保护。服务身份探测不等于加密认证。传输不启动扫描或智能体；响应丢失时在 ARTEX 历史中确认，重复提交相同证据会复用快照。尚无定时同步或 ARTEX 智能体自动消费。
+旧版脚本或集中部署仍可通过 ARTEX 环境变量 `ARTEX_PURGE_INTEL_TOKEN`、`ARTEX_PURGE_INTEL_COMPANY_ID` 和 Purge 环境变量 `DSH_PURGE_ARTEX_INTEL_TOKEN`、`DSH_PURGE_ARTEX_INTEL_COMPANY_ID` 配对；修改变量后需要重启相应进程。**环境变量优先于页面保存的配对**。不要复用隐私桥接或管理员 JWT，也不要将秘密提交到仓库。
+
+Purge 仅连接本机固定地址 `http://127.0.0.1:8787`，先检查 `/api/health` 身份且不跟随重定向。写入使用 `POST /api/purge/intel-bridge` 与独立的 `X-Artex-Purge-Intel-Token`、`X-Artex-Purge-Intel-Company` 请求头。导入保留现有范围验证和内容去重：仅存储授权范围内历史情报，不直接创建实时资产、漏洞或扫描任务；重复内容复用快照 ID。
+
+**读取边界**：配对令牌除了写入与检测，也可以读取当前配对公司的受限概览、资产分页、任务状态、符合公司归属条件的发现与报告，以及历史快照分析。不能作为管理员凭据，不能读取任意公司或无关管理接口。Purge 变更或解除配对后会清空旧公司概览，再读取时使用当前公司。
+
+仅在可信本机使用；不自动启动 ARTEX、Agent、扫描，也不自动同步任务、凭据或 MCP。Windows 安装或升级后仍须实机验证配对、写入、读取、解除和重连；CI 通过不等于双端联动验收。
 
 
 ### Purge 情报离线分析
 
 在「资产同步 → Purge 情报」选择公司，读取导入历史，对某一快照点击「分析情报」。ARTEX 按当前公司范围重新校验保存的证据，再返回结构化分析 `artex.purge-intel-analysis.v1`：域名/IP/关系及历史端口计数、多来源域名、未保存 DNS 快照、DNS 查询异常、无保留地址、无域名关联 IP、无历史端口记录 IP、未知传输协议、缺少原始观察时间和共享地址。数据截断及范围外 DNS 排除数单独提示。
 
-接口：管理员 JWT 的 GET /api/companies/{id}/purge-intel/{snapshot}/analysis。独立写入桥令牌不能读取。分析只读、无网络请求、无 LLM 调用，不自动触发扫描或修改资产；可在页面复制结构化分析 JSON。多个来源标签并不证明独立观测（subfinder 也可能使用 CT 数据）；无 DNS/端口证据并不表示域名不存在或端口关闭。历史 DNS 与证书也不代表当前存活。分析仅针对一个快照，不是跨快照趋势；尚未接入智能体自动读取。
+接口：管理员 JWT 的 GET /api/companies/{id}/purge-intel/{snapshot}/analysis。配对令牌另可经受限公司读取接口访问对应公司的历史分析，不能替代管理员 JWT。分析只读、无网络请求、无 LLM 调用，不自动触发扫描或修改资产；可在页面复制结构化分析 JSON。多个来源标签并不证明独立观测（subfinder 也可能使用 CT 数据）；无 DNS/端口证据并不表示域名不存在或端口关闭。历史 DNS 与证书也不代表当前存活。分析仅针对一个快照，不是跨快照趋势；尚未接入智能体自动读取。
 
 
 ### 任务智能体读取 Purge 历史情报
