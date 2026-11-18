@@ -29,7 +29,9 @@ dc() {
 cleanup() {
   docker rm -f "$target" >/dev/null 2>&1 || true
   dc down -v --remove-orphans >/dev/null 2>&1 || true
-  rm -rf "$tmp"
+  # The disposable capture CA tree is created by root inside the test
+  # container (0700); only the temporary CI fixture is removed with sudo.
+  sudo rm -rf -- "$tmp"
 }
 trap cleanup EXIT
 docker image inspect artex-runner-ci:local >/dev/null
