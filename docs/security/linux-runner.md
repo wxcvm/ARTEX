@@ -63,6 +63,8 @@ CI 还会通过 `scripts/ci/runner-relay-smoke.sh` 使用两个临时 Docker 网
 
 CI 使用 `scripts/ci/runner-compose-smoke.sh` 在临时目录中按真实 `docker-compose.yml` + `docker-compose.runner.yml` 启动 Broker 与 Executor，验证 Compose 命名卷、健康检查和经 Broker 的读写操作。测试使用基于当前 Go 源码的**最小 CI 镜像**，不启动完整 ARTEX/数据库，也不验证正式镜像的全部工具依赖或真实代理抓包。
 
+CI 另通过 `scripts/ci/runner-full-stack-smoke.sh` 以假数据库凭证和本地 HTTP 模拟目标，完整拉起 PostgreSQL、ARTEX API、Broker、Executor 和代理桥；测试执行网络的流量经过代理桥可达本地目标但不能直连。为避免大型镜像构建，它仍使用**精简 Go CI 镜像**，未覆盖正式工具镜像、HTTPS MITM 记录持久化或真实任务。
+
 还需运行真实 ARTEX 任务，确认 Bash/文件操作、任务后台输出、交互式 Shell、代理抓包与安装的工具包能正常工作；只通过以上静态检查**不等于完成隔离验收**。
 
 ## 目前明确的限制

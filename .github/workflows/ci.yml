@@ -52,6 +52,8 @@ jobs:
         run: bash scripts/ci/runner-broker-smoke.sh
       - name: Docker Compose broker/executor startup smoke
         run: bash scripts/ci/runner-compose-smoke.sh
+      - name: Full Compose ARTEX/PostgreSQL/local proxy smoke
+        run: bash scripts/ci/runner-full-stack-smoke.sh
       # Skipped tests, tracked in issue #9:
       # - TestGraphOverviewExpandsAssociatedCompanyScope,
       #   TestCaptureApprovalLifecycle: fail on unmodified upstream code with a
