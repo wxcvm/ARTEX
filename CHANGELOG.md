@@ -21,9 +21,12 @@ All notable changes to this project are documented in this file. The format is b
 
 - 跨平台命令行 ZIP、Windows 桌面便携包及安装器均打包 `extension/` 浏览器捕获扩展；扩展需在 Chrome/Edge 中手动以已解压方式安装，不自动修改浏览器。见 #150。
 - **Purge × ARTEX 协同发行**：本版计划与独立发布的 Purge `1.1.92-wxcvm.10` 配套交付。ARTEX 沿用自身 Windows Setup/便携版与跨平台 ZIP；Purge 是需另行授权获取的私有 Harness 插件，不随 ARTEX 安装器打包。现有本机健康检查、工具目录复用等联动在最终 Windows 实机组合验收后再认定兼容，不将 CI 通过等同于联动验收。
+- **联动操作修复**：配对后在 ARTEX 情报页预选已关联公司，概览发现数量与实际可读取发现采用相同的公司归属口径（#156）；`/function/sync?tab=purge-intel` 可直达 Purge 情报页（#160）。配对令牌只访问对应公司的受限接口，不是管理员 JWT；Windows 双端实机验收仍待完成。
 
 ### 稳定性修复
 
+- **工具输出边界与审计**：有效工具决定仅记一次审计（#157），Agent 工具输出默认按不可信数据包装（#158），不改变工具权限。
+- **可选 Linux Docker 工具 Runner**：控制端、Broker 与 Executor 分离，通过私有 Unix Socket 和固定代理链路执行 SDK 内置文件/Shell 工具（#164–#170）；已增加完整 Compose 假凭据与本地代理链路 CI。默认部署及 Windows EXE 不变；尚非完整沙箱，真实工具镜像、在线任务与 HTTPS 抓包仍需实测。
 - 修复会话恢复时历史消息丢失、旧工具状态残留与消息写入问题，改善 SSE 事件顺序和断线重连游标。见 #106、#110、#115、#131、#134。
 - 改善失败上下文窗口处理、Worker 前沿任务故障显式反馈、任务重启状态与规划器唤醒逻辑。见 #133、#136、#139、#141。
 - Windows 桌面烟测覆盖与浏览器捕获队列回收改善。见 #132、#135。
