@@ -829,6 +829,7 @@ func (s *Server) Handler() http.Handler {
 	s.registerFindingScreenshots(mux)
 	s.registerFindingReproduction(mux)
 	mux.HandleFunc("GET /api/exploration/findings/{id}", s.getFinding)
+	s.registerRemediation(mux)
 	mux.HandleFunc("GET /api/exploration/findings/{id}/lineage", s.findingLineage)
 	mux.HandleFunc("POST /api/exploration/findings/{id}/deepen", s.deepenFinding)
 	mux.HandleFunc("GET /api/exploration/findings/{id}/retests", s.listFindingRetests)

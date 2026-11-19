@@ -276,6 +276,9 @@ WHERE archive.id=$1 FOR UPDATE OF archive,task`, archiveID).Scan(&taskID, &expID
 			return nil, fmt.Errorf("restore %s: %w", table, err)
 		}
 	}
+	if err := restoreFindingRemediationTx(tx, snapshot, taskID); err != nil {
+		return nil, fmt.Errorf("restore finding remediation: %w", err)
+	}
 	if err := restoreFindingTrafficTx(tx, snapshot); err != nil {
 		return nil, fmt.Errorf("restore finding traffic: %w", err)
 	}

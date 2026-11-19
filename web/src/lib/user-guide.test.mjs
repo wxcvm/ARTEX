@@ -60,7 +60,7 @@ test("contextual help links resolve to real section or subsection headings in th
     "/function/tasks", "/function/tasks/detail", "/system/llm", "/system/skills",
     "/system/mcp", "/system/agents", "/system/tools", "/system/settings",
     "/system/logs", "/function/traffic", "/function/assets", "/function/findings",
-    "/function/sync",
+    "/function/sync", "/function/remediation", "/system/reports",
   ]) {
     const href = guideHref(path);
     assert.ok(href.startsWith("/help/#"), path + " has no specific help link");

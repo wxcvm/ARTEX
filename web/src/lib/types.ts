@@ -568,6 +568,63 @@ export interface FindingsPage {
   page_size: number;
 }
 
+export type RemediationStage = "pending_review" | "pending_fix" | "pending_acceptance" | "accepted";
+export type RemediationAction = "review" | "update_plan" | "submit" | "accept" | "return" | "reopen";
+
+export interface RemediationItem {
+  finding_id: string;
+  title: string;
+  severity: Severity;
+  finding_status: FindingStatus;
+  stage: RemediationStage;
+  version: number;
+  evidence_version: number;
+  submitted_evidence_version?: number | null;
+  accepted_evidence_version?: number | null;
+  owner?: string;
+  due_date?: string;
+  plan?: string;
+  reference?: string;
+  needs_review: boolean;
+  read_only: boolean;
+}
+
+export interface RemediationEvent {
+  id: number;
+  version: number;
+  action: RemediationAction;
+  from_stage: RemediationStage;
+  to_stage: RemediationStage;
+  time: string;
+  actor: string;
+  note?: string;
+  reference?: string;
+  owner?: string;
+  due_date?: string;
+  plan?: string;
+}
+
+export interface RemediationList {
+  items: RemediationItem[];
+  total: number;
+  page: number;
+  page_size: number;
+}
+
+export interface RemediationDetail {
+  item: RemediationItem;
+  events: RemediationEvent[];
+  next_before?: number | null;
+}
+
+type RemediationVersioned = { expected_version: number; note: string };
+export type RemediationMutation = RemediationVersioned & (
+  | { action: "review" | "return" | "reopen" }
+  | { action: "accept"; expected_evidence_version: number }
+  | { action: "submit"; expected_evidence_version: number; reference: string }
+  | { action: "update_plan"; plan: string; owner: string; due_date: string }
+);
+
 export interface FindingGroup {
   task_id: string | number | null;
   task_name?: string; // optional task name; empty/absent = untitled

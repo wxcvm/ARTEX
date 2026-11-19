@@ -157,6 +157,13 @@ function FindingDetailInner() {
           <StatusBadge domain="severity" value={finding.severity} dot />
           <StatusBadge domain="finding" value={finding.status} dot />
           <FindingReportExportButton key={id} findingId={id} contextTask={contextTaskId || undefined} />
+          {!contextTaskId && !finding.inherited && finding.id === id && (
+            <Button asChild size="sm" variant="outline">
+              <Link href={`/function/remediation?finding=${encodeURIComponent(finding.id)}#remediation-detail`}>
+                {tr("查看整改记录", "View remediation")}
+              </Link>
+            </Button>
+          )}
           {finding.inherited && finding.source_task_id && (
             <Badge variant="outline">{tr(`来源任务 #${finding.source_task_id} · 只读`, `Source task #${finding.source_task_id} · read-only`)}</Badge>
           )}

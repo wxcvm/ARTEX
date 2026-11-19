@@ -1206,6 +1206,38 @@ CREATE TRIGGER trg_conversation_retest_delete BEFORE DELETE ON conversations
 ALTER TABLE findings ADD COLUMN IF NOT EXISTS evidence_version BIGINT NOT NULL DEFAULT 0;
 ALTER TABLE findings ADD COLUMN IF NOT EXISTS report_evidence_version BIGINT NOT NULL DEFAULT 0;
 
+-- Human remediation state is independent of the finding's existing disposition.
+-- A finding without a state row is pending_review at version zero.
+CREATE TABLE IF NOT EXISTS finding_remediations (
+    finding_id BIGINT PRIMARY KEY REFERENCES findings(id) ON DELETE CASCADE,
+    stage TEXT NOT NULL CHECK (stage IN ('pending_review','pending_fix','pending_acceptance','accepted')),
+    version BIGINT NOT NULL CHECK (version > 0),
+    owner TEXT NOT NULL DEFAULT '',
+    due_date DATE,
+    plan TEXT NOT NULL DEFAULT '',
+    reference TEXT NOT NULL DEFAULT '',
+    submitted_evidence_version BIGINT CHECK (submitted_evidence_version >= 0),
+    accepted_evidence_version BIGINT CHECK (accepted_evidence_version >= 0)
+);
+CREATE INDEX IF NOT EXISTS idx_finding_remediations_stage ON finding_remediations(stage, finding_id);
+
+CREATE TABLE IF NOT EXISTS finding_remediation_events (
+    finding_id BIGINT NOT NULL REFERENCES finding_remediations(finding_id) ON DELETE CASCADE,
+    version BIGINT NOT NULL CHECK (version > 0),
+    action TEXT NOT NULL CHECK (action IN ('review','update_plan','submit','accept','return','reopen')),
+    from_stage TEXT NOT NULL CHECK (from_stage IN ('pending_review','pending_fix','pending_acceptance','accepted')),
+    to_stage TEXT NOT NULL CHECK (to_stage IN ('pending_review','pending_fix','pending_acceptance','accepted')),
+    evidence_version BIGINT NOT NULL CHECK (evidence_version >= 0),
+    actor TEXT NOT NULL,
+    note TEXT NOT NULL DEFAULT '',
+    reference TEXT NOT NULL DEFAULT '',
+    plan TEXT NOT NULL DEFAULT '',
+    owner TEXT NOT NULL DEFAULT '',
+    due_date DATE,
+    created_at TIMESTAMPTZ NOT NULL DEFAULT now(),
+    PRIMARY KEY (finding_id, version)
+);
+
 CREATE TABLE IF NOT EXISTS traffic_evidence_snapshots (
     id TEXT PRIMARY KEY,
     source_traffic_id TEXT NOT NULL,
