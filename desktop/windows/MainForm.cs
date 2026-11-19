@@ -96,9 +96,7 @@ public sealed class MainForm : Form
             Padding = new Padding(5, 3, 5, 3),
         };
         more.DropDownItems.Add("数据库配置", null, (_, _) => EditDatabaseConfiguration());
-        more.DropDownItems.Add("打开配置目录", null, (_, _) =>
-            Process.Start(new ProcessStartInfo("explorer.exe", "\"" + AppContext.BaseDirectory.TrimEnd('\\') + "\"")
-            { UseShellExecute = true }));
+        more.DropDownItems.Add("打开配置目录", null, (_, _) => DatabaseSetupForm.OpenConfigFolder());
         more.DropDownItems.Add(new ToolStripSeparator());
         more.DropDownItems.Add("重新连接", null, (_, _) => RetryConnection());
         more.DropDownItems.Add("退出 ARTEX", null, (_, _) => ExitDesktop());
@@ -466,16 +464,20 @@ public sealed class MainForm : Form
     private void EditDatabaseConfiguration()
     {
         if (lifetime.IsCancellationRequested || Volatile.Read(ref connecting) != 0) return;
-        var owned = ownedBackend is { HasExited: false };
-        if (owned && MessageBox.Show(this,
-            "保存新的数据库连接后，将重新启动此桌面窗口管理的 ARTEX 后端。" +
-            "\n正在执行的任务可能中断。是否继续？",
-            "修改数据库配置", MessageBoxButtons.YesNo, MessageBoxIcon.Question) != DialogResult.Yes)
-            return;
         try
         {
-            using var setup = new DatabaseSetupForm(editExisting: true);
+            using var setup = new DatabaseSetupForm(editExisting: true, confirmSave: owner =>
+                ownedBackend is not { HasExited: false } || MessageBox.Show(owner,
+                    "保存新的数据库连接后，将重新启动此桌面窗口管理的 ARTEX 后端。" +
+                    "\n正在执行的任务可能中断。是否继续？",
+                    "修改数据库配置", MessageBoxButtons.YesNo, MessageBoxIcon.Question) == DialogResult.Yes);
             if (setup.ShowDialog(this) != DialogResult.OK) return;
+            if (!setup.ConfigurationChanged)
+            {
+                if (!ready) _ = ConnectAsync(lifetime.Token);
+                return;
+            }
+            var owned = ownedBackend is { HasExited: false };
             if (owned)
             {
                 ownedBackend!.Kill(entireProcessTree: true);
@@ -535,17 +537,14 @@ public sealed class MainForm : Form
         };
         startInfo.ArgumentList.Add("-addr");
         startInfo.ArgumentList.Add("127.0.0.1:8787");
+        var configPath = DatabaseSetupForm.ConfigPath;
+        startInfo.Environment["ARTEX_CONFIG"] = configPath;
         ownedSetupToken = Convert.ToHexString(System.Security.Cryptography.RandomNumberGenerator.GetBytes(24));
         startInfo.Environment["ARTEX_SETUP_TOKEN"] = ownedSetupToken;
         if (string.IsNullOrWhiteSpace(Environment.GetEnvironmentVariable("ARTEX_KB_DIR")) &&
-            File.Exists(Path.Combine(AppContext.BaseDirectory, "knowledge", "knowledge.db")))
-        {
-            using var configuration = File.Exists(DatabaseSetupForm.ConfigPath) ?
-                JsonDocument.Parse(File.ReadAllText(DatabaseSetupForm.ConfigPath)) : null;
-            if (configuration is null || !configuration.RootElement.TryGetProperty("knowledge_dir", out var knowledgeDir) ||
-                string.IsNullOrWhiteSpace(knowledgeDir.ToString()))
-                startInfo.Environment["ARTEX_KB_DIR"] = Path.Combine(AppContext.BaseDirectory, "knowledge");
-        }
+            File.Exists(Path.Combine(AppContext.BaseDirectory, "knowledge", "knowledge.db")) &&
+            !DatabaseSetupForm.HasConfiguredKnowledgeDirectory(configPath))
+            startInfo.Environment["ARTEX_KB_DIR"] = Path.Combine(AppContext.BaseDirectory, "knowledge");
 
         var process = new Process { StartInfo = startInfo, EnableRaisingEvents = true };
         process.OutputDataReceived += WriteBackendLog;

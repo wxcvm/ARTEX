@@ -54,6 +54,7 @@ export function guideLinks(markdown: string): string {
 // The page-level help button links directly to the relevant section of the
 // existing manual. Keep these names identical to the guide's headings.
 const helpSections: readonly [prefix: string, heading: string][] = [
+  ["/welcome", "0. 新手四步引导"],
   ["/function/tasks/detail", "6.3 任务详情页逐项看"],
   ["/function/tasks", "6.1 创建任务"],
   ["/system/llm", "5.1 创建模型 Profile"],

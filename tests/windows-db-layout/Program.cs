@@ -1,5 +1,6 @@
 using System.Drawing;
 using System.Reflection;
+using System.Text.Json.Nodes;
 using System.Windows.Forms;
 using Artex.Desktop;
 
@@ -157,6 +158,68 @@ internal static class Program
             Environment.SetEnvironmentVariable("ARTEX_PG_DSN", previousDsn);
         }
         dialog.Close();
+        CheckConfigRepair(type);
+    }
+
+    private static void CheckConfigRepair(Type type)
+    {
+        var fixture = Path.Combine(AppContext.BaseDirectory, "ARTEX-layout-config-" + Guid.NewGuid().ToString("N") + ".json");
+        var previousConfig = Environment.GetEnvironmentVariable("ARTEX_CONFIG");
+        var previousDsn = Environment.GetEnvironmentVariable("ARTEX_PG_DSN");
+        var fields = BindingFlags.NonPublic | BindingFlags.Instance;
+        Form RepairForm() => (Form)Activator.CreateInstance(
+            type, fields, binder: null, args: new object[] { true }, culture: null)!;
+        try
+        {
+            Environment.SetEnvironmentVariable("ARTEX_CONFIG", fixture);
+            Environment.SetEnvironmentVariable("ARTEX_PG_DSN", null);
+            const string initial = "{\"skill_dir\":\"keep-me\"}";
+            File.WriteAllText(fixture, initial);
+            var save = type.GetMethod("Save", fields)!;
+            var changed = type.GetProperty("ConfigurationChanged", fields)!;
+            var confirmations = 0;
+            Func<IWin32Window, bool> refuse = _ => { confirmations++; return false; };
+            using (var refused = (Form)Activator.CreateInstance(
+                type, fields, binder: null, args: new object[] { true, refuse }, culture: null)!)
+            {
+                save.Invoke(refused, null);
+                if (confirmations != 1 || changed.GetValue(refused) is true || File.ReadAllText(fixture) != initial)
+                    throw new Exception("Declining confirmation changed saved configuration");
+            }
+            using (var repair = RepairForm())
+            {
+                // Exercise only JSON persistence with a temporary file. Connection
+                // validation belongs to the separate managed PostgreSQL integration.
+                save.Invoke(repair, null);
+                if (changed.GetValue(repair) is not true)
+                    throw new Exception("Saving a missing database object must persist a change");
+            }
+            var saved = JsonNode.Parse(File.ReadAllText(fixture))!.AsObject();
+            if (saved["skill_dir"]!.GetValue<string>() != "keep-me" || saved["database"] is not JsonObject)
+                throw new Exception("Database repair did not preserve unrelated configuration");
+
+            const string malformed = "{\"database\":";
+            File.WriteAllText(fixture, malformed);
+            using var invalid = RepairForm();
+            if (type.GetField("configurationLoadError", fields)!.GetValue(invalid) is not string)
+                throw new Exception("Malformed config has no actionable repair state");
+            if (File.ReadAllText(fixture) != malformed)
+                throw new Exception("Opening repair overwrote malformed configuration");
+
+            Environment.SetEnvironmentVariable("ARTEX_PG_DSN", "postgresql://fixture@example.invalid/app");
+            using var overridden = RepairForm();
+            var primary = (Button)type.GetField("saveButton", fields)!.GetValue(overridden)!;
+            if (primary.Text != "验证环境变量连接" || changed.GetValue(overridden) is true ||
+                !AllChildren(overridden).OfType<LinkLabel>().Any(link => link.Text.Contains("打开配置目录修复")))
+                throw new Exception("External override and malformed config must offer separate verification and repair");
+        }
+        finally
+        {
+            Environment.SetEnvironmentVariable("ARTEX_CONFIG", previousConfig);
+            Environment.SetEnvironmentVariable("ARTEX_PG_DSN", previousDsn);
+            File.Delete(fixture);
+            File.Delete(fixture + ".new");
+        }
     }
 
     private static IEnumerable<Control> AllChildren(Control parent)

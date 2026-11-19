@@ -15,6 +15,7 @@ import { api } from "@/lib/api";
 import { useUiLocale, setUiLocale } from "@/lib/ui-locale.client";
 import { uiText } from "@/lib/ui-locale";
 import { auth } from "@/lib/auth";
+import { resolveSignInDestination } from "@/lib/auth-flow";
 
 export default function LoginPage() {
   const router = useRouter();
@@ -28,6 +29,8 @@ export default function LoginPage() {
   const [termsOpen, setTermsOpen] = useState(false);
   const [readToEnd, setReadToEnd] = useState(false);
   const termsBodyRef = useRef<HTMLDivElement>(null);
+  const mounted = useRef(false);
+  const submitPending = useRef(false);
 
   // Scroll to the bottom of the terms (including when everything fits without scrolling) to unlock "Agree".
   function handleTermsScroll() {
@@ -45,40 +48,61 @@ export default function LoginPage() {
   }, [termsOpen]);
 
   useEffect(() => {
-    // Already signed in — go straight to the main UI (static export has no middleware to do this redirect).
-    const token = auth.getToken();
-    if (token) {
-      // localStorage may still hold credentials while the cookie is gone. Sync first, then start a fresh request,
-      // so a server-side guard or route cache cannot bounce the redirect back to the login page still in its checking state.
-      auth.setToken(token);
-      void api.getLLM().then(state => window.location.replace(state.configured ? "/function/tasks" : "/welcome")).catch(() => window.location.replace("/welcome"));
-      return;
+    let canceled = false;
+    mounted.current = true;
+    async function check() {
+      try {
+        const token = auth.getToken();
+        if (token) {
+          // localStorage can outlive the cookie. Synchronize before navigating.
+          auth.setToken(token);
+          const destination = await resolveSignInDestination(token, auth.getToken, api.getLLM);
+          if (canceled) return;
+          if (destination) {
+            window.location.replace(destination);
+            return;
+          }
+          if (auth.getToken()) return; // A newer session owns navigation.
+        }
+        const { initialized } = await api.authStatus();
+        if (!canceled && !initialized && !auth.getToken()) router.replace("/setup");
+      } catch {
+        if (!canceled) setError("Unable to connect to the backend service");
+      } finally {
+        if (!canceled) setChecking(false);
+      }
     }
-    api
-      .authStatus()
-      .then(({ initialized }) => {
-        if (!initialized) router.replace("/setup");
-      })
-      .catch(() => setError("Unable to connect to the backend service"))
-      .finally(() => setChecking(false));
+    void check();
+    return () => { canceled = true; mounted.current = false; };
   }, [router]);
 
   async function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
+    if (submitPending.current) return;
     if (!agreed) {
       setError("Please read and agree to the Terms of Use first");
       return;
     }
+    submitPending.current = true;
+    const previousToken = auth.getToken();
     setLoading(true);
     setError("");
     try {
       const { token } = await api.login("ARTEX", password);
+      if (!mounted.current || auth.getToken() !== previousToken) return;
       auth.setToken(token);
-      void api.getLLM().then(state => window.location.replace(state.configured ? "/function/tasks" : "/welcome")).catch(() => window.location.replace("/welcome"));
-    } catch {
-      setError("Incorrect username or password");
+      const destination = await resolveSignInDestination(token, auth.getToken, api.getLLM);
+      if (mounted.current && destination) window.location.replace(destination);
+      else if (mounted.current && !auth.getToken()) setError("Session expired. Sign in again.");
+    } catch (e) {
+      if (mounted.current) {
+        setError(e instanceof Error && e.message === "Incorrect username or password"
+          ? e.message
+          : "Unable to connect to the backend service");
+      }
     } finally {
-      setLoading(false);
+      submitPending.current = false;
+      if (mounted.current) setLoading(false);
     }
   }
 
@@ -146,7 +170,7 @@ export default function LoginPage() {
                 </button>
               </Label>
             </div>
-            {error && <p className="text-sm text-destructive">{({ "Unable to connect to the backend service": t("无法连接后端服务", "Unable to connect to the backend service"), "Please read and agree to the Terms of Use first": t("请先阅读并同意使用条款", "Please read and agree to the Terms of Use first"), "Incorrect username or password": t("用户名或密码错误", "Incorrect username or password") } as Record<string, string>)[error] ?? error}</p>}
+            {error && <p role="alert" className="text-sm text-destructive">{({ "Unable to connect to the backend service": t("无法连接后端服务", "Unable to connect to the backend service"), "Please read and agree to the Terms of Use first": t("请先阅读并同意使用条款", "Please read and agree to the Terms of Use first"), "Incorrect username or password": t("用户名或密码错误", "Incorrect username or password"), "Session expired. Sign in again.": t("会话已过期，请重新登录。", "Session expired. Sign in again.") } as Record<string, string>)[error] ?? error}</p>}
             <Button type="submit" className="w-full" disabled={loading || !password || !agreed}>
               {loading ? t("正在登录…", "Signing in...") : t("登录", "Sign in")}
             </Button>

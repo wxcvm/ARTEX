@@ -2,6 +2,7 @@ using System.Diagnostics;
 using System.Net;
 using System.Net.Sockets;
 using System.Reflection;
+using System.Text.Json.Nodes;
 using Artex.Desktop;
 
 internal static class Program
@@ -22,10 +23,71 @@ internal static class Program
     }
     private static T Field<T>(object record, string name) => (T)record.GetType().GetProperty(name)!.GetValue(record)!;
 
+    private static async Task CheckConfigurationRecovery()
+    {
+        var setup = Desktop.GetType("Artex.Desktop.DatabaseSetupForm", true)!;
+        var resolve = setup.GetMethod("ResolveConfigPath", BindingFlags.Static | BindingFlags.NonPublic)!;
+        var fixture = Path.Combine(Path.GetTempPath(), "ARTEX-config-test-" + Guid.NewGuid().ToString("N"));
+        var launch = Path.Combine(fixture, "launcher");
+        var install = Path.Combine(fixture, "program");
+        var config = Path.Combine(launch, "settings", "local.json");
+        Check((string)resolve.Invoke(null, ["  settings/local.json  ", launch, install])! == config,
+            "Relative override must resolve once against desktop launch directory");
+        Check((string)resolve.Invoke(null, [config, install, install])! == config,
+            "An absolute override must survive the backend's different working directory");
+        Check((string)resolve.Invoke(null, [null, launch, install])! == Path.Combine(install, "config.json"),
+            "No override must still mean config beside the desktop");
+
+        var database = setup.GetMethod("ReadDatabaseObject", BindingFlags.Static | BindingFlags.NonPublic)!;
+        foreach (var input in new[] { "{\"skill_dir\":\"keep-me\"}", "{\"skill_dir\":\"keep-me\",\"database\":null}" })
+        {
+            var root = JsonNode.Parse(input)!.AsObject();
+            Check(database.Invoke(null, [root, false]) is null, "Missing database must not prevent opening repair");
+            var created = (JsonObject)database.Invoke(null, [root, true])!;
+            created["port"] = 5432;
+            Check(root["skill_dir"]!.GetValue<string>() == "keep-me", "Other config options must survive database setup");
+            Check(ReferenceEquals(root["database"], created), "New database settings must be attached to saved config");
+        }
+        var wrongType = JsonNode.Parse("{\"database\":[]}")!.AsObject();
+        try { database.Invoke(null, [wrongType, true]); throw new Exception("Invalid database config was replaced"); }
+        catch (TargetInvocationException ex) when (ex.InnerException is InvalidDataException) { }
+        Check(wrongType["database"] is JsonArray, "Invalid database config must remain intact");
+
+        var clusterRoot = Manager.GetProperty("Root", BindingFlags.Static | BindingFlags.NonPublic)!;
+        var originalRoot = clusterRoot.GetValue(null);
+        var manifest = Path.Combine(fixture, "cluster.dpapi");
+        Directory.CreateDirectory(fixture);
+        try
+        {
+            File.WriteAllText(manifest, "not a DPAPI manifest");
+            clusterRoot.SetValue(null, fixture);
+            await (Task)Call("EnsureForConfigurationAsync",
+                "postgresql://test@example.invalid:15432/test", CancellationToken.None)!;
+            await (Task)Call("EnsureForConfigurationAsync",
+                "postgresql://test@127.0.0.1:5432/test", CancellationToken.None)!;
+            Check(File.ReadAllText(manifest) == "not a DPAPI manifest", "External connections modified managed metadata");
+        }
+        finally
+        {
+            clusterRoot.SetValue(null, originalRoot);
+            File.Delete(manifest);
+            Directory.Delete(fixture);
+        }
+    }
+
     private static async Task<int> Main(string[] args)
     {
         try
         {
+            // Start-Process -Credential may inherit the elevated runner's TEMP.
+            // Use the ACL-scoped CI staging directory before launching any child.
+            if (args.Length > 1)
+            {
+                var scratch = Path.Combine(Path.GetDirectoryName(Path.GetFullPath(args[1]))!, "temp-" + Guid.NewGuid().ToString("N"));
+                Directory.CreateDirectory(scratch);
+                Environment.SetEnvironmentVariable("TEMP", scratch);
+                Environment.SetEnvironmentVariable("TMP", scratch);
+            }
             var bridge = Desktop.GetType("Artex.Desktop.SetupTokenBridge", true)!.GetMethod("IsSetupDocument", BindingFlags.Static | BindingFlags.NonPublic)!;
             var route = Desktop.GetType("Artex.Desktop.SetupTokenBridge", true)!.GetMethod("InitialRoute", BindingFlags.Static | BindingFlags.NonPublic)!;
             Check((string)route.Invoke(null, [false])! == "/setup/", "A cached browser login must not skip initial-password setup for a new database");
@@ -42,7 +104,8 @@ internal static class Program
                 Check((int)Call("ChoosePort")! > 15432, "Occupied port reused");
             }
             finally { listener.Stop(); }
-            Console.WriteLine("Setup-token route boundary and occupied-port tests passed.");
+            await CheckConfigurationRecovery();
+            Console.WriteLine("Setup-token boundary, occupied-port and configuration recovery tests passed.");
             if (args.Length == 0) return 0;
             var backend = Path.GetFullPath(args[0]);
             var root = args.Length > 1 ? Path.GetFullPath(args[1]) : Path.Combine(Path.GetTempPath(), "ARTEX 引导测试 " + Guid.NewGuid().ToString("N"));

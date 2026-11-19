@@ -56,6 +56,7 @@ test("contextual help links resolve to real section or subsection headings in th
     [...manual.matchAll(/^#{2,3} (.+)\r?$/gm)].map((match) => guideSlug(match[1])),
   );
   for (const path of [
+    "/welcome",
     "/function/tasks", "/function/tasks/detail", "/system/llm", "/system/skills",
     "/system/mcp", "/system/agents", "/system/tools", "/system/settings",
     "/system/logs", "/function/traffic", "/function/assets", "/function/findings",
@@ -68,7 +69,7 @@ test("contextual help links resolve to real section or subsection headings in th
   }
   assert.equal(guideHref("/chat"), "/help/");
   for (const heading of [
-    "1. 快速选择安装方式", "5.1 创建模型 Profile", "6.1 创建任务",
+    "0. 新手四步引导", "1. 快速选择安装方式", "5.1 创建模型 Profile", "6.1 创建任务",
     "6.3 任务详情页逐项看", "8.2 从 Findings 批量导出",
   ]) {
     assert.ok(headingIds.has(guideSlug(heading)), "quick start has no target: " + heading);

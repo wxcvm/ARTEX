@@ -41,7 +41,7 @@ foreach ($button in @('detectLocal','startLocal','installLocal','create','provis
 foreach ($fixed in @('Width = 94, Height = 30', 'Width = 112, Height = 30', 'Width = 140, Height = 30', 'Width = 135, Height = 30')) {
     if ($source.Contains($fixed)) { throw "Database setup regression: fixed-size action label still exists ($fixed)" }
 }
-Require 'ActiveControl = quickMode.Checked ? saveButton : host;' 'Recommended setup must focus the visible primary action'
+Require 'ActiveControl = customMode.Checked && !HasDsnOverride ? host : saveButton;' 'Recommended and environment override setup must focus the visible primary action'
 Require 'scroll.AutoScrollPosition = Point.Empty;' 'Wizard must begin with the introduction visible'
 Require 'BeginInvoke((Action)(() =>' 'Restore top scroll after the initial focus/layout pass'
 
