@@ -4,6 +4,8 @@
 // are passed through and formatted at the call site.
 
 import type { ChatMention } from "@/lib/chat-mentions";
+import { auth } from "@/lib/auth";
+import { shouldClearSession } from "@/lib/auth-flow";
 import { downloadFilename } from "@/lib/download-filename";
 import { MOCK } from "@/lib/mock/enabled";
 import { mockHandle } from "@/lib/mock/handler";
@@ -138,16 +140,8 @@ export async function http<T>(path: string, init?: RequestInit): Promise<T> {
       ...(init?.headers as Record<string, string> | undefined),
     },
   });
-  if (r.status === 401) {
-    if (typeof window !== "undefined") {
-      localStorage.removeItem("artex_token");
-      document.cookie = "artex_token=; path=/; max-age=0";
-      window.location.href = "/login";
-    }
-    throw new Error("Unauthorized");
-  }
   if (!r.ok) {
-    const fallback = `${init?.method ?? "GET"} ${path}: ${r.status}`;
+    const fallback = r.status === 401 ? "Unauthorized" : `${init?.method ?? "GET"} ${path}: ${r.status}`;
     let message = fallback;
     try {
       const payload = (await r.json()) as { error?: unknown };
@@ -156,6 +150,14 @@ export async function http<T>(path: string, init?: RequestInit): Promise<T> {
       }
     } catch {
       // Keep the status-based fallback for empty or non-JSON error responses.
+    }
+    if (typeof window !== "undefined" && shouldClearSession(path, r.status, message, token, getToken())) {
+      auth.clearToken();
+      // A cached session can expire while the sign-in page is checking it.
+      // Stay on the same page so it can continue with the fresh login form.
+      if (window.location.pathname !== "/login" && window.location.pathname !== "/login/") {
+        window.location.href = "/login";
+      }
     }
     throw new Error(message);
   }

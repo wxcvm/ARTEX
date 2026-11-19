@@ -18,6 +18,8 @@ internal static class ManagedPostgres
     private static string Manifest => Path.Combine(Root, "cluster.dpapi");
     private static string Data => Path.Combine(Root, "data");
     private static readonly SemaphoreSlim Gate = new(1, 1);
+    private const int FirstManagedPort = 15432;
+    private const int LastManagedPort = 15442;
     private static bool startedHere;
     [System.Runtime.InteropServices.DllImport("kernel32.dll", CharSet = System.Runtime.InteropServices.CharSet.Unicode, SetLastError = true)]
     private static extern uint GetShortPathName(string path, StringBuilder buffer, uint length);
@@ -122,8 +124,12 @@ internal static class ManagedPostgres
 
     internal static async Task EnsureForConfigurationAsync(string dsn, CancellationToken cancel)
     {
+        // A remote or ordinary local database doesn't depend on ARTEX's
+        // optional managed cluster, even if its manifest is unreadable.
+        if (!Uri.TryCreate(dsn, UriKind.Absolute, out var uri) || uri.Host != "127.0.0.1" ||
+            uri.Port is < FirstManagedPort or > LastManagedPort) return;
         var c = ReadManifest();
-        if (c is null || !Uri.TryCreate(dsn, UriKind.Absolute, out var uri) || uri.Host != "127.0.0.1" || uri.Port != c.Port) return;
+        if (c is null || uri.Port != c.Port) return;
         await Gate.WaitAsync(cancel);
         try { await EnsureStartedCoreAsync(c, cancel); }
         finally { Gate.Release(); }
@@ -153,7 +159,7 @@ internal static class ManagedPostgres
 
     internal static int ChoosePort()
     {
-        for (var port = 15432; port <= 15442; port++)
+        for (var port = FirstManagedPort; port <= LastManagedPort; port++)
         {
             var listener = new TcpListener(IPAddress.Loopback, port);
             try { listener.Start(); return port; }

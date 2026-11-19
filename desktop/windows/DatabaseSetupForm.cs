@@ -11,14 +11,32 @@ namespace Artex.Desktop;
 // outside the edited database fields are preserved when saving.
 internal sealed class DatabaseSetupForm : Form
 {
+    private static readonly string LaunchDirectory = Environment.CurrentDirectory;
+
     internal static string ConfigPath
     {
-        get
+        get => ResolveConfigPath(Environment.GetEnvironmentVariable("ARTEX_CONFIG"),
+            LaunchDirectory, AppContext.BaseDirectory);
+    }
+
+    internal static string ResolveConfigPath(string? configured, string launchDirectory, string appDirectory) =>
+        !string.IsNullOrWhiteSpace(configured)
+            ? Path.GetFullPath(configured.Trim(), launchDirectory)
+            : Path.Combine(appDirectory, "config.json");
+
+    internal static void OpenConfigFolder()
+    {
+        try
         {
-            var custom = Environment.GetEnvironmentVariable("ARTEX_CONFIG");
-            return !string.IsNullOrWhiteSpace(custom)
-                ? Path.GetFullPath(custom.Trim())
-                : Path.Combine(AppContext.BaseDirectory, "config.json");
+            var directory = Path.GetDirectoryName(ConfigPath);
+            while (directory is not null && !Directory.Exists(directory))
+                directory = Path.GetDirectoryName(directory);
+            if (directory is not null)
+                Process.Start(new ProcessStartInfo(directory) { UseShellExecute = true });
+        }
+        catch (Exception ex) when (ex is IOException or UnauthorizedAccessException or ArgumentException or System.ComponentModel.Win32Exception)
+        {
+            MessageBox.Show("无法打开配置目录：" + ex.Message, "数据库配置", MessageBoxButtons.OK, MessageBoxIcon.Warning);
         }
     }
 
@@ -52,6 +70,10 @@ internal sealed class DatabaseSetupForm : Form
     private readonly CancellationTokenSource discoveryLifetime = new();
     private readonly HashSet<Keys> passwordKeysHeld = new();
     private readonly bool editExisting;
+    private readonly Func<IWin32Window, bool>? confirmSave;
+    private string? configurationLoadError;
+    private (string Host, string Port, string User, string Password, string Database, string Ssl)? loadedInputs;
+    internal bool ConfigurationChanged { get; private set; }
     private Control? editableContent;
     private static bool HasDsnOverride =>
         !string.IsNullOrWhiteSpace(Environment.GetEnvironmentVariable("ARTEX_PG_DSN"));
@@ -59,7 +81,7 @@ internal sealed class DatabaseSetupForm : Form
     {
         AutoSize = true, ForeColor = Color.FromArgb(251, 198, 112),
         Margin = new Padding(0, 0, 0, 14),
-        Text = "检测到 ARTEX_PG_DSN 环境变量：它优先于向导保存的连接。请修改或移除该环境变量并重新启动 ARTEX，保存到配置文件的连接才会生效。",
+        Text = "当前连接由 ARTEX_PG_DSN 环境变量指定。本页仅验证该连接，不会修改配置文件。如需改用文件配置，请移除环境变量并重新启动 ARTEX。",
     };
     private readonly RadioButton quickMode = new()
     {
@@ -73,9 +95,12 @@ internal sealed class DatabaseSetupForm : Form
     };
     private readonly Button saveButton = new() { Text = "初始化并连接" };
 
-    internal DatabaseSetupForm(bool editExisting = false)
+    internal DatabaseSetupForm(bool editExisting = false) : this(editExisting, confirmSave: null) { }
+
+    internal DatabaseSetupForm(bool editExisting, Func<IWin32Window, bool>? confirmSave)
     {
         this.editExisting = editExisting && File.Exists(ConfigPath);
+        this.confirmSave = confirmSave;
         editExisting = this.editExisting;
         Text = editExisting ? "ARTEX · 数据库设置" : "ARTEX · 快速开始";
         if (!editExisting) user.Text = "postgres";
@@ -148,6 +173,7 @@ internal sealed class DatabaseSetupForm : Form
         };
         quickMode.Checked = !HasDsnOverride;
         customMode.Checked = HasDsnOverride;
+        quickMode.Enabled = customMode.Enabled = !HasDsnOverride;
         quickMode.ForeColor = Color.FromArgb(156, 195, 255);
         customMode.ForeColor = Color.FromArgb(218, 231, 248);
         quickMode.Margin = new Padding(0, 5, 28, 5);
@@ -279,13 +305,14 @@ internal sealed class DatabaseSetupForm : Form
         var advancedRows = new[] { 1, 2, 3, 4, 5, 6, 7, 9, 10 };
         void UpdateMode()
         {
-            var advanced = customMode.Checked;
+            var overridden = HasDsnOverride;
+            var advanced = customMode.Checked && !overridden;
             foreach (var row in advancedRows)
                 foreach (Control control in layout.Controls)
                     if (layout.GetPositionFromControl(control).Row == row)
-                        control.Visible = advanced;
+                        control.Visible = advanced || (overridden && row == 9);
             test.Visible = advanced;
-            save.Text = advanced ? "验证并保存连接" : "自动准备本机数据库";
+            save.Text = overridden ? "验证环境变量连接" : advanced ? "验证并保存连接" : "自动准备本机数据库";
             var passwordLabel = layout.GetControlFromPosition(0, 4);
             if (passwordLabel != null) passwordLabel.Text = advanced ? "数据库密码" : "postgres 管理员密码";
         }
@@ -330,6 +357,12 @@ internal sealed class DatabaseSetupForm : Form
 
         var helpPanel = new FlowLayoutPanel { AutoSize = true, Dock = DockStyle.Top,
             FlowDirection = FlowDirection.TopDown, WrapContents = false };
+        var configRecovery = new LinkLabel
+        {
+            Text = "配置文件无法读取，未修改 · 打开配置目录修复", AutoSize = true,
+            LinkColor = Color.FromArgb(251, 198, 112), Visible = false,
+        };
+        configRecovery.LinkClicked += (_, _) => OpenConfigFolder();
         var helpToggle = new LinkLabel { Text = "详细指南：用途、操作、安装选项和报错处理", AutoSize = true, LinkColor = Color.LightSkyBlue };
         var guide = new TextBox { ReadOnly = true, Multiline = true, ScrollBars = ScrollBars.Vertical,
             Width = 680, Height = 330, Visible = false, BackColor = BackColor, ForeColor = ForeColor,
@@ -345,12 +378,13 @@ internal sealed class DatabaseSetupForm : Form
         var quickInstall = new Button { Text = "安装 PostgreSQL" };
         ConfigureActionButton(quickInstall, 150);
         quickInstall.Click += (_, _) => InstallPostgreSQL();
-        quickInstall.Visible = ManagedPostgres.FindBinaries() is null;
+        quickInstall.Visible = !HasDsnOverride && ManagedPostgres.FindBinaries() is null;
         Activated += async (_, _) => {
             if (IsDisposed || !quickInstall.Visible || ManagedPostgres.FindBinaries() is null) return;
             quickInstall.Visible = false;
             if (saveButton.Enabled) await SetupAndSaveAsync();
         };
+        helpPanel.Controls.Add(configRecovery);
         helpPanel.Controls.Add(quickInstall);
         helpPanel.Controls.Add(helpToggle);
         helpPanel.Controls.Add(guide);
@@ -379,12 +413,21 @@ internal sealed class DatabaseSetupForm : Form
                 work.Left + (work.Width - Width) / 2,
                 work.Top + (work.Height - Height) / 2);
         };
-        if (editExisting && File.Exists(ConfigPath)) LoadExistingConfiguration();
+        if (editExisting)
+        {
+            try { LoadExistingConfiguration(); }
+            catch (Exception ex) when (ex is JsonException or IOException or InvalidDataException or UnauthorizedAccessException)
+            {
+                configurationLoadError = "无法读取现有配置，未修改该文件。请打开配置目录修复后重新进入引导。";
+                configRecovery.Visible = true;
+                configRecovery.AccessibleDescription = configurationLoadError;
+            }
+        }
         Shown += async (_, _) =>
         {
             // WinForms scrolls to the first focused input on opening. Restore
             // the first explanatory row after focus and initial layout settle.
-            ActiveControl = quickMode.Checked ? saveButton : host;
+            ActiveControl = customMode.Checked && !HasDsnOverride ? host : saveButton;
             scroll.AutoScrollPosition = Point.Empty;
             BeginInvoke((Action)(() =>
             {
@@ -531,9 +574,18 @@ internal sealed class DatabaseSetupForm : Form
             var backend = Path.Combine(AppContext.BaseDirectory, "artex.exe");
             if (HasDsnOverride)
             {
-                await ManagedPostgres.RunAsync(backend, ["-check-db"], discoveryLifetime.Token);
-                discoveryStatus.Text = "环境变量指定的连接已验证；未保存无效的覆盖配置。";
+                if (!await CheckConfiguredAsync(discoveryLifetime.Token))
+                {
+                    discoveryStatus.Text = "无法连接 ARTEX_PG_DSN 指定的数据库。请检查连接并在修改环境变量后重新启动。";
+                    return;
+                }
+                discoveryStatus.Text = "环境变量指定的连接已验证，未修改配置文件。";
                 DialogResult = DialogResult.OK; Close(); return;
+            }
+            if (configurationLoadError is { } error)
+            {
+                discoveryStatus.Text = error;
+                return;
             }
             if (quickMode.Checked)
             {
@@ -552,6 +604,15 @@ internal sealed class DatabaseSetupForm : Form
             }
             else
             {
+                // Still validate the saved configuration for an unchanged form,
+                // but keep its original DSN/options and do not restart the backend.
+                if (loadedInputs == InputValues())
+                {
+                    if (await CheckConfiguredAsync(discoveryLifetime.Token))
+                    { DialogResult = DialogResult.OK; Close(); return; }
+                    discoveryStatus.Text = "现有配置无法连接，未修改原连接和附加参数。请检查数据库服务，或修改连接后再保存。";
+                    return;
+                }
                 var dsn = CurrentDsn(); if (dsn is null) return;
                 await ManagedPostgres.EnsureForConfigurationAsync(dsn, discoveryLifetime.Token);
                 await ManagedPostgres.RunAsync(backend, ["-check-db"], discoveryLifetime.Token,
@@ -563,7 +624,12 @@ internal sealed class DatabaseSetupForm : Form
         catch (Exception ex) { if (!IsDisposed) discoveryStatus.Text = "准备未完成：" + ex.Message; }
         finally
         {
-            if (!IsDisposed) { saveButton.Enabled = true; quickMode.Enabled = customMode.Enabled = true; if (editableContent is not null) editableContent.Enabled = true; }
+            if (!IsDisposed)
+            {
+                if (editableContent is not null) editableContent.Enabled = true;
+                saveButton.Enabled = true;
+                quickMode.Enabled = customMode.Enabled = !HasDsnOverride;
+            }
         }
     }
 
@@ -572,9 +638,10 @@ internal sealed class DatabaseSetupForm : Form
         var env = Environment.GetEnvironmentVariable("ARTEX_PG_DSN");
         if (!string.IsNullOrWhiteSpace(env)) return env;
         if (!File.Exists(ConfigPath)) return null;
-        var db = JsonNode.Parse(File.ReadAllText(ConfigPath))?["database"];
+        var db = ReadDatabaseObject(ReadConfigObject(ConfigPath));
         if (db is null) return null;
         if (!string.IsNullOrWhiteSpace(db["dsn"]?.ToString())) return db["dsn"]!.ToString();
+        if (!HasDatabaseConnection(db)) return null;
         var builder = new UriBuilder("postgres", db["host"]?.ToString() ?? "127.0.0.1",
             int.TryParse(db["port"]?.ToString(), out var p) ? p : 5432, db["dbname"]?.ToString() ?? "artex")
         { UserName = Uri.EscapeDataString(db["user"]?.ToString() ?? "artex"), Password = Uri.EscapeDataString(db["password"]?.ToString() ?? ""),
@@ -586,10 +653,12 @@ internal sealed class DatabaseSetupForm : Form
     {
         try
         {
-            var dsn = ConfiguredDsn(); if (dsn is null) return false;
-            await ManagedPostgres.EnsureForConfigurationAsync(dsn, cancel);
+            // Use the UI's parse only to identify its own cluster. The child
+            // validates the real configuration using the same parser as startup.
+            if (ConfiguredDsn() is { } dsn)
+                await ManagedPostgres.EnsureForConfigurationAsync(dsn, cancel);
             await ManagedPostgres.RunAsync(Path.Combine(AppContext.BaseDirectory, "artex.exe"), ["-check-db"], cancel,
-                new() { ["ARTEX_PG_DSN"] = dsn }, secrets: [dsn]);
+                new() { ["ARTEX_CONFIG"] = ConfigPath });
             return true;
         }
         catch (OperationCanceledException) when (cancel.IsCancellationRequested) { throw; }
@@ -788,18 +857,54 @@ internal sealed class DatabaseSetupForm : Form
         }
     }
 
+    private (string Host, string Port, string User, string Password, string Database, string Ssl) InputValues() =>
+        (host.Text.Trim(), port.Text.Trim(), user.Text.Trim(), password.Text, database.Text.Trim(), sslMode.Text.Trim());
+
+    private static bool HasDatabaseConnection(JsonObject database) =>
+        new[] { "dsn", "host", "user", "dbname" }
+            .Any(key => database[key] is JsonValue value &&
+                value.TryGetValue<string>(out var text) && !string.IsNullOrWhiteSpace(text));
+
+    internal static JsonObject ReadConfigObject(string path) =>
+        JsonNode.Parse(File.ReadAllText(path)) as JsonObject
+        ?? throw new InvalidDataException("config.json 必须是有效的 JSON 对象。");
+
+    internal static JsonObject? ReadDatabaseObject(JsonObject root, bool createIfMissing = false)
+    {
+        if (root["database"] is JsonObject database) return database;
+        if (root["database"] is not null)
+            throw new InvalidDataException("config.json 的 database 字段应为 JSON 对象。");
+        if (!createIfMissing) return null;
+        database = new JsonObject();
+        root["database"] = database;
+        return database;
+    }
+
+    internal static bool HasConfiguredKnowledgeDirectory(string path)
+    {
+        try
+        {
+            return ReadConfigObject(path)["knowledge_dir"] is JsonValue value &&
+                value.TryGetValue<string>(out var directory) && !string.IsNullOrWhiteSpace(directory);
+        }
+        catch (Exception ex) when (ex is JsonException or IOException or InvalidDataException or UnauthorizedAccessException)
+        {
+            // ARTEX_PG_DSN can make an independent backend usable even when
+            // JSON configuration is absent or invalid. KB lookup is optional.
+            return false;
+        }
+    }
+
     private void LoadExistingConfiguration()
     {
-        var json = JsonNode.Parse(File.ReadAllText(ConfigPath)) as JsonObject
-            ?? throw new InvalidDataException("config.json 必须是有效的 JSON 对象。");
-        var db = json["database"] as JsonObject
-            ?? throw new InvalidDataException("config.json 的 database 字段应为 JSON 对象。");
+        var db = ReadDatabaseObject(ReadConfigObject(ConfigPath));
+        if (db is null) return;
 
         var dsn = db["dsn"]?.ToString();
         if (!string.IsNullOrWhiteSpace(dsn) && Uri.TryCreate(dsn, UriKind.Absolute, out var uri))
         {
             host.Text = uri.Host;
-            port.Text = uri.Port.ToString();
+            port.Text = (uri.IsDefaultPort ? 5432 : uri.Port).ToString();
             var credentials = uri.UserInfo.Split(':', 2);
             user.Text = Uri.UnescapeDataString(credentials[0]);
             if (credentials.Length == 2) password.Text = Uri.UnescapeDataString(credentials[1]);
@@ -817,6 +922,7 @@ internal sealed class DatabaseSetupForm : Form
             database.Text = db["dbname"]?.ToString() ?? database.Text;
             sslMode.Text = db["sslmode"]?.ToString() ?? sslMode.Text;
         }
+        if (HasDatabaseConnection(db)) loadedInputs = InputValues();
     }
 
     private static void AddField(TableLayoutPanel layout, int row, string name, TextBox field)
@@ -855,6 +961,7 @@ internal sealed class DatabaseSetupForm : Form
         try
         {
             var path = ConfigPath;
+            if (confirmSave?.Invoke(this) == false) return;
             Directory.CreateDirectory(Path.GetDirectoryName(Path.GetFullPath(path))!);
             if (!editExisting || !File.Exists(path))
             {
@@ -874,10 +981,8 @@ internal sealed class DatabaseSetupForm : Form
                 // Preserve all other settings (skill_dir and future extensions).
                 // A previous database.dsn takes precedence over component fields;
                 // remove that key when the operator replaces the connection here.
-                var root = JsonNode.Parse(File.ReadAllText(path)) as JsonObject
-                    ?? throw new InvalidDataException("配置文件内容不是 JSON 对象。");
-                var dbNode = root["database"] as JsonObject
-                    ?? throw new InvalidDataException("配置文件的 database 字段不是 JSON 对象。");
+                var root = ReadConfigObject(path);
+                var dbNode = ReadDatabaseObject(root, createIfMissing: true)!;
                 dbNode.Remove("dsn");
                 dbNode["host"] = hostname;
                 dbNode["port"] = portNumber;
@@ -889,11 +994,7 @@ internal sealed class DatabaseSetupForm : Form
                 File.WriteAllText(tmp, root.ToJsonString(new JsonSerializerOptions { WriteIndented = true }) + "\n");
                 File.Move(tmp, path, overwrite: true);
             }
-            if (HasDsnOverride)
-                MessageBox.Show(this,
-                    "数据库连接已保存到配置文件，但当前 ARTEX_PG_DSN 环境变量仍优先于该文件。"
-                    + "\n请修改或移除该变量并重新启动 ARTEX，否则程序仍会使用原来的连接。",
-                    "环境变量优先", MessageBoxButtons.OK, MessageBoxIcon.Information);
+            ConfigurationChanged = true;
             DialogResult = DialogResult.OK;
             Close();
         }
