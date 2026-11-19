@@ -79,6 +79,15 @@ internal static class Program
     {
         try
         {
+            // Start-Process -Credential may inherit the elevated runner's TEMP.
+            // Use the ACL-scoped CI staging directory before launching any child.
+            if (args.Length > 1)
+            {
+                var scratch = Path.Combine(Path.GetDirectoryName(Path.GetFullPath(args[1]))!, "temp-" + Guid.NewGuid().ToString("N"));
+                Directory.CreateDirectory(scratch);
+                Environment.SetEnvironmentVariable("TEMP", scratch);
+                Environment.SetEnvironmentVariable("TMP", scratch);
+            }
             var bridge = Desktop.GetType("Artex.Desktop.SetupTokenBridge", true)!.GetMethod("IsSetupDocument", BindingFlags.Static | BindingFlags.NonPublic)!;
             var route = Desktop.GetType("Artex.Desktop.SetupTokenBridge", true)!.GetMethod("InitialRoute", BindingFlags.Static | BindingFlags.NonPublic)!;
             Check((string)route.Invoke(null, [false])! == "/setup/", "A cached browser login must not skip initial-password setup for a new database");
