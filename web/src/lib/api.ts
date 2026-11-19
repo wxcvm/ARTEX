@@ -129,6 +129,13 @@ function getToken(): string | null {
   return localStorage.getItem("artex_token");
 }
 
+export class ApiResponseError extends Error {
+  constructor(readonly status: number, message: string) {
+    super(message);
+    this.name = "ApiResponseError";
+  }
+}
+
 export async function http<T>(path: string, init?: RequestInit): Promise<T> {
   if (MOCK) return mockHandle<T>(init?.method ?? "GET", path, init?.body ?? null);
   const token = getToken();
@@ -159,7 +166,7 @@ export async function http<T>(path: string, init?: RequestInit): Promise<T> {
         window.location.href = "/login";
       }
     }
-    throw new Error(message);
+    throw new ApiResponseError(r.status, message);
   }
   if (r.status === 204) return undefined as T;
   return r.json();
@@ -611,6 +618,20 @@ export const api = {
   // ---- exploration (per task) ----
   frontier: (task?: string) => get<TaskNode[]>(`/exploration/frontier${tq(task)}`).then(arr),
   findings: (task?: string) => get<Finding[]>(`/exploration/findings${tq(task)}`).then(arr),
+  remediationList: (filters: { stage?: string; severity?: string; q?: string; page?: number; limit?: number }) => {
+    const q = new URLSearchParams();
+    if (filters.stage) q.set("stage", filters.stage);
+    if (filters.severity) q.set("severity", filters.severity);
+    if (filters.q) q.set("q", filters.q);
+    q.set("page", String(filters.page ?? 1));
+    q.set("limit", String(filters.limit ?? 25));
+    return get<import("./types").RemediationList>(`/remediation?${q}`);
+  },
+  remediationDetail: (id: string, before?: number) => get<import("./types").RemediationDetail>(
+    `/exploration/findings/${encodeURIComponent(id)}/remediation${before === undefined ? "" : `?before=${before}`}`,
+  ),
+  addRemediationEvent: (id: string, input: import("./types").RemediationMutation) =>
+    post<import("./types").RemediationDetail>(`/exploration/findings/${encodeURIComponent(id)}/remediation/events`, input),
   findingsPage: (q: FindingQuery) => {
     const p = findingFilterParams(q);
     p.set("page", String(q.page));

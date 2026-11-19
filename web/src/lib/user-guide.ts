@@ -67,6 +67,8 @@ const helpSections: readonly [prefix: string, heading: string][] = [
   ["/function/traffic", "7.2 Traffic：流量记录"],
   ["/function/assets", "7.1 Assets：资产图谱与范围"],
   ["/function/findings", "7.3 Findings：漏洞记录与证据"],
+  ["/function/remediation", "7.5 复核与修复工作台"],
+  ["/system/reports", "8.3 报告中心：查找与重试"],
   ["/function/sync", "7.1 Assets：资产图谱与范围"],
 ];
 

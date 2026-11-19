@@ -97,6 +97,7 @@ const traditionalText: Record<string, string> = {
   "上一页": "上一頁",
   "下一页": "下一頁",
   "报告中心": "報告中心",
+  "整改工作台": "改善工作臺",
   "集中管理任务已保存的报告与可复用模板。已归档任务的报告随归档保存，恢复后会重新出现在这里。": "集中管理任務已儲存的報告與可重複使用的範本。已封存任務的報告隨封存儲存，還原後會重新出現在此處。",
   "历史报告": "歷史報告",
   "报告名、任务名、模板或任务编号": "報告名稱、任務名稱、範本或任務編號",
@@ -164,7 +165,7 @@ const traditionalNavigation: Record<string, string> = {
 
 const englishNavigation: Record<string, string> = {
   dashboard: "Overview", chat: "Chat", tasks: "Tasks", findings: "Findings",
-  reports: "Report center", traffic: "Traffic records", commands: "Tool execution", "llm-records": "Model records",
+  remediation: "Remediation workbench", reports: "Report center", traffic: "Traffic records", commands: "Tool execution", "llm-records": "Model records",
   assets: "Assets", sync: "Asset sync", workspace: "Workspace",
   welcome: "Getting started / Setup", knowledge: "Knowledge base", llm: "Model configuration",
   agents: "Agents", mcp: "MCP servers", skills: "Skills", tools: "Tool management",

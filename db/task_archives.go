@@ -588,6 +588,8 @@ func (d *DB) snapshotTaskArchive(taskID int64, llmRecords io.Writer) (*TaskArchi
 		{"task_scope", `SELECT * FROM task_scope WHERE task_id=$1 ORDER BY id`, []any{taskID}},
 		{"coverage_ledger", `SELECT * FROM coverage_ledger WHERE task_id=$1 ORDER BY risk_area,surface`, []any{taskID}},
 		{"findings", `SELECT * FROM findings WHERE task_id=$1 ORDER BY id`, []any{taskID}},
+		{"finding_remediations", `SELECT r.* FROM finding_remediations r JOIN findings f ON f.id=r.finding_id WHERE f.task_id=$1 ORDER BY r.finding_id`, []any{taskID}},
+		{"finding_remediation_events", `SELECT e.* FROM finding_remediation_events e JOIN findings f ON f.id=e.finding_id WHERE f.task_id=$1 ORDER BY e.finding_id,e.version`, []any{taskID}},
 		{"finding_traffic_bindings", `SELECT b.* FROM finding_traffic_bindings b JOIN findings f ON f.id=b.finding_id WHERE f.task_id=$1 ORDER BY b.finding_id,b.position,b.id`, []any{taskID}},
 		{"finding_screenshots", `SELECT s.* FROM finding_screenshots s JOIN findings f ON f.id=s.finding_id WHERE f.task_id=$1 ORDER BY s.finding_id,s.position NULLS LAST,s.created_at,s.id`, []any{taskID}},
 		{"finding_reproduction_steps", `SELECT s.* FROM finding_reproduction_steps s JOIN findings f ON f.id=s.finding_id WHERE f.task_id=$1 ORDER BY s.finding_id,s.position`, []any{taskID}},

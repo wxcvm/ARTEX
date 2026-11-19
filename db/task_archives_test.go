@@ -197,7 +197,13 @@ VALUES($1,$2,0,'quota_exhausted','balance exhausted',$3,$4,$3)`, task.ID, llmPro
 	}); err != nil {
 		t.Fatal(err)
 	}
-	if _, err := d.AddFinding(task.ID, nodeID, vulnclass, "archive finding", SeverityCritical, "summary", "evidence", "worker", []int64{assetID}); err != nil {
+	findingID, err := d.AddFinding(task.ID, nodeID, vulnclass, "archive finding", SeverityCritical, "summary", "evidence", "worker", []int64{assetID})
+	if err != nil {
+		t.Fatal(err)
+	}
+	findingKey := fmt.Sprint(findingID)
+	change := RemediationTransition{Action: "review", ExpectedVersion: remediationVersion(0), Actor: "ARTEX", Note: "Reviewed for archive fixture"}
+	if _, err := d.TransitionFindingRemediation(t.Context(), findingKey, change); err != nil {
 		t.Fatal(err)
 	}
 	archive, err := d.QueueTaskArchive(task.ID)
@@ -208,6 +214,10 @@ VALUES($1,$2,0,'quota_exhausted','balance exhausted',$3,$4,$3)`, task.ID, llmPro
 	if err != nil || claimed == nil || claimed.ID != archive.ID || claimed.State != Archiving {
 		t.Fatalf("claim = %+v, %v", claimed, err)
 	}
+	change.ExpectedVersion = remediationVersion(1)
+	if _, err := d.TransitionFindingRemediation(t.Context(), findingKey, change); !errors.Is(err, ErrRemediationReadOnly) {
+		t.Fatalf("queued archive allowed remediation writes: %v", err)
+	}
 	var llmRecords bytes.Buffer
 	snapshot, err := d.SnapshotTaskArchiveWithLLMRecords(task.ID, &llmRecords)
 	if err != nil {
@@ -215,6 +225,9 @@ VALUES($1,$2,0,'quota_exhausted','balance exhausted',$3,$4,$3)`, task.ID, llmPro
 	}
 	if snapshot.StreamedTables["llm_records"] != TaskArchiveLLMRecordsPath || snapshot.DataCounts["llm_records"] != 1 {
 		t.Fatalf("unexpected streamed LLM metadata: paths=%v counts=%v", snapshot.StreamedTables, snapshot.DataCounts)
+	}
+	if snapshot.DataCounts["finding_remediations"] != 1 || snapshot.DataCounts["finding_remediation_events"] != 1 {
+		t.Fatalf("archive omitted remediation history: %v", snapshot.DataCounts)
 	}
 	if rawRowCount(snapshot.Tables["llm_records"]) != 0 {
 		t.Fatal("streamed LLM records were also retained in manifest memory")
@@ -296,6 +309,11 @@ VALUES($1,$2,0,'quota_exhausted','balance exhausted',$3,$4,$3)`, task.ID, llmPro
 	}
 	if nodes < 2 || assets != 1 || usage != 1 {
 		t.Fatalf("restore incomplete nodes=%d assets=%d usage=%d", nodes, assets, usage)
+	}
+	restored, err := d.GetFindingRemediation(t.Context(), findingKey, 0)
+	if err != nil || restored.Item.Stage != remediationFix || restored.Item.Version != 1 ||
+		len(restored.Events) != 1 || restored.Events[0].Note != change.Note {
+		t.Fatalf("restored remediation: %+v (%v)", restored, err)
 	}
 	var restoredRawRequest, restoredRawResponse string
 	if err := d.QueryRow(`SELECT COALESCE(raw_request,''),COALESCE(raw_response,'') FROM llm_records WHERE task_id=$1`, fmt.Sprint(task.ID)).
