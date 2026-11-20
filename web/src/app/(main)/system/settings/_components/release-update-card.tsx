@@ -36,7 +36,8 @@ export function ReleaseUpdateCard(){
       <Button size="sm" variant="outline" disabled={busy} onClick={()=>void check()}>{busy?t("正在检查…","Checking…"):t("检查更新","Check for updates")}</Button>
       {error&&<p role="alert" className="break-words text-xs text-destructive">{error}</p>}
       {result&&<section className="space-y-2 rounded-md border p-3">
-        <p className="text-sm font-medium">{t("最新稳定版本：","Latest stable: ")}{result.latest}</p>
+        <p className="text-sm font-medium">{t("最新稳定版本：","Latest stable: ")}{result.latest}{result.source==="mirror"&&<span className="ml-2 rounded bg-muted px-1.5 py-0.5 text-[11px] text-muted-foreground">{t("社区镜像","mirror")}</span>}</p>
+        {result.note&&<p className="break-words text-xs text-muted-foreground">{result.note}</p>}
         <p className="text-xs text-muted-foreground">{!result.comparable?t("当前为开发或非标准版本，请手动确认。","Development or nonstandard build; compare manually."):result.has_update?t("有新版本可用。","An update is available."):t("当前已是最新稳定版或更新版本。","Current build is up to date or newer.")}</p>
         <a className="block text-sm text-primary underline" href={result.release_url} target="_blank" rel="noreferrer">{t("查看官方发布说明","Official release notes")}</a>
         {result.assets.map(asset=><a key={asset.name} href={asset.url} target="_blank" rel="noreferrer" className="block break-all text-xs text-primary underline">{asset.name} · {Math.max(0.01,asset.size/1048576).toFixed(2)} MiB</a>)}

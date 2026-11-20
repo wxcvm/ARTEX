@@ -4,6 +4,10 @@ All notable changes to this project are documented in this file. The format is b
 
 ## [Unreleased]
 
+### 修复
+
+- **更新检查链路兜底**：`GET /api/update/check` 在官方 GitHub API 不可达（403 限流 / TLS 重置 / 超时）时依次回退到社区镜像（可用 `ARTEX_RELEASE_API_MIRRORS` 自定义覆盖整条链路），首个健康端点命中即返回；响应新增 `source`（official/mirror）与 `note` 字段，前端"版本与更新"卡片展示镜像来源徽标与跳过的失败端点；全部端点失败时返回包含每个失败环节具体原因的 502，不再是无信息裸 502。仍为只读检查：不下载、不重启、不落盘。见 server/release_update.go。
+
 ## [0.6.0]
 
 ### 新增与增强

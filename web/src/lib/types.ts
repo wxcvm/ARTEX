@@ -1836,6 +1836,10 @@ export interface ReleaseUpdate {
   release_url: string;
   published_at: string;
   assets: {name:string;size:number;url:string}[];
+  /** official = api.github.com answered directly; mirror = community mirror answered after the official API failed. */
+  source?: string;
+  /** Explains fallback/failed hops, shown under the latest version. */
+  note?: string;
 }
 
 export interface ReportSection {
