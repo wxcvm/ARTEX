@@ -856,7 +856,12 @@ func unixNanoOrZero(t *time.Time) int64 {
 	return t.UnixNano()
 }
 
-func taskFromPG(pt *pgdb.Task, store *pgdb.ExplorationStore, ic *intercept.Interceptor) *Task {
+func taskFromPG(pt *pgdb.Task, store *pgdb.ExplorationStore, assets *pgdb.AssetStore, ic *intercept.Interceptor) *Task {
+	// Task-scope enforcement is installed here because this is where a task's
+	// guard is born and where both the task id and the asset store are in hand.
+	// The mode comes from ARTEX_SCOPE_MODE; see scope_wiring.go.
+	g := guard.NewWithInterceptor(ic)
+	g.UseScope(scopeModeFromEnv(), taskScopeSource(assets, pt.ID))
 	return &Task{
 		ID: strconv.FormatInt(pt.ID, 10), ExpID: pt.ExplorationID,
 		Name:       pt.Name,
@@ -875,7 +880,7 @@ func taskFromPG(pt *pgdb.Task, store *pgdb.ExplorationStore, ic *intercept.Inter
 		PlanQuietMode:   pt.PlanQuietMode,
 		CoverageEnabled: pt.CoverageEnabled,
 		FirstRunAt:      unixOrZero(pt.FirstRunAt), DeadlineAt: unixOrZero(pt.DeadlineAt),
-		Store: store, Guard: guard.NewWithInterceptor(ic), notify: make(chan struct{}, 1),
+		Store: store, Guard: g, notify: make(chan struct{}, 1),
 	}
 }
 
@@ -929,7 +934,7 @@ func (m *Manager) CreateTaskWithOptions(description, goal string, opts pgdb.Task
 	if err != nil {
 		return nil, err
 	}
-	t := taskFromPG(pt, m.pg.Exploration(pt.ExplorationID), m.interceptor)
+	t := taskFromPG(pt, m.pg.Exploration(pt.ExplorationID), m.assets, m.interceptor)
 	m.mu.Lock()
 	m.tasks[t.ID] = t
 	m.active = t.ID
@@ -1128,7 +1133,7 @@ func (m *Manager) LoadExisting() []*Task {
 		if _, ok := m.tasks[id]; ok {
 			continue
 		}
-		t := taskFromPG(pt, m.pg.Exploration(pt.ExplorationID), m.interceptor)
+		t := taskFromPG(pt, m.pg.Exploration(pt.ExplorationID), m.assets, m.interceptor)
 		m.tasks[id] = t
 		loaded = append(loaded, t)
 	}

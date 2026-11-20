@@ -1,10 +1,11 @@
 // Package guard implements the safety boundary layer (docs §11): an audit log,
-// user-configured intercept-rule evaluation, and Observer/G5 failure attribution.
-// Every tool call passes through the PreToolUse hook before executing.
-// (The RoE authorization-scope mechanism was removed; a replacement may be added
-// later.) Destructive/exfil gating is no longer hard-coded here — it lives in the
-// DB intercept rules (seeded as ordinary [built-in] rules, so users can disable or
-// delete them), evaluated via applyIntercept.
+// user-configured intercept-rule evaluation, Observer/G5 failure attribution, and
+// task-scope enforcement. Every tool call passes through the PreToolUse hook
+// before executing. Destructive/exfil gating is no longer hard-coded here — it
+// lives in the DB intercept rules (seeded as ordinary [built-in] rules, so users
+// can disable or delete them), evaluated via applyIntercept. The authorization
+// boundary is back as a code-level check rather than a prompt-level request: see
+// scope.go, which enforces the task_scope the planner registers via add_task_scope.
 package guard
 
 import (
@@ -22,7 +23,7 @@ import (
 type AuditEntry struct {
 	TS      int64  `json:"ts"`
 	Tool    string `json:"tool"`
-	Action  string `json:"action"` // allow|block
+	Action  string `json:"action"` // allow|block|warn (warn: scope violation, call proceeded)
 	Reason  string `json:"reason,omitempty"`
 	Command string `json:"command,omitempty"`
 }
@@ -34,6 +35,14 @@ type Guard struct {
 	attrib      map[string]int // failure attribution counts (Observer / G5)
 	reg         *hook.Registry
 	interceptor *intercept.Interceptor // optional; nil disables user-configured rules
+
+	// Task-scope enforcement (see scope.go). scopeSource is nil until UseScope is
+	// called, and scopeMode is ScopeOff by default, so a Guard that was never
+	// given a source behaves exactly like one built before this existed.
+	scopeMu     sync.Mutex
+	scopeMode   ScopeMode
+	scopeSource ScopeSource
+	scopeCache  scopeSnapshot
 }
 
 // New creates a Guard without user-configured intercept rules (used for pentest
@@ -75,6 +84,14 @@ func (g *Guard) preToolUse(ctx context.Context, ev hook.Event) hook.Result {
 		cmd = in.Text
 	}
 	result := g.applyIntercept(ctx, ev)
+	// The scope gate runs only after the intercept layer let the call through: an
+	// already-blocked call needs no second opinion, and the intercept reason stays
+	// the one recorded.
+	if result.Decision != "block" {
+		if blocked, isBlock := g.checkScope(ev.ToolName, cmd, ev.Input); isBlock {
+			result = blocked
+		}
+	}
 	g.recordToolDecision(ev.ToolName, cmd, result)
 	return result
 }
