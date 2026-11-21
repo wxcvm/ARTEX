@@ -4,6 +4,7 @@ import (
 	"math"
 	"sync"
 	"testing"
+	"time"
 )
 
 func TestBudgetJournalArithmeticGuard(t *testing.T) {
@@ -52,43 +53,47 @@ func TestBudgetJournalReserveSettleAndReopen(t *testing.T) {
 	if err != nil || created.State != "active" {
 		t.Fatalf("create budget run: %+v %v", created, err)
 	}
-	a := BudgetCallReservation{TaskID: taskID, RunID: run, CallID: "a", IntentID: 12, Tokens: 8}
+	epoch, err := d.AcquireBudgetOwner(taskID, run, 10*time.Minute)
+	if err != nil {
+		t.Fatalf("claim budget owner: %v", err)
+	}
+	a := BudgetCallReservation{TaskID: taskID, RunID: run, OwnerEpoch: epoch, CallID: "a", IntentID: 12, Tokens: 8}
 	if ok, err := d.ReserveBudgetCall(a); err != nil || !ok {
 		t.Fatalf("first reserve: %v %v", ok, err)
 	}
 	if ok, err := d.ReserveBudgetCall(a); err != nil || ok {
 		t.Fatalf("replayed reserve charged twice: %v %v", ok, err)
 	}
-	if ok, err := d.ReserveBudgetCall(BudgetCallReservation{TaskID: taskID, RunID: run, CallID: "a", IntentID: 12, Tokens: 7}); err == nil || ok {
+	if ok, err := d.ReserveBudgetCall(BudgetCallReservation{TaskID: taskID, RunID: run, OwnerEpoch: epoch, CallID: "a", IntentID: 12, Tokens: 7}); err == nil || ok {
 		t.Fatalf("changed reservation was accepted: %v %v", ok, err)
 	}
-	b := BudgetCallReservation{TaskID: taskID, RunID: run, CallID: "b", Tokens: 11}
+	b := BudgetCallReservation{TaskID: taskID, RunID: run, OwnerEpoch: epoch, CallID: "b", Tokens: 11}
 	if ok, err := d.ReserveBudgetCall(b); err != nil || !ok {
 		t.Fatalf("second reserve: %v %v", ok, err)
 	}
-	if ok, err := d.ReserveBudgetCall(BudgetCallReservation{TaskID: taskID, RunID: run, CallID: "c", Tokens: 2}); err == nil || ok {
+	if ok, err := d.ReserveBudgetCall(BudgetCallReservation{TaskID: taskID, RunID: run, OwnerEpoch: epoch, CallID: "c", Tokens: 2}); err == nil || ok {
 		t.Fatalf("over-allocation accepted: %v %v", ok, err)
 	}
-	if ok, err := d.SettleBudgetCall(taskID, run, "a", 9); err != nil || !ok {
+	if ok, err := d.SettleBudgetCall(taskID, run, "a", 9, epoch); err != nil || !ok {
 		t.Fatalf("settle a: %v %v", ok, err)
 	}
-	if ok, err := d.SettleBudgetCall(taskID, run, "a", 9); err != nil || ok {
+	if ok, err := d.SettleBudgetCall(taskID, run, "a", 9, epoch); err != nil || ok {
 		t.Fatalf("duplicate settlement charged twice: %v %v", ok, err)
 	}
-	if ok, err := d.SettleBudgetCall(taskID, run, "a", 10); err == nil || ok {
+	if ok, err := d.SettleBudgetCall(taskID, run, "a", 10, epoch); err == nil || ok {
 		t.Fatalf("changed settlement was accepted: %v %v", ok, err)
 	}
-	if ok, err := d.ReserveBudgetCall(BudgetCallReservation{TaskID: taskID, RunID: run, CallID: "c", Tokens: 1}); err == nil || ok {
+	if ok, err := d.ReserveBudgetCall(BudgetCallReservation{TaskID: taskID, RunID: run, OwnerEpoch: epoch, CallID: "c", Tokens: 1}); err == nil || ok {
 		t.Fatalf("spent+held exceeded cap without rejection: %v %v", ok, err)
 	}
-	if ok, err := d.SettleBudgetCall(taskID, run, "b", 5); err != nil || !ok {
+	if ok, err := d.SettleBudgetCall(taskID, run, "b", 5, epoch); err != nil || !ok {
 		t.Fatalf("settle b: %v %v", ok, err)
 	}
-	c := BudgetCallReservation{TaskID: taskID, RunID: run, CallID: "c", Tokens: 5}
+	c := BudgetCallReservation{TaskID: taskID, RunID: run, OwnerEpoch: epoch, CallID: "c", Tokens: 5}
 	if ok, err := d.ReserveBudgetCall(c); err != nil || !ok {
 		t.Fatalf("reserve after refund: %v %v", ok, err)
 	}
-	if ok, err := d.SettleBudgetCall(taskID, run, "c", 0); err != nil || !ok {
+	if ok, err := d.SettleBudgetCall(taskID, run, "c", 0, epoch); err != nil || !ok {
 		t.Fatalf("zero-token attempt must still charge a turn: %v %v", ok, err)
 	}
 	st, err := d.ReadBudgetRun(taskID, run)
@@ -114,16 +119,16 @@ func TestBudgetJournalReserveSettleAndReopen(t *testing.T) {
 	if err != nil || afterRestart != st {
 		t.Fatalf("fresh db handle did not restore committed counters: %+v %v", afterRestart, err)
 	}
-	if ok, err := d2.ReserveBudgetCall(BudgetCallReservation{TaskID: taskID, RunID: run, CallID: "d", Tokens: 0}); err == nil || ok {
+	if ok, err := d2.ReserveBudgetCall(BudgetCallReservation{TaskID: taskID, RunID: run, OwnerEpoch: epoch, OwnerEpoch: epoch, CallID: "d", Tokens: 0}); err == nil || ok {
 		t.Fatalf("a fourth turn exceeded the persisted cap: %v %v", ok, err)
 	}
-	if err := d.CloseBudgetRun(taskID, run); err != nil {
+	if err := d.CloseBudgetRun(taskID, run, epoch); err != nil {
 		t.Fatalf("close settled epoch: %v", err)
 	}
-	if err := d.CloseBudgetRun(taskID, run); err != nil {
+	if err := d.CloseBudgetRun(taskID, run, epoch); err != nil {
 		t.Fatalf("idempotent epoch closure: %v", err)
 	}
-	if ok, err := d.ReserveBudgetCall(BudgetCallReservation{TaskID: taskID, RunID: run, CallID: "late", Tokens: 1}); err == nil || ok {
+	if ok, err := d.ReserveBudgetCall(BudgetCallReservation{TaskID: taskID, RunID: run, OwnerEpoch: epoch, CallID: "late", Tokens: 1}); err == nil || ok {
 		t.Fatalf("closed epoch admitted a new call: %v %v", ok, err)
 	}
 	next, err := d.OpenBudgetRun(taskID, "new-epoch", 20, 3)
@@ -142,27 +147,31 @@ func TestBudgetJournalQuarantinePreservesUnknownCost(t *testing.T) {
 	if _, err := d.OpenBudgetRun(taskID, run, 100, 5); err != nil {
 		t.Fatal(err)
 	}
-	c := BudgetCallReservation{TaskID: taskID, RunID: run, CallID: "provider-request", Tokens: 60}
+	epoch, err := d.AcquireBudgetOwner(taskID, run, 10*time.Minute)
+	if err != nil {
+		t.Fatal(err)
+	}
+	c := BudgetCallReservation{TaskID: taskID, RunID: run, OwnerEpoch: epoch, CallID: "provider-request", Tokens: 60}
 	if ok, err := d.ReserveBudgetCall(c); err != nil || !ok {
 		t.Fatalf("reserve: %v %v", ok, err)
 	}
-	if n, err := d.QuarantineBudgetRun(taskID, run); err != nil || n != 1 {
+	if n, err := d.QuarantineBudgetRun(taskID, run, epoch); err != nil || n != 1 {
 		t.Fatalf("quarantine: n=%d err=%v", n, err)
 	}
-	if n, err := d.QuarantineBudgetRun(taskID, run); err != nil || n != 0 {
+	if n, err := d.QuarantineBudgetRun(taskID, run, epoch); err != nil || n != 0 {
 		t.Fatalf("quarantine must be idempotent: n=%d err=%v", n, err)
 	}
 	st, err := d.ReadBudgetRun(taskID, run)
 	if err != nil || st.State != "recovery_required" || st.HeldTokens != 60 || st.HeldTurns != 1 {
 		t.Fatalf("crash released an unknown reservation: %+v %v", st, err)
 	}
-	if ok, err := d.ReserveBudgetCall(BudgetCallReservation{TaskID: taskID, RunID: run, CallID: "next", Tokens: 1}); err == nil || ok {
+	if ok, err := d.ReserveBudgetCall(BudgetCallReservation{TaskID: taskID, RunID: run, OwnerEpoch: epoch, CallID: "next", Tokens: 1}); err == nil || ok {
 		t.Fatalf("new work admitted during recovery: %v %v", ok, err)
 	}
-	if ok, err := d.SettleBudgetCall(taskID, run, c.CallID, 0); err == nil || ok {
+	if ok, err := d.SettleBudgetCall(taskID, run, c.CallID, 0, epoch); err == nil || ok {
 		t.Fatalf("unknown provider response was silently charged as zero: %v %v", ok, err)
 	}
-	if err := d.CloseBudgetRun(taskID, run); err == nil {
+	if err := d.CloseBudgetRun(taskID, run, epoch); err == nil {
 		t.Fatal("unresolved crashed run was closed and could reset its budget")
 	}
 	if _, err := d.OpenBudgetRun(taskID, "revived-while-unknown", 100, 5); err == nil {
@@ -179,6 +188,10 @@ func TestBudgetJournalConcurrentReservationCannotOverbook(t *testing.T) {
 	if _, err := d.OpenBudgetRun(taskID, run, 50, 1); err != nil {
 		t.Fatal(err)
 	}
+	epoch, err := d.AcquireBudgetOwner(taskID, run, 10*time.Minute)
+	if err != nil {
+		t.Fatal(err)
+	}
 	var wg sync.WaitGroup
 	gate := make(chan struct{})
 	results := make(chan bool, 2)
@@ -188,7 +201,7 @@ func TestBudgetJournalConcurrentReservationCannotOverbook(t *testing.T) {
 		go func(callID string) {
 			defer wg.Done()
 			<-gate
-			ok, err := d.ReserveBudgetCall(BudgetCallReservation{TaskID: taskID, RunID: run, CallID: callID, Tokens: 40})
+			ok, err := d.ReserveBudgetCall(BudgetCallReservation{TaskID: taskID, RunID: run, OwnerEpoch: epoch, CallID: callID, Tokens: 40})
 			results <- ok
 			errs <- err
 		}(id)
