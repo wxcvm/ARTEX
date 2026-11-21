@@ -1,7 +1,6 @@
 package db
 
 import (
-	"database/sql"
 	"errors"
 	"fmt"
 	"math"
@@ -187,6 +186,3 @@ func (d *DB) ReadUnclosedBudgetRun(taskID int64) (BudgetRun, error) {
 FROM task_budget_runs WHERE task_id=$1 AND state <> 'closed'`, taskID))
 }
 
-// Keep a compile-time reference to sql.ErrNoRows for callers using this API.
-// (The method returns the standard database/sql error unchanged.)
-var _ = sql.ErrNoRows
