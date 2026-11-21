@@ -345,15 +345,16 @@ func thinkingText(msg llm.Message) string {
 	return b.String()
 }
 
-// recordUsage appends one lightweight metering row to llm_usage (no bodies). Skips
-// zero-token calls with no model, which carry nothing worth metering.
+// recordUsage always charges the in-run usage sink for a logical attempt,
+// including empty responses with unknown model names (they still consume a
+// turn). The best-effort telemetry table omits unidentifiable zero-token rows.
 func (r *Recorder) recordUsage(ctx context.Context, taskID string, expID int64, worker string, usage llm.Usage, latencyMs int, status string) {
+	if sink, _ := ctx.Value(usageSinkContextKey{}).(func(llm.Usage)); sink != nil {
+		sink(usage)
+	}
 	if r.model == "" && usage.InputTokens == 0 && usage.OutputTokens == 0 &&
 		usage.CacheReadTokens == 0 && usage.CacheWriteTokens == 0 {
 		return
-	}
-	if sink, _ := ctx.Value(usageSinkContextKey{}).(func(llm.Usage)); sink != nil {
-		sink(usage)
 	}
 	if r.pg == nil {
 		return
