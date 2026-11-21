@@ -63,7 +63,15 @@ func left(capacity, spent int64) int64 {
 	if capacity == Unlimited {
 		return Unlimited
 	}
-	return max(capacity-spent, 0)
+	// Avoid negative upstream readings increasing the remaining budget, and
+	// avoid subtraction overflow if a metered total has saturated.
+	if spent <= 0 {
+		return capacity
+	}
+	if spent >= capacity {
+		return 0
+	}
+	return capacity - spent
 }
 
 // WrapupMargin is the reserve kept for the forced wrap-up (0 when unlimited).
@@ -72,13 +80,29 @@ func WrapupMargin(task Budget) Budget {
 		if capacity == Unlimited {
 			return 0
 		}
-		return max(capacity*BudgetMarginPercent/100, floor)
+		// Divide before multiplying so large, finite caps never overflow.
+		percent := (capacity/100)*BudgetMarginPercent + (capacity%100)*BudgetMarginPercent/100
+		return max(percent, floor)
 	}
 	return Budget{m(task.Tokens, BudgetMarginMinTokens), m(task.Turns, BudgetMarginMinTurns)}
 }
 
+// saturatingAdd ensures even malformed provider accounting or long-running
+// workloads never make consumed usage wrap negative and reopen dispatch.
+func saturatingAdd(a, b int64) int64 {
+	if b <= 0 {
+		return a
+	}
+	if a >= math.MaxInt64-b {
+		return math.MaxInt64
+	}
+	return a + b
+}
+
 func addUsage(s Spend, u llm.Usage) Spend {
-	return Spend{s.Tokens + int64(u.InputTokens+u.OutputTokens), s.Turns + 1}
+	input, output := max(int64(u.InputTokens), 0), max(int64(u.OutputTokens), 0)
+	tokens := saturatingAdd(input, output)
+	return Spend{saturatingAdd(s.Tokens, tokens), saturatingAdd(s.Turns, 1)}
 }
 
 // BudgetsFromEnv reads ARTEX_TASK_BUDGET_{TOKENS,TURNS} and
@@ -205,8 +229,8 @@ func (m *IntentMeter) Exhausted() bool {
 func (m *IntentMeter) Finish() {
 	m.l.mu.Lock()
 	defer m.l.mu.Unlock()
-	m.l.workerRuns++
-	m.l.workerSpent = Spend{m.l.workerSpent.Tokens + m.spent.Tokens, m.l.workerSpent.Turns + m.spent.Turns}
+	m.l.workerRuns = saturatingAdd(m.l.workerRuns, 1)
+	m.l.workerSpent = Spend{saturatingAdd(m.l.workerSpent.Tokens, m.spent.Tokens), saturatingAdd(m.l.workerSpent.Turns, m.spent.Turns)}
 }
 
 // BudgetWrapupBlocks reports whether a worker tool is refused once its budget is
