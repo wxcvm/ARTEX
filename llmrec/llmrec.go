@@ -175,7 +175,7 @@ func (r *Recorder) Stream(ctx context.Context, req llm.CompletionRequest) iter.S
 			if streamErr != nil {
 				status = "error"
 			}
-			r.recordUsage(ctx, taskID, expID, worker, usage, int(time.Since(start).Milliseconds()), status)
+			r.recordUsageTelemetry(taskID, expID, worker, usage, int(time.Since(start).Milliseconds()), status)
 			if recordBodies {
 				r.record(req, session, taskID, worker, reqBody, capt, start, text, thinking, usage, stopReason, streamErr)
 			}
@@ -237,6 +237,7 @@ func (r *Recorder) Stream(ctx context.Context, req llm.CompletionRequest) iter.S
 				}
 			}
 			usage.Add(attemptUsage)
+			meterPhysicalAttempt(ctx, attemptUsage)
 			text, thinking = textBuf.String(), thinkingBuf.String()
 
 			if stopped || streamErr != nil || seenContent {
@@ -296,9 +297,11 @@ func (r *Recorder) Complete(ctx context.Context, req llm.CompletionRequest) (llm
 
 
 	msg, stopReason, usage, err := r.inner.Complete(ctx, req)
+	meterPhysicalAttempt(ctx, usage)
 	for attempt := 0; attempt < emptyResponseRetries && err == nil && ctx.Err() == nil && emptyMessage(msg); attempt++ {
 		var nextUsage llm.Usage
 		msg, stopReason, nextUsage, err = r.inner.Complete(ctx, req)
+		meterPhysicalAttempt(ctx, nextUsage)
 		usage.Add(nextUsage)
 	}
 	if err == nil && ctx.Err() != nil {
@@ -310,7 +313,7 @@ func (r *Recorder) Complete(ctx context.Context, req llm.CompletionRequest) (llm
 	if err != nil {
 		status = "error"
 	}
-	r.recordUsage(ctx, taskID, expID, worker, usage, int(time.Since(start).Milliseconds()), status)
+	r.recordUsageTelemetry(taskID, expID, worker, usage, int(time.Since(start).Milliseconds()), status)
 	if recordBodies {
 		r.record(req, session, taskID, worker, reqBody, capt, start, msg.Text(), thinkingText(msg), usage, stopReason, err)
 	}
@@ -345,13 +348,27 @@ func thinkingText(msg llm.Message) string {
 	return b.String()
 }
 
-// recordUsage always charges the in-run usage sink for a logical attempt,
-// including empty responses with unknown model names (they still consume a
-// turn). The best-effort telemetry table omits unidentifiable zero-token rows.
-func (r *Recorder) recordUsage(ctx context.Context, taskID string, expID int64, worker string, usage llm.Usage, latencyMs int, status string) {
+// meterPhysicalAttempt charges one Turn for each actual request to the
+// underlying provider. A retry after an empty response is another provider
+// attempt, even when it reports zero tokens or an unknown model name.
+func meterPhysicalAttempt(ctx context.Context, usage llm.Usage) {
 	if sink, _ := ctx.Value(usageSinkContextKey{}).(func(llm.Usage)); sink != nil {
 		sink(usage)
 	}
+}
+
+// recordUsage is used by direct callers/tests to meter and persist one
+// logical provider attempt. The Stream/Complete implementations instead meter
+// each inner attempt as it finishes and use recordUsageTelemetry once for the
+// aggregated, best-effort database reporting row.
+func (r *Recorder) recordUsage(ctx context.Context, taskID string, expID int64, worker string, usage llm.Usage, latencyMs int, status string) {
+	meterPhysicalAttempt(ctx, usage)
+	r.recordUsageTelemetry(taskID, expID, worker, usage, latencyMs, status)
+}
+
+// recordUsageTelemetry keeps the existing one-row-per-logical-call reporting
+// contract, independently of the number of inner provider retries.
+func (r *Recorder) recordUsageTelemetry(taskID string, expID int64, worker string, usage llm.Usage, latencyMs int, status string) {
 	if r.model == "" && usage.InputTokens == 0 && usage.OutputTokens == 0 &&
 		usage.CacheReadTokens == 0 && usage.CacheWriteTokens == 0 {
 		return
