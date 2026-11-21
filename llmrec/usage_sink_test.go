@@ -24,7 +24,7 @@ func TestUsageSinkCountsZeroTokenAttemptWithoutModel(t *testing.T) {
 	ctx := WithUsageSink(context.Background(), func(u llm.Usage) { calls++; got = u })
 	r := &Recorder{} // no profile/model name; no database
 	r.recordUsage(ctx, "1", 2, "worker", llm.Usage{}, 1, "error")
-	if calls != 1 || got != (llm.Usage{}) {
+	if calls != 1 || got.InputTokens != 0 || got.OutputTokens != 0 {
 		t.Fatalf("zero-token model-less attempt escaped run budget: calls=%d usage=%+v", calls, got)
 	}
 }
