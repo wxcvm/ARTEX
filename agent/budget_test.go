@@ -184,3 +184,84 @@ func TestWrapupMarginLargeFiniteCapDoesNotOverflow(t *testing.T) {
 		t.Fatalf("remaining overflowed at a saturated cap: %+v", got)
 	}
 }
+
+func TestBudgetCheckpointRestoresWorkerEstimateAndSpent(t *testing.T) {
+	taskBudget, intentBudget := NewBudget(300_000, 50), NewBudget(75_000, 10)
+	l := NewBudgetLedger(taskBudget, intentBudget)
+	spend(l, 25_000)
+	m := l.StartIntent()
+	m.Record(llm.Usage{InputTokens: 13_000, OutputTokens: 2_000})
+	m.Finish()
+	m.Finish() // a duplicate completion callback must not skew the average
+	spend(l, 1_000)
+
+	before := l.Checkpoint()
+	if before.Spent != (Spend{41_000, 3}) || before.WorkerRuns != 1 || before.WorkerSpent != (Spend{15_000, 1}) {
+		t.Fatalf("unexpected pre-restart snapshot: %+v", before)
+	}
+	restored, err := RestoreBudgetLedger(taskBudget, intentBudget, before)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if after := restored.Checkpoint(); after != before {
+		t.Fatalf("restore changed snapshot: before=%+v after=%+v", before, after)
+	}
+	if restored.State() != l.State() {
+		t.Fatalf("dispatch or worker estimate changed after restore: old=%+v new=%+v", l.State(), restored.State())
+	}
+	restored.Record(llm.Usage{InputTokens: 1_000})
+	if got := restored.Checkpoint().Spent; got != (Spend{42_000, 4}) {
+		t.Fatalf("restored meter did not continue monotonically: %+v", got)
+	}
+	if got := l.Checkpoint().Spent; got != (Spend{41_000, 3}) {
+		t.Fatalf("restored ledger incorrectly aliases the old one: %+v", got)
+	}
+}
+
+func TestBudgetCheckpointPreservesOneTimeWrapup(t *testing.T) {
+	taskBudget, intentBudget := NewBudget(100_000, 8), NewBudget(20_000, 3)
+	l := NewBudgetLedger(taskBudget, intentBudget)
+	spend(l, 79_999)
+	if !l.BeginWrapup() {
+		t.Fatal("initial wrap-up was not admitted")
+	}
+	cp := l.Checkpoint()
+	r, err := RestoreBudgetLedger(taskBudget, intentBudget, cp)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if !r.Checkpoint().WrapupStarted || r.BeginWrapup() || r.State().Dispatch {
+		t.Fatalf("restored ledger reopened wrap-up or dispatch: %+v", r.Checkpoint())
+	}
+}
+
+func TestBudgetCheckpointRejectsCorruptOrChangedLimits(t *testing.T) {
+	taskBudget, intentBudget := NewBudget(100_000, 10), NewBudget(20_000, 2)
+	cp := NewBudgetLedger(taskBudget, intentBudget).Checkpoint()
+	cases := []BudgetCheckpoint{
+		func() BudgetCheckpoint { c := cp; c.Spent.Tokens = -1; return c }(),
+		func() BudgetCheckpoint { c := cp; c.WorkerRuns = -1; return c }(),
+		func() BudgetCheckpoint { c := cp; c.WorkerSpent.Turns = 1; return c }(),
+		func() BudgetCheckpoint { c := cp; c.WorkerRuns = 1; c.WorkerSpent.Tokens = 5; return c }(),
+	}
+	for _, invalid := range cases {
+		if _, err := RestoreBudgetLedger(taskBudget, intentBudget, invalid); err == nil {
+			t.Fatalf("invalid checkpoint was accepted: %+v", invalid)
+		}
+	}
+	if _, err := RestoreBudgetLedger(NewBudget(200_000, 10), intentBudget, cp); err == nil {
+		t.Fatal("checkpoint restored with changed task limit")
+	}
+	if _, err := RestoreBudgetLedger(taskBudget, NewBudget(20_000, 3), cp); err == nil {
+		t.Fatal("checkpoint restored with changed intent limit")
+	}
+	disabled := NewBudget(0, 0)
+	empty := BudgetCheckpoint{Task: disabled, Intent: disabled}
+	if got, err := RestoreBudgetLedger(disabled, disabled, empty); err != nil || got != nil {
+		t.Fatalf("disabled budget was not a no-op: got=%+v err=%v", got, err)
+	}
+	empty.Spent.Turns = 1
+	if _, err := RestoreBudgetLedger(disabled, disabled, empty); err == nil {
+		t.Fatal("disabled budget accepted a checkpoint with consumed turns")
+	}
+}
