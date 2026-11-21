@@ -279,3 +279,44 @@ WHERE task_id=$1 AND run_id=$2`, taskID, runID)
 	}
 	return affected, nil
 }
+
+// CloseBudgetRun is the explicit terminal boundary for one accounting epoch.
+// It is idempotent after successful closure. An unresolved reservation or a
+// recovery-required run cannot be discarded to mint a fresh budget.
+func (d *DB) CloseBudgetRun(taskID int64, runID string) error {
+	if err := validateBudgetIdentity(taskID, runID); err != nil {
+		return err
+	}
+	tx, err := d.Begin()
+	if err != nil {
+		return err
+	}
+	defer tx.Rollback() //nolint:errcheck
+	var heldTokens, heldTurns int64
+	var state string
+	if err := tx.QueryRow(`SELECT held_tokens,held_turns,state FROM task_budget_runs
+WHERE task_id=$1 AND run_id=$2 FOR UPDATE`, taskID, runID).
+		Scan(&heldTokens, &heldTurns, &state); err != nil {
+		return err
+	}
+	if state == "closed" {
+		return tx.Commit()
+	}
+	if state != "active" || heldTokens != 0 || heldTurns != 0 {
+		return errors.New("cannot close a run with unknown or outstanding budget calls")
+	}
+	var unresolved bool
+	if err := tx.QueryRow(`SELECT EXISTS(SELECT 1 FROM task_budget_calls
+WHERE task_id=$1 AND run_id=$2 AND state <> 'settled')`, taskID, runID).
+		Scan(&unresolved); err != nil {
+		return err
+	}
+	if unresolved {
+		return errors.New("cannot close a run with unresolved calls")
+	}
+	if _, err := tx.Exec(`UPDATE task_budget_runs SET state='closed',updated_at=now()
+WHERE task_id=$1 AND run_id=$2`, taskID, runID); err != nil {
+		return err
+	}
+	return tx.Commit()
+}
