@@ -126,6 +126,60 @@ type BudgetLedger struct {
 	wrapup       bool // the forced wrap-up has started
 }
 
+// BudgetCheckpoint captures the complete in-memory accounting state needed
+// to restore dispatch estimates and the once-only wrap-up decision. The DB
+// run epoch and idempotent call journal remain separate: this value alone is
+// not a durable transaction or proof of which model calls completed.
+type BudgetCheckpoint struct {
+	Task, Intent     Budget
+	Spent            Spend
+	WorkerRuns       int64
+	WorkerSpent      Spend
+	WrapupStarted    bool
+}
+
+// Checkpoint creates a consistent snapshot while planner and workers meter
+// concurrently. Persisting it must be coordinated with the durable call
+// journal; storing an old checkpoint over a newer one is not safe.
+func (l *BudgetLedger) Checkpoint() BudgetCheckpoint {
+	if l == nil {
+		return BudgetCheckpoint{}
+	}
+	l.mu.Lock()
+	defer l.mu.Unlock()
+	return BudgetCheckpoint{
+		Task: l.task, Intent: l.intent,
+		Spent: l.spent, WorkerRuns: l.workerRuns,
+		WorkerSpent: l.workerSpent, WrapupStarted: l.wrapup,
+	}
+}
+
+// RestoreBudgetLedger reconstructs the scheduler's in-memory counters from a
+// validated checkpoint. A changed cap is not silently accepted because it
+// would make existing spend appear smaller relative to the new limits.
+// The caller must first resolve the DB journal's outstanding/unknown calls.
+func RestoreBudgetLedger(task, intent Budget, c BudgetCheckpoint) (*BudgetLedger, error) {
+	if c.Task != task || c.Intent != intent {
+		return nil, fmt.Errorf("budget checkpoint limits do not match the configured run")
+	}
+	if c.Spent.Tokens < 0 || c.Spent.Turns < 0 || c.WorkerRuns < 0 ||
+		c.WorkerSpent.Tokens < 0 || c.WorkerSpent.Turns < 0 ||
+		c.WorkerSpent.Tokens > c.Spent.Tokens || c.WorkerSpent.Turns > c.Spent.Turns ||
+		(c.WorkerRuns == 0 && c.WorkerSpent != (Spend{})) {
+		return nil, fmt.Errorf("budget checkpoint has inconsistent counters")
+	}
+	l := NewBudgetLedger(task, intent)
+	if l == nil {
+		if c.Spent != (Spend{}) || c.WorkerRuns != 0 ||
+			c.WorkerSpent != (Spend{}) || c.WrapupStarted {
+			return nil, fmt.Errorf("budget checkpoint contains spend while budgeting is disabled")
+		}
+		return nil, nil
+	}
+	l.spent, l.workerRuns, l.workerSpent, l.wrapup = c.Spent, c.WorkerRuns, c.WorkerSpent, c.WrapupStarted
+	return l, nil
+}
+
 // NewBudgetLedger returns nil when no budget is set: callers then change nothing.
 func NewBudgetLedger(task, intent Budget) *BudgetLedger {
 	if task == NewBudget(0, 0) && intent == NewBudget(0, 0) {
@@ -192,8 +246,9 @@ func (s BudgetState) Line() string {
 // IntentMeter meters one worker run against min(intent budget, task remaining
 // above the reserve).
 type IntentMeter struct {
-	l     *BudgetLedger
-	spent Spend // guarded by l.mu
+	l        *BudgetLedger
+	spent    Spend // guarded by l.mu
+	finished bool  // guarded by l.mu; duplicate Finish must not skew averages
 }
 
 // StartIntent opens the meter of one worker run.
@@ -229,6 +284,10 @@ func (m *IntentMeter) Exhausted() bool {
 func (m *IntentMeter) Finish() {
 	m.l.mu.Lock()
 	defer m.l.mu.Unlock()
+	if m.finished {
+		return
+	}
+	m.finished = true
 	m.l.workerRuns = saturatingAdd(m.l.workerRuns, 1)
 	m.l.workerSpent = Spend{saturatingAdd(m.l.workerSpent.Tokens, m.spent.Tokens), saturatingAdd(m.l.workerSpent.Turns, m.spent.Turns)}
 }
