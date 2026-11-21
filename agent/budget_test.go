@@ -2,6 +2,7 @@ package agent
 
 import (
 	"context"
+	"math"
 	"strings"
 	"testing"
 
@@ -141,5 +142,45 @@ func TestBudgetCountsMatchUsageFixture(t *testing.T) {
 	const want = 12_000 + 800 + 15_500 + 1_200 + 4_000 + 300 + 6_100
 	if st := l.State(); st.Spent != (Spend{want, 5}) || st.Remaining != (Budget{1_000_000 - want, 995}) || st.Estimate != (Spend{10_400, 3}) {
 		t.Fatalf("spent %+v remaining %+v estimate %+v, want {%d 5}, remaining, {10400 3}", st.Spent, st.Remaining, st.Estimate, want)
+	}
+}
+
+func TestBudgetUsageAccountingCannotWrapOrDecrease(t *testing.T) {
+	l := NewBudgetLedger(NewBudget(100_000, 10), NewBudget(0, 0))
+	// A malformed provider can report negative token values, but it must not
+	// give a task more remaining budget than it had before.
+	l.Record(llm.Usage{InputTokens: -500, OutputTokens: -10})
+	if got := l.State().Spent; got != (Spend{0, 1}) {
+		t.Fatalf("negative usage changed metered tokens: %+v", got)
+	}
+	l.Record(llm.Usage{InputTokens: int(math.MaxInt64 - 1), OutputTokens: 9})
+	if got := l.State().Spent; got != (Spend{math.MaxInt64, 2}) {
+		t.Fatalf("overflowed task usage instead of saturating: %+v", got)
+	}
+	l.Record(llm.Usage{InputTokens: -3, OutputTokens: -7})
+	if st := l.State(); st.Spent != (Spend{math.MaxInt64, 3}) || st.Dispatch || st.Remaining.Tokens != 0 {
+		t.Fatalf("malformed usage reopened an exhausted task: %+v", st)
+	}
+
+	m := l.StartIntent()
+	m.Record(llm.Usage{InputTokens: int(math.MaxInt64 - 1), OutputTokens: 9})
+	m.Record(llm.Usage{InputTokens: 100, OutputTokens: -5})
+	if got := m.Remaining(); got.Tokens != 0 {
+		t.Fatalf("intent budget reopened after token saturation: %+v", got)
+	}
+	m.Finish()
+	if st := l.State(); st.Estimate.Tokens < 0 || st.Estimate.Turns < 0 {
+		t.Fatalf("worker estimate overflowed: %+v", st)
+	}
+}
+
+func TestWrapupMarginLargeFiniteCapDoesNotOverflow(t *testing.T) {
+	const cap = math.MaxInt64 - 1
+	margin := WrapupMargin(NewBudget(cap, cap))
+	if margin != (Budget{cap / 20, cap / 20}) {
+		t.Fatalf("5%% reserve overflowed for large finite caps: %+v", margin)
+	}
+	if got := (Budget{cap, cap}).Remaining(Spend{cap, cap}); got != (Budget{0, 0}) {
+		t.Fatalf("remaining overflowed at a saturated cap: %+v", got)
 	}
 }
