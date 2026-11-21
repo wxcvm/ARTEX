@@ -21,6 +21,13 @@ export function createSettingsMutationQueue<T extends object>(
         pending = pending.filter((entry) => entry.id !== id);
       });
     },
+    refresh(read: () => Promise<T>): Promise<T> {
+      const request = tail.then(read);
+      // Keep later writes behind this read, so recovery cannot observe a
+      // snapshot from before an already queued mutation.
+      tail = request.then(() => undefined, () => undefined);
+      return request.then((snapshot) => this.overlay(snapshot));
+    },
     overlay(snapshot: T): T {
       return Object.assign({}, snapshot, ...pending.map(({ patch }) => patch));
     },
