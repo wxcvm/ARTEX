@@ -33,27 +33,27 @@ type sarifDriver struct {
 }
 
 type sarifResultProperties struct {
-	FindingID  int64   `json:"findingId"`
-	TaskID     *int64  `json:"taskId,omitempty"`
-	AssetIDs   []int64 `json:"assetIds,omitempty"`
-	AssetRefs  []sarifAssetRef `json:"assetRefs,omitempty"`
-	Severity              string `json:"severity"`
-	Status                string `json:"status"`
-	TrafficCount          int    `json:"trafficCount"`
-	EvidenceVersion       int64  `json:"evidenceVersion"`
-	ReportEvidenceVersion int64  `json:"reportEvidenceVersion"`
-	ReportStale           bool   `json:"reportStale"`
-	ReportAvailable       bool   `json:"reportAvailable"`
+	FindingID             int64           `json:"findingId"`
+	TaskID                *int64          `json:"taskId,omitempty"`
+	AssetIDs              []int64         `json:"assetIds,omitempty"`
+	AssetRefs             []sarifAssetRef `json:"assetRefs,omitempty"`
+	Severity              string          `json:"severity"`
+	Status                string          `json:"status"`
+	TrafficCount          int             `json:"trafficCount"`
+	EvidenceVersion       int64           `json:"evidenceVersion"`
+	ReportEvidenceVersion int64           `json:"reportEvidenceVersion"`
+	ReportStale           bool            `json:"reportStale"`
+	ReportAvailable       bool            `json:"reportAvailable"`
 }
 
 // Stable source identity for cross-tool reconciliation. Never exports auth,
 // raw URL query strings, traffic contents, or private credential fields.
 type sarifAssetRef struct {
-	ID int64 `json:"id"`
-	Type string `json:"type,omitempty"`
-	IP string `json:"ip,omitempty"`
+	ID     int64  `json:"id"`
+	Type   string `json:"type,omitempty"`
+	IP     string `json:"ip,omitempty"`
 	Domain string `json:"domain,omitempty"`
-	Port *int `json:"port,omitempty"`
+	Port   *int   `json:"port,omitempty"`
 }
 
 func assetSARIFRef(a *db.Asset) sarifAssetRef {
@@ -63,14 +63,26 @@ func assetSARIFRef(a *db.Asset) sarifAssetRef {
 		if u, err := url.Parse(a.URL); err == nil && u.Hostname() != "" {
 			if ref.IP == "" && ref.Domain == "" {
 				host := strings.ToLower(u.Hostname())
-				if net.ParseIP(host) != nil { ref.IP = host } else { ref.Domain = host }
+				if net.ParseIP(host) != nil {
+					ref.IP = host
+				} else {
+					ref.Domain = host
+				}
 			}
 			if ref.Port == nil {
 				p, err := strconv.Atoi(u.Port())
-				if err == nil && p > 0 && p <= 65535 { ref.Port = &p }
+				if err == nil && p > 0 && p <= 65535 {
+					ref.Port = &p
+				}
 				if u.Port() == "" {
-					if u.Scheme == "https" { p = 443; ref.Port = &p }
-					if u.Scheme == "http" { p = 80; ref.Port = &p }
+					if u.Scheme == "https" {
+						p = 443
+						ref.Port = &p
+					}
+					if u.Scheme == "http" {
+						p = 80
+						ref.Port = &p
+					}
 				}
 			}
 		}
@@ -88,10 +100,15 @@ type sarifResult struct {
 }
 
 type sarifRun struct {
-	Tool    struct {
+	Tool struct {
 		Driver sarifDriver `json:"driver"`
 	} `json:"tool"`
-	Results []sarifResult `json:"results"`
+	Results    []sarifResult       `json:"results"`
+	Properties *sarifRunProperties `json:"properties,omitempty"`
+}
+
+type sarifRunProperties struct {
+	ARTEXSourceID string `json:"artexSourceId"`
 }
 
 type sarifLog struct {
@@ -146,6 +163,12 @@ func FindingsSARIF(findings []*db.DBFinding) ([]byte, error) {
 // FindingsSARIFWithAssets adds source asset identities to the normal export.
 // It reads only the explicitly linked asset rows and does not alter findings.
 func FindingsSARIFWithAssets(findings []*db.DBFinding, identity map[int64]*db.Asset) ([]byte, error) {
+	return FindingsSARIFWithSource(findings, identity, "")
+}
+
+// FindingsSARIFWithSource includes the database's report identity, if known.
+// It does not attest the report's authenticity or add company assignments.
+func FindingsSARIFWithSource(findings []*db.DBFinding, identity map[int64]*db.Asset, sourceID string) ([]byte, error) {
 	items := append([]*db.DBFinding(nil), findings...)
 	sortFindingsForExport(items)
 
@@ -164,25 +187,27 @@ func FindingsSARIFWithAssets(findings []*db.DBFinding, identity map[int64]*db.As
 		sort.Slice(assets, func(i, j int) bool { return assets[i] < assets[j] })
 		refs := make([]sarifAssetRef, 0, len(assets))
 		for _, assetID := range assets {
-			if asset := identity[assetID]; asset != nil { refs = append(refs, assetSARIFRef(asset)) }
+			if asset := identity[assetID]; asset != nil {
+				refs = append(refs, assetSARIFRef(asset))
+			}
 		}
 		message := findingTitle(f)
 		if summary := strings.TrimSpace(f.Summary); summary != "" {
 			message = fmt.Sprintf("%s: %s", message, summary)
 		}
 		results = append(results, sarifResult{
-			RuleID: id,
-			Level:  sarifLevel(f.Severity),
-			Kind:   sarifKind(f.Status),
+			RuleID:  id,
+			Level:   sarifLevel(f.Severity),
+			Kind:    sarifKind(f.Status),
 			Message: sarifText{Text: message},
 			PartialFingerprints: map[string]string{
 				"artexFindingId": strconv.FormatInt(f.ID, 10),
 			},
 			Properties: sarifResultProperties{
-				FindingID: f.ID,
-				TaskID: f.TaskID,
-				AssetIDs: assets,
-				AssetRefs: refs,
+				FindingID:             f.ID,
+				TaskID:                f.TaskID,
+				AssetIDs:              assets,
+				AssetRefs:             refs,
 				Severity:              f.Severity,
 				Status:                f.Status,
 				TrafficCount:          f.TrafficCount,
@@ -207,6 +232,9 @@ func FindingsSARIFWithAssets(findings []*db.DBFinding, identity map[int64]*db.As
 	}
 
 	run := sarifRun{Results: results}
+	if sourceID != "" {
+		run.Properties = &sarifRunProperties{ARTEXSourceID: sourceID}
+	}
 	run.Tool.Driver = sarifDriver{
 		Name: "ARTEX", InformationURI: "https://github.com/wxcvm/ARTEX",
 		Rules: rules,
