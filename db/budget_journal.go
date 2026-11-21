@@ -43,7 +43,10 @@ func budgetJournalFits(limit, spent, held, requested int64) bool {
 	if limit == 0 {
 		return true // zero is the existing unlimited-budget convention
 	}
-	return spent <= limit && held <= limit-spent && requested <= limit-spent-held
+	// A zero-token reservation must not reopen dispatch after exhaustion.
+	// Unknown provider usage may exceed its reservation, so an exhausted
+	// dimension must reject even an estimated-zero new attempt.
+	return spent < limit && held < limit-spent && requested <= limit-spent-held
 }
 
 func scanBudgetRun(row *sql.Row) (BudgetRun, error) {
