@@ -1698,6 +1698,10 @@ CREATE TABLE IF NOT EXISTS task_budget_runs (
 );
 CREATE INDEX IF NOT EXISTS idx_task_budget_runs_state
     ON task_budget_runs(state) WHERE state <> 'closed';
+-- An unexpected fresh run ID must not bypass an active/recovering task budget.
+-- Terminal revival may create a new epoch only after the prior one is closed.
+CREATE UNIQUE INDEX IF NOT EXISTS idx_task_budget_single_live_run
+    ON task_budget_runs(task_id) WHERE state <> 'closed';
 
 CREATE TABLE IF NOT EXISTS task_budget_calls (
     task_id         BIGINT NOT NULL,
