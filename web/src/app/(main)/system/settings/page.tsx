@@ -85,7 +85,7 @@ export default function SystemSettingsPage() {
         apply(s);
         toast.success(t("已保存并发执行智能体数量（对后续启动的任务生效）", "Saved worker concurrency (applies to new tasks)"));
       })
-      .catch((e) => toast.error(t("保存失败：", "Save failed: ") + (e as Error).message))
+      .catch(recoverSettingsFailure)
       .finally(() => setSavingWorkers(false));
   };
 
@@ -97,7 +97,7 @@ export default function SystemSettingsPage() {
         apply(s);
         toast.success(t("已保存 Python 解释器配置", "Saved Python interpreter"));
       })
-      .catch((e) => toast.error(t("保存失败：", "Save failed: ") + (e as Error).message))
+      .catch(recoverSettingsFailure)
       .finally(() => setSaving(false));
   };
   const detectPython = () => {
@@ -126,7 +126,7 @@ export default function SystemSettingsPage() {
 
   const recoverSettingsFailure = (error: unknown) => {
     toast.error(`${t("保存失败：", "Save failed: ")}${error instanceof Error ? error.message : String(error)}`);
-    void api.settings().then(apply).catch((loadError) => {
+    void settingsMutations.refresh(() => api.settings()).then(apply).catch((loadError) => {
       toast.error(`${t("无法重新读取设置：", "Could not reload settings: ")}${loadError instanceof Error ? loadError.message : String(loadError)}`);
     });
   };
@@ -190,13 +190,7 @@ export default function SystemSettingsPage() {
         apply(s);
         toast.success(t("已保存网页搜索配置", "Saved web search config"));
       })
-      .catch((e) => {
-        toast.error(t("保存失败：", "Save failed: ") + (e as Error).message);
-        api
-          .settings()
-          .then(apply)
-          .catch(() => undefined);
-      })
+      .catch(recoverSettingsFailure)
       .finally(() => setSaving(false));
   };
 
@@ -209,7 +203,7 @@ export default function SystemSettingsPage() {
         setBraveKeyInput("");
         toast.success(t("已保存 Brave API Key", "Saved Brave API Key"));
       })
-      .catch((e) => toast.error(t("保存失败：", "Save failed: ") + (e as Error).message))
+      .catch(recoverSettingsFailure)
       .finally(() => setSavingKey(false));
   };
 
@@ -222,7 +216,7 @@ export default function SystemSettingsPage() {
         setTavilyKeyInput("");
         toast.success(t("已保存 Tavily API Key", "Saved Tavily API Key"));
       })
-      .catch((e) => toast.error(t("保存失败：", "Save failed: ") + (e as Error).message))
+      .catch(recoverSettingsFailure)
       .finally(() => setSavingTavilyKey(false));
   };
 
@@ -234,7 +228,7 @@ export default function SystemSettingsPage() {
         apply(s);
         toast.success(proxyInput.trim() ? t("已保存出站代理", "Saved egress proxy") : t("已清除出站代理（直连）", "Cleared egress proxy (direct)"));
       })
-      .catch((e) => toast.error(t("保存失败：", "Save failed: ") + (e as Error).message))
+      .catch(recoverSettingsFailure)
       .finally(() => setSavingProxy(false));
   };
 
@@ -246,7 +240,7 @@ export default function SystemSettingsPage() {
         apply(s);
         toast.success(globalProxyInput.trim() ? t("已保存全局代理", "Saved global proxy") : t("已清除全局代理（直连）", "Cleared global proxy (direct)"));
       })
-      .catch((e) => toast.error(t("保存失败：", "Save failed: ") + (e as Error).message))
+      .catch(recoverSettingsFailure)
       .finally(() => setSavingGlobalProxy(false));
   };
 
