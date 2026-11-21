@@ -39,6 +39,7 @@ export default function SystemSettingsPage() {
   const [testingGlobalProxy, setTestingGlobalProxy] = React.useState(false);
   const [testing, setTesting] = React.useState(false);
   const [loaded, setLoaded] = React.useState(false);
+  const [settingsLoadError, setSettingsLoadError] = React.useState("");
   const [saving, setSaving] = React.useState(false);
   const [savingKey, setSavingKey] = React.useState(false);
   const [pyInterp, setPyInterp] = React.useState("");
@@ -108,13 +109,20 @@ export default function SystemSettingsPage() {
       .finally(() => setSaving(false));
   };
 
-  React.useEffect(() => {
-    api
-      .settings()
-      .then(apply)
-      .catch(() => undefined)
-      .finally(() => setLoaded(true));
+  const loadSettings = React.useCallback(() => {
+    setLoaded(false);
+    setSettingsLoadError("");
+    void api.settings()
+      .then((settings) => {
+        apply(settings);
+        setLoaded(true);
+      })
+      .catch((error) => setSettingsLoadError(error instanceof Error ? error.message : String(error)));
   }, [apply]);
+
+  React.useEffect(() => {
+    loadSettings();
+  }, [loadSettings]);
 
   const recoverSettingsFailure = (error: unknown) => {
     toast.error(`${t("保存失败：", "Save failed: ")}${error instanceof Error ? error.message : String(error)}`);
@@ -287,6 +295,13 @@ export default function SystemSettingsPage() {
           {t("集中管理网络、模型工具与工作台行为。每项设置的生效范围在对应卡片中说明。", "Manage networking, model tools and workspace behavior. Each card explains when its settings apply.")}
         </p>
       </header>
+
+      {settingsLoadError && (
+        <div role="alert" className="flex flex-wrap items-center justify-between gap-3 rounded-lg border border-destructive/50 p-3 text-sm text-destructive">
+          <span>{t("读取系统设置失败：", "Failed to load system settings: ")}{settingsLoadError}</span>
+          <Button type="button" variant="outline" onClick={loadSettings}>{t("重新读取", "Retry loading")}</Button>
+        </div>
+      )}
 
       {/* Multi-column instead of grid: the web search card is several times taller than the others and
           its height varies with the selected backend (brave/tavily key inputs are conditional). A grid
