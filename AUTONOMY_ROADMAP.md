@@ -36,7 +36,7 @@
 基线已包含 Go 后端、Next.js 前端、PostgreSQL、任务与 Agent 管理、模型池、流量和证据存储、报告、通知、浏览器流量导入及资产同步。用户分支的变更记录还包含：
 
 - 模型链故障转移、优先级与轮转机制，以及 Ollama 配置支持。
-- 数据库层在恢复时补回暂停时段；但本轮发现 Engine 仍读取旧截止时间缓存，且截止时间协调器尚未避开暂停状态，不能将其视为已完成的端到端冻结保证（见 P0.2）。
+- 数据库层在恢复时补回暂停时段；当前 main 已改为从生命周期快照读取截止时间，并用统一转换锁协调 pause 与 timeout settlement（见 P0.2 的已修复证据）。预算账本仍是进程内存状态，跨进程重启的单调性尚未建立。
 - 按调用计量的模型成本账本，以及任务详情指标与结果卡片。
 - 证据要求、结果复核与去重约束。
 - 按测试包隔离数据库的测试基础设施，以及已有基准脚手架。
@@ -103,7 +103,15 @@ UTF-8 修复参考 [RuoJi6 的 `542d7e9`](https://github.com/RuoJi6/ARTEX/commit
 
 **原因**：局部暂停逻辑不等于整个运行生命周期都具备确定性。
 
-**已定位的优先缺口（本轮未修改）**：`Manager.ApplyTaskAdmission` 会更新 `Task.DeadlineAt`，但 `Engine.taskDeadline` 优先返回 `e.deadline` 旧缓存；`deadlineCoordinator` 也未检查暂停状态。现有 `TestPauseShiftsTaskDeadlineOnResume` 仅验证数据库和 Task 对象，没有验证 Engine。下一批需要共同修复缓存来源、暂停与进入 settling 的原子竞争，以及暂停失败时的补偿，不能只给协调器加一个非原子的 `if paused` 就宣称修复完成。无数据库回归可先缓存截止时间、修改生命周期中的截止时间、再次查询；另需故障注入验证暂停和到期同时发生时只有一个转换获胜。
+**已修复的早期缺口（当前 main，2026-11-21 复核）**：
+- `Engine.taskDeadline` 直接读取 `Task.lifecycleSnapshot().DeadlineAt`，不再使用独立的旧截止时间缓存（`server/engine_timeout.go`）。
+- `Manager.ApplyTaskAdmission` 在 resume/admission 时把持久化的 `paused_at` 区间补回 `deadline_at`，并同步到 live Task（`server/manager.go`）。
+- `nextDeadlineAction` 与 pause 共用 `transitionMu`；检查暂停、删除、终态和 settling，并原子领取 timeout settlement。pause 提交失败会恢复 barrier，成功提交后才取消执行（`server/task_transition.go`）。
+- 已有确定性回归：`TestTaskTransitionDeadlineUsesCommittedSnapshot`、`TestTaskTransitionPauseWins`、`TestTaskTransitionSettlementWinsAndControlsConflict`、`TestTaskTransitionFailedCommitRestoresBarrier`、`TestTaskTransitionCoordinatorWaitsAcrossPauseAndResume`、`TestTaskTransitionCoordinatorCancelDeleteTerminalAndQueue`；另有 PostgreSQL 集成测试 `TestPauseShiftsTaskDeadlineOnResume`、`TestPauseCommitFailureCompensatesWithPostgres` 和 FIFO 复活测试 `TestTimedOutTaskRevivalResetsClockAndSettlingAcrossFIFO`。
+
+**当前真正的 P0 缺口：预算跨进程重启不单调。** `agent.BudgetLedger` 明确为 in-memory，`Engine.budgetFor` 在进程启动后创建空账本。因此重启 ARTEX 会重新计数 task token/turn 预算。现有 `llm_usage` 仅有 task/worker/token/call 维度，写入为 best-effort，且没有 intent/run 幂等 ID；不能单独重建严格的 task + intent 预算及 worker 平均估算。需要先设计可恢复的持久化预算账本（含幂等键、崩溃窗口和写入失败语义），再实现和故障注入，不能把现有汇总 usage 表直接称为严格预算账本。
+
+**仍需验收**：完整覆盖 queued/running/pausing/paused/stopping/completed/failed 的合法/非法状态转换；停止确认后不再派发新工作；预算在 pause/resume/restart 后保持单调；UI 显示真实状态与剩余期限；在真实 PostgreSQL 和进程重启环境完成验收。Issue #173 在这些项目完成前保持开放。
 
 **实现方向**：先盘点并统一现有状态及转换，明确 `queued/running/pausing/paused/stopping/completed/failed` 的合法边；预算按运行实例和逻辑任务同时核算；记录停止原因与确认时间，UI 显示实际状态而非乐观完成。
 
