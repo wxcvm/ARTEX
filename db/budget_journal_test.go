@@ -119,7 +119,7 @@ func TestBudgetJournalReserveSettleAndReopen(t *testing.T) {
 	if err != nil || afterRestart != st {
 		t.Fatalf("fresh db handle did not restore committed counters: %+v %v", afterRestart, err)
 	}
-	if ok, err := d2.ReserveBudgetCall(BudgetCallReservation{TaskID: taskID, RunID: run, OwnerEpoch: epoch, OwnerEpoch: epoch, CallID: "d", Tokens: 0}); err == nil || ok {
+	if ok, err := d2.ReserveBudgetCall(BudgetCallReservation{TaskID: taskID, RunID: run, OwnerEpoch: epoch, CallID: "d", Tokens: 0}); err == nil || ok {
 		t.Fatalf("a fourth turn exceeded the persisted cap: %v %v", ok, err)
 	}
 	if err := d.CloseBudgetRun(taskID, run, epoch); err != nil {
