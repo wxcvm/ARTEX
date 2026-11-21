@@ -1673,3 +1673,47 @@ CREATE TABLE IF NOT EXISTS account_audit (
     result TEXT NOT NULL
 );
 CREATE INDEX IF NOT EXISTS idx_account_audit_action ON account_audit(action, id DESC);
+
+
+-- =====================================================================
+-- Task budget journal, phase 1 (opt-in DB primitives; not wired to Engine).
+-- This is NOT llm_usage: reservations and results must share a run epoch
+-- and an idempotency key, and unresolved calls cannot be treated as free.
+-- A restart must not silently mint a new run epoch.
+-- =====================================================================
+CREATE TABLE IF NOT EXISTS task_budget_runs (
+    task_id       BIGINT NOT NULL REFERENCES tasks(id) ON DELETE CASCADE,
+    run_id        TEXT NOT NULL CHECK (length(run_id) BETWEEN 1 AND 128),
+    token_limit   BIGINT NOT NULL CHECK (token_limit >= 0), -- 0 = unlimited
+    turn_limit    BIGINT NOT NULL CHECK (turn_limit >= 0),  -- 0 = unlimited
+    spent_tokens  BIGINT NOT NULL DEFAULT 0 CHECK (spent_tokens >= 0),
+    spent_turns   BIGINT NOT NULL DEFAULT 0 CHECK (spent_turns >= 0),
+    held_tokens   BIGINT NOT NULL DEFAULT 0 CHECK (held_tokens >= 0),
+    held_turns    BIGINT NOT NULL DEFAULT 0 CHECK (held_turns >= 0),
+    state         TEXT NOT NULL DEFAULT 'active'
+                  CHECK (state IN ('active','recovery_required','closed')),
+    created_at    TIMESTAMPTZ NOT NULL DEFAULT now(),
+    updated_at    TIMESTAMPTZ NOT NULL DEFAULT now(),
+    PRIMARY KEY (task_id,run_id)
+);
+CREATE INDEX IF NOT EXISTS idx_task_budget_runs_state
+    ON task_budget_runs(state) WHERE state <> 'closed';
+
+CREATE TABLE IF NOT EXISTS task_budget_calls (
+    task_id         BIGINT NOT NULL,
+    run_id          TEXT NOT NULL,
+    call_id         TEXT NOT NULL CHECK (length(call_id) BETWEEN 1 AND 128),
+    intent_id       BIGINT NOT NULL DEFAULT 0,
+    reserved_tokens BIGINT NOT NULL CHECK (reserved_tokens >= 0),
+    actual_tokens   BIGINT CHECK (actual_tokens >= 0),
+    state           TEXT NOT NULL DEFAULT 'reserved'
+                    CHECK (state IN ('reserved','settled','unknown')),
+    created_at      TIMESTAMPTZ NOT NULL DEFAULT now(),
+    settled_at      TIMESTAMPTZ,
+    PRIMARY KEY (task_id,run_id,call_id),
+    FOREIGN KEY (task_id,run_id) REFERENCES task_budget_runs(task_id,run_id) ON DELETE CASCADE,
+    CHECK ((state = 'settled' AND actual_tokens IS NOT NULL AND settled_at IS NOT NULL)
+        OR (state <> 'settled' AND actual_tokens IS NULL AND settled_at IS NULL))
+);
+CREATE INDEX IF NOT EXISTS idx_task_budget_calls_unresolved
+    ON task_budget_calls(task_id,run_id) WHERE state <> 'settled';
