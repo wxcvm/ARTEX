@@ -18,6 +18,7 @@ import { ReleaseUpdateCard } from "./_components/release-update-card";
 import { ReportTemplateManager } from "@/components/report-template-manager";
 import { CHAT_SEND_MODE_OPTIONS, type ChatSendMode, setChatSendMode, useChatSendMode } from "@/lib/chat-send-mode";
 import type { Settings } from "@/lib/types";
+import { createSettingsMutationQueue } from "@/lib/settings-mutation-queue";
 
 export default function SystemSettingsPage() {
   const locale = useUiLocale();
@@ -38,6 +39,7 @@ export default function SystemSettingsPage() {
   const [testingGlobalProxy, setTestingGlobalProxy] = React.useState(false);
   const [testing, setTesting] = React.useState(false);
   const [loaded, setLoaded] = React.useState(false);
+  const [settingsLoadError, setSettingsLoadError] = React.useState("");
   const [saving, setSaving] = React.useState(false);
   const [savingKey, setSavingKey] = React.useState(false);
   const [pyInterp, setPyInterp] = React.useState("");
@@ -51,7 +53,10 @@ export default function SystemSettingsPage() {
   // Pure frontend preference: bypasses /api/settings, reads and writes localStorage directly.
   const sendMode = useChatSendMode();
 
-  const apply = React.useCallback((s: Settings) => {
+  const settingsMutations = React.useMemo(() => createSettingsMutationQueue<Settings>((patch) => api.setSettings(patch)), []);
+
+  const apply = React.useCallback((saved: Settings) => {
+    const s = settingsMutations.overlay(saved);
     setTrafficCapture(!!s.traffic_capture);
     setAgentTrafficBinding(!!s.agent_traffic_binding);
     setWebSearch(!!s.web_search_enabled);
@@ -65,7 +70,7 @@ export default function SystemSettingsPage() {
     setInjectPlanner(s.constraints_inject_planner !== false);
     setInjectWorker(s.constraints_inject_worker !== false);
     setNoaCompaction(!!s.noa_compaction);
-  }, []);
+  }, [settingsMutations]);
 
   const saveWorkers = () => {
     const n = Number(workers);
@@ -74,25 +79,25 @@ export default function SystemSettingsPage() {
       return;
     }
     setSavingWorkers(true);
-    api
-      .setSettings({ workers: n })
+    settingsMutations
+      .save({ workers: n })
       .then((s) => {
         apply(s);
         toast.success(t("已保存并发执行智能体数量（对后续启动的任务生效）", "Saved worker concurrency (applies to new tasks)"));
       })
-      .catch((e) => toast.error(t("保存失败：", "Save failed: ") + (e as Error).message))
+      .catch(recoverSettingsFailure)
       .finally(() => setSavingWorkers(false));
   };
 
   const savePython = () => {
     setSaving(true);
-    api
-      .setSettings({ python_interpreter: pyInterp.trim() })
+    settingsMutations
+      .save({ python_interpreter: pyInterp.trim() })
       .then((s) => {
         apply(s);
         toast.success(t("已保存 Python 解释器配置", "Saved Python interpreter"));
       })
-      .catch((e) => toast.error(t("保存失败：", "Save failed: ") + (e as Error).message))
+      .catch(recoverSettingsFailure)
       .finally(() => setSaving(false));
   };
   const detectPython = () => {
@@ -104,136 +109,138 @@ export default function SystemSettingsPage() {
       .finally(() => setSaving(false));
   };
 
-  React.useEffect(() => {
-    api
-      .settings()
-      .then(apply)
-      .catch(() => undefined)
-      .finally(() => setLoaded(true));
+  const loadSettings = React.useCallback(() => {
+    setLoaded(false);
+    setSettingsLoadError("");
+    void api.settings()
+      .then((settings) => {
+        apply(settings);
+        setLoaded(true);
+      })
+      .catch((error) => setSettingsLoadError(error instanceof Error ? error.message : String(error)));
   }, [apply]);
+
+  React.useEffect(() => {
+    loadSettings();
+  }, [loadSettings]);
+
+  const recoverSettingsFailure = (error: unknown) => {
+    toast.error(`${t("保存失败：", "Save failed: ")}${error instanceof Error ? error.message : String(error)}`);
+    void settingsMutations.refresh(() => api.settings()).then(apply).catch((loadError) => {
+      toast.error(`${t("无法重新读取设置：", "Could not reload settings: ")}${loadError instanceof Error ? loadError.message : String(loadError)}`);
+    });
+  };
 
   const toggleTraffic = (v: boolean) => {
     setTrafficCapture(v); // optimistic
     setSaving(true);
-    api
-      .setSettings({ traffic_capture: v })
+    settingsMutations
+      .save({ traffic_capture: v })
       .then(apply)
-      .catch(() => setTrafficCapture(!v)) // revert on failure
+      .catch(recoverSettingsFailure)
       .finally(() => setSaving(false));
   };
 
   const toggleInjectPlanner = (v: boolean) => {
     setInjectPlanner(v); // optimistic
-    api
-      .setSettings({ constraints_inject_planner: v })
+    settingsMutations
+      .save({ constraints_inject_planner: v })
       .then(apply)
-      .catch(() => setInjectPlanner(!v)); // revert on failure
+      .catch(recoverSettingsFailure);
   };
 
   const toggleAgentTrafficBinding = (v: boolean) => {
     setAgentTrafficBinding(v);
     setSaving(true);
-    api
-      .setSettings({ agent_traffic_binding: v })
+    settingsMutations
+      .save({ agent_traffic_binding: v })
       .then((s) => {
         apply(s);
         toast.success(v ? t("已启用智能体流量自动关联", "Enabled automatic agent traffic binding") : t("已关闭智能体流量自动关联", "Disabled automatic agent traffic binding"));
       })
-      .catch((e) => {
-        setAgentTrafficBinding(!v);
-        toast.error(`${t("保存失败：", "Save failed: ")}${(e as Error).message}`);
-      })
+      .catch(recoverSettingsFailure)
       .finally(() => setSaving(false));
   };
 
   const toggleInjectWorker = (v: boolean) => {
     setInjectWorker(v); // optimistic
-    api
-      .setSettings({ constraints_inject_worker: v })
+    settingsMutations
+      .save({ constraints_inject_worker: v })
       .then(apply)
-      .catch(() => setInjectWorker(!v)); // revert on failure
+      .catch(recoverSettingsFailure);
   };
 
   const toggleNoaCompaction = (v: boolean) => {
     setNoaCompaction(v); // optimistic
-    api
-      .setSettings({ noa_compaction: v })
+    settingsMutations
+      .save({ noa_compaction: v })
       .then((s) => {
         apply(s);
         toast.success(v ? t("已启用 noa 上下文压缩（对后续运行生效）", "Enabled noa context compaction (applies to new runs)") : t("已关闭 noa 上下文压缩（恢复内置压缩）", "Disabled noa context compaction (restored built-in compaction)"));
       })
-      .catch((e) => {
-        setNoaCompaction(!v); // revert on failure
-        toast.error(`${t("保存失败：", "Save failed: ")}${(e as Error).message}`);
-      });
+      .catch(recoverSettingsFailure);
   };
 
   // Persist a web-search patch (enable and/or backend). Optimistic with refetch.
   const saveWebSearch = (patch: Partial<Settings>) => {
     setSaving(true);
-    api
-      .setSettings(patch)
+    settingsMutations
+      .save(patch)
       .then((s) => {
         apply(s);
         toast.success(t("已保存网页搜索配置", "Saved web search config"));
       })
-      .catch((e) => {
-        toast.error(t("保存失败：", "Save failed: ") + (e as Error).message);
-        api
-          .settings()
-          .then(apply)
-          .catch(() => undefined);
-      })
+      .catch(recoverSettingsFailure)
       .finally(() => setSaving(false));
   };
 
   const saveBraveKey = () => {
     setSavingKey(true);
-    api
-      .setSettings({ brave_search_api_key: braveKeyInput })
+    settingsMutations
+      .save({ brave_search_api_key: braveKeyInput })
       .then((s) => {
         apply(s);
         setBraveKeyInput("");
         toast.success(t("已保存 Brave API Key", "Saved Brave API Key"));
       })
-      .catch((e) => toast.error(t("保存失败：", "Save failed: ") + (e as Error).message))
+      .catch(recoverSettingsFailure)
       .finally(() => setSavingKey(false));
   };
 
   const saveTavilyKey = () => {
     setSavingTavilyKey(true);
-    api
-      .setSettings({ tavily_search_api_key: tavilyKeyInput })
+    settingsMutations
+      .save({ tavily_search_api_key: tavilyKeyInput })
       .then((s) => {
         apply(s);
         setTavilyKeyInput("");
         toast.success(t("已保存 Tavily API Key", "Saved Tavily API Key"));
       })
-      .catch((e) => toast.error(t("保存失败：", "Save failed: ") + (e as Error).message))
+      .catch(recoverSettingsFailure)
       .finally(() => setSavingTavilyKey(false));
   };
 
   const saveProxy = () => {
     setSavingProxy(true);
-    api
-      .setSettings({ web_search_proxy: proxyInput.trim() })
+    settingsMutations
+      .save({ web_search_proxy: proxyInput.trim() })
       .then((s) => {
         apply(s);
         toast.success(proxyInput.trim() ? t("已保存出站代理", "Saved egress proxy") : t("已清除出站代理（直连）", "Cleared egress proxy (direct)"));
       })
-      .catch((e) => toast.error(t("保存失败：", "Save failed: ") + (e as Error).message))
+      .catch(recoverSettingsFailure)
       .finally(() => setSavingProxy(false));
   };
 
   const saveGlobalProxy = () => {
     setSavingGlobalProxy(true);
-    api
-      .setSettings({ global_proxy: globalProxyInput.trim() })
+    settingsMutations
+      .save({ global_proxy: globalProxyInput.trim() })
       .then((s) => {
         apply(s);
         toast.success(globalProxyInput.trim() ? t("已保存全局代理", "Saved global proxy") : t("已清除全局代理（直连）", "Cleared global proxy (direct)"));
       })
-      .catch((e) => toast.error(t("保存失败：", "Save failed: ") + (e as Error).message))
+      .catch(recoverSettingsFailure)
       .finally(() => setSavingGlobalProxy(false));
   };
 
@@ -282,6 +289,13 @@ export default function SystemSettingsPage() {
           {t("集中管理网络、模型工具与工作台行为。每项设置的生效范围在对应卡片中说明。", "Manage networking, model tools and workspace behavior. Each card explains when its settings apply.")}
         </p>
       </header>
+
+      {settingsLoadError && (
+        <div role="alert" className="flex flex-wrap items-center justify-between gap-3 rounded-lg border border-destructive/50 p-3 text-sm text-destructive">
+          <span>{t("读取系统设置失败：", "Failed to load system settings: ")}{settingsLoadError}</span>
+          <Button type="button" variant="outline" onClick={loadSettings}>{t("重新读取", "Retry loading")}</Button>
+        </div>
+      )}
 
       {/* Multi-column instead of grid: the web search card is several times taller than the others and
           its height varies with the selected backend (brave/tavily key inputs are conditional). A grid

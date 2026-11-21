@@ -17,7 +17,7 @@ import { Label } from "@/components/ui/label";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { api } from "@/lib/api";
-import { assetSyncTabFromSearch } from "@/lib/asset-sync-tab";
+import { assetSyncTabFromSearch, scopeSentryReady } from "@/lib/asset-sync-tab";
 import { PurgeIntelPanel } from "./purge-intel-panel";
 import type { SSProject, SSTask } from "@/lib/types";
 
@@ -72,31 +72,49 @@ function ScopeSentryPanel() {
   const tr = (zh: string, en: string) => uiText(locale, zh, en);
   const [status, setStatus] = React.useState<SSStatus | null>(null);
   const [loadingStatus, setLoadingStatus] = React.useState(true);
+  const [statusError, setStatusError] = React.useState("");
+  const statusRequestId = React.useRef(0);
 
   const loadStatus = React.useCallback(() => {
+    const requestId = ++statusRequestId.current;
     setLoadingStatus(true);
+    setStatus(null);
+    setStatusError("");
     api
       .ssStatus()
-      .then(setStatus)
-      .catch((e) => toast.error(`${tr("读取数据源状态失败：", "Failed to read source status: ")}${e.message}`))
-      .finally(() => setLoadingStatus(false));
+      .then((next) => {
+        if (requestId === statusRequestId.current) setStatus(next);
+      })
+      .catch((e) => {
+        if (requestId === statusRequestId.current) setStatusError(e instanceof Error ? e.message : String(e));
+      })
+      .finally(() => {
+        if (requestId === statusRequestId.current) setLoadingStatus(false);
+      });
   }, []);
 
   React.useEffect(() => {
     loadStatus();
+    return () => { statusRequestId.current += 1; };
   }, [loadStatus]);
 
-  const ready = !!status && status.exists && status.configured && status.enabled;
+  const ready = !loadingStatus && !statusError && scopeSentryReady(status);
 
   return (
     <div className="space-y-4">
-      <DataSourceCard status={status} loading={loadingStatus} onChanged={loadStatus} />
+      <DataSourceCard status={status} loading={loadingStatus} error={statusError} onChanged={loadStatus} />
       {ready ? (
         <SyncWorkbench />
       ) : (
         <Card>
           <CardContent className="py-8 text-center text-muted-foreground text-sm">
-            {tr("数据源就绪后即可选择项目 / 任务进行同步。", "Select a project or task when the source is ready.")}
+            {statusError
+              ? tr("读取数据源状态失败：", "Failed to read source status: ") + statusError
+              : loadingStatus
+                ? tr("正在检测数据源状态…", "Checking source status…")
+                : status?.exists && status.configured && status.enabled && !status.reachable
+                  ? tr("ScopeSentry 当前无法连接。请检查服务与网络后点击“刷新”。", "ScopeSentry is unreachable. Check the service and network, then refresh.")
+                  : tr("数据源就绪后即可选择项目 / 任务进行同步。", "Select a project or task when the source is ready.")}
           </CardContent>
         </Card>
       )}
@@ -109,10 +127,12 @@ function ScopeSentryPanel() {
 function DataSourceCard({
   status,
   loading,
+  error,
   onChanged,
 }: {
   status: SSStatus | null;
   loading: boolean;
+  error: string;
   onChanged: () => void;
 }) {
   const locale = useUiLocale();
@@ -165,7 +185,11 @@ function DataSourceCard({
         </Button>
       </CardHeader>
       <CardContent className="space-y-3">
-        {!status?.exists ? (
+        {loading ? (
+          <p role="status" className="text-sm text-muted-foreground">{tr("正在读取数据源状态…", "Loading source status…")}</p>
+        ) : error ? (
+          <p role="alert" className="text-sm text-destructive">{tr("无法读取数据源状态：", "Could not load source status: ")}{error}</p>
+        ) : !status?.exists ? (
           <div className="flex items-center justify-between gap-4">
             <p className="text-muted-foreground text-sm">
               {tr("尚未创建 ScopeSentry 数据源。创建后会新增一个占位 MCP（地址/密钥为空、未启用）。", "No ScopeSentry source exists. Creating one adds a disabled placeholder MCP with empty address and key.")}
