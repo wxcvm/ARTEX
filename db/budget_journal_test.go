@@ -102,6 +102,9 @@ func TestBudgetJournalReserveSettleAndReopen(t *testing.T) {
 	if _, err := d.OpenBudgetRun(taskID, run, 100, 3); err == nil {
 		t.Fatal("reopening an epoch with different limits was allowed")
 	}
+	if _, err := d.OpenBudgetRun(taskID, "new-epoch", 20, 3); err == nil {
+		t.Fatal("concurrent active epoch bypassed the existing task budget")
+	}
 	d2, err := Open(testDSN(t))
 	if err != nil {
 		t.Fatal(err)
@@ -113,6 +116,23 @@ func TestBudgetJournalReserveSettleAndReopen(t *testing.T) {
 	}
 	if ok, err := d2.ReserveBudgetCall(BudgetCallReservation{TaskID: taskID, RunID: run, CallID: "d", Tokens: 0}); err == nil || ok {
 		t.Fatalf("a fourth turn exceeded the persisted cap: %v %v", ok, err)
+	}
+	if err := d.CloseBudgetRun(taskID, run); err != nil {
+		t.Fatalf("close settled epoch: %v", err)
+	}
+	if err := d.CloseBudgetRun(taskID, run); err != nil {
+		t.Fatalf("idempotent epoch closure: %v", err)
+	}
+	if ok, err := d.ReserveBudgetCall(BudgetCallReservation{TaskID: taskID, RunID: run, CallID: "late", Tokens: 1}); err == nil || ok {
+		t.Fatalf("closed epoch admitted a new call: %v %v", ok, err)
+	}
+	next, err := d.OpenBudgetRun(taskID, "new-epoch", 20, 3)
+	if err != nil || next.State != "active" || next.SpentTokens != 0 || next.SpentTurns != 0 {
+		t.Fatalf("explicit new epoch after closure: %+v %v", next, err)
+	}
+	previous, err := d.ReadBudgetRun(taskID, run)
+	if err != nil || previous.State != "closed" || previous.SpentTokens != 14 || previous.SpentTurns != 3 {
+		t.Fatalf("terminal revival erased historical epoch: %+v %v", previous, err)
 	}
 }
 
@@ -141,6 +161,12 @@ func TestBudgetJournalQuarantinePreservesUnknownCost(t *testing.T) {
 	}
 	if ok, err := d.SettleBudgetCall(taskID, run, c.CallID, 0); err == nil || ok {
 		t.Fatalf("unknown provider response was silently charged as zero: %v %v", ok, err)
+	}
+	if err := d.CloseBudgetRun(taskID, run); err == nil {
+		t.Fatal("unresolved crashed run was closed and could reset its budget")
+	}
+	if _, err := d.OpenBudgetRun(taskID, "revived-while-unknown", 100, 5); err == nil {
+		t.Fatal("new run bypassed the recovery-required epoch")
 	}
 	if ok, err := d.ReserveBudgetCall(c); err != nil || ok {
 		t.Fatalf("exact replay of held call should not charge twice: %v %v", ok, err)
