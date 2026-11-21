@@ -176,14 +176,14 @@ func TestBudgetJournalConcurrentReservationCannotOverbook(t *testing.T) {
 			wins++
 		}
 	}
+	failures := 0
 	for err := range errs {
-		// The losing call is expected to hit the budget limit.
-		if err == nil {
-			continue
+		if err != nil {
+			failures++
 		}
 	}
 	st, err := d.ReadBudgetRun(taskID, run)
-	if err != nil || wins != 1 || st.HeldTokens != 40 || st.HeldTurns != 1 {
-		t.Fatalf("parallel reservations were not serialized: wins=%d state=%+v err=%v", wins, st, err)
+	if err != nil || wins != 1 || failures != 1 || st.HeldTokens != 40 || st.HeldTurns != 1 {
+		t.Fatalf("parallel reservations were not serialized: wins=%d failures=%d state=%+v err=%v", wins, failures, st, err)
 	}
 }
