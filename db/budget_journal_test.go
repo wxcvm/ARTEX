@@ -10,8 +10,9 @@ func TestBudgetJournalArithmeticGuard(t *testing.T) {
 	if !budgetJournalFits(0, math.MaxInt64, 0, 2) {
 		t.Fatal("unlimited cap should not apply a finite limit")
 	}
-	if budgetJournalFits(10, 8, 2, 1) || budgetJournalFits(10, 11, 0, 0) {
-		t.Fatal("reservation exceeded a finite budget")
+	if budgetJournalFits(10, 8, 2, 1) || budgetJournalFits(10, 11, 0, 0) ||
+		budgetJournalFits(10, 10, 0, 0) || budgetJournalFits(10, 5, 5, 0) {
+		t.Fatal("reservation was admitted into an exhausted finite budget")
 	}
 	if !budgetJournalFits(10, 5, 2, 3) {
 		t.Fatal("exact remaining allowance was rejected")
