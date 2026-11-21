@@ -70,6 +70,7 @@ test("recovery reads wait for earlier writes and preserve later queued selection
   const firstGate = new Promise((resolve) => { releaseFirst = resolve; });
   let stored = { first: false, later: false };
   const events = [];
+  let readSnapshot;
   const queue = createSettingsMutationQueue(async (patch) => {
     if ("first" in patch) await firstGate;
     if ("later" in patch) events.push("later-write");
@@ -78,7 +79,7 @@ test("recovery reads wait for earlier writes and preserve later queued selection
   });
 
   const first = queue.save({ first: true });
-  const recovery = queue.refresh(async () => { events.push("recovery-read"); return { ...stored }; });
+  const recovery = queue.refresh(async () => { events.push("recovery-read"); readSnapshot = { ...stored }; return readSnapshot; });
   const later = queue.save({ later: true });
   releaseFirst();
 
@@ -86,7 +87,7 @@ test("recovery reads wait for earlier writes and preserve later queued selection
   const recovered = await recovery;
   assert.deepEqual(recovered, { first: true, later: true });
   assert.deepEqual(events.slice(0, 2), ["recovery-read", "later-write"]);
-  assert.deepEqual(stored, { first: true, later: false });
+  assert.deepEqual(readSnapshot, { first: true, later: false });
   await later;
   assert.deepEqual(stored, { first: true, later: true });
 });
