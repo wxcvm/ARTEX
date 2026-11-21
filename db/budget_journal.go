@@ -22,6 +22,7 @@ type BudgetRun struct {
 // caller must persist and reuse CallID on retries; IntentID=0 means planner.
 type BudgetCallReservation struct {
 	TaskID, IntentID, Tokens int64
+	OwnerEpoch              int64
 	RunID, CallID            string
 }
 
@@ -121,12 +122,18 @@ func (d *DB) ReserveBudgetCall(c BudgetCallReservation) (created bool, err error
 		return false, err
 	}
 	defer tx.Rollback() //nolint:errcheck
-	var limitTokens, limitTurns, spentTokens, spentTurns, heldTokens, heldTurns int64
+	var limitTokens, limitTurns, spentTokens, spentTurns, heldTokens, heldTurns, ownerEpoch int64
+	var leaseActive bool
 	var state string
-	err = tx.QueryRow(`SELECT token_limit,turn_limit,spent_tokens,spent_turns,held_tokens,held_turns,state
+	err = tx.QueryRow(`SELECT token_limit,turn_limit,spent_tokens,spent_turns,held_tokens,held_turns,state,
+owner_epoch,COALESCE(owner_until > clock_timestamp(),false)
 FROM task_budget_runs WHERE task_id=$1 AND run_id=$2 FOR UPDATE`, c.TaskID, c.RunID).
-		Scan(&limitTokens, &limitTurns, &spentTokens, &spentTurns, &heldTokens, &heldTurns, &state)
+		Scan(&limitTokens, &limitTurns, &spentTokens, &spentTurns, &heldTokens, &heldTurns, &state,
+			&ownerEpoch, &leaseActive)
 	if err != nil {
+		return false, err
+	}
+	if err := budgetOwnerValid(c.OwnerEpoch, ownerEpoch, leaseActive); err != nil {
 		return false, err
 	}
 	var oldTokens, oldIntent int64
@@ -172,7 +179,7 @@ WHERE task_id=$1 AND run_id=$2`, c.TaskID, c.RunID, nextHeldTokens, nextHeldTurn
 // It charges exactly one turn (including a zero-token failure). Actual tokens
 // can exceed the reservation; this blocks future reservations if over limit.
 // Failed/unknown calls must NEVER be settled as zero without evidence.
-func (d *DB) SettleBudgetCall(taskID int64, runID, callID string, actualTokens int64) (changed bool, err error) {
+func (d *DB) SettleBudgetCall(taskID int64, runID, callID string, actualTokens, ownerEpoch int64) (changed bool, err error) {
 	if err := validateBudgetIdentity(taskID, runID); err != nil {
 		return false, err
 	}
@@ -184,11 +191,16 @@ func (d *DB) SettleBudgetCall(taskID int64, runID, callID string, actualTokens i
 		return false, err
 	}
 	defer tx.Rollback() //nolint:errcheck
-	var spentTokens, spentTurns, heldTokens, heldTurns int64
-	err = tx.QueryRow(`SELECT spent_tokens,spent_turns,held_tokens,held_turns
+	var spentTokens, spentTurns, heldTokens, heldTurns, actualEpoch int64
+	var leaseActive bool
+	err = tx.QueryRow(`SELECT spent_tokens,spent_turns,held_tokens,held_turns,
+owner_epoch,COALESCE(owner_until > clock_timestamp(),false)
 FROM task_budget_runs WHERE task_id=$1 AND run_id=$2 FOR UPDATE`, taskID, runID).
-		Scan(&spentTokens, &spentTurns, &heldTokens, &heldTurns)
+		Scan(&spentTokens, &spentTurns, &heldTokens, &heldTurns, &actualEpoch, &leaseActive)
 	if err != nil {
+		return false, err
+	}
+	if err := budgetOwnerValid(ownerEpoch, actualEpoch, leaseActive); err != nil {
 		return false, err
 	}
 	var reserved int64
@@ -235,7 +247,7 @@ held_tokens=$5,held_turns=$6,updated_at=now() WHERE task_id=$1 AND run_id=$2`,
 // QuarantineBudgetRun marks all outstanding calls unknown and blocks new ones.
 // This is a recovery action for a single owner after ensuring no old process
 // can still settle; it intentionally DOES NOT release held reservations.
-func (d *DB) QuarantineBudgetRun(taskID int64, runID string) (int64, error) {
+func (d *DB) QuarantineBudgetRun(taskID int64, runID string, ownerEpoch int64) (int64, error) {
 	if err := validateBudgetIdentity(taskID, runID); err != nil {
 		return 0, err
 	}
@@ -245,8 +257,14 @@ func (d *DB) QuarantineBudgetRun(taskID int64, runID string) (int64, error) {
 	}
 	defer tx.Rollback() //nolint:errcheck
 	var state string
-	if err := tx.QueryRow(`SELECT state FROM task_budget_runs
-WHERE task_id=$1 AND run_id=$2 FOR UPDATE`, taskID, runID).Scan(&state); err != nil {
+	var actualEpoch int64
+	var leaseActive bool
+	if err := tx.QueryRow(`SELECT state,owner_epoch,COALESCE(owner_until > clock_timestamp(),false)
+FROM task_budget_runs WHERE task_id=$1 AND run_id=$2 FOR UPDATE`, taskID, runID).
+		Scan(&state, &actualEpoch, &leaseActive); err != nil {
+		return 0, err
+	}
+	if err := budgetOwnerValid(ownerEpoch, actualEpoch, leaseActive); err != nil {
 		return 0, err
 	}
 	if state == "closed" {
@@ -283,7 +301,7 @@ WHERE task_id=$1 AND run_id=$2`, taskID, runID)
 // CloseBudgetRun is the explicit terminal boundary for one accounting epoch.
 // It is idempotent after successful closure. An unresolved reservation or a
 // recovery-required run cannot be discarded to mint a fresh budget.
-func (d *DB) CloseBudgetRun(taskID int64, runID string) error {
+func (d *DB) CloseBudgetRun(taskID int64, runID string, ownerEpoch int64) error {
 	if err := validateBudgetIdentity(taskID, runID); err != nil {
 		return err
 	}
@@ -292,15 +310,22 @@ func (d *DB) CloseBudgetRun(taskID int64, runID string) error {
 		return err
 	}
 	defer tx.Rollback() //nolint:errcheck
-	var heldTokens, heldTurns int64
+	var heldTokens, heldTurns, actualEpoch int64
 	var state string
-	if err := tx.QueryRow(`SELECT held_tokens,held_turns,state FROM task_budget_runs
-WHERE task_id=$1 AND run_id=$2 FOR UPDATE`, taskID, runID).
-		Scan(&heldTokens, &heldTurns, &state); err != nil {
+	var leaseActive bool
+	if err := tx.QueryRow(`SELECT held_tokens,held_turns,state,owner_epoch,
+COALESCE(owner_until > clock_timestamp(),false)
+FROM task_budget_runs WHERE task_id=$1 AND run_id=$2 FOR UPDATE`, taskID, runID).
+		Scan(&heldTokens, &heldTurns, &state, &actualEpoch, &leaseActive); err != nil {
 		return err
 	}
 	if state == "closed" {
+		// A previously committed close is idempotent; no old owner is given
+		// renewed write authority by this acknowledgement.
 		return tx.Commit()
+	}
+	if err := budgetOwnerValid(ownerEpoch, actualEpoch, leaseActive); err != nil {
+		return err
 	}
 	if state != "active" || heldTokens != 0 || heldTurns != 0 {
 		return errors.New("cannot close a run with unknown or outstanding budget calls")
