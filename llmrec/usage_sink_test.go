@@ -17,3 +17,14 @@ func TestUsageSinkWithoutDatabase(t *testing.T) {
 		t.Fatalf("usage sink: calls=%d usage=%+v", calls, got)
 	}
 }
+
+func TestUsageSinkCountsZeroTokenAttemptWithoutModel(t *testing.T) {
+	var calls int
+	var got llm.Usage
+	ctx := WithUsageSink(context.Background(), func(u llm.Usage) { calls++; got = u })
+	r := &Recorder{} // no profile/model name; no database
+	r.recordUsage(ctx, "1", 2, "worker", llm.Usage{}, 1, "error")
+	if calls != 1 || got != (llm.Usage{}) {
+		t.Fatalf("zero-token model-less attempt escaped run budget: calls=%d usage=%+v", calls, got)
+	}
+}
