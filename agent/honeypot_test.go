@@ -90,7 +90,7 @@ func TestHoneypotGuardStopsToolBeforeExecution(t *testing.T) {
 		},
 		Run: func(context.Context, json.RawMessage, *actool.ToolContext) (actool.Result, error) {
 			called = true
-			return actool.Text("executed"), nil
+			return actool.Errorf("inner executed"), nil
 		},
 	})
 	runtime := &HoneypotRuntime{
