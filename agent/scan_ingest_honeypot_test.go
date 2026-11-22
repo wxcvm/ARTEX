@@ -80,6 +80,9 @@ func TestScanIngestMatchesProductNamesAsWholeTokens(t *testing.T) {
 	); len(got) != 0 {
 		t.Fatalf("untrusted or unrelated fields triggered detection: %v", got)
 	}
+	if got := explicitHoneypotSignals(honeypotField{name: "nmap.service.product", value: "Generic honeypot service"}); len(got) != 0 {
+		t.Fatalf("generic honeypot wording is not a product fingerprint: %v", got)
+	}
 	got := explicitHoneypotSignals(
 		honeypotField{name: "nmap.service.product", value: "Cowrie SSH Honeypot"},
 		honeypotField{name: "httpx.tech", value: "OpenCanary"},

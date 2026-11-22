@@ -28,7 +28,7 @@ import (
 var knownHoneypotNames = []string{
 	"cowrie", "dionaea", "conpot", "heralding", "opencanary", "open canary",
 	"honeytrap", "honeyd", "honeydb", "elasticpot", "mailoney", "endlessh", "wordpot",
-	"glastopf", "kippo", "amun", "t-pot", "honeypot", "canarytoken",
+	"glastopf", "kippo", "amun", "t-pot", "canarytoken",
 }
 
 type honeypotField struct {
