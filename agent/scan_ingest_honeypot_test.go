@@ -8,23 +8,30 @@ import (
 func TestScanIngestDetectsExplicitNmapHoneypotFingerprint(t *testing.T) {
 	xml := `<nmaprun>
 <host><status state="up"/><address addr="198.51.100.77" addrtype="ipv4"/>
+<hostnames><hostname name="decoy.example.test" type="user"/></hostnames>
 <ports><port protocol="tcp" portid="22"><state state="open"/>
 <service name="ssh" product="Cowrie SSH Honeypot" version="2.5"/>
 </port></ports></host></nmaprun>`
 	s := parseScan(t, "nmap-xml", xml)
-	if len(s.Honeypots) != 1 {
-		t.Fatalf("assessments=%+v, want one", s.Honeypots)
+	if len(s.Honeypots) != 2 {
+		t.Fatalf("assessments=%+v, want IP and scanned-hostname aliases", s.Honeypots)
 	}
-	a := s.Honeypots[0]
-	if a.Host != "198.51.100.77" || a.Score < 90 || a.Level != "suspected" ||
-		!strings.Contains(strings.Join(a.Signals, " "), "nmap.service.product:cowrie") {
-		t.Fatalf("unexpected assessment: %+v", a)
-	}
+	hosts := map[string]bool{}
 	foundFact := false
+	for _, a := range s.Honeypots {
+		hosts[a.Host] = true
+		if a.Score < 90 || a.Level != "suspected" ||
+			!strings.Contains(strings.Join(a.Signals, " "), "nmap.service.product:cowrie") {
+			t.Fatalf("unexpected assessment: %+v", a)
+		}
+	}
 	for _, fact := range s.Facts {
-		if fact.Source == factSourceHoneypot && strings.Contains(fact.Summary, a.Host) {
+		if fact.Source == factSourceHoneypot {
 			foundFact = true
 		}
+	}
+	if !hosts["198.51.100.77"] || !hosts["decoy.example.test"] {
+		t.Fatalf("IP/domain aliases missing: %+v", s.Honeypots)
 	}
 	if !foundFact {
 		t.Fatal("explicit honeypot evidence must be retained as a separate graph fact")
