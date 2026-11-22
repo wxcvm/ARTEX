@@ -38,7 +38,7 @@ func normalizeHoneypotTarget(raw string) string {
 
 // Record accepts only high-confidence explicit fingerprints.
 func (r *HoneypotRegistry) Record(a db.HoneypotAssessment) bool {
-	if r == nil || a.Score < 90 || a.Level != "suspected" || len(a.Signals) == 0 {
+	if r == nil || a.Score < db.HoneypotAutoStopScore || a.Level != "suspected" || len(a.Signals) == 0 {
 		return false
 	}
 	a.Host = normalizeHoneypotTarget(a.Host)
