@@ -12,6 +12,7 @@ type providerAdmissionContextKey struct{}
 // must perform its reservation transaction inside this callback and fail
 // closed on any database/owner-fence error.
 //
+// Multiple calls compose in registration order; the first error stops admission.
 // Without this hook the Recorder retains its existing passthrough behavior.
 // A successful admission is not a usage settlement; actual attempts continue
 // to be recorded through the usage sink after the provider returns.
