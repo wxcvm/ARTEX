@@ -256,9 +256,18 @@ func (t *ToolSet) runScanIngest(ctx context.Context, in json.RawMessage, tc *act
 	// Persisted evidence is already written above. If every asset identity owned
 	// by this worker intent is now quarantined, cancel it before another model
 	// turn or retry can spend more tokens.
-	if runtime != nil && runtime.Registry != nil && runtime.Stop != nil &&
-		runtime.Registry.AllQuarantined(runtime.Targets) {
-		runtime.Stop()
+	if runtime != nil && runtime.Registry != nil && runtime.Stop != nil {
+		quarantined := runtime.Registry.AllQuarantined(runtime.Targets)
+		if len(runtime.Targets) == 0 && len(allowedHosts) > 0 {
+			observedTargets := make([]string, 0, len(allowedHosts))
+			for host := range allowedHosts {
+				observedTargets = append(observedTargets, host)
+			}
+			quarantined = runtime.Registry.AllQuarantined(observedTargets)
+		}
+		if quarantined {
+			runtime.Stop()
+		}
 	}
 	return jsonResult(out)
 }
