@@ -175,10 +175,26 @@ func HoneypotRuntimeFrom(ctx context.Context) *HoneypotRuntime {
 // intent. URLs, domains and IPs are retained as aliases so scanner observations
 // can be matched whether they identify a host by name or address.
 func IntentTargetHosts(as *db.AssetStore, intent *db.Node) []string {
-	if as == nil || intent == nil || len(intent.Anchors) == 0 {
+	if as == nil || intent == nil {
 		return nil
 	}
-	assets, err := as.GetByIDs(intent.Anchors)
+	ids := append([]int64(nil), intent.Anchors...)
+	var payload struct {
+		AssetIDs []int64 `json:"asset_ids"`
+	}
+	_ = json.Unmarshal(intent.Payload, &payload)
+	seen := make(map[int64]bool, len(ids)+len(payload.AssetIDs))
+	unique := make([]int64, 0, len(ids)+len(payload.AssetIDs))
+	for _, id := range append(ids, payload.AssetIDs...) {
+		if id > 0 && !seen[id] {
+			seen[id] = true
+			unique = append(unique, id)
+		}
+	}
+	if len(unique) == 0 {
+		return nil
+	}
+	assets, err := as.GetByIDs(unique)
 	if err != nil {
 		return nil
 	}
