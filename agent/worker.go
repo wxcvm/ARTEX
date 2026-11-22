@@ -430,7 +430,6 @@ func (w *Worker) execute(ctx context.Context, name string, taskID int64, as *db.
 	defer cleanup()
 	honeypotRuntime := HoneypotRuntimeFrom(ctx)
 	tools = guardHoneypotTools(tools, honeypotRuntime)
-	def.Deferred = guardHoneypotTools(def.Deferred, honeypotRuntime)
 
 	// The intent is the worker's [sole duty, an invariant across the whole run] → it
 	// goes into the system prompt together with the launch instruction and the raw
