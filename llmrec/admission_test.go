@@ -124,3 +124,21 @@ func TestProviderPreflightRespectsCancellation(t *testing.T) {
 		t.Fatalf("cancelled context reached provider: calls=%d err=%v", provider.completeCalls, err)
 	}
 }
+
+func TestProviderAdmissionHooksComposeInOrder(t *testing.T) {
+	var calls []string
+	ctx := WithProviderAdmission(context.Background(), func(context.Context) error {
+		calls = append(calls, "honeypot")
+		return nil
+	})
+	ctx = WithProviderAdmission(ctx, func(context.Context) error {
+		calls = append(calls, "budget")
+		return nil
+	})
+	if err := checkProviderAdmission(ctx); err != nil {
+		t.Fatal(err)
+	}
+	if len(calls) != 2 || calls[0] != "honeypot" || calls[1] != "budget" {
+		t.Fatalf("admission hooks did not compose in order: %v", calls)
+	}
+}
