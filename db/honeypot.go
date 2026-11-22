@@ -139,8 +139,9 @@ ORDER BY score DESC, observed_at DESC`, args...)
 	return out, rows.Err()
 }
 
-// HoneypotAssessmentsForTask returns only assessments matching hosts already
-// associated with this task; it never broadens the task's target scope.
+// HoneypotAssessmentsForTask returns active assessments observed within this task.
+// Records are task-scoped so a separate authorized task can deliberately test the
+// same honeypot without inheriting another task's stop decision.
 func (s *AssetStore) HoneypotAssessmentsForTask(taskID int64) ([]HoneypotAssessment, error) {
 	if s == nil || s.db == nil {
 		return nil, errors.New("asset store is unavailable")
