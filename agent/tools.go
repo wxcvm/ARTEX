@@ -1216,7 +1216,7 @@ func (t *ToolSet) addOneIntent(it intentItem) (int64, error) {
 		for _, assessment := range assessments {
 			hosts = append(hosts, assessment.Host)
 		}
-		return 0, fmt.Errorf("intent not dispatched: all anchored target identities have a recent explicit honeypot fingerprint (%s); do not schedule repeat work unless the operator explicitly overrides this decision", strings.Join(hosts, ", "))
+		return 0, fmt.Errorf("intent not dispatched: all anchored target identities have a recent explicit honeypot fingerprint (%s); requires operator review before any repeat intent is created", strings.Join(hosts, ", "))
 	}
 	// Asset interception: if the assets bound to an intent hit the system's asset
 	// interception rules, the intent is forbidden from being dispatched.
