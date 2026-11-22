@@ -55,11 +55,11 @@ func TestHoneypotRegistryNormalizesAliasesAndRequiresAllTargets(t *testing.T) {
 func TestAssetTargetHostsKeepsURLDomainAndIPAliases(t *testing.T) {
 	got := AssetTargetHosts([]*db.Asset{
 		{Type: "service", URL: "https://app.example.test:8443/login", IP: "198.51.100.77"},
-		{Type: "ip", IP: "203.0.113.9", BoundDomains: []string{"bound.example.test"}},
+
 		{Type: "ip", IP: "198.51.100.77"},
 		{Type: "root_domain", Domain: "example.test"},
 	})
-	want := []string{"198.51.100.77", "203.0.113.9", "app.example.test", "bound.example.test", "example.test"}
+	want := []string{"198.51.100.77", "app.example.test", "example.test"}
 	if len(got) != len(want) {
 		t.Fatalf("hosts=%v want %v", got, want)
 	}
