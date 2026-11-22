@@ -1692,10 +1692,15 @@ CREATE TABLE IF NOT EXISTS task_budget_runs (
     held_turns    BIGINT NOT NULL DEFAULT 0 CHECK (held_turns >= 0),
     state         TEXT NOT NULL DEFAULT 'active'
                   CHECK (state IN ('active','recovery_required','closed')),
+    owner_epoch   BIGINT NOT NULL DEFAULT 0 CHECK (owner_epoch >= 0),
+    owner_until   TIMESTAMPTZ,
     created_at    TIMESTAMPTZ NOT NULL DEFAULT now(),
     updated_at    TIMESTAMPTZ NOT NULL DEFAULT now(),
     PRIMARY KEY (task_id,run_id)
 );
+-- Existing installs from phase 1 need additive owner-fence columns.
+ALTER TABLE task_budget_runs ADD COLUMN IF NOT EXISTS owner_epoch BIGINT NOT NULL DEFAULT 0;
+ALTER TABLE task_budget_runs ADD COLUMN IF NOT EXISTS owner_until TIMESTAMPTZ;
 CREATE INDEX IF NOT EXISTS idx_task_budget_runs_state
     ON task_budget_runs(state) WHERE state <> 'closed';
 -- An unexpected fresh run ID must not bypass an active/recovering task budget.
