@@ -348,6 +348,9 @@ func (s *scanIngest) addNmapHost(h nmapHost) {
 	}
 	s.Assets = append(s.Assets, assetInputItem{Type: "ip", IP: ip, BoundDomains: bound, OpenPorts: open})
 	s.addHoneypot(ip, fingerprintFields...)
+	for _, domain := range bound {
+		s.addHoneypot(domain, fingerprintFields...)
+	}
 	s.note("hosts", fmt.Sprintf("%s (%d open ports)", ip, len(list)))
 	shown := list
 	if len(shown) > 50 {
