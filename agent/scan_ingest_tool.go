@@ -190,6 +190,16 @@ func (t *ToolSet) runScanIngest(ctx context.Context, in json.RawMessage, tc *act
 			for _, host := range AssetTargetHosts(assets) {
 				allowedHosts[host] = true
 			}
+			// Nmap's user-supplied hostname is stored as a bound domain on its IP
+			// asset; admit that alias for this scan's assessment without treating
+			// every historical bound domain as an independent worker target.
+			for _, asset := range assets {
+				for _, domain := range asset.BoundDomains {
+					if host := normalizeHoneypotTarget(domain); host != "" {
+						allowedHosts[host] = true
+					}
+				}
+			}
 		} else {
 			honeypotPersistErrors = append(honeypotPersistErrors, "could not verify accepted scan assets: "+err.Error())
 		}
