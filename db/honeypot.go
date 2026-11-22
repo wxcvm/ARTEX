@@ -35,9 +35,12 @@ func normalizeHoneypotHost(raw string) string {
 
 // RecordHoneypotAssessment stores only explicit, high-confidence signatures.
 // Weak heuristics must never automatically suppress a target.
-func (s *AssetStore) RecordHoneypotAssessment(a HoneypotAssessment) error {
+func (s *AssetStore) RecordHoneypotAssessment(taskID int64, a HoneypotAssessment) error {
 	if s == nil || s.db == nil {
 		return errors.New("asset store is unavailable")
+	}
+	if taskID <= 0 {
+		return errors.New("honeypot assessment task id is required")
 	}
 	a.Host = normalizeHoneypotHost(a.Host)
 	if a.Host == "" {
@@ -70,9 +73,9 @@ func (s *AssetStore) RecordHoneypotAssessment(a HoneypotAssessment) error {
 		return fmt.Errorf("marshal honeypot signals: %w", err)
 	}
 	_, err = s.db.Exec(`
-INSERT INTO target_honeypot_assessments(host, score, level, signals, observed_at, expires_at)
-VALUES ($1, $2, $3, $4::jsonb, $5, $6)
-ON CONFLICT (host) DO UPDATE SET
+INSERT INTO target_honeypot_assessments(task_id, host, score, level, signals, observed_at, expires_at)
+VALUES ($1, $2, $3, $4, $5::jsonb, $6, $7)
+ON CONFLICT (task_id, host) DO UPDATE SET
     score = GREATEST(target_honeypot_assessments.score, EXCLUDED.score),
     level = 'suspected',
     signals = CASE
@@ -81,14 +84,17 @@ ON CONFLICT (host) DO UPDATE SET
     END,
     observed_at = GREATEST(target_honeypot_assessments.observed_at, EXCLUDED.observed_at),
     expires_at = GREATEST(target_honeypot_assessments.expires_at, EXCLUDED.expires_at)`,
-		a.Host, a.Score, a.Level, string(signals), a.ObservedAt, a.ExpiresAt)
+		taskID, a.Host, a.Score, a.Level, string(signals), a.ObservedAt, a.ExpiresAt)
 	return err
 }
 
 // HoneypotAssessments returns unexpired assessments for the supplied hosts.
-func (s *AssetStore) HoneypotAssessments(hosts []string) ([]HoneypotAssessment, error) {
+func (s *AssetStore) HoneypotAssessments(taskID int64, hosts []string) ([]HoneypotAssessment, error) {
 	if s == nil || s.db == nil {
 		return nil, errors.New("asset store is unavailable")
+	}
+	if taskID <= 0 {
+		return nil, errors.New("honeypot assessment task id is required")
 	}
 	seen := make(map[string]bool, len(hosts))
 	normalized := make([]string, 0, len(hosts))
@@ -103,15 +109,16 @@ func (s *AssetStore) HoneypotAssessments(hosts []string) ([]HoneypotAssessment, 
 		return nil, nil
 	}
 	marks := make([]string, len(normalized))
-	args := make([]any, len(normalized))
+	args := make([]any, len(normalized)+1)
+	args[0] = taskID
 	for i, host := range normalized {
-		marks[i] = fmt.Sprintf("$%d", i+1)
-		args[i] = host
+		marks[i] = fmt.Sprintf("$%d", i+2)
+		args[i+1] = host
 	}
 	rows, err := s.db.Query(`
 SELECT host, score, level, signals::text, observed_at, expires_at
 FROM target_honeypot_assessments
-WHERE host IN (`+strings.Join(marks, ",")+`) AND expires_at > now()
+WHERE task_id=$1 AND host IN (`+strings.Join(marks, ",")+`) AND expires_at > now()
 ORDER BY score DESC, observed_at DESC`, args...)
 	if err != nil {
 		return nil, err
@@ -135,12 +142,33 @@ ORDER BY score DESC, observed_at DESC`, args...)
 // HoneypotAssessmentsForTask returns only assessments matching hosts already
 // associated with this task; it never broadens the task's target scope.
 func (s *AssetStore) HoneypotAssessmentsForTask(taskID int64) ([]HoneypotAssessment, error) {
+	if s == nil || s.db == nil {
+		return nil, errors.New("asset store is unavailable")
+	}
 	if taskID <= 0 {
 		return nil, nil
 	}
-	hosts, err := s.HostsByTaskWithSources(taskID)
+	rows, err := s.db.Query(`
+SELECT host, score, level, signals::text, observed_at, expires_at
+FROM target_honeypot_assessments
+WHERE task_id=$1 AND expires_at > now()
+ORDER BY score DESC, observed_at DESC
+LIMIT 100`, taskID)
 	if err != nil {
 		return nil, err
 	}
-	return s.HoneypotAssessments(hosts)
+	defer rows.Close()
+	var out []HoneypotAssessment
+	for rows.Next() {
+		var a HoneypotAssessment
+		var raw []byte
+		if err := rows.Scan(&a.Host, &a.Score, &a.Level, &raw, &a.ObservedAt, &a.ExpiresAt); err != nil {
+			return nil, err
+		}
+		if err := json.Unmarshal(raw, &a.Signals); err != nil {
+			return nil, err
+		}
+		out = append(out, a)
+	}
+	return out, rows.Err()
 }
