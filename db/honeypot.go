@@ -12,10 +12,14 @@ import (
 // HoneypotAssessmentTTL bounds how long an explicit fingerprint suppresses
 // repeat work. A short cache avoids treating a mutable service as permanently
 // classified while still preventing multi-agent retries within a task.
-const HoneypotAssessmentTTL = time.Hour
+const (
+	HoneypotAssessmentTTL = time.Hour
+	HoneypotAutoStopScore = 90
+)
 
 // HoneypotAssessment is a high-confidence, rule-based observation. It means
-// "suspected honeypot", never a definitive claim about the target.
+// "suspected honeypot", never a definitive claim about the target. Score is a
+// policy confidence marker, not a calibrated probability.
 type HoneypotAssessment struct {
 	Host       string    `json:"host"`
 	Score      int       `json:"score"`
@@ -46,7 +50,7 @@ func (s *AssetStore) RecordHoneypotAssessment(taskID int64, a HoneypotAssessment
 	if a.Host == "" {
 		return errors.New("honeypot assessment host is required")
 	}
-	if a.Score < 90 || a.Score > 100 {
+	if a.Score < HoneypotAutoStopScore || a.Score > 100 {
 		return errors.New("only high-confidence honeypot assessments can be persisted")
 	}
 	if len(a.Signals) == 0 {
