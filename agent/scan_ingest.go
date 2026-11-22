@@ -27,7 +27,8 @@ import (
 // response-timing heuristics are intentionally excluded from automatic stops.
 var knownHoneypotNames = []string{
 	"cowrie", "dionaea", "conpot", "heralding", "opencanary", "open canary",
-	"honeytrap", "glastopf", "kippo", "amun", "t-pot", "honeypot", "canarytoken",
+	"honeytrap", "honeyd", "honeydb", "elasticpot", "mailoney", "endlessh", "wordpot",
+	"glastopf", "kippo", "amun", "t-pot", "honeypot", "canarytoken",
 }
 
 type honeypotField struct {
