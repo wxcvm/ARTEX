@@ -1238,7 +1238,7 @@ func (e *Engine) runIntent(ctx context.Context, t *Task, name string, worker *ag
 			return true
 		}
 		e.emitActivity(t, db.Activity{NodeID: &iid, Worker: name, Kind: "text",
-			Summary: "Automatically stopped: an explicit honeypot fingerprint matched every target identity for this intent; further tool and LLM calls were suppressed"})
+			Summary: fmt.Sprintf("Automatically stopped: explicit honeypot fingerprint matched every target identity (%s); further tool and LLM calls were suppressed", preview(strings.Join(targetHosts, ", "), 160))})
 		log.Printf("[worker %s] task %s intent #%d blocked by honeypot fingerprint; no retry", name, t.ID, intent.ID)
 		e.touch(t.ID)
 		t.NotifyDone(intent.ID)
