@@ -22,6 +22,7 @@ const bbotMaxLineBytes = 64 << 10
 const (
 	factSourceToolOutput = "tool_output"
 	factSourceThirdPartyIntel = "third_party_intel"
+	factSourceHoneypot = "honeypot_assessment"
 )
 
 var scanReaders = map[string]func(io.Reader, *scanIngest) error{
@@ -147,6 +148,22 @@ func (t *ToolSet) runScanIngest(ctx context.Context, in json.RawMessage, tc *act
 		"format": a.Format, "hosts": len(s.hosts), "ports": s.Ports, "urls": len(s.urls), "events": s.Events,
 		"skipped": s.Skipped, "oversized_lines": s.Oversized, "over_cap": s.OverCap, "truncated": s.Truncated, "notable": s.Notable,
 	}
+	runtime := t.honeypotRuntime
+	var honeypotPersistErrors []string
+	for _, assessment := range s.Honeypots {
+		if runtime != nil && runtime.Registry != nil {
+			runtime.Registry.Record(assessment)
+		}
+		if err := t.as.RecordHoneypotAssessment(assessment); err != nil && len(honeypotPersistErrors) < scanNotableMax {
+			honeypotPersistErrors = append(honeypotPersistErrors, err.Error())
+		}
+	}
+	if len(s.Honeypots) > 0 {
+		out["honeypot_assessments"] = s.Honeypots
+	}
+	if len(honeypotPersistErrors) > 0 {
+		out["honeypot_persist_errors"] = honeypotPersistErrors
+	}
 	if len(s.Assets) > 0 {
 		raw, _ := json.Marshal(map[string]any{"assets": s.Assets})
 		r, err := t.insertAssets().Call(ctx, raw, nil)
@@ -176,6 +193,13 @@ func (t *ToolSet) runScanIngest(ctx context.Context, in json.RawMessage, tc *act
 	out["facts_written"], out["facts_existing"] = written, existing
 	if len(errs) > 0 {
 		out["fact_errors"] = errs
+	}
+	// Persisted evidence is already written above. If every asset identity owned
+	// by this worker intent is now quarantined, cancel it before another model
+	// turn or retry can spend more tokens.
+	if runtime != nil && runtime.Registry != nil && runtime.Stop != nil &&
+		runtime.Registry.AllQuarantined(runtime.Targets) {
+		runtime.Stop()
 	}
 	return jsonResult(out)
 }
