@@ -154,7 +154,7 @@ func (t *ToolSet) runScanIngest(ctx context.Context, in json.RawMessage, tc *act
 		if runtime != nil && runtime.Registry != nil {
 			runtime.Registry.Record(assessment)
 		}
-		if err := t.as.RecordHoneypotAssessment(assessment); err != nil && len(honeypotPersistErrors) < scanNotableMax {
+		if err := t.as.RecordHoneypotAssessment(t.taskID, assessment); err != nil && len(honeypotPersistErrors) < scanNotableMax {
 			honeypotPersistErrors = append(honeypotPersistErrors, err.Error())
 		}
 	}
