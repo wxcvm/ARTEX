@@ -227,7 +227,7 @@ func (t *ToolSet) quarantinedAssets(ids []int64) ([]db.HoneypotAssessment, bool)
 	if len(hosts) == 0 {
 		return nil, false
 	}
-	assessments, err := t.as.HoneypotAssessments(hosts)
+	assessments, err := t.as.HoneypotAssessments(t.taskID, hosts)
 	if err != nil {
 		return nil, false
 	}
