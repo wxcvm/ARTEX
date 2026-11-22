@@ -14,6 +14,7 @@ import (
 	"github.com/Autumn-27/artex/agent"
 	"github.com/Autumn-27/artex/db"
 	"github.com/Autumn-27/artex/intercept"
+	"github.com/Autumn-27/artex/llmrec"
 	"github.com/Autumn-27/norma/harness"
 	"github.com/Autumn-27/norma/llm"
 	"github.com/jackc/pgx/v5/pgconn"
@@ -145,7 +146,8 @@ type Engine struct {
 	stamped      sync.Map // taskID -> bool, whether first_run_at has been stamped (once per process)
 	inflight     sync.Map // taskID -> *int64, count of in-flight planner.Plan + worker.Execute (for drain)
 	coordStarted sync.Map // taskID -> bool, whether the deadline coordinator has started (deduplicated across Run/reload)
-	budgets sync.Map // taskID -> optional run budget ledger
+	budgets   sync.Map // taskID -> optional run budget ledger
+	honeypots sync.Map // taskID -> *agent.HoneypotRegistry
 
 	// resolve returns a task's dedicated planner/worker (wired by the server as the
 	// authoritative task-router). nil,nil means this task is deliberately unavailable
@@ -289,6 +291,7 @@ func (e *Engine) StopTask(taskID string) {
 	e.inflight.Delete(taskID)
 	e.coordStarted.Delete(taskID)
 	e.budgets.Delete(taskID)
+	e.honeypots.Delete(taskID)
 	e.deleteMu.Lock()
 	e.deleting.Delete(taskID)
 	e.deleteMu.Unlock()
@@ -966,7 +969,9 @@ func (e *Engine) plannerLoop(ctx context.Context, t *Task) {
 		triggers := t.drainTriggers()
 		taskIDInt, _ := strconv.ParseInt(t.ID, 10, 64)
 		e.BeginLLMCall(t.ID)
-		met, reason, err := planner.Plan(e.budgetRoundCtx(ectx, t, false), taskIDInt, e.m.assets, t.Store, t.Goal, triggers, emit)
+		plannerCtx := agent.WithHoneypotRuntime(e.budgetRoundCtx(ectx, t, false),
+			&agent.HoneypotRuntime{Registry: e.honeypotFor(t.ID)})
+		met, reason, err := planner.Plan(plannerCtx, taskIDInt, e.m.assets, t.Store, t.Goal, triggers, emit)
 		e.EndLLMCall(t.ID)
 		switch {
 		case err != nil && ectx.Err() == nil:
@@ -1117,6 +1122,34 @@ func (e *Engine) runIntent(ctx context.Context, t *Task, name string, worker *ag
 	}
 	label := fmt.Sprintf("%s · #%d", name, iid)
 	workCtx = intercept.WithTaskContext(workCtx, t.ID, label, taskEmit)
+	// Load recent persisted decisions once per intent, then share them across
+	// this task's concurrent workers. The provider admission hook runs before
+	// every physical model request, including Recorder retries.
+	targetHosts := agent.IntentTargetHosts(e.m.assets, intent)
+	registry := e.honeypotFor(t.ID)
+	taskIDValue, _ := strconv.ParseInt(t.ID, 10, 64)
+	if len(targetHosts) > 0 {
+		if assessments, err := e.m.assets.HoneypotAssessments(taskIDValue, targetHosts); err == nil {
+			registry.RecordAll(assessments)
+		} else {
+			log.Printf("[honeypot] task %s intent #%d could not load prior target assessments: %v", t.ID, intent.ID, err)
+		}
+	}
+	runtime := &agent.HoneypotRuntime{
+		Registry: registry,
+		Targets: targetHosts,
+		Stop: func() { workCancel(agent.AbortHoneypot) },
+	}
+	workCtx = agent.WithHoneypotRuntime(workCtx, runtime)
+	if len(targetHosts) > 0 {
+		workCtx = llmrec.WithProviderAdmission(workCtx, func(context.Context) error {
+			if registry.AllQuarantined(targetHosts) {
+				workCancel(agent.AbortHoneypot)
+				return agent.ErrHoneypotTargetQuarantined
+			}
+			return nil
+		})
+	}
 	workCtx, meter := e.budgetIntent(workCtx, t.ID)
 	if meter != nil {
 		defer func() {
@@ -1184,6 +1217,8 @@ func (e *Engine) runIntent(ctx context.Context, t *Task, name string, worker *ag
 			action = "pause"
 		case errors.Is(workCause, agent.AbortWorkCancelledByUser):
 			action = "cancel"
+		case errors.Is(workCause, agent.AbortHoneypot):
+			action = "honeypot"
 		}
 	}
 	var controlErr error
@@ -1196,6 +1231,19 @@ func (e *Engine) runIntent(ctx context.Context, t *Task, name string, worker *ag
 		}
 		log.Printf("[worker %s] task %s intent #%d paused", name, t.ID, intent.ID)
 		e.touch(t.ID)
+		return true
+	}
+	if action == "honeypot" {
+		controlErr = transitionIntentState(t.Store, intent.ID, "running", "blocked")
+		if controlErr != nil {
+			log.Printf("[worker %s] task %s intent #%d failed to persist honeypot stop: %v", name, t.ID, intent.ID, controlErr)
+			return true
+		}
+		e.emitActivity(t, db.Activity{NodeID: &iid, Worker: name, Kind: "text",
+			Summary: fmt.Sprintf("Automatically stopped: explicit honeypot fingerprint matched every target identity (%s); further tool and LLM calls were suppressed", preview(strings.Join(targetHosts, ", "), 160))})
+		log.Printf("[worker %s] task %s intent #%d blocked by honeypot fingerprint; no retry", name, t.ID, intent.ID)
+		e.touch(t.ID)
+		t.NotifyDone(intent.ID)
 		return true
 	}
 	if action == "cancel" {

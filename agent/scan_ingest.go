@@ -23,6 +23,113 @@ import (
 // one Go-quoted fact detail. It never reaches a summary, a notable
 // item or an instruction.
 
+// Explicit product/banner names only. Generic cloud, ASN, port-count and
+// response-timing heuristics are intentionally excluded from automatic stops.
+var knownHoneypotNames = []string{
+	"cowrie", "dionaea", "conpot", "heralding", "opencanary", "open canary",
+	"honeytrap", "honeyd", "honeydb", "elasticpot", "mailoney", "endlessh", "wordpot",
+	"glastopf", "kippo", "amun", "t-pot", "canarytoken",
+}
+
+type honeypotField struct {
+	name  string
+	value string
+}
+
+var honeypotIdentityFields = map[string]bool{
+	"nmap.service.name":    true,
+	"nmap.service.product": true,
+	"nmap.service.cpe":     true,
+	"httpx.webserver":      true,
+	"httpx.tech":           true,
+}
+
+func honeypotTokens(value string) []string {
+	return strings.FieldsFunc(strings.ToLower(value), func(r rune) bool {
+		return !((r >= 'a' && r <= 'z') || (r >= '0' && r <= '9'))
+	})
+}
+
+func containsHoneypotName(value string, name string) bool {
+	tokens, wanted := honeypotTokens(value), honeypotTokens(name)
+	if len(wanted) == 0 || len(tokens) < len(wanted) {
+		return false
+	}
+	for i := 0; i <= len(tokens)-len(wanted); i++ {
+		match := true
+		for j := range wanted {
+			if tokens[i+j] != wanted[j] {
+				match = false
+				break
+			}
+		}
+		if match {
+			return true
+		}
+	}
+	return false
+}
+
+func explicitHoneypotSignals(fields ...honeypotField) []string {
+	var signals []string
+	seen := map[string]bool{}
+	for _, field := range fields {
+		// Only scanner fields that identify a service/product are eligible.
+		// Page titles, arbitrary TLS JSON and version strings are target-controlled
+		// prose and must never independently trigger an automatic stop.
+		if !honeypotIdentityFields[field.name] || strings.TrimSpace(field.value) == "" {
+			continue
+		}
+		for _, name := range knownHoneypotNames {
+			if containsHoneypotName(field.value, name) {
+				signal := field.name + ":" + name
+				if !seen[signal] {
+					seen[signal] = true
+					signals = append(signals, signal)
+				}
+			}
+		}
+	}
+	return signals
+}
+
+func (s *scanIngest) addHoneypot(host string, fields ...honeypotField) {
+	host = scanHost(host)
+	if host == "" {
+		return
+	}
+	signals := explicitHoneypotSignals(fields...)
+	if len(signals) == 0 {
+		return
+	}
+	assessment := db.HoneypotAssessment{Host: host, Score: 95, Level: "suspected", Signals: signals}
+	for i := range s.Honeypots {
+		if s.Honeypots[i].Host != host {
+			continue
+		}
+		seen := map[string]bool{}
+		for _, signal := range s.Honeypots[i].Signals {
+			seen[signal] = true
+		}
+		for _, signal := range signals {
+			if !seen[signal] {
+				s.Honeypots[i].Signals = append(s.Honeypots[i].Signals, signal)
+			}
+		}
+		return
+	}
+	s.Honeypots = append(s.Honeypots, assessment)
+	if len(s.Assets)+len(s.Facts) < scanMaxItems {
+		payload, _ := json.Marshal(assessment)
+		s.Facts = append(s.Facts, factItem{
+			Source: factSourceHoneypot,
+			Summary: "explicit honeypot fingerprint observed on " + host,
+			Detail: strconv.Quote(string(payload)),
+			Confidence: "observed",
+		})
+	}
+}
+
 // scanNotableMax caps the notable items returned per type.
 const scanNotableMax = 20
 
@@ -38,6 +145,7 @@ type scanIngest struct {
 	hosts, urls                                map[string]bool
 	Assets                                     []assetInputItem
 	Facts                                      []factItem
+	Honeypots                                  []db.HoneypotAssessment
 	Notable                                    map[string][]string
 }
 
@@ -241,6 +349,7 @@ func (s *scanIngest) addNmapHost(h nmapHost) {
 	var open []db.PortService
 	var list []string
 	var ports []map[string]any
+	var fingerprintFields []honeypotField
 	for _, p := range h.Ports {
 		port, err := strconv.Atoi(p.ID)
 		if err != nil || port <= 0 || port > 65535 || p.State.State != "open" ||
@@ -250,6 +359,13 @@ func (s *scanIngest) addNmapHost(h nmapHost) {
 		name := bbotToken(p.Svc.Name)
 		if name == "" {
 			name = "unknown"
+		}
+		fingerprintFields = append(fingerprintFields,
+			honeypotField{name: "nmap.service.name", value: p.Svc.Name},
+			honeypotField{name: "nmap.service.product", value: p.Svc.Product},
+			)
+		for _, cpe := range p.Svc.CPE {
+			fingerprintFields = append(fingerprintFields, honeypotField{name: "nmap.service.cpe", value: cpe})
 		}
 		s.Ports++
 		pp := fmt.Sprintf("%d/%s", port, p.Proto)
@@ -268,6 +384,10 @@ func (s *scanIngest) addNmapHost(h nmapHost) {
 		}
 	}
 	s.Assets = append(s.Assets, assetInputItem{Type: "ip", IP: ip, BoundDomains: bound, OpenPorts: open})
+	s.addHoneypot(ip, fingerprintFields...)
+	for _, domain := range bound {
+		s.addHoneypot(domain, fingerprintFields...)
+	}
 	s.note("hosts", fmt.Sprintf("%s (%d open ports)", ip, len(list)))
 	shown := list
 	if len(shown) > 50 {
@@ -413,6 +533,16 @@ func (s *scanIngest) addHttpx(line []byte) {
 		item.ContentLength = &r.ContentLength
 	}
 	s.Assets = append(s.Assets, item)
+	fields := []honeypotField{
+		{name: "httpx.webserver", value: r.Webserver},
+	}
+	for _, tech := range r.Tech {
+		fields = append(fields, honeypotField{name: "httpx.tech", value: tech})
+	}
+	s.addHoneypot(host, fields...)
+	if item.IP != "" && item.IP != host {
+		s.addHoneypot(item.IP, fields...)
+	}
 	s.note("urls", fmt.Sprintf("%s %d", u, r.StatusCode))
 	s.fact(fmt.Sprintf("httpx: %s responded with status %d", u, r.StatusCode),
 		map[string]any{"title": r.Title, "tech": r.Tech, "webserver": r.Webserver, "content_length": r.ContentLength,

@@ -49,6 +49,8 @@ var (
 		"The user deleted a running Worker. This call was cancelled; after the Worker exits the write area, the server handles the intent per the user-chosen deletion mode — soft delete only marks it deleted and keeps all outputs, hard delete cascades to remove the intent and the downstream nodes supported only by it")
 	AbortWorkFinished = cause("work_finished", "Worker finished normally, context freed",
 		"The Worker finished normally, and the engine released its context resources in detachWork. This is not an interruption; if it appears in an interruption message, the cancel and finish events raced")
+	AbortHoneypot = cause("honeypot_detected", "Explicit honeypot fingerprint detected",
+		"An existing scanner result matched an explicit known honeypot product/banner signature. This intent was stopped and blocked before further tool or LLM calls; the recorded evidence is retained for operator review")
 	AbortPausedRaceGuard = cause("paused_race_guard", "Refused a new run while task is paused",
 		"While the task is paused, the engine refuses to issue a new execution context, preventing a race between claim and pause from letting a Worker keep starting; already-claimed intents return to frontier")
 

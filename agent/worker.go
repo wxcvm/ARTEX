@@ -402,6 +402,7 @@ func (w *Worker) execute(ctx context.Context, name string, taskID int64, as *db.
 	tsx := NewToolSet(ts, name)
 	tsx.SetFindingRecorder(w.findingRecorder)
 	tsx.SetTaskID(taskID)
+	tsx.SetHoneypotRuntime(HoneypotRuntimeFrom(ctx))
 	coverageEnabled := as == nil || as.CoverageEnabled(taskID)
 	tsx.SetCoverageEnabled(coverageEnabled)
 	if as != nil {
@@ -427,6 +428,8 @@ func (w *Worker) execute(ctx context.Context, name string, taskID int64, as *db.
 	query := strings.TrimSpace(queryPayload.Summary + " " + message)
 	tools, def, cleanup := AugmentTools(WithToolQuery(ctx, query), "worker", base)
 	defer cleanup()
+	honeypotRuntime := HoneypotRuntimeFrom(ctx)
+	tools = guardHoneypotTools(tools, honeypotRuntime)
 
 	// The intent is the worker's [sole duty, an invariant across the whole run] → it
 	// goes into the system prompt together with the launch instruction and the raw
