@@ -116,15 +116,17 @@ CREATE TRIGGER trg_av2_upd BEFORE UPDATE ON assets
 -- Short-lived, high-confidence honeypot fingerprints prevent repeated agent
 -- reasoning/tool work on the same suspected decoy. Weak heuristics are not stored.
 CREATE TABLE IF NOT EXISTS target_honeypot_assessments (
-    host        TEXT PRIMARY KEY,
+    task_id     BIGINT NOT NULL,
+    host        TEXT NOT NULL,
     score       SMALLINT NOT NULL CHECK (score BETWEEN 90 AND 100),
     level       TEXT NOT NULL DEFAULT 'suspected' CHECK (level = 'suspected'),
     signals     JSONB NOT NULL DEFAULT '[]'::jsonb,
     observed_at TIMESTAMPTZ NOT NULL DEFAULT now(),
-    expires_at  TIMESTAMPTZ NOT NULL
+    expires_at  TIMESTAMPTZ NOT NULL,
+    PRIMARY KEY (task_id, host)
 );
 CREATE INDEX IF NOT EXISTS idx_target_honeypot_expiry
-    ON target_honeypot_assessments(expires_at);
+    ON target_honeypot_assessments(task_id, expires_at);
 
 -- Purge historical intelligence is deliberately separate from verified assets.
 CREATE TABLE IF NOT EXISTS purge_intel_snapshots (
