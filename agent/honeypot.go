@@ -2,6 +2,7 @@ package agent
 
 import (
 	"context"
+	"encoding/json"
 	"errors"
 	"net/url"
 	"sort"
@@ -251,7 +252,7 @@ type honeypotGuardedTool struct {
 	runtime *HoneypotRuntime
 }
 
-func (g *honeypotGuardedTool) Call(ctx context.Context, in []byte, tc *actool.ToolContext) (actool.Result, error) {
+func (g *honeypotGuardedTool) Call(ctx context.Context, in json.RawMessage, tc *actool.ToolContext) (actool.Result, error) {
 	if g.runtime != nil && g.runtime.Registry != nil && g.runtime.Registry.AllQuarantined(g.runtime.Targets) {
 		if g.runtime.Stop != nil {
 			g.runtime.Stop()
