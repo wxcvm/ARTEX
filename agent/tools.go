@@ -194,6 +194,9 @@ type ToolSet struct {
 	// overview. Wired for the main agent + cross-task orchestration; nil elsewhere →
 	// falls back to the bare notify.
 	notifyHint func(texts []string)
+	// honeypotRuntime carries the task-shared, short-lived explicit-fingerprint
+	// registry. Nil preserves the pre-feature behavior for standalone agents.
+	honeypotRuntime *HoneypotRuntime
 }
 
 // SetNotifyGoal wires the goal-add trigger callback (see ToolSet.notifyGoal). Set only
@@ -204,6 +207,9 @@ func (t *ToolSet) SetNotifyGoal(fn func([]string)) { t.notifyGoal = fn }
 // the main-agent chat and cross-task orchestration, so a runtime-added hint fires a
 // planner round announced by name instead of a bare wake.
 func (t *ToolSet) SetNotifyHint(fn func([]string)) { t.notifyHint = fn }
+
+// SetHoneypotRuntime attaches the task-shared target risk state to this toolset.
+func (t *ToolSet) SetHoneypotRuntime(runtime *HoneypotRuntime) { t.honeypotRuntime = runtime }
 
 // SetResumeTask wires the task-revive callback (see ToolSet.resumeTask). Set only by
 // the main-agent chat, so runtime-added goals can pull a finished task back to running.
@@ -667,6 +673,27 @@ func (t *ToolSet) graphOverviewData() map[string]any {
 			}
 			if len(m) > 0 {
 				out["coverage"] = m
+			}
+		}
+	}
+	// Only explicit, unexpired honeypot fingerprints for this task's existing
+	// assets are surfaced to the planner. Keep this block compact: its purpose is
+	// to stop duplicate intent generation, not to make the model re-analyze evidence.
+	if t.as != nil && t.taskID > 0 {
+		if assessments, err := t.as.HoneypotAssessmentsForTask(t.taskID); err == nil && len(assessments) > 0 {
+			targets := make([]map[string]any, 0, min(len(assessments), 12))
+			for _, assessment := range assessments[:min(len(assessments), 12)] {
+				signals := assessment.Signals
+				if len(signals) > 2 {
+					signals = signals[:2]
+				}
+				targets = append(targets, map[string]any{
+					"host": assessment.Host, "score": assessment.Score, "signals": signals,
+				})
+			}
+			out["honeypot_targets"] = map[string]any{
+				"count": len(assessments), "targets": targets,
+				"note": "recent explicit honeypot fingerprints; do not create repeat intents for these targets. This is a suspected classification, not proof.",
 			}
 		}
 	}
@@ -1184,6 +1211,13 @@ func (t *ToolSet) addOneIntent(it intentItem) (int64, error) {
 		priority = 5
 	}
 	anchors := pidList(it.AssetIDs)
+	if assessments, quarantined := t.quarantinedAssets(anchors); quarantined {
+		hosts := make([]string, 0, len(assessments))
+		for _, assessment := range assessments {
+			hosts = append(hosts, assessment.Host)
+		}
+		return 0, fmt.Errorf("intent not dispatched: all anchored target identities have a recent explicit honeypot fingerprint (%s); do not schedule repeat work unless the operator explicitly overrides this decision", strings.Join(hosts, ", "))
+	}
 	// Asset interception: if the assets bound to an intent hit the system's asset
 	// interception rules, the intent is forbidden from being dispatched.
 	if t.as != nil && len(anchors) > 0 {
