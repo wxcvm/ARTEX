@@ -36,16 +36,52 @@ type honeypotField struct {
 	value string
 }
 
+var honeypotIdentityFields = map[string]bool{
+	"nmap.service.name":    true,
+	"nmap.service.product": true,
+	"nmap.service.cpe":     true,
+	"httpx.webserver":      true,
+	"httpx.tech":           true,
+}
+
+func honeypotTokens(value string) []string {
+	return strings.FieldsFunc(strings.ToLower(value), func(r rune) bool {
+		return !((r >= 'a' && r <= 'z') || (r >= '0' && r <= '9'))
+	})
+}
+
+func containsHoneypotName(value string, name string) bool {
+	tokens, wanted := honeypotTokens(value), honeypotTokens(name)
+	if len(wanted) == 0 || len(tokens) < len(wanted) {
+		return false
+	}
+	for i := 0; i <= len(tokens)-len(wanted); i++ {
+		match := true
+		for j := range wanted {
+			if tokens[i+j] != wanted[j] {
+				match = false
+				break
+			}
+		}
+		if match {
+			return true
+		}
+	}
+	return false
+}
+
 func explicitHoneypotSignals(fields ...honeypotField) []string {
 	var signals []string
 	seen := map[string]bool{}
 	for _, field := range fields {
-		value := strings.ToLower(field.value)
-		if value == "" {
+		// Only scanner fields that identify a service/product are eligible.
+		// Page titles, arbitrary TLS JSON and version strings are target-controlled
+		// prose and must never independently trigger an automatic stop.
+		if !honeypotIdentityFields[field.name] || strings.TrimSpace(field.value) == "" {
 			continue
 		}
 		for _, name := range knownHoneypotNames {
-			if strings.Contains(value, name) {
+			if containsHoneypotName(field.value, name) {
 				signal := field.name + ":" + name
 				if !seen[signal] {
 					seen[signal] = true
@@ -327,7 +363,7 @@ func (s *scanIngest) addNmapHost(h nmapHost) {
 		fingerprintFields = append(fingerprintFields,
 			honeypotField{name: "nmap.service.name", value: p.Svc.Name},
 			honeypotField{name: "nmap.service.product", value: p.Svc.Product},
-			honeypotField{name: "nmap.service.version", value: p.Svc.Version})
+			)
 		for _, cpe := range p.Svc.CPE {
 			fingerprintFields = append(fingerprintFields, honeypotField{name: "nmap.service.cpe", value: cpe})
 		}
@@ -498,9 +534,7 @@ func (s *scanIngest) addHttpx(line []byte) {
 	}
 	s.Assets = append(s.Assets, item)
 	fields := []honeypotField{
-		{name: "httpx.title", value: r.Title},
 		{name: "httpx.webserver", value: r.Webserver},
-		{name: "httpx.tls", value: string(r.TLS)},
 	}
 	for _, tech := range r.Tech {
 		fields = append(fields, honeypotField{name: "httpx.tech", value: tech})

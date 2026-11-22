@@ -63,3 +63,28 @@ func TestScanIngestDoesNotFlagOrdinaryCloudAndWebFingerprints(t *testing.T) {
 		t.Fatalf("ordinary hosting fingerprints must not quarantine a target: %+v", s.Honeypots)
 	}
 }
+
+func TestScanIngestIgnoresHoneypotWordsInUntrustedPageText(t *testing.T) {
+	line := `{"url":"https://normal.example.test","ip":"198.51.100.77","status_code":200,"title":"Honeypot detection guide","tech":["Nginx"],"webserver":"nginx","tls":{"subject_dn":"CN=honeypot.example.test"}}`
+	s := parseScan(t, "httpx-jsonl", line)
+	if len(s.Honeypots) != 0 {
+		t.Fatalf("page title or certificate metadata must not trigger quarantine: %+v", s.Honeypots)
+	}
+}
+
+func TestScanIngestMatchesProductNamesAsWholeTokens(t *testing.T) {
+	if got := explicitHoneypotSignals(
+		honeypotField{name: "nmap.service.product", value: "Honeywell industrial controller"},
+		honeypotField{name: "nmap.service.version", value: "Cowrie 2.5"},
+		honeypotField{name: "httpx.title", value: "OpenCanary"},
+	); len(got) != 0 {
+		t.Fatalf("untrusted or unrelated fields triggered detection: %v", got)
+	}
+	got := explicitHoneypotSignals(
+		honeypotField{name: "nmap.service.product", value: "Cowrie SSH Honeypot"},
+		honeypotField{name: "httpx.tech", value: "OpenCanary"},
+	)
+	if len(got) != 2 {
+		t.Fatalf("explicit product identities should match: %v", got)
+	}
+}
