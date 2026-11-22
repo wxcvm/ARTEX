@@ -19,6 +19,15 @@ func WithProviderAdmission(ctx context.Context, admit func(context.Context) erro
 	if admit == nil {
 		return ctx
 	}
+	if previous, ok := ctx.Value(providerAdmissionContextKey{}).(func(context.Context) error); ok && previous != nil {
+		combined := func(ctx context.Context) error {
+			if err := previous(ctx); err != nil {
+				return err
+			}
+			return admit(ctx)
+		}
+		return context.WithValue(ctx, providerAdmissionContextKey{}, combined)
+	}
 	return context.WithValue(ctx, providerAdmissionContextKey{}, admit)
 }
 
