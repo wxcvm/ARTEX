@@ -26,6 +26,17 @@ func TestHoneypotAssessmentRoundTripAndExpiry(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
+	otherTask, err := assets.HoneypotAssessments(taskID+1, []string{host})
+	if err != nil {
+		t.Fatal(err)
+	}
+	if len(otherTask) != 0 {
+		t.Fatalf("assessment leaked across task boundaries: %+v", otherTask)
+	}
+	byTask, err := assets.HoneypotAssessmentsForTask(taskID)
+	if err != nil || len(byTask) != 1 {
+		t.Fatalf("task assessment query: items=%+v err=%v", byTask, err)
+	}
 	if len(got) != 1 || got[0].Host != host || got[0].Score != 95 ||
 		got[0].Level != "suspected" || len(got[0].Signals) != 1 ||
 		got[0].Signals[0] != "nmap.service.product:cowrie" ||
