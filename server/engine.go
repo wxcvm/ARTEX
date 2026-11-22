@@ -1128,7 +1128,8 @@ func (e *Engine) runIntent(ctx context.Context, t *Task, name string, worker *ag
 	targetHosts := agent.IntentTargetHosts(e.m.assets, intent)
 	if len(targetHosts) > 0 {
 		registry := e.honeypotFor(t.ID)
-		if assessments, err := e.m.assets.HoneypotAssessments(targetHosts); err == nil {
+		taskIDValue, _ := strconv.ParseInt(t.ID, 10, 64)
+		if assessments, err := e.m.assets.HoneypotAssessments(taskIDValue, targetHosts); err == nil {
 			registry.RecordAll(assessments)
 		} else {
 			log.Printf("[honeypot] task %s intent #%d could not load prior target assessments: %v", t.ID, intent.ID, err)
