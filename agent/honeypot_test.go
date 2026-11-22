@@ -1,10 +1,14 @@
 package agent
 
 import (
+	"context"
+	"encoding/json"
 	"testing"
 	"time"
 
 	"github.com/Autumn-27/artex/db"
+	acperm "github.com/Autumn-27/norma/permission"
+	actool "github.com/Autumn-27/norma/tool"
 )
 
 func TestHoneypotRegistryRequiresExplicitUnexpiredSignal(t *testing.T) {
@@ -67,5 +71,36 @@ func TestAssetTargetHostsKeepsURLDomainAndIPAliases(t *testing.T) {
 		if got[i] != want[i] {
 			t.Fatalf("hosts=%v want %v", got, want)
 		}
+	}
+}
+
+func TestHoneypotGuardStopsToolBeforeExecution(t *testing.T) {
+	registry := NewHoneypotRegistry()
+	registry.Record(db.HoneypotAssessment{
+		Host: "decoy.example.test", Score: 95, Level: "suspected",
+		Signals: []string{"nmap.service.product:cowrie"},
+	})
+	called, stopped := false, false
+	inner := actool.Build(actool.Spec{
+		Name: "test_probe",
+		Description: "test probe",
+		Schema: map[string]any{"type": "object"},
+		Permissions: func(context.Context, json.RawMessage, acperm.Context) acperm.Decision {
+			return acperm.Allowed()
+		},
+		Run: func(context.Context, json.RawMessage, *actool.ToolContext) (actool.Result, error) {
+			called = true
+			return actool.Text("executed"), nil
+		},
+	})
+	runtime := &HoneypotRuntime{
+		Registry: registry,
+		Targets: []string{"decoy.example.test"},
+		Stop: func() { stopped = true },
+	}
+	guarded := guardHoneypotTools([]actool.CoreTool{inner}, runtime)
+	_, err := guarded[0].Call(context.Background(), json.RawMessage(`{}`), nil)
+	if err != nil || called || !stopped {
+		t.Fatalf("quarantined tool executed or failed to stop: called=%v stopped=%v err=%v", called, stopped, err)
 	}
 }
