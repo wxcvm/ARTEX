@@ -8,6 +8,7 @@ import (
 	"io"
 	"os"
 	"path/filepath"
+	"strconv"
 	"strings"
 
 	"github.com/Autumn-27/artex/db"
@@ -150,20 +151,7 @@ func (t *ToolSet) runScanIngest(ctx context.Context, in json.RawMessage, tc *act
 	}
 	runtime := t.honeypotRuntime
 	var honeypotPersistErrors []string
-	for _, assessment := range s.Honeypots {
-		if runtime != nil && runtime.Registry != nil {
-			runtime.Registry.Record(assessment)
-		}
-		if err := t.as.RecordHoneypotAssessment(t.taskID, assessment); err != nil && len(honeypotPersistErrors) < scanNotableMax {
-			honeypotPersistErrors = append(honeypotPersistErrors, err.Error())
-		}
-	}
-	if len(s.Honeypots) > 0 {
-		out["honeypot_assessments"] = s.Honeypots
-	}
-	if len(honeypotPersistErrors) > 0 {
-		out["honeypot_persist_errors"] = honeypotPersistErrors
-	}
+	var insertedAssetIDs []int64
 	if len(s.Assets) > 0 {
 		raw, _ := json.Marshal(map[string]any{"assets": s.Assets})
 		r, err := t.insertAssets().Call(ctx, raw, nil)
@@ -171,12 +159,19 @@ func (t *ToolSet) runScanIngest(ctx context.Context, in json.RawMessage, tc *act
 			return r, err
 		}
 		var res struct {
-			Results []json.RawMessage `json:"results"`
+			Results []struct {
+				ID int64 `json:"id"`
+			} `json:"results"`
 			Errors  []struct {
 				Error string `json:"error"`
 			} `json:"errors"`
 		}
 		_ = json.Unmarshal([]byte(r.Flatten()), &res)
+		for _, result := range res.Results {
+			if result.ID > 0 {
+				insertedAssetIDs = append(insertedAssetIDs, result.ID)
+			}
+		}
 		out["assets_written"] = len(res.Results)
 		if len(res.Errors) > 0 {
 			var errs []string
@@ -186,7 +181,61 @@ func (t *ToolSet) runScanIngest(ctx context.Context, in json.RawMessage, tc *act
 			out["asset_errors"] = map[string]any{"count": len(res.Errors), "first": errs}
 		}
 	}
-	written, existing, errs, err := t.recordScanFacts(s.Facts)
+	// Only persist a fingerprint when at least one corresponding asset passed
+	// the existing task asset gate. This prevents an out-of-scope scanner result
+	// from poisoning the task's quarantine cache.
+	allowedHosts := map[string]bool{}
+	if len(insertedAssetIDs) > 0 {
+		if assets, err := t.as.GetByIDs(insertedAssetIDs); err == nil {
+			for _, host := range AssetTargetHosts(assets) {
+				allowedHosts[host] = true
+			}
+		} else {
+			honeypotPersistErrors = append(honeypotPersistErrors, "could not verify accepted scan assets: "+err.Error())
+		}
+	}
+	var persistedHoneypots []db.HoneypotAssessment
+	for _, assessment := range s.Honeypots {
+		host := normalizeHoneypotTarget(assessment.Host)
+		if !allowedHosts[host] {
+			continue
+		}
+		if runtime != nil && runtime.Registry != nil {
+			runtime.Registry.Record(assessment)
+		}
+		if err := t.as.RecordHoneypotAssessment(t.taskID, assessment); err != nil {
+			if len(honeypotPersistErrors) < scanNotableMax {
+				honeypotPersistErrors = append(honeypotPersistErrors, err.Error())
+			}
+			continue
+		}
+		persistedHoneypots = append(persistedHoneypots, assessment)
+	}
+	if len(persistedHoneypots) > 0 {
+		out["honeypot_assessments"] = persistedHoneypots
+	}
+	if len(honeypotPersistErrors) > 0 {
+		out["honeypot_persist_errors"] = honeypotPersistErrors
+	}
+	facts := s.Facts
+	if len(s.Honeypots) > 0 {
+		facts = make([]factItem, 0, len(s.Facts))
+		for _, fact := range s.Facts {
+			if fact.Source != factSourceHoneypot {
+				facts = append(facts, fact)
+				continue
+			}
+			raw, err := strconv.Unquote(fact.Detail)
+			if err != nil {
+				continue
+			}
+			var assessment db.HoneypotAssessment
+			if json.Unmarshal([]byte(raw), &assessment) == nil && allowedHosts[normalizeHoneypotTarget(assessment.Host)] {
+				facts = append(facts, fact)
+			}
+		}
+	}
+	written, existing, errs, err := t.recordScanFacts(facts)
 	if err != nil {
 		return actool.Errorf("facts: " + err.Error()), nil
 	}
