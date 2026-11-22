@@ -207,6 +207,9 @@ func AssetTargetHosts(assets []*db.Asset) []string {
 		add(asset.Domain)
 		add(asset.IP)
 		add(asset.RootDomain)
+		for _, domain := range asset.BoundDomains {
+			add(domain)
+		}
 	}
 	sort.Strings(hosts)
 	return hosts
