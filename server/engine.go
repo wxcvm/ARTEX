@@ -1126,20 +1126,22 @@ func (e *Engine) runIntent(ctx context.Context, t *Task, name string, worker *ag
 	// this task's concurrent workers. The provider admission hook runs before
 	// every physical model request, including Recorder retries.
 	targetHosts := agent.IntentTargetHosts(e.m.assets, intent)
+	registry := e.honeypotFor(t.ID)
+	taskIDValue, _ := strconv.ParseInt(t.ID, 10, 64)
 	if len(targetHosts) > 0 {
-		registry := e.honeypotFor(t.ID)
-		taskIDValue, _ := strconv.ParseInt(t.ID, 10, 64)
 		if assessments, err := e.m.assets.HoneypotAssessments(taskIDValue, targetHosts); err == nil {
 			registry.RecordAll(assessments)
 		} else {
 			log.Printf("[honeypot] task %s intent #%d could not load prior target assessments: %v", t.ID, intent.ID, err)
 		}
-		runtime := &agent.HoneypotRuntime{
-			Registry: registry,
-			Targets: targetHosts,
-			Stop: func() { workCancel(agent.AbortHoneypot) },
-		}
-		workCtx = agent.WithHoneypotRuntime(workCtx, runtime)
+	}
+	runtime := &agent.HoneypotRuntime{
+		Registry: registry,
+		Targets: targetHosts,
+		Stop: func() { workCancel(agent.AbortHoneypot) },
+	}
+	workCtx = agent.WithHoneypotRuntime(workCtx, runtime)
+	if len(targetHosts) > 0 {
 		workCtx = llmrec.WithProviderAdmission(workCtx, func(context.Context) error {
 			if registry.AllQuarantined(targetHosts) {
 				workCancel(agent.AbortHoneypot)
