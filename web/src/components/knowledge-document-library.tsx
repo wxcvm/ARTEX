@@ -90,7 +90,7 @@ export function KnowledgeDocumentLibrary({taskId}: {taskId?: string}) {
   async function upload(){
     if(!files.length||busy)return;
     setBusy(true);setError("");setUploadErrors([]);stopUpload.current=false;
-    let count=0;
+    let count=0, reused=0;
     const failed:File[]=[];
     let last:KnowledgeDocument|null=null;
     const pending=[...files];
@@ -100,8 +100,10 @@ export function KnowledgeDocumentLibrary({taskId}: {taskId?: string}) {
         const file=pending[i];
         setUploadProgress((i+1)+"/"+pending.length+" · "+file.name);
         try{
-          last=await api.uploadKnowledgeDocument(file,uploadCategory,taskId,{forceOCR,ocrLanguage});
-          count++;
+          const result=await api.uploadKnowledgeDocument(file,uploadCategory,taskId,{forceOCR,ocrLanguage});
+          last=result;
+          if(result.reused)reused++;
+          else count++;
         }catch(e){
           failed.push(file);
           setUploadErrors(old=>[...old,file.name+": "+(e as Error).message]);
@@ -110,8 +112,9 @@ export function KnowledgeDocumentLibrary({taskId}: {taskId?: string}) {
       setFiles(failed);
       if(input.current)input.current.value="";
       if(last){clearSelection();setSelected(last);refresh();}
-      setUploadProgress(tr("已导入 ","Imported ")+count+"/"+pending.length+(failed.length?tr("；未完成 ","; remaining ")+failed.length:""));
-      if(count>0)toast.success(tr("已导入文档：","Documents imported: ")+count);
+      const reuseNote=reused?tr("；复用已有文档 ","; reused existing ")+reused:"";
+      setUploadProgress(tr("新增 ","Added ")+count+"/"+pending.length+reuseNote+(failed.length?tr("；未完成 ","; remaining ")+failed.length:""));
+      if(count+reused>0)toast.success(tr("新增文档：","Documents added: ")+count+reuseNote);
     }finally{setBusy(false);}
   }
   async function remove(){

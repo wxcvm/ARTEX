@@ -7,8 +7,6 @@ import (
 	"errors"
 	"strings"
 	"time"
-
-	"github.com/google/uuid"
 )
 
 var ErrKnowledgeDocumentNotFound = errors.New("knowledge document not found")
@@ -72,8 +70,7 @@ func (d *DB) SaveKnowledgeDocument(ctx context.Context, taskID int64, id string,
 		if err:=LockTaskEvidenceTx(tx,taskID); err!=nil {return err}
 		var err error
 		if id=="" {
-			out,err=scanKnowledgeDocument(tx.QueryRowContext(ctx,`INSERT INTO knowledge_documents(id,task_id,title,category,content,source_filename)
-VALUES($1,NULLIF($2::bigint,0),$3,$4,$5,$6) RETURNING `+knowledgeDocumentCols,uuid.NewString(),taskID,doc.Title,doc.Category,doc.Content,doc.SourceFilename))
+			out,err=insertKnowledgeDocumentTx(ctx,tx,taskID,doc)
 		} else {
 			out,err=scanKnowledgeDocument(tx.QueryRowContext(ctx,`UPDATE knowledge_documents SET title=$3,category=$4,content=$5,updated_at=now()
 WHERE id=$1 AND task_id IS NOT DISTINCT FROM NULLIF($2::bigint,0) RETURNING `+knowledgeDocumentCols,id,taskID,doc.Title,doc.Category,doc.Content))

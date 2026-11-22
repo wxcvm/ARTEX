@@ -295,7 +295,8 @@ export const api = {
       const error = await r.json().catch(() => ({}));
       throw new Error(error.error || `Upload failed: ${r.status}`);
     }
-    return r.json() as Promise<KnowledgeDocument>;
+    const document = await r.json() as KnowledgeDocument;
+    return { ...document, reused: r.headers.get("X-ARTEX-Knowledge-Upload") === "reused" };
   },
   knowledgeEntry: (id: number) => get<{ id: number; title: string; category?: string; kind?: string; usage?: string; content: string; verified: boolean }>(`/knowledge?id=${id}`),
   // Backend application version (injected via ldflags at release, default "dev").
