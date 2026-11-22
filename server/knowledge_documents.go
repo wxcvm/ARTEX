@@ -51,6 +51,9 @@ func knowledgeDocumentError(w http.ResponseWriter,err error){
 	switch {
 	case errors.Is(err,db.ErrKnowledgeDocumentNotFound),errors.Is(err,sql.ErrNoRows): writeErr(w,404,"document not found")
 	case errors.Is(err,db.ErrTaskArchiveState): writeErr(w,409,"task is being archived or is archived")
+	case errors.Is(err,db.ErrKnowledgeHandoffConflict): writeErr(w,409,"handoff conflicts with an existing document; nothing was overwritten")
+	case errors.Is(err,db.ErrKnowledgeHandoffScope): writeErr(w,400,"select an ARTEX task before uploading a Purge handoff")
+	case errors.Is(err,kb.ErrInvalidPurgeHandoff): writeErr(w,400,"Purge handoff filename does not match the content digest")
 	default: writeErr(w,500,"knowledge document operation failed")
 	}
 }
@@ -104,6 +107,27 @@ func (s *Server) uploadKnowledgeDocument(w http.ResponseWriter,r *http.Request){
 	if err!=nil{writeErr(w,400,err.Error());return}
 	doc:=db.KnowledgeDocument{Title:strings.TrimSuffix(name,filepath.Ext(name)),Category:r.FormValue("category"),Content:content,SourceFilename:name}
 	if !validKnowledgeDocument(&doc){writeErr(w,400,"invalid document metadata");return}
+	handoff, err := kb.ParsePurgeHandoff(name, content)
+	if err != nil {
+		knowledgeDocumentError(w, err)
+		return
+	}
+	if handoff != nil {
+		doc.SourceFilename, doc.Content = handoff.Filename, handoff.Content
+		doc.Title = strings.TrimSuffix(handoff.Filename, ".md")
+		out, reused, err := s.m.pg.SavePurgeHandoffDocument(r.Context(), id, doc)
+		if err != nil {
+			knowledgeDocumentError(w, err)
+			return
+		}
+		if reused {
+			w.Header().Set("X-ARTEX-Knowledge-Upload", "reused")
+			writeJSON(w, 200, out)
+		} else {
+			writeJSON(w, 201, out)
+		}
+		return
+	}
 	out,err:=s.m.pg.SaveKnowledgeDocument(r.Context(),id,"",doc)
 	if err!=nil{knowledgeDocumentError(w,err);return}
 	writeJSON(w,201,out)
