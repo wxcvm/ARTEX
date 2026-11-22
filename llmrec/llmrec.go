@@ -190,6 +190,14 @@ func (r *Recorder) Stream(ctx context.Context, req llm.CompletionRequest) iter.S
 				seenContent  bool
 				stopped      bool
 			)
+			// The admission decision belongs to the actual provider attempt.
+			// Empty-response retries must each pass it again, not reuse the
+			// initial approval when the task budget has since been exhausted.
+			if admissionErr := checkProviderAdmission(ctx); admissionErr != nil {
+				streamErr = admissionErr
+				yield(llm.StreamEvent{}, admissionErr)
+				return
+			}
 			// Hold metadata until the first content event. An empty reply
 			// never reaches the caller, and hence cannot appear successful.
 			for ev, err := range r.inner.Stream(ctx, req) {
@@ -296,13 +304,24 @@ func (r *Recorder) Complete(ctx context.Context, req llm.CompletionRequest) (llm
 	}
 
 
-	msg, stopReason, usage, err := r.inner.Complete(ctx, req)
-	meterPhysicalAttempt(ctx, usage)
-	for attempt := 0; attempt < emptyResponseRetries && err == nil && ctx.Err() == nil && emptyMessage(msg); attempt++ {
+	var (
+		msg        llm.Message
+		stopReason string
+		usage      llm.Usage
+		err        error
+	)
+	for attempt := 0; attempt <= emptyResponseRetries; attempt++ {
+		if admissionErr := checkProviderAdmission(ctx); admissionErr != nil {
+			err = admissionErr
+			break
+		}
 		var nextUsage llm.Usage
 		msg, stopReason, nextUsage, err = r.inner.Complete(ctx, req)
 		meterPhysicalAttempt(ctx, nextUsage)
 		usage.Add(nextUsage)
+		if err != nil || ctx.Err() != nil || !emptyMessage(msg) {
+			break
+		}
 	}
 	if err == nil && ctx.Err() != nil {
 		err = ctx.Err()
