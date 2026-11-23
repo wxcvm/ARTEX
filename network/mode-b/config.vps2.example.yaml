@@ -1,0 +1,58 @@
+# EXAMPLE ONLY: copy to config.yaml (gitignored), fill credentials, then verify.
+# Intended path: isolated ARTEX executor -> Mihomo -> airport SOCKS -> VPS1 -> VPS2 -> target.
+# Requires a REAL independently operated VPS2 node. This file does not create one.
+# DNS and the final MATCH route use vps2. No DIRECT or select fallback is provided.
+mixed-port: 7890
+allow-lan: true
+bind-address: "*"
+mode: rule
+ipv6: false
+log-level: warning
+
+dns:
+  enable: true
+  ipv6: false
+  respect-rules: true
+  nameserver:
+    - "https://1.1.1.1/dns-query#vps2"
+
+proxies:
+  - name: airport-entry
+    type: socks5
+    # Must be reachable from this Docker gateway, not public/LAN-exposed.
+    server: host.docker.internal
+    port: 7890
+    udp: true
+
+  - name: vps1
+    type: vless
+    # Preserve the existing VPS1 VLESS + REALITY TCP listener.
+    # HY2 can replace this node ONLY when the upstream chain carries UDP.
+    server: 192.0.2.10  # REPLACE with literal VPS1 IP
+    port: 443
+    uuid: "REPLACE_WITH_VPS1_UUID"
+    tls: true
+    servername: "REPLACE_WITH_VPS1_REALITY_SNI"
+    client-fingerprint: chrome
+    reality-opts:
+      public-key: "REPLACE_WITH_VPS1_REALITY_PUBLIC_KEY"
+      short-id: "REPLACE_WITH_VPS1_SHORT_ID"
+    dialer-proxy: airport-entry
+
+  - name: vps2
+    type: vless
+    # Must be a DIFFERENT server reachable through VPS1's outbound route.
+    # VPS2 is the observed public exit when this node successfully connects.
+    server: 198.51.100.20  # REPLACE with literal VPS2 IP
+    port: 443
+    uuid: "REPLACE_WITH_VPS2_UUID"
+    tls: true
+    servername: "REPLACE_WITH_VPS2_REALITY_SNI"
+    client-fingerprint: chrome
+    reality-opts:
+      public-key: "REPLACE_WITH_VPS2_REALITY_PUBLIC_KEY"
+      short-id: "REPLACE_WITH_VPS2_SHORT_ID"
+    dialer-proxy: vps1
+
+rules:
+  - MATCH,vps2
