@@ -29,6 +29,23 @@ for service in tool-executor tool-runner mode-b-egress; do
   fi
 done
 
+# Validate the *running* Docker network, not only the Compose YAML.
+# Docker internal:true by itself may allow access to host-bound proxy ports.
+# Check through the daemon API so this also works with Docker Desktop's Linux VM.
+execution_network="$("${compose[@]}" config --format json | python3 -c '
+import json,sys
+print(json.load(sys.stdin)["networks"]["runner-execution"]["name"])
+')"
+for family in ipv4 ipv6; do
+  option="com.docker.network.bridge.gateway_mode_${family}"
+  actual="$(docker network inspect "$execution_network" --format "{{ index .Options \"$option\" }}")"
+  if [[ "$actual" != isolated ]]; then
+    echo "FAILED: runner-execution host-gateway isolation not active ($family); Docker Engine 28+ required" >&2
+    exit 1
+  fi
+done
+echo 'PASS: running Docker executor bridge has isolated IPv4/IPv6 gateways'
+
 # A tool-controlled command must not escape by explicitly bypassing proxy env.
 if "${compose[@]}" exec -T tool-executor sh -ec '
   env -u HTTP_PROXY -u HTTPS_PROXY -u ALL_PROXY \

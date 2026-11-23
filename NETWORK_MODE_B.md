@@ -101,8 +101,11 @@ Linux Docker host as ARTEX:
 MODE_B_EXPECTED_EXIT_IP=<your-known-VPS1-or-VPS2-public-IPv4> bash scripts/mode-b-verify.sh
 ```
 
-The script checks that the executor cannot directly connect to an external
-IPv4 address, then makes one explicit proxied HTTPS request to compare the
+The script first checks the **actual running Docker network options** for
+isolated IPv4/IPv6 host gateways. This works with Docker Desktop's Linux
+daemon API without assuming the Docker bridge interface is visible from WSL.
+It then checks that the executor cannot directly connect to an external
+IPv4 address, and makes one explicit proxied HTTPS request to compare the
 observed public IPv4 with the provided expected exit. It does not change
 Docker networks, stop a gateway, log the observed IP or use real credentials in
 CI. A successful check **does not establish the airport hop, VPS2 tunnel or
