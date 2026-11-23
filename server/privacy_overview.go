@@ -3,6 +3,7 @@ package server
 import (
 	"context"
 	"net/http"
+	"os"
 	"time"
 
 	"github.com/Autumn-27/artex/agent"
@@ -18,6 +19,7 @@ type PrivacyOverview struct {
 	ModelKeys ModelKeysOverview `json:"model_keys"`
 	Config ConfigOverview `json:"config"`
 	Outbound OutboundOverview `json:"outbound"`
+	ExecutionNetwork ExecutionNetworkOverview `json:"execution_network"`
 }
 
 type ListenerOverview struct {
@@ -61,6 +63,39 @@ type OutboundOverview struct {
 	ProxyConfigured int `json:"proxy_configured"`
 }
 
+// ExecutionNetworkOverview is deliberately configuration-only. The ARTEX
+// controller cannot infer Docker routes, actual proxy transit or VPS2 from
+// its environment. Do not advertise a working kill switch without observations.
+type ExecutionNetworkOverview struct {
+	Mode string `json:"mode"`
+	Configuration string `json:"configuration"`
+	Verification string `json:"verification"`
+	Scope string `json:"scope"`
+	FinalExit string `json:"final_exit"`
+}
+
+func executionNetworkOverview(getenv func(string) string) ExecutionNetworkOverview {
+	result := ExecutionNetworkOverview{
+		Mode: "off", Configuration: "not_configured", Verification: "not_tested",
+		Scope: "none", FinalExit: "not_tested",
+	}
+	socket := getenv("ARTEX_RUNNER_SOCKET")
+	proxy := getenv("ARTEX_RUNNER_PROXY_ADDR")
+	if socket == "" && proxy == "" {
+		return result
+	}
+	result.Mode = "other"
+	result.Configuration = "partial"
+	if socket != "" {
+		result.Scope = "runner_builtins_intended"
+	}
+	if socket == "/run/artex-runner/runner.sock" && proxy == "http://mode-b-egress:7890" {
+		result.Mode = "B"
+		result.Configuration = "configured_only"
+	}
+	return result
+}
+
 func summarizeModelKeys(s db.ModelKeyStatus) ModelKeysOverview {
 	return ModelKeysOverview{State:"complete", KeyState:s.KeyState, Total:s.Total, Empty:s.Empty,
 		PlaintextOnly:s.PlaintextOnly, EncryptedOnly:s.EncryptedOnly, Mixed:s.Mixed,
@@ -101,6 +136,7 @@ func (s *Server) privacyOverviewSnapshot(ctx context.Context) PrivacyOverview {
 		ModelKeys: ModelKeysOverview{State:"unavailable", KeyState:"not_inspected"},
 		Config: summarizeConfig(s.sensitiveConfigSnapshot(ctx)),
 		Outbound: summarizeOutbound(agent.ModelOutboundAudit()),
+		ExecutionNetwork: executionNetworkOverview(os.Getenv),
 	}
 	if s.m != nil && s.m.pg != nil {
 		if status, err := s.m.pg.ModelKeyDiagnostics(ctx); err == nil {
