@@ -58,6 +58,8 @@ jobs:
           go test ./modeb -count=1
       - name: Docker Compose broker/executor startup smoke
         run: bash scripts/ci/runner-compose-smoke.sh
+      - name: Mode B Docker direct egress denial (no credentials)
+        run: bash scripts/ci/mode-b-network-smoke.sh
       - name: Full Compose ARTEX/PostgreSQL/local proxy smoke
         run: bash scripts/ci/runner-full-stack-smoke.sh
       # Skipped tests, tracked in issue #9:
