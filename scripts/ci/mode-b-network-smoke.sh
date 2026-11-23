@@ -28,7 +28,13 @@ import json, sys
 cfg = json.load(open(sys.argv[1]))
 services = cfg["services"]
 executor, gateway, broker, controller = (services[x] for x in ("tool-executor", "mode-b-egress", "tool-runner", "artex"))
-assert cfg["networks"]["runner-execution"]["internal"] is True
+internal_net = cfg["networks"]["runner-execution"]
+assert internal_net["internal"] is True
+assert internal_net["driver"] == "bridge"
+for family in ("ipv4", "ipv6"):
+    option = "com.docker.network.bridge.gateway_mode_" + family
+    assert internal_net["driver_opts"][option] == "isolated", (option, internal_net)
+assert internal_net.get("enable_ipv6", False) is False
 assert set(executor["networks"]) == {"runner-execution"}
 assert set(gateway["networks"]) == {"runner-execution", "mode-b-uplink"}
 assert set(broker["networks"]) == {"runner-control"}
@@ -72,6 +78,15 @@ PY
 mock_gateway="${project}-mock-gateway"
 network="${project}_runner-execution"
 docker network inspect "$network" >/dev/null
+# Docker Engine 28+ isolated-gateway mode leaves the bridge device without
+# any host-side IPv4 address. Ordinary internal:true alone does not.
+network_id="$(docker network inspect -f '{{.Id}}' "$network")"
+bridge="br-${network_id:0:12}"
+ip -4 address show dev "$bridge" > "$tmp/bridge-ipv4.txt"
+if grep -Eq '(^|[[:space:]])inet[[:space:]]' "$tmp/bridge-ipv4.txt"; then
+  echo "Mode B ERROR: execution bridge still has a reachable host IPv4 address" >&2
+  exit 1
+fi
 docker run --detach --rm --name "$mock_gateway" \
   --network "$network" --network-alias mode-b-egress \
   --read-only --cap-drop ALL --security-opt no-new-privileges \
