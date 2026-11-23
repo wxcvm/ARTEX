@@ -1,0 +1,106 @@
+# Mode B opt-in: tool-executor -> private Mihomo gateway -> airport -> VPS1.
+# Compose with docker-compose.yml ONLY, not docker-compose.runner.yml.
+# VPS2 is a separate egress policy on VPS1 and is NOT implied by this file.
+services:
+  postgres:
+    networks: [runner-control]
+
+  artex:
+    environment:
+      ARTEX_RUNNER_SOCKET: /run/artex-runner/runner.sock
+      # Rewrites the existing localhost:8788 tool proxy to the isolated gateway.
+      # The standard traffic-recording relay is intentionally not connected.
+      ARTEX_RUNNER_PROXY_ADDR: http://mode-b-egress:7890
+    volumes:
+      - runner_socket:/run/artex-runner
+    depends_on:
+      tool-runner:
+        condition: service_healthy
+      mode-b-egress:
+        condition: service_started
+    networks: [runner-control]
+
+  tool-runner:
+    image: ${ARTEX_IMAGE:-artex}:${ARTEX_TAG:-local}
+    entrypoint: ["/app/artex"]
+    command: ["-runner-broker-socket", "/run/artex-runner/runner.sock", "-runner-broker-target", "/run/artex-executor/executor.sock"]
+    environment:
+      ARTEX_RUNNER_REMOTE_PEER_ONLY: "1"
+    volumes:
+      - runner_socket:/run/artex-runner
+      - runner_executor_socket:/run/artex-executor
+    depends_on:
+      tool-executor:
+        condition: service_healthy
+    read_only: true
+    cap_drop: [ALL]
+    security_opt: ["no-new-privileges:true"]
+    networks: [runner-control]
+    healthcheck:
+      test: ["CMD-SHELL", "test -S /run/artex-runner/runner.sock"]
+      interval: 2s
+      timeout: 2s
+      retries: 20
+    restart: unless-stopped
+
+  # No default Internet route; clients must explicitly use mode-b-egress.
+  # Direct sockets from Bash/nmap/other non-proxy-aware tools fail rather than fall back.
+  tool-executor:
+    image: ${ARTEX_IMAGE:-artex}:${ARTEX_TAG:-local}
+    entrypoint: ["/app/artex"]
+    command: ["-runner-socket", "/run/artex-executor/executor.sock"]
+    environment:
+      HOME: /tmp
+      ARTEX_RUNNER_REMOTE_PEER_ONLY: "1"
+      HTTP_PROXY: http://mode-b-egress:7890
+      HTTPS_PROXY: http://mode-b-egress:7890
+      ALL_PROXY: socks5h://mode-b-egress:7890
+      http_proxy: http://mode-b-egress:7890
+      https_proxy: http://mode-b-egress:7890
+      all_proxy: socks5h://mode-b-egress:7890
+      NO_PROXY: localhost,127.0.0.1
+      no_proxy: localhost,127.0.0.1
+    volumes:
+      - runner_executor_socket:/run/artex-executor
+      - ./data/tasks:/app/data/tasks
+      - ./data/sessions:/app/data/sessions
+    depends_on:
+      mode-b-egress:
+        condition: service_started
+    read_only: true
+    tmpfs: ["/tmp:rw,nosuid,size=1g"]
+    cap_drop: [ALL]
+    cap_add: [NET_RAW]
+    security_opt: ["no-new-privileges:true"]
+    networks: [runner-execution]
+    healthcheck:
+      test: ["CMD-SHELL", "test -S /run/artex-executor/executor.sock"]
+      interval: 2s
+      timeout: 2s
+      retries: 20
+    restart: unless-stopped
+
+  # Only this gateway joins an outward-facing network; never publish 7890.
+  mode-b-egress:
+    image: ${ARTEX_MODE_B_MIHOMO_IMAGE:-docker.io/metacubex/mihomo:Alpha}
+    command: ["-f", "/etc/mihomo/config.yaml"]
+    volumes:
+      - ./network/mode-b/config.yaml:/etc/mihomo/config.yaml:ro
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    read_only: true
+    tmpfs: ["/tmp:rw,nosuid,size=64m"]
+    cap_drop: [ALL]
+    security_opt: ["no-new-privileges:true"]
+    networks: [runner-execution, mode-b-uplink]
+    restart: unless-stopped
+
+networks:
+  runner-control:
+  runner-execution:
+    internal: true
+  mode-b-uplink:
+
+volumes:
+  runner_socket:
+  runner_executor_socket:
