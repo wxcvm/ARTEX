@@ -1,0 +1,63 @@
+# Mode B: Purge × ARTEX opt-in chained egress (phase 1)
+
+> **Status:** implementation candidate. Static checks are not a runtime leak test.
+> Intended topology: ARTEX isolated tool runner → Mihomo → existing airport proxy → VPS1 (VLESS+REALITY or HY2) → [later: VPS2 egress].
+> VPS2 is **not yet provisioned or enforced** by this change. The proxy chain only exists after the operator supplies real node values.
+
+## Why this is a separate Compose file
+
+The default Docker and Windows installs stay unchanged. Use **only** the base file plus the Mode B file, **never** combine this with `docker-compose.runner.yml`. The latter uses a recording relay on another network; combining both would create an uncontrolled alternative exit.
+
+The controller/LLM, PostgreSQL, third-party MCP connectors, browser services outside the executor, and native Windows clients are **not** covered by this phase. The isolation protects only `tool-executor` (Norma Read/Write/Bash/PTY/background built-ins). An external subprocess in another service is outside this boundary.
+
+## Set up on an owned Linux Docker host
+
+1. Build the current fork's `artex:local` image per the main README. Keep `.env` local and confidential.
+2. Copy `network/mode-b/config.example.yaml` to `network/mode-b/config.yaml` and set your own airport SOCKS5 address and VPS1 VLESS+REALITY credentials. **Do not commit `config.yaml`**; it is gitignored.
+3. `airport-entry` is the **first** hop. On Windows Docker Desktop, `host.docker.internal` usually resolves to the host; on Linux this file adds `host-gateway`. The airport SOCKS listener must be deliberately reachable from the gateway, and should not be exposed to your LAN/public internet. A host-local listener may not be reachable through `host.docker.internal`; test this instead of enabling wide-open LAN binding.
+4. Keep `vps1.dialer-proxy: airport-entry`, `MATCH,vps1`, and **no** DIRECT/fallback group. VPS1 `server` should be a literal IP to avoid bootstrap DNS outside the chain. VLESS/REALITY is the included example, not a new server: use your existing VPS1 listener. For HY2, replace only the VPS1 node with a valid `hysteria2` node; the airport SOCKS5 proxy must support UDP forwarding for the QUIC handshake. If it cannot, prefer the existing TCP VLESS path rather than direct-fallback.
+5. Check and start:
+
+```sh
+test -f network/mode-b/config.yaml || { echo 'missing local Mode B config'; exit 1; }
+docker compose -f docker-compose.yml -f docker-compose.mode-b.yml config --quiet
+docker compose -f docker-compose.yml -f docker-compose.mode-b.yml up -d
+```
+
+The proxy image may be pinned through `ARTEX_MODE_B_MIHOMO_IMAGE`; the default is the upstream Alpha image. A checked-in example does not prove node availability or a successful SOCKS UDP bridge.
+
+## Isolation properties (and limits)
+
+- `tool-executor` joins only the Docker network `runner-execution`, explicitly marked `internal: true`. No published ports, no external-network membership and no ordinary default route. Its HTTP(S)/SOCKS-aware command-line clients use `mode-b-egress:7890`.
+- `mode-b-egress` is the **only** process attached to both the execution and upstream network. It is a mixed proxy, not a TUN: proxy-unaware raw TCP/UDP/ICMP scanners will be blocked, not magically proxied. Docker DNS, host routing/firewall exceptions and packet-level behavior require separate runtime verification; this is not a host-wide kill switch.
+- The previous ARTEX traffic-recording relay is intentionally excluded. `ARTEX_RUNNER_PROXY_ADDR` instead rewrites controller-provided localhost:8788 tool-proxy settings to the chained egress gateway. Traffic capture may not work as before. Do not silently add the relay back.
+- No VPS admin secrets, SSH private keys, cloud provider credentials, API keys or host Docker socket are mounted into the executor/gateway.
+- A stopped gateway, incorrect airport settings, invalid VPS1 credentials or a broken upstream means HTTP requests should fail. Do not add a DIRECT/fallback rule to restore connectivity.
+
+## Acceptance (requires a real host and both your existing nodes)
+
+Use a dedicated, authorized test target and **do not run live tasks while changing the gateway**.
+
+```sh
+# 1. Direct connection must fail even with the proxy environment stripped.
+docker compose -f docker-compose.yml -f docker-compose.mode-b.yml exec -T tool-executor \
+  sh -c 'env -u HTTP_PROXY -u HTTPS_PROXY -u ALL_PROXY -u http_proxy -u https_proxy -u all_proxy curl --noproxy "*" --connect-timeout 5 -fsS https://example.org/'
+
+# 2. Via gateway: must work after supplying real credentials.
+docker compose -f docker-compose.yml -f docker-compose.mode-b.yml exec -T tool-executor \
+  curl --proxy http://mode-b-egress:7890 --noproxy "" --connect-timeout 10 -fsS https://api.ipify.org
+
+# 3. Stop gateway, then repeat (2): must fail, without direct fallback.
+docker compose -f docker-compose.yml -f docker-compose.mode-b.yml stop mode-b-egress
+docker compose -f docker-compose.yml -f docker-compose.mode-b.yml up -d mode-b-egress
+```
+
+Check IPv4 and IPv6 separately, monitor DNS from the **host** and gateway, and check the exit from a target you own. Record a positive transit result plus negative airport/VPS1 outage tests. Running a command against `api.ipify.org` shows only that command's observed source IP, not a full application privacy proof. Also verify restart, PTY/background tools and every enabled MCP/browser path before claiming production-ready. Keep local audit logs intact.
+
+## Phase 2: VPS2
+
+The planned final path is airport → VPS1 → VPS2, preserving VPS1's existing HY2/VLESS listener. To obtain two independent servers at zero extra cost, investigate an eligible free-tier VM; availability and eligibility are **not guaranteed**. Establish a WireGuard tunnel **only on VPS1 for the service's outbound traffic**, with routing and firewall rules that prevent the VLESS/HY2 handler from failing open when WireGuard is down. Do **not** simply replace VPS1's whole default route: that can sever SSH/admin ingress, leak service traffic or create loops. This phase needs a separately reviewed deployment and tests proving the observed exit really is VPS2.
+
+## Related scope / handoff
+
+Purge's existing VPS SSH management route does **not** route ARTEX or model traffic. Purge's existing proxy settings control only explicit plugin operations. A later read-only Purge network status panel should ingest **verified** ARTEX mode/runner/entry/exit status, and show `not_tested` until real observations are available. Never infer a working chain from saved profile fields alone.
