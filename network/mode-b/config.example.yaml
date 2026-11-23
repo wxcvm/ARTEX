@@ -1,0 +1,44 @@
+# EXAMPLE ONLY. Copy to config.yaml (gitignored) and fill from your own nodes.
+# Scope: ARTEX Docker tool-executor outbound requests that honor proxy settings.
+# No DIRECT/fallback node is defined. VPS2 requires separate configuration on VPS1.
+mixed-port: 7890
+allow-lan: true
+bind-address: "*"
+mode: rule
+ipv6: false
+log-level: warning
+
+dns:
+  enable: true
+  ipv6: false
+  respect-rules: true
+  # HTTPS DNS is also routed through vps1, not a standalone direct resolver.
+  # Using literal IPs for the proxy servers avoids proxy bootstrap DNS.
+  nameserver:
+    - "https://1.1.1.1/dns-query#vps1"
+
+proxies:
+  - name: airport-entry
+    type: socks5
+    # The existing FlClash/Mihomo SOCKS listener must be reachable ONLY from
+    # your Docker host/gateway; binding a proxy on all LAN interfaces is unsafe.
+    server: host.docker.internal
+    port: 7890
+    udp: true
+
+  - name: vps1
+    type: vless
+    server: 192.0.2.10   # REPLACE with your existing VPS1 literal address
+    port: 443
+    uuid: "REPLACE_WITH_VPS1_UUID"
+    tls: true
+    servername: "REPLACE_WITH_REALITY_SNI"
+    client-fingerprint: chrome
+    reality-opts:
+      public-key: "REPLACE_WITH_VPS1_PUBLIC_KEY"
+      short-id: "REPLACE_WITH_VPS1_SHORT_ID"
+    dialer-proxy: airport-entry
+
+# Always choose the chained exit. A broken airport or VPS1 must fail closed.
+rules:
+  - MATCH,vps1

@@ -50,8 +50,18 @@ jobs:
         run: bash scripts/ci/runner-relay-smoke.sh
       - name: Docker broker and tool executor isolation smoke
         run: bash scripts/ci/runner-broker-smoke.sh
+      - name: Mode B verifier shell syntax
+        run: bash -n scripts/mode-b-verify.sh scripts/ci/mode-b-network-smoke.sh
+      - name: Mode B Compose parse (fake credentials, no external traffic)
+        env:
+          POSTGRES_PASSWORD: ci-fixture-only
+        run: |
+          docker compose -f docker-compose.yml -f docker-compose.mode-b.yml config --quiet
+          go test ./modeb -count=1
       - name: Docker Compose broker/executor startup smoke
         run: bash scripts/ci/runner-compose-smoke.sh
+      - name: Mode B Docker direct egress denial (no credentials)
+        run: bash scripts/ci/mode-b-network-smoke.sh
       - name: Full Compose ARTEX/PostgreSQL/local proxy smoke
         run: bash scripts/ci/runner-full-stack-smoke.sh
       # Skipped tests, tracked in issue #9:
