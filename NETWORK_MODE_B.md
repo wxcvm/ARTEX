@@ -26,6 +26,27 @@ docker compose -f docker-compose.yml -f docker-compose.mode-b.yml up -d
 
 The proxy image may be pinned through `ARTEX_MODE_B_MIHOMO_IMAGE`; the default is the upstream stable latest tag; pin a tested image digest for production. A checked-in example does not prove node availability or a successful SOCKS UDP bridge.
 
+## Docker Engine prerequisite and host-gateway bypass
+
+**Docker Engine 28 or newer is required** for `driver_opts:
+com.docker.network.bridge.gateway_mode_ipv4: isolated` on the
+`runner-execution` bridge. The network also sets isolated IPv6 gateway
+mode and leaves IPv6 disabled. The Docker daemon used by Docker Desktop
+or WSL is what matters, not just the version of a CLI installed on the
+Windows host. If this network mode is unsupported, do **not** remove
+these options merely to make Compose start: ordinary `internal: true`
+still allows connections to services bound to the host bridge gateway,
+which could include a separate system proxy and bypass the required VPS
+chain. See the [Docker Engine 28 release notes](https://docs.docker.com/engine/release-notes/28/)
+and [Docker's port publishing and gateway modes](https://docs.docker.com/engine/network/port-publishing/).
+
+The CI test now checks both the requested `isolated` driver options
+and the *actual host bridge interface* for an assigned IPv4 address.
+This check applies to a native Linux Docker Engine; with Docker Desktop,
+the bridge may be inside its separate Linux VM. It does **not**
+establish that the host DNS resolver, external MCP services, the gateway
+itself, or all IPv6 link-local traffic is confined to the chain.
+
 ## Isolation properties (and limits)
 
 - `tool-executor` joins only the Docker network `runner-execution`, explicitly marked `internal: true`. No published ports, no external-network membership and no ordinary default route. Its HTTP(S)/SOCKS-aware command-line clients use `mode-b-egress:7890`.
@@ -53,6 +74,23 @@ docker compose -f docker-compose.yml -f docker-compose.mode-b.yml up -d mode-b-e
 ```
 
 Check IPv4 and IPv6 separately, monitor DNS from the **host** and gateway, and check the exit from a target you own. Record a positive transit result plus negative airport/VPS1 outage tests. Running a command against `api.ipify.org` shows only that command's observed source IP, not a full application privacy proof. Also verify restart, PTY/background tools and every enabled MCP/browser path before claiming production-ready. Keep local audit logs intact.
+
+### Offline failure-path regression in CI
+
+`scripts/ci/mode-b-network-smoke.sh` now creates a disposable gateway
+**emulator**, verifies its injected HTTP 502 response is actually received
+by an isolated executor, stops that gateway, and verifies that neither
+explicit-proxy nor unproxied direct IPv4 requests can succeed after the
+outage. It also checks direct IPv4/IPv6 denial with all proxy
+environment variables unset. These are **real Docker network** tests
+without accessing VPS nodes, provisioning servers or using credentials.
+
+The emulated gateway is **not Mihomo**. This checks only the executor's
+network isolation and absence of an automatic HTTP-client fallback, not
+Mihomo's runtime route selection, live airport/VPS2 interoperability,
+host-level DNS/IPv6 paths, or arbitrary external MCP processes. For
+Mihomo runtime failure and actual exit-IP acceptance, use the manual
+checks below with tasks stopped.
 
 ## Repeatable, operator-triggered exit check
 

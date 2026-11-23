@@ -98,6 +98,14 @@ networks:
   runner-control:
   runner-execution:
     internal: true
+    driver: bridge
+    enable_ipv6: false
+    # Docker Engine 28+: ordinary internal bridge networks still expose the
+    # host bridge gateway (and host-bound proxy services) to task containers.
+    # Isolated gateway mode prevents a host-address bypass of mode-b-egress.
+    driver_opts:
+      com.docker.network.bridge.gateway_mode_ipv4: isolated
+      com.docker.network.bridge.gateway_mode_ipv6: isolated
   mode-b-uplink:
 
 volumes:
