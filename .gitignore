@@ -77,3 +77,6 @@ benchmark-results/
 /desktop/windows/bin/
 /desktop/windows/obj/
 
+
+# Operator-owned Mode B nodes/credentials, never put them in Git
+/network/mode-b/config.yaml
