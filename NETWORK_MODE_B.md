@@ -24,7 +24,7 @@ docker compose -f docker-compose.yml -f docker-compose.mode-b.yml config --quiet
 docker compose -f docker-compose.yml -f docker-compose.mode-b.yml up -d
 ```
 
-The proxy image may be pinned through `ARTEX_MODE_B_MIHOMO_IMAGE`; the default is the upstream Alpha image. A checked-in example does not prove node availability or a successful SOCKS UDP bridge.
+The proxy image may be pinned through `ARTEX_MODE_B_MIHOMO_IMAGE`; the default is the upstream stable latest tag; pin a tested image digest for production. A checked-in example does not prove node availability or a successful SOCKS UDP bridge.
 
 ## Isolation properties (and limits)
 
@@ -61,3 +61,14 @@ The planned final path is airport → VPS1 → VPS2, preserving VPS1's existing 
 ## Related scope / handoff
 
 Purge's existing VPS SSH management route does **not** route ARTEX or model traffic. Purge's existing proxy settings control only explicit plugin operations. A later read-only Purge network status panel should ingest **verified** ARTEX mode/runner/entry/exit status, and show `not_tested` until real observations are available. Never infer a working chain from saved profile fields alone.
+
+## Purge read-only status (phase 1b)
+
+The existing `/api/privacy/bridge-overview` response now includes a fixed-value
+`execution_network` aggregate when the service sees the opt-in Runner environment.
+Its `mode=B` and `configuration=configured_only` mean **environment variables
+were set**, NOT that the Docker network, airport, VPS1 or VPS2 succeeded. The
+`verification` and `final_exit` fields are deliberately `not_tested` until
+an explicit, independently verified runtime acceptance check exists. Purge PR
+wxcvm/dsh-purge#507 reads these fields through its existing scoped credential
+and displays them without exposing proxy URLs or node credentials.
