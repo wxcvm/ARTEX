@@ -50,6 +50,8 @@ jobs:
         run: bash scripts/ci/runner-relay-smoke.sh
       - name: Docker broker and tool executor isolation smoke
         run: bash scripts/ci/runner-broker-smoke.sh
+      - name: Mode B verifier shell syntax
+        run: bash -n scripts/mode-b-verify.sh scripts/ci/mode-b-network-smoke.sh
       - name: Mode B Compose parse (fake credentials, no external traffic)
         env:
           POSTGRES_PASSWORD: ci-fixture-only
