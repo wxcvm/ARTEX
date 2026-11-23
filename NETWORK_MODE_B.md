@@ -26,6 +26,27 @@ docker compose -f docker-compose.yml -f docker-compose.mode-b.yml up -d
 
 The proxy image may be pinned through `ARTEX_MODE_B_MIHOMO_IMAGE`; the default is the upstream stable latest tag; pin a tested image digest for production. A checked-in example does not prove node availability or a successful SOCKS UDP bridge.
 
+## Docker Engine prerequisite and host-gateway bypass
+
+**Docker Engine 28 or newer is required** for `driver_opts:
+com.docker.network.bridge.gateway_mode_ipv4: isolated` on the
+`runner-execution` bridge. The network also sets isolated IPv6 gateway
+mode and leaves IPv6 disabled. The Docker daemon used by Docker Desktop
+or WSL is what matters, not just the version of a CLI installed on the
+Windows host. If this network mode is unsupported, do **not** remove
+these options merely to make Compose start: ordinary `internal: true`
+still allows connections to services bound to the host bridge gateway,
+which could include a separate system proxy and bypass the required VPS
+chain. See the [Docker Engine 28 release notes](https://docs.docker.com/engine/release-notes/28/)
+and [Docker's port publishing and gateway modes](https://docs.docker.com/engine/network/port-publishing/).
+
+The CI test now checks both the requested `isolated` driver options
+and the *actual host bridge interface* for an assigned IPv4 address.
+This check applies to a native Linux Docker Engine; with Docker Desktop,
+the bridge may be inside its separate Linux VM. It does **not**
+establish that the host DNS resolver, external MCP services, the gateway
+itself, or all IPv6 link-local traffic is confined to the chain.
+
 ## Isolation properties (and limits)
 
 - `tool-executor` joins only the Docker network `runner-execution`, explicitly marked `internal: true`. No published ports, no external-network membership and no ordinary default route. Its HTTP(S)/SOCKS-aware command-line clients use `mode-b-egress:7890`.
