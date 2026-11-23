@@ -54,6 +54,23 @@ docker compose -f docker-compose.yml -f docker-compose.mode-b.yml up -d mode-b-e
 
 Check IPv4 and IPv6 separately, monitor DNS from the **host** and gateway, and check the exit from a target you own. Record a positive transit result plus negative airport/VPS1 outage tests. Running a command against `api.ipify.org` shows only that command's observed source IP, not a full application privacy proof. Also verify restart, PTY/background tools and every enabled MCP/browser path before claiming production-ready. Keep local audit logs intact.
 
+### Offline failure-path regression in CI
+
+`scripts/ci/mode-b-network-smoke.sh` now creates a disposable gateway
+**emulator**, verifies its injected HTTP 502 response is actually received
+by an isolated executor, stops that gateway, and verifies that neither
+explicit-proxy nor unproxied direct IPv4 requests can succeed after the
+outage. It also checks direct IPv4/IPv6 denial with all proxy
+environment variables unset. These are **real Docker network** tests
+without accessing VPS nodes, provisioning servers or using credentials.
+
+The emulated gateway is **not Mihomo**. This checks only the executor's
+network isolation and absence of an automatic HTTP-client fallback, not
+Mihomo's runtime route selection, live airport/VPS2 interoperability,
+host-level DNS/IPv6 paths, or arbitrary external MCP processes. For
+Mihomo runtime failure and actual exit-IP acceptance, use the manual
+checks below with tasks stopped.
+
 ## Repeatable, operator-triggered exit check
 
 After Mode B is started and all its local nodes are configured, run on the same
