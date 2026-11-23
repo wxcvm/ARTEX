@@ -83,7 +83,7 @@ services:
   # Only this gateway joins an outward-facing network; never publish 7890.
   mode-b-egress:
     image: ${ARTEX_MODE_B_MIHOMO_IMAGE:-docker.io/metacubex/mihomo:Alpha}
-    command: ["-f", "/etc/mihomo/config.yaml"]
+    command: ["-d", "/tmp/mihomo", "-f", "/etc/mihomo/config.yaml"]
     volumes:
       - ./network/mode-b/config.yaml:/etc/mihomo/config.yaml:ro
     extra_hosts:
