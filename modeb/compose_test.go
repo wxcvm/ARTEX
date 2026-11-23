@@ -17,6 +17,8 @@ type composeProfile struct {
     } `yaml:"services"`
     Networks map[string]struct {
         Internal bool `yaml:"internal"`
+        Driver string `yaml:"driver"`
+        DriverOpts map[string]string `yaml:"driver_opts"`
     } `yaml:"networks"`
 }
 
@@ -25,8 +27,17 @@ func TestModeBExecutorHasOnlyIsolatedNetwork(t *testing.T) {
     if err != nil { t.Fatal(err) }
     var profile composeProfile
     if err := yaml.Unmarshal(data, &profile); err != nil { t.Fatal(err) }
-    if !profile.Networks["runner-execution"].Internal {
-        t.Fatal("runner-execution must explicitly be internal")
+    executionNet := profile.Networks["runner-execution"]
+    if !executionNet.Internal || executionNet.Driver != "bridge" {
+        t.Fatal("runner-execution must be an internal Docker bridge")
+    }
+    for _, key := range []string{
+        "com.docker.network.bridge.gateway_mode_ipv4",
+        "com.docker.network.bridge.gateway_mode_ipv6",
+    } {
+        if executionNet.DriverOpts[key] != "isolated" {
+            t.Fatalf("%s must isolate host bridge gateway, got %q", key, executionNet.DriverOpts[key])
+        }
     }
     executor, ok := profile.Services["tool-executor"]
     if !ok || len(executor.Networks) != 1 || executor.Networks[0] != "runner-execution" {
