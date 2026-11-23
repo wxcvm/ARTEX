@@ -73,9 +73,54 @@ private expected IPs. Inspect the proxy logs and the host's DNS/IPv6 paths
 separately. A gateway outage test must be performed only while no live tasks
 are running; restoring it after the test is an explicit operator action.
 
+## Three-hop proxy-chain variant (opt-in, no VPS1 routing changes)
+
+`network/mode-b/config.vps2.example.yaml` adds an explicit second remote
+exit to the current airport → VPS1 sequence. The resulting path for a
+**proxy-aware** task request is:
+
+```text
+isolated executor → private Mihomo → airport SOCKS → existing VPS1 VLESS/REALITY → VPS2 VLESS/REALITY → target
+```
+
+Here, the VPS2 node uses `dialer-proxy: vps1`, VPS1 still uses
+`dialer-proxy: airport-entry`, and the only routing rule is
+`MATCH,vps2`. DNS over HTTPS is tagged `#vps2`. Thus the user has
+one explicit exit choice and no automatic `DIRECT` failover.
+
+To opt in, copy `config.vps2.example.yaml` instead of
+`config.example.yaml` to the gitignored `config.yaml`. Supply both
+servers' actual (distinct) IPs and credentials locally, then restart the
+gateway when tasks are idle. Do not commit your node secrets:
+
+```sh
+cp network/mode-b/config.vps2.example.yaml network/mode-b/config.yaml
+# Edit network/mode-b/config.yaml locally; set real airport, VPS1 and VPS2 settings.
+docker compose -f docker-compose.yml -f docker-compose.mode-b.yml config --quiet
+docker compose -f docker-compose.yml -f docker-compose.mode-b.yml up -d
+MODE_B_EXPECTED_EXIT_IP=<VPS2-public-IPv4> bash scripts/mode-b-verify.sh
+```
+
+**This does not provision VPS2** or require changing VPS1's host-wide
+default route. You need a real second remote node (an already-owned node or
+an eligible free-tier resource; availability not guaranteed). The two VLESS
++ REALITY hops are an illustrative protocol combination, not a verified
+compatibility guarantee. When an intermediate node cannot support this
+`dialer-proxy` chain, change the intermediate transport after independent
+testing rather than permitting a `DIRECT` fallback. Mihomo's upstream
+documentation cautions against using UDP-heavy or TLS-camouflage transport
+as a relayed *middle* node; see
+https://wiki.metacubex.one/en/config/proxies/dialer-proxy/ .
+
+Keep both topologies separate: the original two-hop config remains supported.
+A successful public exit-IP check still **does not prove all intermediate
+hops or cover non-Runner traffic**. Operators should correlate node-side
+connection logs during an authorized test, and stop tasks before testing
+failure/outage behavior.
+
 ## Phase 2: VPS2
 
-The planned final path is airport → VPS1 → VPS2, preserving VPS1's existing HY2/VLESS listener. To obtain two independent servers at zero extra cost, investigate an eligible free-tier VM; availability and eligibility are **not guaranteed**. Establish a WireGuard tunnel **only on VPS1 for the service's outbound traffic**, with routing and firewall rules that prevent the VLESS/HY2 handler from failing open when WireGuard is down. Do **not** simply replace VPS1's whole default route: that can sever SSH/admin ingress, leak service traffic or create loops. This phase needs a separately reviewed deployment and tests proving the observed exit really is VPS2.
+The planned final path is airport → VPS1 → VPS2, preserving VPS1's existing HY2/VLESS listener. To obtain two independent servers at zero extra cost, investigate an eligible free-tier VM; availability and eligibility are **not guaranteed**. An alternative to the proxy-chain variant is to establish a WireGuard tunnel **only on VPS1 for the service's outbound traffic**, with routing and firewall rules that prevent the VLESS/HY2 handler from failing open when WireGuard is down. Do **not** simply replace VPS1's whole default route: that can sever SSH/admin ingress, leak service traffic or create loops. This phase needs a separately reviewed deployment and tests proving the observed exit really is VPS2.
 
 ## Related scope / handoff
 
