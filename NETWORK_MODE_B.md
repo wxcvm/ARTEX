@@ -54,6 +54,25 @@ docker compose -f docker-compose.yml -f docker-compose.mode-b.yml up -d mode-b-e
 
 Check IPv4 and IPv6 separately, monitor DNS from the **host** and gateway, and check the exit from a target you own. Record a positive transit result plus negative airport/VPS1 outage tests. Running a command against `api.ipify.org` shows only that command's observed source IP, not a full application privacy proof. Also verify restart, PTY/background tools and every enabled MCP/browser path before claiming production-ready. Keep local audit logs intact.
 
+## Repeatable, operator-triggered exit check
+
+After Mode B is started and all its local nodes are configured, run on the same
+Linux Docker host as ARTEX:
+
+```sh
+MODE_B_EXPECTED_EXIT_IP=<your-known-VPS1-or-VPS2-public-IPv4> bash scripts/mode-b-verify.sh
+```
+
+The script checks that the executor cannot directly connect to an external
+IPv4 address, then makes one explicit proxied HTTPS request to compare the
+observed public IPv4 with the provided expected exit. It does not change
+Docker networks, stop a gateway, log the observed IP or use real credentials in
+CI. A successful check **does not establish the airport hop, VPS2 tunnel or
+host-level DNS/IPv6 isolation**. It intentionally rejects placeholder and
+private expected IPs. Inspect the proxy logs and the host's DNS/IPv6 paths
+separately. A gateway outage test must be performed only while no live tasks
+are running; restoring it after the test is an explicit operator action.
+
 ## Phase 2: VPS2
 
 The planned final path is airport → VPS1 → VPS2, preserving VPS1's existing HY2/VLESS listener. To obtain two independent servers at zero extra cost, investigate an eligible free-tier VM; availability and eligibility are **not guaranteed**. Establish a WireGuard tunnel **only on VPS1 for the service's outbound traffic**, with routing and firewall rules that prevent the VLESS/HY2 handler from failing open when WireGuard is down. Do **not** simply replace VPS1's whole default route: that can sever SSH/admin ingress, leak service traffic or create loops. This phase needs a separately reviewed deployment and tests proving the observed exit really is VPS2.
