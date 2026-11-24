@@ -13,7 +13,7 @@ import (
 	"time"
 )
 
-const modeBEgressEchoURL = "https://api.ipify.org"
+const modeBEgressEchoURL = "https://api4.ipify.org"
 
 // EgressProbeRequest is deliberately limited to comparing the executor's
 // observed public IPv4 with an operator-supplied expected exit. It accepts no
