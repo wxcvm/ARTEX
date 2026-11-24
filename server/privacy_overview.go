@@ -72,12 +72,18 @@ type ExecutionNetworkOverview struct {
 	Verification string `json:"verification"`
 	Scope string `json:"scope"`
 	FinalExit string `json:"final_exit"`
+	ActualEgress string `json:"actual_egress"`
+	ObservedAt *time.Time `json:"observed_at"`
+	FailClosed string `json:"fail_closed"`
+	VerifyBeforeTask bool `json:"verify_before_task"`
+	CoveredProcesses []string `json:"covered_processes"`
 }
 
 func executionNetworkOverview(getenv func(string) string) ExecutionNetworkOverview {
 	result := ExecutionNetworkOverview{
 		Mode: "off", Configuration: "not_configured", Verification: "not_tested",
-		Scope: "none", FinalExit: "not_tested",
+		Scope: "none", FinalExit: "not_tested", ActualEgress: "not_tested",
+		FailClosed: "not_tested", VerifyBeforeTask: false, CoveredProcesses: []string{},
 	}
 	socket := getenv("ARTEX_RUNNER_SOCKET")
 	proxy := getenv("ARTEX_RUNNER_PROXY_ADDR")
@@ -92,6 +98,7 @@ func executionNetworkOverview(getenv func(string) string) ExecutionNetworkOvervi
 	if socket == "/run/artex-runner/runner.sock" && proxy == "http://mode-b-egress:7890" {
 		result.Mode = "B"
 		result.Configuration = "configured_only"
+		result.CoveredProcesses = []string{"linux_docker_tool_executor_proxy_aware"}
 	}
 	return result
 }
@@ -136,7 +143,7 @@ func (s *Server) privacyOverviewSnapshot(ctx context.Context) PrivacyOverview {
 		ModelKeys: ModelKeysOverview{State:"unavailable", KeyState:"not_inspected"},
 		Config: summarizeConfig(s.sensitiveConfigSnapshot(ctx)),
 		Outbound: summarizeOutbound(agent.ModelOutboundAudit()),
-		ExecutionNetwork: executionNetworkOverview(os.Getenv),
+		ExecutionNetwork: applyModeBProbeSnapshot(executionNetworkOverview(os.Getenv)),
 	}
 	if s.m != nil && s.m.pg != nil {
 		if status, err := s.m.pg.ModelKeyDiagnostics(ctx); err == nil {
