@@ -163,10 +163,12 @@ type Engine struct {
 }
 
 type taskRuntime struct {
-	ctx    context.Context
-	cancel context.CancelFunc
-	wg     sync.WaitGroup
-	loops  sync.WaitGroup // planner, worker and deadline routines; excludes the owner-renewal routine
+	ctx       context.Context
+	cancel    context.CancelFunc
+	wg        sync.WaitGroup
+	routineMu sync.Mutex
+	draining  bool
+	loops     sync.WaitGroup // planner, worker and deadline routines; excludes the owner-renewal routine
 }
 
 type workExecution struct {
@@ -245,12 +247,26 @@ func (e *Engine) registerTaskRoutines(parent context.Context, taskID string, cou
 }
 
 func runTaskRoutine(rt *taskRuntime, fn func(context.Context)) {
+	rt.routineMu.Lock()
+	if rt.draining {
+		rt.routineMu.Unlock()
+		rt.wg.Done()
+		return
+	}
 	rt.loops.Add(1)
+	rt.routineMu.Unlock()
 	go func() {
 		defer rt.wg.Done()
 		defer rt.loops.Done()
 		fn(rt.ctx)
 	}()
+}
+
+func drainTaskRoutines(rt *taskRuntime) {
+	rt.routineMu.Lock()
+	rt.draining = true
+	rt.routineMu.Unlock()
+	rt.loops.Wait()
 }
 
 // StopTask permanently stops every long-lived goroutine and removes all Engine
