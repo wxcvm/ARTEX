@@ -164,63 +164,48 @@ jobs:
         shell: pwsh
         timeout-minutes: 3
         run: ./desktop/windows/test-desktop-smoke.ps1
-      - name: Download and verify PostgreSQL 16 installer
+      - name: Download and verify PostgreSQL 16 binaries
         shell: pwsh
         timeout-minutes: 8
         run: |
           $ErrorActionPreference = 'Stop'
-          $installer = Join-Path $env:RUNNER_TEMP 'postgresql-16.16-2-windows-x64.exe'
+          $archive = Join-Path $env:RUNNER_TEMP 'postgresql-16.16-2-windows-x64-binaries.zip'
           $curl = (Get-Command curl.exe -ErrorAction Stop).Source
-          & $curl --fail --location --show-error --retry 2 --retry-delay 2 --connect-timeout 20 --max-time 420 --progress-bar --output $installer --write-out "downloaded=%{size_download} bytes elapsed=%{time_total}s http=%{http_code}`n" 'https://get.enterprisedb.com/postgresql/postgresql-16.16-2-windows-x64.exe'
-          if ($LASTEXITCODE -ne 0) { throw "PostgreSQL installer download failed (curl exit $LASTEXITCODE)" }
-          if (-not (Test-Path -LiteralPath $installer)) { throw "PostgreSQL installer was not downloaded" }
-          $actual = (Get-FileHash -LiteralPath $installer -Algorithm SHA256).Hash
-          $expected = 'DD526F2D32C9ACC1CB54DEE8D7265E7B8E12519934731201DF13EB0C2C58E128'
-          if ($actual -ne $expected) { throw "PostgreSQL installer checksum mismatch: $actual" }
-          Write-Host "[ARTEX] PostgreSQL installer downloaded and checksum verified."
+          & $curl --fail --location --show-error --retry 2 --retry-delay 2 --connect-timeout 20 --max-time 420 --progress-bar --output $archive --write-out "downloaded=%{size_download} bytes elapsed=%{time_total}s http=%{http_code}`n" 'https://get.enterprisedb.com/postgresql/postgresql-16.16-2-windows-x64-binaries.zip'
+          if ($LASTEXITCODE -ne 0) { throw "PostgreSQL binaries download failed (curl exit $LASTEXITCODE)" }
+          if (-not (Test-Path -LiteralPath $archive)) { throw "PostgreSQL binaries archive was not downloaded" }
+          $actual = (Get-FileHash -LiteralPath $archive -Algorithm SHA256).Hash
+          $expected = 'ADD1DE261B150E6923266ABEE293F05050795E73F5356158AEE4221A2170C073'
+          if ($actual -ne $expected) { throw "PostgreSQL binaries checksum mismatch: $actual" }
+          Write-Host "[ARTEX] PostgreSQL binaries downloaded and checksum verified."
 
-      - name: Install PostgreSQL 16 runtime for independent-cluster integration
+      - name: Extract PostgreSQL 16 runtime for independent-cluster integration
         shell: pwsh
         timeout-minutes: 5
         run: |
           $ErrorActionPreference = 'Stop'
-          $installer = Join-Path $env:RUNNER_TEMP 'postgresql-16.16-2-windows-x64.exe'
-          $debug = Join-Path $env:RUNNER_TEMP 'postgresql-install.log'
-          $arguments = @(
-            '--mode', 'unattended',
-            '--unattendedmodeui', 'none',
-            '--superpassword', 'ArtexCIFixtureOnly',
-            '--enable_acledit', '1',
-            '--install_runtimes', '0',
-            '--enable-components', 'server,commandlinetools',
-            '--serverport', '25432',
-            '--debugtrace', $debug,
-            '--debuglevel', '4'
-          )
-          $process = Start-Process -FilePath $installer -ArgumentList $arguments -PassThru -NoNewWindow
-          if (-not $process.WaitForExit(240000)) {
-            & taskkill.exe /PID $process.Id /T /F 2>&1 | Write-Host
-            if (Test-Path -LiteralPath $debug) {
-              Get-Content -LiteralPath $debug -Tail 80 | ForEach-Object { $_.Replace('ArtexCIFixtureOnly', '[REDACTED]') }
-            }
-            throw "PostgreSQL installer exceeded the 4-minute process limit"
-          }
-          $process.Refresh()
-          if ($process.ExitCode -ne 0) {
-            if (Test-Path -LiteralPath $debug) {
-              Get-Content -LiteralPath $debug -Tail 80 | ForEach-Object { $_.Replace('ArtexCIFixtureOnly', '[REDACTED]') }
-            }
-            throw "PostgreSQL installer failed ($($process.ExitCode))"
-          }
-          $bin = Join-Path $env:ProgramFiles 'PostgreSQL\16\bin'
+          $archive = Join-Path $env:RUNNER_TEMP 'postgresql-16.16-2-windows-x64-binaries.zip'
+          $prefix = Join-Path $env:ProgramFiles 'PostgreSQL\16'
+          New-Item -ItemType Directory -Path $prefix -Force | Out-Null
+          Expand-Archive -LiteralPath $archive -DestinationPath $prefix -Force
+          $payload = Join-Path $prefix 'pgsql'
+          $payloadBin = Join-Path $payload 'bin'
           foreach ($name in @('initdb.exe', 'pg_ctl.exe', 'postgres.exe')) {
-            if (-not (Test-Path (Join-Path $bin $name))) { throw "PostgreSQL runtime missing: $name" }
+            if (-not (Test-Path (Join-Path $payloadBin $name))) { throw "PostgreSQL archive missing: $name" }
+          }
+          Get-ChildItem -LiteralPath $payload | ForEach-Object {
+            Move-Item -LiteralPath $_.FullName -Destination $prefix -Force
+          }
+          Remove-Item -LiteralPath $payload -Recurse -Force
+          $bin = Join-Path $prefix 'bin'
+          foreach ($name in @('initdb.exe', 'pg_ctl.exe', 'postgres.exe')) {
+            if (-not (Test-Path (Join-Path $bin $name))) { throw "PostgreSQL runtime missing after extraction: $name" }
           }
           $version = & (Join-Path $bin 'postgres.exe') --version
           if ($LASTEXITCODE -ne 0 -or $version -notmatch '^postgres \(PostgreSQL\) 16\.') {
             throw "Unexpected PostgreSQL runtime: $version"
           }
-          Write-Host "[ARTEX] PostgreSQL runtime installed: $version"
+          Write-Host "[ARTEX] PostgreSQL runtime extracted: $version"
       - name: Ordinary-user database preparation and onboarding boundaries
         shell: pwsh
         timeout-minutes: 8
