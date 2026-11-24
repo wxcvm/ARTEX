@@ -180,6 +180,7 @@ jobs:
             '--superpassword', 'ArtexCIFixtureOnly',
             '--enable_acledit', '1',
             '--install_runtimes', '0',
+            '--enable-components', 'server,commandlinetools',
             '--serverport', '25432'
           )
           $process = Start-Process -FilePath $installer -ArgumentList $arguments -Wait -PassThru -NoNewWindow
