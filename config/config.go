@@ -99,15 +99,24 @@ func Path() string {
 	return candidates[0]
 }
 
-// Load reads and parses the config file. A missing/unreadable file yields a zero
-// Config (so callers fall back to defaults) rather than an error.
-func Load() Config {
-	var c Config
-	b, err := os.ReadFile(Path())
+// readConfig never returns partially decoded settings. Keep diagnostics free
+// of JSON values: configuration can contain database credentials.
+func readConfig(path string) (Config, error) {
+	b, err := os.ReadFile(path)
 	if err != nil {
-		return c
+		return Config{}, err
 	}
-	_ = json.Unmarshal(b, &c)
+	var c *Config
+	if err := json.Unmarshal(b, &c); err != nil || c == nil {
+		return Config{}, fmt.Errorf("invalid JSON configuration in %s: expected a configuration object with valid field types", path)
+	}
+	return *c, nil
+}
+
+// Load reads optional settings. Missing, unreadable or invalid configuration
+// yields a zero Config; callers requiring database configuration use readConfig.
+func Load() Config {
+	c, _ := readConfig(Path())
 	return c
 }
 
@@ -155,14 +164,19 @@ func PostgresDSN() (dsn, source string, err error) {
 	if v := strings.TrimSpace(os.Getenv("ARTEX_PG_DSN")); v != "" {
 		return v, "environment variable ARTEX_PG_DSN", nil
 	}
-	db := Load().Database
+	path := Path()
+	cfg, err := readConfig(path)
+	if err != nil && !os.IsNotExist(err) {
+		return "", "", fmt.Errorf("read database config: %w", err)
+	}
+	db := cfg.Database
 	if d := strings.TrimSpace(db.DSN); d != "" {
-		return d, "config file " + Path() + " (database.dsn)", nil
+		return d, "config file " + path + " (database.dsn)", nil
 	}
 	if db.Host != "" || db.DBName != "" || db.User != "" {
-		return db.buildDSN(), "config file " + Path() + " (database fields)", nil
+		return db.buildDSN(), "config file " + path + " (database fields)", nil
 	}
-	return "", "", fmt.Errorf("no database config found: the environment variable ARTEX_PG_DSN is not set, and config file %s provides no database (dsn or host/user/dbname). Create the config file or set the environment variable and retry", Path())
+	return "", "", fmt.Errorf("no database config found: the environment variable ARTEX_PG_DSN is not set, and config file %s provides no database (dsn or host/user/dbname). Create the config file or set the environment variable and retry", path)
 }
 
 func (d Database) buildDSN() string {
