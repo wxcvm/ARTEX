@@ -1264,7 +1264,7 @@ func (e *Engine) runIntent(ctx context.Context, t *Task, name string, worker *ag
 		// Park the stopped run in paused before handing cleanup to the API. If the
 		// request disconnects after cancellation, the intent remains recoverable and
 		// a later cancel can finish cleanup instead of leaving a phantom running row.
-		controlErr = transitionIntentState(t.Store, intent.ID, "running", "paused")
+		controlErr = transitionClaimedIntentState(t.Store, intent, "running", "paused", "")
 		if controlErr != nil {
 			log.Printf("[worker %s] task %s intent #%d failed to persist the cancel barrier: %v", name, t.ID, intent.ID, controlErr)
 			return true
@@ -1277,7 +1277,7 @@ func (e *Engine) runIntent(ctx context.Context, t *Task, name string, worker *ag
 	// so it is re-claimed on resume — the worker will resume the prior LLM
 	// conversation from its transcript instead of restarting from scratch.
 	if ectx.Err() != nil && taskExecutionPaused(context.Cause(ectx)) {
-		if err := transitionIntentState(t.Store, intent.ID, "running", "open"); err != nil {
+		if err := transitionClaimedIntentState(t.Store, intent, "running", "open", ""); err != nil {
 			log.Printf("[worker %s] task %s intent #%d task-pause rollback failed: %v", name, t.ID, intent.ID, err)
 		}
 		return true
@@ -1304,7 +1304,7 @@ func (e *Engine) runIntent(ctx context.Context, t *Task, name string, worker *ag
 	}
 	// killed by the planner: mark stopped (don't write back results, don't auto-reclaim).
 	if killed {
-		if err := transitionIntentState(t.Store, intent.ID, "running", "stopped"); err != nil {
+		if err := transitionClaimedIntentState(t.Store, intent, "running", "stopped", ""); err != nil {
 			log.Printf("[worker %s] task %s intent #%d failed to persist the planner stop: %v", name, t.ID, intent.ID, err)
 		}
 		log.Printf("[worker %s] task %s intent #%d killed (stopped)", name, t.ID, intent.ID)
