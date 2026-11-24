@@ -4,9 +4,12 @@ import (
 	"context"
 	"database/sql"
 	"errors"
+	"fmt"
+	"net/url"
 	"testing"
 	"time"
 
+	"github.com/jackc/pgx/v5"
 	"github.com/jackc/pgx/v5/pgconn"
 )
 
@@ -110,5 +113,65 @@ WHERE a.key = 'planner'`).Scan(&plannerVars); err != nil {
 	}
 	if agents != wantAgents {
 		t.Fatalf("after re-open want %d agents, got %d", wantAgents, agents)
+	}
+}
+
+// TestEnsureDatabaseConcurrentCreation uses a uniquely named disposable database.
+// It never creates or drops the database named by the configured DSN itself.
+func TestEnsureDatabaseConcurrentCreation(t *testing.T) {
+	u, err := url.Parse(testDSN(t))
+	if err != nil || (u.Scheme != "postgres" && u.Scheme != "postgresql") {
+		t.Skip("requires a PostgreSQL URL")
+	}
+	adminURL := *u
+	adminURL.Path = "/postgres"
+	adminURL.RawPath = ""
+	admin, err := sql.Open("pgx", adminURL.String())
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer admin.Close()
+	ctx, cancel := context.WithTimeout(t.Context(), 30*time.Second)
+	defer cancel()
+	if err := admin.PingContext(ctx); err != nil {
+		t.Skipf("maintenance database unavailable: %v", err)
+	}
+	var canCreate bool
+	if err := admin.QueryRowContext(ctx, `SELECT rolcreatedb OR rolsuper FROM pg_roles WHERE rolname=current_user`).Scan(&canCreate); err != nil {
+		t.Fatal(err)
+	}
+	if !canCreate {
+		t.Skip("test requires permission to create a disposable database")
+	}
+
+	name := fmt.Sprintf("artex_create_test_%d", time.Now().UnixNano())
+	u.Path = "/" + name
+	u.RawPath = ""
+	defer func() {
+		cleanup, cancel := context.WithTimeout(context.Background(), 10*time.Second)
+		defer cancel()
+		if _, err := admin.ExecContext(cleanup, "DROP DATABASE IF EXISTS "+pgx.Identifier{name}.Sanitize()); err != nil {
+			t.Errorf("drop disposable database: %v", err)
+		}
+	}()
+
+	const workers = 6
+	start := make(chan struct{})
+	results := make(chan error, workers)
+	for i := 0; i < workers; i++ {
+		go func() {
+			<-start
+			results <- ensureDatabase(u.String())
+		}()
+	}
+	close(start)
+	for i := 0; i < workers; i++ {
+		if err := <-results; err != nil {
+			t.Errorf("concurrent database initialization: %v", err)
+		}
+	}
+	var count int
+	if err := admin.QueryRowContext(ctx, `SELECT count(*) FROM pg_database WHERE datname=$1`, name).Scan(&count); err != nil || count != 1 {
+		t.Fatalf("disposable database count=%d, err=%v", count, err)
 	}
 }
