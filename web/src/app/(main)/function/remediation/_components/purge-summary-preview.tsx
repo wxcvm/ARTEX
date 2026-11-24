@@ -46,7 +46,7 @@ export function PurgeRemediationPreview() {
     { key: "falsePositive", label: tr("误报", "False positive"), value: summary.counts.falsePositive, color: "bg-slate-400" },
     { key: "resolved", label: tr("已处置标记", "Marked resolved"), value: summary.counts.resolved, color: "bg-violet-500" },
   ] : [];
-  const reviewed = summary ? summary.counts.total - summary.counts.pending : 0;
+  const notPending = summary ? summary.counts.total - summary.counts.pending : 0;
   const cards = summary ? [
     [tr("记录总数", "Total"), summary.counts.total],
     [tr("待研判", "Pending"), summary.counts.pending],
@@ -83,7 +83,7 @@ export function PurgeRemediationPreview() {
             <div className="flex flex-wrap items-center justify-between gap-2 text-sm">
               <span className="font-medium">{tr("复核状态分布", "Review status distribution")}</span>
               <span className="text-muted-foreground tabular-nums">
-                {tr("非待研判 " + reviewed + " / " + summary.counts.total, reviewed + " beyond pending / " + summary.counts.total)}
+                {tr("非待研判 " + notPending + " / " + summary.counts.total, notPending + " beyond pending / " + summary.counts.total)}
               </span>
             </div>
             <div role="img" aria-label={segments.map(item => item.label + ": " + item.value).join(", ")}
