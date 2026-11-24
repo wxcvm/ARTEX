@@ -153,7 +153,7 @@ func (e *Engine) maintainTaskOwner(rt *taskRuntime, t *Task, owner *durableTaskO
 drain:
 	drained := make(chan struct{})
 	go func() {
-		rt.loops.Wait()
+		drainTaskRoutines(rt)
 		close(drained)
 	}()
 	for {
