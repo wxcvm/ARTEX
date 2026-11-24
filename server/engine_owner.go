@@ -15,7 +15,6 @@ import (
 const (
 	taskOwnerLeaseTTL     = 2 * time.Minute
 	taskOwnerRenewEvery   = 30 * time.Second
-	taskOwnerDrainInterval = 100 * time.Millisecond
 )
 
 type durableTaskOwner struct {
