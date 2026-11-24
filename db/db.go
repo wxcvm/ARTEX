@@ -32,8 +32,9 @@ const schemaMigrationLockKey int64 = 7337741001
 // never deadlocks itself.
 const maxOpenConns = 32
 
-// databaseStartupTimeout bounds a full Open call, including connection, lock wait,
-// schema migration and seeding. Call OpenContext when the caller owns a deadline.
+// databaseStartupTimeout bounds PostgreSQL connection, migration-lock wait,
+// target ping, schema DDL and deadlock backoff during startup. Call OpenContext
+// when the caller owns a deadline.
 const databaseStartupTimeout = 30 * time.Second
 
 var schemaDeadlockRetryDelays = [...]time.Duration{
