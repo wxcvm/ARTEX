@@ -261,3 +261,50 @@ func TestRemotePeerOnlyRejectsLocalSDKToolRPC(t *testing.T) {
 		t.Fatal("guarded listener did not stop")
 	}
 }
+
+func TestRunnerBrokerForwardsOnlyTheScopedEgressProbe(t *testing.T) {
+	if runtime.GOOS == "windows" {
+		t.Skip("Unix-socket deployment is Linux-only")
+	}
+	t.Setenv("ARTEX_RUNNER_REMOTE_PEER_ONLY", "")
+	t.Setenv("ARTEX_RUNNER_PROXY_ADDR", "")
+	root := t.TempDir()
+	executorSocket := filepath.Join(root, "executor.sock")
+	brokerSocket := filepath.Join(root, "broker.sock")
+	ctx, cancel := context.WithCancel(context.Background())
+	defer cancel()
+	done := make(chan error, 2)
+	go func() { done <- Serve(ctx, executorSocket) }()
+	waitForSocket := func(path string) {
+		t.Helper()
+		for i := 0; i < 200; i++ {
+			if _, err := os.Stat(path); err == nil {
+				return
+			}
+			time.Sleep(10 * time.Millisecond)
+		}
+		t.Fatalf("socket did not become ready: %s", path)
+	}
+	waitForSocket(executorSocket)
+	go func() { done <- ServeBroker(ctx, brokerSocket, executorSocket) }()
+	waitForSocket(brokerSocket)
+
+	client := NewClient(brokerSocket)
+	probeCtx, probeCancel := context.WithTimeout(context.Background(), 3*time.Second)
+	defer probeCancel()
+	_, err := client.ProbeEgress(probeCtx, "1.1.1.1")
+	if err == nil || !strings.Contains(err.Error(), "HTTP 503") {
+		t.Fatalf("broker must forward the private probe to the executor (which rejects missing Mode B), got %v", err)
+	}
+	cancel()
+	for i := 0; i < 2; i++ {
+		select {
+		case err := <-done:
+			if err != nil {
+				t.Fatal(err)
+			}
+		case <-time.After(5 * time.Second):
+			t.Fatal("runner broker/executor did not stop")
+		}
+	}
+}
