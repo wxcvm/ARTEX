@@ -70,6 +70,18 @@ func validExpectedModeBExit(raw string) (string, bool) {
 // through the isolated executor's fixed private gateway; the controller does
 // not make an outbound request and receives no raw observed IP.
 func (s *Server) verifyExecutionNetwork(w http.ResponseWriter, r *http.Request) {
+	socket := os.Getenv("ARTEX_RUNNER_SOCKET")
+	verifyExecutionNetworkWith(w, r, os.Getenv, func(ctx context.Context, expected string) (toolrunner.EgressProbeResponse, error) {
+		return toolrunner.NewClient(socket).ProbeEgress(ctx, expected)
+	})
+}
+
+func verifyExecutionNetworkWith(
+	w http.ResponseWriter,
+	r *http.Request,
+	getenv func(string) string,
+	probe func(context.Context, string) (toolrunner.EgressProbeResponse, error),
+) {
 	var input struct {
 		ExpectedExitIP string `json:"expected_exit_ip"`
 	}
@@ -88,13 +100,13 @@ func (s *Server) verifyExecutionNetwork(w http.ResponseWriter, r *http.Request) 
 		writeErr(w, http.StatusBadRequest, "expected_exit_ip must be a public IPv4 address")
 		return
 	}
-	if executionNetworkOverview(os.Getenv).Mode != "B" {
+	if executionNetworkOverview(getenv).Mode != "B" {
 		writeErr(w, http.StatusConflict, "ARTEX Mode B isolated runner is not configured")
 		return
 	}
 	ctx, cancel := context.WithTimeout(r.Context(), 15*time.Second)
 	defer cancel()
-	result, err := toolrunner.NewClient(os.Getenv("ARTEX_RUNNER_SOCKET")).ProbeEgress(ctx, expected)
+	result, err := probe(ctx, expected)
 	if err != nil {
 		recordModeBProbe("probe_failed", "unavailable", "unavailable")
 		writeErr(w, http.StatusBadGateway, "isolated executor egress probe failed; no direct fallback was attempted")
