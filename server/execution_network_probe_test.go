@@ -5,9 +5,9 @@ import (
 	"errors"
 	"net/http"
 	"net/http/httptest"
-	"time"
 	"strings"
 	"testing"
+	"time"
 
 	"github.com/Autumn-27/artex/toolrunner"
 )
