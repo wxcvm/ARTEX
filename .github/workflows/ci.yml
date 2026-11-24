@@ -166,9 +166,32 @@ jobs:
         run: ./desktop/windows/test-desktop-smoke.ps1
       - name: Install PostgreSQL 16 runtime for independent-cluster integration
         shell: pwsh
+        timeout-minutes: 8
         run: |
-          choco install postgresql16 --yes --no-progress --params '/Password:ArtexCIFixtureOnly /Port:25432'
-          if ($LASTEXITCODE -ne 0) { throw "PostgreSQL runtime installation failed" }
+          $ErrorActionPreference = 'Stop'
+          $installer = Join-Path $env:RUNNER_TEMP 'postgresql-16.16-2-windows-x64.exe'
+          Invoke-WebRequest -Uri 'https://get.enterprisedb.com/postgresql/postgresql-16.16-2-windows-x64.exe' -OutFile $installer
+          $actual = (Get-FileHash -LiteralPath $installer -Algorithm SHA256).Hash
+          $expected = 'DD526F2D32C9ACC1CB54DEE8D7265E7B8E12519934731201DF13EB0C2C58E128'
+          if ($actual -ne $expected) { throw "PostgreSQL installer checksum mismatch: $actual" }
+          $arguments = @(
+            '--mode', 'unattended',
+            '--unattendedmodeui', 'none',
+            '--superpassword', 'ArtexCIFixtureOnly',
+            '--enable_acledit', '1',
+            '--install_runtimes', '0',
+            '--serverport', '25432'
+          )
+          $process = Start-Process -FilePath $installer -ArgumentList $arguments -Wait -PassThru -NoNewWindow
+          if ($process.ExitCode -ne 0) { throw "PostgreSQL installer failed ($($process.ExitCode))" }
+          $bin = Join-Path $env:ProgramFiles 'PostgreSQL\16\bin'
+          foreach ($name in @('initdb.exe', 'pg_ctl.exe', 'postgres.exe')) {
+            if (-not (Test-Path (Join-Path $bin $name))) { throw "PostgreSQL runtime missing: $name" }
+          }
+          $version = & (Join-Path $bin 'postgres.exe') --version
+          if ($LASTEXITCODE -ne 0 -or $version -notmatch '^postgres \(PostgreSQL\) 16\.') {
+            throw "Unexpected PostgreSQL runtime: $version"
+          }
       - name: Ordinary-user database preparation and onboarding boundaries
         shell: pwsh
         timeout-minutes: 8
