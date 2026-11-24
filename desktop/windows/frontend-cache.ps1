@@ -14,7 +14,7 @@ function Get-FrontendInputs([string]$Root) {
     }
     $entries = @($files | Sort-Object FullName | ForEach-Object {
         [ordered]@{
-            path = $_.FullName.Substring($Root.TrimEnd([char[]]@('/', '\\')).Length + 1)
+            path = $_.FullName.Substring($Root.TrimEnd([IO.Path]::DirectorySeparatorChar, [IO.Path]::AltDirectorySeparatorChar).Length + 1)
             size = $_.Length
             ticks = $_.LastWriteTimeUtc.Ticks
         }
