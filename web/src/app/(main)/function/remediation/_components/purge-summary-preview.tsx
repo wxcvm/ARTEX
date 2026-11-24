@@ -39,6 +39,14 @@ export function PurgeRemediationPreview() {
     if (input.current) input.current.value = "";
   }
 
+  const segments = summary ? [
+    { key: "pending", label: tr("待研判", "Pending"), value: summary.counts.pending, color: "bg-amber-500" },
+    { key: "reviewing", label: tr("研判中", "Reviewing"), value: summary.counts.reviewing, color: "bg-sky-500" },
+    { key: "confirmed", label: tr("人工确认", "Confirmed"), value: summary.counts.confirmed, color: "bg-emerald-500" },
+    { key: "falsePositive", label: tr("误报", "False positive"), value: summary.counts.falsePositive, color: "bg-slate-400" },
+    { key: "resolved", label: tr("已处置标记", "Marked resolved"), value: summary.counts.resolved, color: "bg-violet-500" },
+  ] : [];
+  const reviewed = summary ? summary.counts.total - summary.counts.pending : 0;
   const cards = summary ? [
     [tr("记录总数", "Total"), summary.counts.total],
     [tr("待研判", "Pending"), summary.counts.pending],
@@ -71,6 +79,26 @@ export function PurgeRemediationPreview() {
       {summary && phase === "ready" && (
         <div className="space-y-3">
           <p className="text-xs text-muted-foreground">{tr("Purge 本地读取时间（非 ARTEX 实时数据）：", "Purge snapshot time (not live ARTEX data): ")}<time dateTime={summary.capturedAt}>{summary.capturedAt}</time></p>
+          <div className="space-y-2 rounded-lg border p-3">
+            <div className="flex flex-wrap items-center justify-between gap-2 text-sm">
+              <span className="font-medium">{tr("复核状态分布", "Review status distribution")}</span>
+              <span className="text-muted-foreground tabular-nums">
+                {tr("非待研判 " + reviewed + " / " + summary.counts.total, reviewed + " beyond pending / " + summary.counts.total)}
+              </span>
+            </div>
+            <div role="img" aria-label={segments.map(item => item.label + ": " + item.value).join(", ")}
+              className="flex h-3 overflow-hidden rounded-full bg-muted">
+              {segments.map(item => <div key={item.key} className={item.color}
+                style={{ width: summary.counts.total ? (item.value / summary.counts.total * 100) + "%" : "0%" }}
+                title={item.label + ": " + item.value} />)}
+            </div>
+            <div className="flex flex-wrap gap-x-4 gap-y-2">
+              {segments.map(item => <div key={item.key} className="flex items-center gap-1.5 text-xs text-muted-foreground">
+                <span aria-hidden className={"size-2 rounded-full " + item.color} />
+                <span>{item.label}</span><span className="tabular-nums">{item.value}</span>
+              </div>)}
+            </div>
+          </div>
           <div className="grid grid-cols-2 gap-2 sm:grid-cols-3 lg:grid-cols-6">
             {cards.map(([label, value]) => <div key={label} className="min-w-0 rounded-lg border p-3">
               <p className="text-xs text-muted-foreground">{label}</p>
