@@ -32,6 +32,11 @@ const schemaMigrationLockKey int64 = 7337741001
 // never deadlocks itself.
 const maxOpenConns = 32
 
+// databaseStartupTimeout bounds PostgreSQL connection, migration-lock wait,
+// target ping, schema DDL and deadlock backoff during startup. Call OpenContext
+// when the caller owns a deadline.
+const databaseStartupTimeout = 30 * time.Second
+
 var schemaDeadlockRetryDelays = [...]time.Duration{
 	100 * time.Millisecond,
 	250 * time.Millisecond,
@@ -48,13 +53,29 @@ func isPostgresDeadlock(err error) bool {
 	return errors.As(err, &pgErr) && pgErr.Code == "40P01"
 }
 
-func applySchemaWithRetry(ctx context.Context, execer schemaExecer, sleep func(time.Duration)) error {
+func waitForSchemaRetry(ctx context.Context, delay time.Duration) error {
+	timer := time.NewTimer(delay)
+	defer timer.Stop()
+	select {
+	case <-ctx.Done():
+		return ctx.Err()
+	case <-timer.C:
+		return nil
+	}
+}
+
+func applySchemaWithRetry(ctx context.Context, execer schemaExecer, sleep func(context.Context, time.Duration) error) error {
+	if sleep == nil {
+		sleep = waitForSchemaRetry
+	}
 	for attempt := 0; ; attempt++ {
 		if _, err := execer.ExecContext(ctx, schemaSQL); err != nil {
 			if !isPostgresDeadlock(err) || attempt >= len(schemaDeadlockRetryDelays) {
 				return err
 			}
-			sleep(schemaDeadlockRetryDelays[attempt])
+			if err := sleep(ctx, schemaDeadlockRetryDelays[attempt]); err != nil {
+				return err
+			}
 			continue
 		}
 		return nil
@@ -74,7 +95,9 @@ func withSchemaMigrationLock(ctx context.Context, sqlDB *sql.DB, action func(*sq
 		return fmt.Errorf("advisory lock: %w", err)
 	}
 	defer func() {
-		if _, unlockErr := conn.ExecContext(context.Background(), `SELECT pg_advisory_unlock($1)`, schemaMigrationLockKey); unlockErr != nil && err == nil {
+		unlockCtx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+		defer cancel()
+		if _, unlockErr := conn.ExecContext(unlockCtx, `SELECT pg_advisory_unlock($1)`, schemaMigrationLockKey); unlockErr != nil && err == nil {
 			err = fmt.Errorf("advisory unlock: %w", unlockErr)
 		}
 	}()
@@ -125,6 +148,12 @@ type DB struct{ *sql.DB }
 // ensureDatabase connects to the postgres system database and creates the target
 // database if it does not exist. dsn must be a postgres:// URL.
 func ensureDatabase(dsn string) error {
+	ctx, cancel := context.WithTimeout(context.Background(), databaseStartupTimeout)
+	defer cancel()
+	return ensureDatabaseContext(ctx, dsn)
+}
+
+func ensureDatabaseContext(ctx context.Context, dsn string) error {
 	u, err := url.Parse(dsn)
 	if err != nil {
 		return nil // unparseable DSN — let the normal Open fail with a clear error
@@ -141,12 +170,15 @@ func ensureDatabase(dsn string) error {
 		return nil // best-effort; let Open surface the real error
 	}
 	defer admin.Close()
-	if err := admin.Ping(); err != nil {
+	if err := admin.PingContext(ctx); err != nil {
+		if ctx.Err() != nil {
+			return fmt.Errorf("connect to postgres maintenance database: %w", ctx.Err())
+		}
 		return nil
 	}
 	const existsSQL = `SELECT EXISTS (SELECT 1 FROM pg_database WHERE datname=$1)`
 	var exists bool
-	if err := admin.QueryRow(existsSQL, dbName).Scan(&exists); err != nil {
+	if err := admin.QueryRowContext(ctx, existsSQL, dbName).Scan(&exists); err != nil {
 		return fmt.Errorf("check database %q: %w", dbName, err)
 	}
 	if exists {
@@ -156,7 +188,6 @@ func ensureDatabase(dsn string) error {
 	// Concurrent ARTEX instances coordinate on the maintenance database.
 	// Check again after acquiring the session lock: another instance may have
 	// created the database while this one was waiting.
-	ctx := context.Background()
 	return withSchemaMigrationLock(ctx, admin, func(conn *sql.Conn) error {
 		if err := conn.QueryRowContext(ctx, existsSQL, dbName).Scan(&exists); err != nil {
 			return fmt.Errorf("check database %q: %w", dbName, err)
@@ -172,11 +203,23 @@ func ensureDatabase(dsn string) error {
 }
 
 // Open connects, applies the schema (idempotent), and seeds builtin rows.
+// The default startup budget prevents a dead PostgreSQL endpoint or a stuck
+// migration lock from hanging the desktop/backend startup indefinitely.
 func Open(dsn string) (*DB, error) {
+	ctx, cancel := context.WithTimeout(context.Background(), databaseStartupTimeout)
+	defer cancel()
+	return OpenContext(ctx, dsn)
+}
+
+// OpenContext is Open with a caller-owned startup deadline or cancellation.
+func OpenContext(ctx context.Context, dsn string) (*DB, error) {
+	if err := ctx.Err(); err != nil {
+		return nil, err
+	}
 	if _, err := profileSecretCipher(); err != nil {
 		return nil, err
 	}
-	if err := ensureDatabase(dsn); err != nil {
+	if err := ensureDatabaseContext(ctx, dsn); err != nil {
 		return nil, err
 	}
 	sqlDB, err := sql.Open("pgx", dsn)
@@ -196,7 +239,7 @@ func Open(dsn string) (*DB, error) {
 	sqlDB.SetMaxIdleConns(maxOpenConns)
 	sqlDB.SetConnMaxLifetime(30 * time.Minute)
 	sqlDB.SetConnMaxIdleTime(5 * time.Minute)
-	if err := sqlDB.Ping(); err != nil {
+	if err := sqlDB.PingContext(ctx); err != nil {
 		sqlDB.Close()
 		return nil, fmt.Errorf("ping postgres (%s): %w", config.Redact(dsn), err)
 	}
@@ -204,8 +247,8 @@ func Open(dsn string) (*DB, error) {
 	// pgx runs multi-statement Exec via the simple protocol when there are no args.
 	// Keep the dedicated lock connection checked out until both DDL and seeding
 	// finish so concurrent application instances cannot initialize out of order.
-	err = withSchemaMigrationLock(context.Background(), sqlDB, func(conn *sql.Conn) error {
-		if err := applySchemaWithRetry(context.Background(), conn, time.Sleep); err != nil {
+	err = withSchemaMigrationLock(ctx, sqlDB, func(conn *sql.Conn) error {
+		if err := applySchemaWithRetry(ctx, conn, nil); err != nil {
 			return fmt.Errorf("apply schema: %w", err)
 		}
 		if err := d.seedBuiltins(); err != nil {
