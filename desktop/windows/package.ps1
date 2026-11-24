@@ -39,8 +39,17 @@ if ($cacheAllowed -and (Test-FrontendFresh $root $frontendCache $inputs)) {
         } else {
             Write-Host "[ARTEX] Node dependencies unchanged; skipping npm ci"
         }
-        & npm run build:static
-        if ($LASTEXITCODE -ne 0) { throw "web static export failed" }
+        # npm's build:static script uses POSIX inline environment assignment.
+        # On native Windows invoke the installed Next CLI with an explicit
+        # process environment instead; do not download a second copy of Next.
+        $previousExport = [Environment]::GetEnvironmentVariable("NEXT_EXPORT", "Process")
+        try {
+            $env:NEXT_EXPORT = "1"
+            & node (Join-Path $root "web/node_modules/next/dist/bin/next") build
+            if ($LASTEXITCODE -ne 0) { throw "web static export failed" }
+        } finally {
+            [Environment]::SetEnvironmentVariable("NEXT_EXPORT", $previousExport, "Process")
+        }
     } finally {
         Pop-Location
     }
