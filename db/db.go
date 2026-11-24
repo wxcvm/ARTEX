@@ -15,6 +15,7 @@ import (
 	"time"
 
 	"github.com/Autumn-27/artex/config"
+	"github.com/jackc/pgx/v5"
 	"github.com/jackc/pgx/v5/pgconn"
 	_ "github.com/jackc/pgx/v5/stdlib" // pgx database/sql driver ("pgx")
 )
@@ -143,14 +144,31 @@ func ensureDatabase(dsn string) error {
 	if err := admin.Ping(); err != nil {
 		return nil
 	}
+	const existsSQL = `SELECT EXISTS (SELECT 1 FROM pg_database WHERE datname=$1)`
 	var exists bool
-	_ = admin.QueryRow(`SELECT true FROM pg_database WHERE datname=$1`, dbName).Scan(&exists)
-	if !exists {
-		if _, err := admin.Exec(`CREATE DATABASE "` + dbName + `"`); err != nil {
+	if err := admin.QueryRow(existsSQL, dbName).Scan(&exists); err != nil {
+		return fmt.Errorf("check database %q: %w", dbName, err)
+	}
+	if exists {
+		return nil
+	}
+
+	// Concurrent ARTEX instances coordinate on the maintenance database.
+	// Check again after acquiring the session lock: another instance may have
+	// created the database while this one was waiting.
+	ctx := context.Background()
+	return withSchemaMigrationLock(ctx, admin, func(conn *sql.Conn) error {
+		if err := conn.QueryRowContext(ctx, existsSQL, dbName).Scan(&exists); err != nil {
+			return fmt.Errorf("check database %q: %w", dbName, err)
+		}
+		if exists {
+			return nil
+		}
+		if _, err := conn.ExecContext(ctx, "CREATE DATABASE "+pgx.Identifier{dbName}.Sanitize()); err != nil {
 			return fmt.Errorf("create database %q: %w", dbName, err)
 		}
-	}
-	return nil
+		return nil
+	})
 }
 
 // Open connects, applies the schema (idempotent), and seeds builtin rows.
