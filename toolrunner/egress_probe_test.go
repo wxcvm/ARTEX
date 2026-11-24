@@ -3,8 +3,8 @@ package toolrunner
 import (
 	"context"
 	"encoding/json"
-	"net/http"
 	"net"
+	"net/http"
 	"net/http/httptest"
 	"net/url"
 	"strings"
