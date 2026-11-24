@@ -150,6 +150,9 @@ jobs:
         with:
           name: ci-web-dist
           path: server/webui/dist
+      - name: Check incremental desktop frontend cache invalidation
+        shell: pwsh
+        run: ./desktop/windows/test-frontend-cache.ps1
       - name: Build portable Windows desktop bundle
         shell: pwsh
         run: ./desktop/windows/package.ps1 -SkipWebBuild -Version preview

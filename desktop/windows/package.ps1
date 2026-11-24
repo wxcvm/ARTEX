@@ -15,31 +15,16 @@ Set-Location $root
 
 # WSARTEX-inspired fast local builds. CI/release packaging keeps the default
 # full-build behavior; SkipWebBuild still takes precedence.
-function Test-FrontendFresh {
-    $export = Join-Path $root "server/webui/dist"
-    $index = Join-Path $export "index.html"
-    if (-not (Test-Path $index) -or -not (Test-Path (Join-Path $export "_next"))) { return $false }
-    $stamp = (Get-Item $index).LastWriteTimeUtc
-    foreach ($relative in @(
-        "web/src", "web/public", "web/package.json", "web/package-lock.json",
-        "web/next.config.mjs", "web/postcss.config.mjs", "web/tsconfig.json",
-        "web/tsconfig.scripts.json", "web/components.json", "web/biome.json",
-        "web/.env", "web/.env.local", "web/.env.production"
-    )) {
-        $path = Join-Path $root $relative
-        if (-not (Test-Path $path)) { continue }
-        $item = Get-Item $path
-        $files = if ($item.PSIsContainer) { Get-ChildItem $path -Recurse -File } else { @($item) }
-        foreach ($file in $files) {
-            if ($file.LastWriteTimeUtc -gt $stamp) { return $false }
-        }
-    }
-    return $true
-}
+. (Join-Path $PSScriptRoot "frontend-cache.ps1")
+$frontendCache = Join-Path $root "web/.next/artex-desktop-inputs.json"
+$cacheAllowed = $Incremental -and -not $SkipWebBuild -and
+    -not $env:ARTEX_BUILD_ID -and -not (Get-ChildItem Env: | Where-Object Name -Like "NEXT_PUBLIC_*")
+$inputs = if ($cacheAllowed) { Get-FrontendInputs $root } else { $null }
 
-if (-not $SkipWebBuild -and $Incremental -and (Test-FrontendFresh)) {
+if ($cacheAllowed -and (Test-FrontendFresh $root $frontendCache $inputs)) {
     Write-Host "[ARTEX] Frontend unchanged; reusing server/webui/dist"
 } elseif (-not $SkipWebBuild) {
+    Remove-Item -LiteralPath $frontendCache -Force -ErrorAction SilentlyContinue
     Push-Location (Join-Path $root "web")
     try {
         $marker = Join-Path $root "web/node_modules/.package-lock.json"
@@ -54,8 +39,17 @@ if (-not $SkipWebBuild -and $Incremental -and (Test-FrontendFresh)) {
         } else {
             Write-Host "[ARTEX] Node dependencies unchanged; skipping npm ci"
         }
-        & npm run build:static
-        if ($LASTEXITCODE -ne 0) { throw "web static export failed" }
+        # npm's build:static script uses POSIX inline environment assignment.
+        # On native Windows invoke the installed Next CLI with an explicit
+        # process environment instead; do not download a second copy of Next.
+        $previousExport = [Environment]::GetEnvironmentVariable("NEXT_EXPORT", "Process")
+        try {
+            $env:NEXT_EXPORT = "1"
+            & node (Join-Path $root "web/node_modules/next/dist/bin/next") build
+            if ($LASTEXITCODE -ne 0) { throw "web static export failed" }
+        } finally {
+            [Environment]::SetEnvironmentVariable("NEXT_EXPORT", $previousExport, "Process")
+        }
     } finally {
         Pop-Location
     }
@@ -64,6 +58,11 @@ if (-not $SkipWebBuild -and $Incremental -and (Test-FrontendFresh)) {
     $embed = Join-Path $root "server/webui/dist"
     if (Test-Path $embed) { Remove-Item -Path $embed -Recurse -Force }
     Copy-Item -Path $export -Destination $embed -Recurse -Force
+    # Do not mark an export reusable if the source changed during its build.
+    if ($cacheAllowed -and $inputs -ceq (Get-FrontendInputs $root)) {
+        New-Item -ItemType Directory -Path (Split-Path $frontendCache) -Force | Out-Null
+        Set-Content -LiteralPath $frontendCache -Value $inputs -NoNewline -Encoding UTF8
+    }
 }
 
 if (-not (Test-Path (Join-Path $root "server/webui/dist/index.html"))) {
