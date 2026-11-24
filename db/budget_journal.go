@@ -60,8 +60,8 @@ func scanBudgetRun(row *sql.Row) (BudgetRun, error) {
 const budgetRunColumns = "task_id,run_id,token_limit,turn_limit,spent_tokens,spent_turns,held_tokens,held_turns,state"
 
 // OpenBudgetRun inserts a run exactly once and never replaces its counters or
-// limits on re-open. The Engine is NOT wired to this table yet; the runtime must
-// not call it with a fresh run ID merely because the process restarted.
+// limits on re-open. Engine uses the unclosed row as the durable task-owner epoch;
+// process restarts must reuse it rather than minting a fresh run ID.
 func (d *DB) OpenBudgetRun(taskID int64, runID string, tokenLimit, turnLimit int64) (BudgetRun, error) {
 	if err := validateBudgetIdentity(taskID, runID); err != nil {
 		return BudgetRun{}, err
