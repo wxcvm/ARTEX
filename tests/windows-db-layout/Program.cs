@@ -1,5 +1,6 @@
 using System.Drawing;
 using System.Reflection;
+using System.Text.Json;
 using System.Text.Json.Nodes;
 using System.Windows.Forms;
 using Artex.Desktop;
@@ -14,6 +15,7 @@ internal static class Program
         try
         {
             ApplicationConfiguration.Initialize();
+            CheckHealthResponseShape();
             Run();
             Console.WriteLine("[ARTEX] Large-font/narrow-window database layout and password key repeat passed.");
             return 0;
@@ -23,6 +25,33 @@ internal static class Program
             Console.Error.WriteLine(error);
             return 1;
         }
+    }
+
+    private static void CheckHealthResponseShape()
+    {
+        var check = typeof(MainForm).GetMethod("IsHealthDocument", BindingFlags.Static | BindingFlags.NonPublic)!;
+        foreach (var (json, expected) in new (string, bool)[]
+        {
+            ("""{"service":"artex","ok":true,"version":"test"}""", true),
+            ("""{"service":"other","ok":true}""", false),
+            ("""{"service":"artex","ok":false}""", false),
+            ("""{"service":"artex","ok":"true"}""", false),
+            ("""{"service":"artex"}""", false),
+            ("""{"ok":true}""", false),
+            ("""{"service":123,"ok":true}""", false),
+            ("""{"service":{},"ok":true}""", false),
+            ("""{"service":null,"ok":true}""", false),
+            ("[]", false),
+            ("null", false),
+            ("true", false),
+            ("123", false),
+        })
+        {
+            using var document = JsonDocument.Parse(json);
+            if (!Equals(check.Invoke(null, new object[] { document.RootElement }), expected))
+                throw new Exception("Incorrect desktop health result for: " + json);
+        }
+        Console.WriteLine("[ARTEX] Desktop health response shape regression passed.");
     }
 
     private static void Run()
