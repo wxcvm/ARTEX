@@ -6,6 +6,7 @@ import (
 	"errors"
 	"strconv"
 	"testing"
+	"time"
 
 	"github.com/Autumn-27/artex/db"
 )
@@ -80,3 +81,63 @@ func TestRunFailsClosedWhenDurableOwnerCannotBeAcquired(t *testing.T) {
 	}
 }
 
+
+func TestEngineRuntimeReleasesDurableOwnerAfterDrain(t *testing.T) {
+	for _, key := range []string{"ARTEX_TASK_BUDGET_TOKENS", "ARTEX_TASK_BUDGET_TURNS", "ARTEX_INTENT_BUDGET_TOKENS", "ARTEX_INTENT_BUDGET_TURNS"} {
+		t.Setenv(key, "")
+	}
+	dsn, _, err := db.DSN()
+	if err != nil {
+		t.Skipf("PostgreSQL is not configured: %v", err)
+	}
+	pg, err := db.Open(dsn)
+	if err != nil {
+		t.Skipf("PostgreSQL is unavailable: %v", err)
+	}
+	taskRow, err := pg.CreateTask("engine owner drain fixture", "release owner after runtime drain", nil, 0, 0)
+	if err != nil {
+		pg.Close()
+		t.Fatal(err)
+	}
+	t.Cleanup(func() {
+		_ = pg.DeleteTask(taskRow.ID)
+		_ = pg.Close()
+	})
+
+	taskID := strconv.FormatInt(taskRow.ID, 10)
+	task := &Task{
+		ID: taskID, ExpID: taskRow.ExplorationID, Store: pg.Exploration(taskRow.ExplorationID),
+		Description: taskRow.Description, Goal: taskRow.Goal, notify: make(chan struct{}, 1),
+	}
+	m := &Manager{pg: pg, tasks: map[string]*Task{taskID: task}}
+	e := NewEngine(m)
+	e.Run(context.Background(), task)
+	if !e.Started(taskID) {
+		t.Fatal("task runtime did not start after acquiring its durable owner")
+	}
+	value, ok := e.taskOwners.Load(taskID)
+	if !ok {
+		t.Fatal("task runtime did not retain its durable owner")
+	}
+	owner := value.(*durableTaskOwner)
+	stopped := make(chan struct{})
+	go func() {
+		e.StopTask(taskID)
+		close(stopped)
+	}()
+	select {
+	case <-stopped:
+	case <-time.After(5 * time.Second):
+		t.Fatal("task runtime did not drain and release its owner")
+	}
+	next, err := pg.AcquireBudgetOwner(taskRow.ID, owner.runID, taskOwnerLeaseTTL)
+	if err != nil {
+		t.Fatalf("owner was not released after task drain: %v", err)
+	}
+	if next != owner.epoch+1 {
+		t.Fatalf("next owner epoch=%d; want %d", next, owner.epoch+1)
+	}
+	if err := pg.ReleaseBudgetOwner(taskRow.ID, owner.runID, next); err != nil {
+		t.Fatal(err)
+	}
+}
