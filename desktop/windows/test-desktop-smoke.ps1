@@ -1,5 +1,6 @@
 param(
-    [string]$OutputDir = "dist"
+    [string]$OutputDir = "dist",
+    [ValidateRange(1, 50)] [int]$WindowCycles = 3
 )
 
 $ErrorActionPreference = "Stop"
@@ -129,6 +130,26 @@ public static class ArtexSmokeWindow {
     [DllImport("user32.dll")] public static extern bool ShowWindowAsync(IntPtr hwnd, int command);
     [DllImport("user32.dll")] public static extern bool IsWindowVisible(IntPtr hwnd);
     [DllImport("user32.dll")] public static extern bool IsIconic(IntPtr hwnd);
+    [DllImport("user32.dll")] public static extern bool IsWindow(IntPtr hwnd);
+    [DllImport("user32.dll")] public static extern IntPtr GetForegroundWindow();
+    [StructLayout(LayoutKind.Sequential)]
+    private struct POINT { public int X, Y; }
+    [StructLayout(LayoutKind.Sequential)]
+    private struct RECT { public int Left, Top, Right, Bottom; }
+    [StructLayout(LayoutKind.Sequential)]
+    private struct WINDOWPLACEMENT {
+        public uint length, flags, showCmd;
+        public POINT ptMinPosition, ptMaxPosition;
+        public RECT rcNormalPosition;
+    }
+    [DllImport("user32.dll", SetLastError = true)]
+    private static extern bool GetWindowPlacement(IntPtr hwnd, ref WINDOWPLACEMENT placement);
+    public static string Describe(IntPtr hwnd) {
+        var placement = new WINDOWPLACEMENT { length = (uint)Marshal.SizeOf<WINDOWPLACEMENT>() };
+        var success = GetWindowPlacement(hwnd, ref placement);
+        var error = success ? 0 : Marshal.GetLastWin32Error();
+        return $"hwnd={hwnd}, valid={IsWindow(hwnd)}, visible={IsWindowVisible(hwnd)}, iconic={IsIconic(hwnd)}, foreground={GetForegroundWindow()}, placementOk={success}, showCmd={placement.showCmd}, flags={placement.flags}, placementError={error}";
+    }
     [DllImport("user32.dll")] public static extern bool PostMessage(IntPtr hwnd, uint msg, IntPtr wParam, IntPtr lParam);
 }
 '@
@@ -141,34 +162,36 @@ public static class ArtexSmokeWindow {
         Start-Sleep -Milliseconds 100
     }
     if ($hwnd -eq [IntPtr]::Zero -or -not [ArtexSmokeWindow]::IsWindowVisible($hwnd)) {
-        throw "Desktop main window not visible"
+        throw "Desktop main window not visible: $([ArtexSmokeWindow]::Describe($hwnd))"
     }
 
     function Assert-ArtexWindowState([bool]$minimized, [string]$action) {
         for ($i = 0; $i -lt 60; $i++) {
             $desktop.Refresh()
             if ($desktop.HasExited) { throw "Desktop exited after $action (code $($desktop.ExitCode))" }
-            if ([ArtexSmokeWindow]::IsWindowVisible($hwnd) -and
+            if ([ArtexSmokeWindow]::IsWindow($hwnd) -and [ArtexSmokeWindow]::IsWindowVisible($hwnd) -and
                 ([ArtexSmokeWindow]::IsIconic($hwnd) -eq $minimized)) { return }
             Start-Sleep -Milliseconds 100
         }
-        throw "Desktop window did not retain its visible taskbar state after $action"
+        throw "Desktop window did not retain its visible taskbar state after $action (expected minimized=$minimized): $([ArtexSmokeWindow]::Describe($hwnd)); process exited=$($desktop.HasExited); current main hwnd=$($desktop.MainWindowHandle)"
     }
 
-    [ArtexSmokeWindow]::ShowWindowAsync($hwnd, 6) | Out-Null # SW_MINIMIZE
-    Assert-ArtexWindowState $true "minimize"
-    [ArtexSmokeWindow]::ShowWindowAsync($hwnd, 9) | Out-Null # SW_RESTORE
-    Assert-ArtexWindowState $false "restore"
-    # The title-bar X sends WM_SYSCOMMAND/SC_CLOSE. Posting WM_CLOSE
-    # directly is interpreted by WinForms as TaskManagerClosing, not
-    # UserClosing, and intentionally takes the actual shutdown path.
-    if (-not [ArtexSmokeWindow]::PostMessage($hwnd, 0x0112, [IntPtr]0xF060, [IntPtr]::Zero)) {
-        throw "Could not send SC_CLOSE to desktop"
+    for ($cycle = 1; $cycle -le $WindowCycles; $cycle++) {
+        [ArtexSmokeWindow]::ShowWindowAsync($hwnd, 6) | Out-Null # SW_MINIMIZE
+        Assert-ArtexWindowState $true "minimize (cycle $cycle)"
+        [ArtexSmokeWindow]::ShowWindowAsync($hwnd, 9) | Out-Null # SW_RESTORE
+        Assert-ArtexWindowState $false "restore (cycle $cycle)"
+        # The title-bar X sends WM_SYSCOMMAND/SC_CLOSE. Posting WM_CLOSE
+        # directly is interpreted by WinForms as TaskManagerClosing, not
+        # UserClosing, and intentionally takes the actual shutdown path.
+        if (-not [ArtexSmokeWindow]::PostMessage($hwnd, 0x0112, [IntPtr]0xF060, [IntPtr]::Zero)) {
+            throw "Could not send SC_CLOSE to desktop (cycle $cycle): $([ArtexSmokeWindow]::Describe($hwnd))"
+        }
+        Assert-ArtexWindowState $true "close button (cycle $cycle)"
+        [ArtexSmokeWindow]::ShowWindowAsync($hwnd, 9) | Out-Null
+        Assert-ArtexWindowState $false "restore after close (cycle $cycle)"
+        Write-Host "[ARTEX] Minimize, close-to-taskbar and restore passed (cycle $cycle/$WindowCycles)."
     }
-    Assert-ArtexWindowState $true "close button"
-    [ArtexSmokeWindow]::ShowWindowAsync($hwnd, 9) | Out-Null
-    Assert-ArtexWindowState $false "restore after close"
-    Write-Host "[ARTEX] Minimize, close-to-taskbar and restore passed."
 }
 finally {
     if ($desktop) {
