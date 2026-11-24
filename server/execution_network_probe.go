@@ -101,10 +101,9 @@ func (s *Server) verifyExecutionNetwork(w http.ResponseWriter, r *http.Request) 
 		return
 	}
 	if !result.OK || result.Status != "exit_ip_match" {
-		recordModeBProbe("exit_ip_mismatch", "mismatch", "mismatch")
+		observedAt := recordModeBProbe("exit_ip_mismatch", "mismatch", "mismatch")
 		writeJSON(w, http.StatusOK, map[string]any{
-			"ok": false, "status": "exit_ip_mismatch",
-			"observed_at": time.Now().UTC(),
+			"ok": false, "status": "exit_ip_mismatch", "observed_at": observedAt,
 		})
 		return
 	}
