@@ -221,6 +221,8 @@ CREATE TABLE IF NOT EXISTS exploration_nodes (
     )
 );
 ALTER TABLE exploration_nodes ADD COLUMN IF NOT EXISTS blocked_reason TEXT;
+-- Fences worker settlement callbacks to the exact claim that started the run.
+ALTER TABLE exploration_nodes ADD COLUMN IF NOT EXISTS claim_token TEXT;
 -- Intent soft delete: when state='deleted', delete_reason records the user-provided deletion reason.
 ALTER TABLE exploration_nodes ADD COLUMN IF NOT EXISTS delete_reason TEXT;
 -- cold-digest (§2.3/§5.3): content_version bumps on any change that could alter a

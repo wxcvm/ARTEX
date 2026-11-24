@@ -20,3 +20,18 @@ func TestClaimNextReportsFrontierReadFailure(t *testing.T) {
 		t.Fatalf("closed-DB frontier returned node=%+v error=%v; want a reported query failure",node,err)
 	}
 }
+
+
+func TestIntentClaimTokensAreUnique(t *testing.T) {
+	first, err := newIntentClaimToken()
+	if err != nil {
+		t.Fatal(err)
+	}
+	second, err := newIntentClaimToken()
+	if err != nil {
+		t.Fatal(err)
+	}
+	if first == "" || second == "" || first == second {
+		t.Fatalf("claim tokens must be non-empty and unique: first=%q second=%q", first, second)
+	}
+}
