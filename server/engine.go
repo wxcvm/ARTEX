@@ -148,8 +148,9 @@ type Engine struct {
 	stamped      sync.Map // taskID -> bool, whether first_run_at has been stamped (once per process)
 	inflight     sync.Map // taskID -> *int64, count of in-flight planner.Plan + worker.Execute (for drain)
 	coordStarted sync.Map // taskID -> bool, whether the deadline coordinator has started (deduplicated across Run/reload)
-	budgets   sync.Map // taskID -> optional run budget ledger
-	honeypots sync.Map // taskID -> *agent.HoneypotRegistry
+	budgets    sync.Map // taskID -> optional run budget ledger
+	taskOwners sync.Map // taskID -> *durableTaskOwner
+	honeypots  sync.Map // taskID -> *agent.HoneypotRegistry
 
 	// resolve returns a task's dedicated planner/worker (wired by the server as the
 	// authoritative task-router). nil,nil means this task is deliberately unavailable
@@ -165,6 +166,7 @@ type taskRuntime struct {
 	ctx    context.Context
 	cancel context.CancelFunc
 	wg     sync.WaitGroup
+	loops  sync.WaitGroup // planner, worker and deadline routines; excludes the owner-renewal routine
 }
 
 type workExecution struct {
@@ -243,8 +245,10 @@ func (e *Engine) registerTaskRoutines(parent context.Context, taskID string, cou
 }
 
 func runTaskRoutine(rt *taskRuntime, fn func(context.Context)) {
+	rt.loops.Add(1)
 	go func() {
 		defer rt.wg.Done()
+		defer rt.loops.Done()
 		fn(rt.ctx)
 	}()
 }
@@ -293,6 +297,7 @@ func (e *Engine) StopTask(taskID string) {
 	e.inflight.Delete(taskID)
 	e.coordStarted.Delete(taskID)
 	e.budgets.Delete(taskID)
+	e.taskOwners.Delete(taskID)
 	e.honeypots.Delete(taskID)
 	e.deleteMu.Lock()
 	e.deleting.Delete(taskID)
@@ -788,9 +793,21 @@ func (e *Engine) Run(ctx context.Context, t *Task) {
 		t.Notify() // already running — just nudge a planning round
 		return
 	}
-	// Reserve the initial frontier check (and any retry) in the task runtime as
-	// well, so StopTask waits for it before freeing task-owned resources.
-	rt := e.registerTaskRoutines(ctx, t.ID, 2+workers)
+	owner, err := e.acquireTaskOwner(t)
+	if err != nil {
+		e.started.Delete(t.ID)
+		e.deleteMu.RUnlock()
+		log.Printf("[engine] task %s not started; durable execution owner unavailable: %v", t.ID, err)
+		return
+	}
+	routineCount := 2 + workers // planner, workers, and initial frontier check
+	if owner != nil {
+		routineCount++ // the lease renewer remains alive until the other routines drain
+		e.taskOwners.Store(t.ID, owner)
+	}
+	// Reserve every task routine before releasing the delete barrier, so StopTask
+	// cannot race WaitGroup.Add with Wait.
+	rt := e.registerTaskRoutines(ctx, t.ID, routineCount)
 	e.deleteMu.RUnlock()
 	e.touch(t.ID)
 	runTaskRoutine(rt, func(loopCtx context.Context) { e.plannerLoop(loopCtx, t) })
@@ -802,7 +819,7 @@ func (e *Engine) Run(ctx context.Context, t *Task) {
 	// Kick the first planning round only when there are no active intents at all
 	// (open+running). For a task with seeded intents: the seed is already open, or the
 	// worker just started above has claimed it as running first — both count as "work
-	// exists", so skip the first planner round: the worker runs the seed intent directly and NotifyDone/heartbeat wakes the planner when done.
+	// exists", so skip the first planning round: the worker runs the seed intent directly and NotifyDone/heartbeat wakes the planner when done.
 	// ⚠️ Do not use Frontier (counts only open): a worker claiming (open→running) races with this check and would kick spuriously. After a restart-driven auto-recovery only running intents may remain — skip then too.
 	if has, err := t.Store.HasActiveIntent(); err != nil {
 		log.Printf("[engine] task %s could not inspect active intents before initial planning: %v", t.ID, err)
@@ -813,8 +830,13 @@ func (e *Engine) Run(ctx context.Context, t *Task) {
 			t.Notify() // kick the first planning round (acted on once LLM is ready)
 		}
 	}
+	if owner != nil {
+		go func() {
+			defer rt.wg.Done()
+			e.maintainTaskOwner(rt, t, owner)
+		}()
+	}
 }
-
 // retryInitialPlanning rechecks only the DB state after a transient read error.
 // Never infer an empty frontier from an unavailable DB, but do not leave a
 // previously unseeded task waiting for the planner heartbeat either.
