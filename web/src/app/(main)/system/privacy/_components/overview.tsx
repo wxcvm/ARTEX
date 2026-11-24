@@ -166,6 +166,7 @@ export function PrivacyOverviewPanel() {
                 <h3 className="font-semibold">{tr("ARTEX 任务出口 · 模式 B", "ARTEX task egress · Mode B")}</h3>
                 <p>{tr("模式：", "Mode: ")}{label(snapshot.execution_network.mode)} · {tr("配置：", "Configuration: ")}{label(snapshot.execution_network.configuration)}</p>
                 <p>{tr("出口验证：", "Egress verification: ")}{label(snapshot.execution_network.verification)} · {tr("最终出口：", "Final exit: ")}{label(snapshot.execution_network.final_exit)}</p>
+                <p>{tr("出口观测：", "Observed egress: ")}{label(snapshot.execution_network.actual_egress)}</p>
                 <p>{tr("失败关闭：", "Fail-closed: ")}{label(snapshot.execution_network.fail_closed)} · {tr("任务开始前验证：", "Verify before task: ")}{snapshot.execution_network.verify_before_task ? tr("已启用", "Enabled") : tr("未启用", "Not enabled")}</p>
                 <p className="text-muted-foreground">{tr("覆盖范围：", "Covered scope: ")}{(snapshot.execution_network.covered_processes ?? []).join(", ") || tr("无", "None")}</p>
                 {snapshot.execution_network.observed_at && <p className="text-muted-foreground">{tr("最近观测：", "Last observed: ")}{new Date(snapshot.execution_network.observed_at).toLocaleString(locale)}</p>}
