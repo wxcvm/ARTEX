@@ -578,10 +578,7 @@ public sealed class MainForm : Form
             if (!response.IsSuccessStatusCode) return false;
             using var document = await JsonDocument.ParseAsync(
                 await response.Content.ReadAsStreamAsync(cancel), cancellationToken: cancel);
-            return document.RootElement.TryGetProperty("service", out var service) &&
-                   service.GetString() == "artex" &&
-                   document.RootElement.TryGetProperty("ok", out var ok) &&
-                   ok.ValueKind == JsonValueKind.True;
+            return IsHealthDocument(document.RootElement);
         }
         catch (OperationCanceledException) when (cancel.IsCancellationRequested)
         {
@@ -591,6 +588,16 @@ public sealed class MainForm : Form
         catch (TaskCanceledException) { return false; }
         catch (JsonException) { return false; }
     }
+
+    // A different service may return valid JSON with an unrelated schema.
+    // Treat it as unhealthy so the caller can diagnose an occupied local port.
+    private static bool IsHealthDocument(JsonElement root) =>
+        root.ValueKind == JsonValueKind.Object &&
+        root.TryGetProperty("service", out var service) &&
+        service.ValueKind == JsonValueKind.String &&
+        service.GetString() == "artex" &&
+        root.TryGetProperty("ok", out var ok) &&
+        ok.ValueKind == JsonValueKind.True;
 
     private static void OpenInBrowser() =>
         Process.Start(new ProcessStartInfo(Service.AbsoluteUri) { UseShellExecute = true });
