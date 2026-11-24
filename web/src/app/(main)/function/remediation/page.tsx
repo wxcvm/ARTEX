@@ -14,6 +14,7 @@ import type { RemediationList } from "@/lib/types";
 import { uiText } from "@/lib/ui-locale";
 import { useUiLocale } from "@/lib/ui-locale.client";
 import { RemediationRecord } from "./_components/remediation-record";
+import { PurgeRemediationPreview } from "./_components/purge-summary-preview";
 import { stageLabel } from "./_components/labels";
 
 const selectClass = "h-8 rounded-lg border bg-background px-2 text-sm";
@@ -79,6 +80,7 @@ function Workbench() {
           {tr("只管理已有发现的人工复核、整改计划和验收记录。这里不会启动检查、调用模型或改写原始证据。", "Manage human review, remediation plans, and acceptance for existing findings. This does not run checks, call models or rewrite evidence.")}
         </p>
       </header>
+      <PurgeRemediationPreview />
       <div className="grid items-start gap-4 lg:grid-cols-[minmax(16rem,1fr)_minmax(0,1.7fr)]">
         <section className="min-w-0 space-y-4 rounded-xl border bg-card p-4" aria-labelledby="remediation-list-heading">
           <h2 id="remediation-list-heading" className="text-lg font-semibold">{tr("整改记录", "Remediation records")}</h2>
