@@ -4,8 +4,7 @@ import (
 	"context"
 	"encoding/json"
 	"io"
-	"net"
-	"net/http"
+		"net/http"
 	"os"
 	"strings"
 	"sync"
@@ -58,12 +57,7 @@ func applyModeBProbeSnapshot(out ExecutionNetworkOverview) ExecutionNetworkOverv
 }
 
 func validExpectedModeBExit(raw string) (string, bool) {
-	ip := net.ParseIP(strings.TrimSpace(raw))
-	if ip == nil || ip.To4() == nil || !ip.IsGlobalUnicast() || ip.IsPrivate() ||
-		ip.IsLoopback() || ip.IsLinkLocalUnicast() || ip.IsMulticast() || ip.IsUnspecified() {
-		return "", false
-	}
-	return ip.To4().String(), true
+	return toolrunner.NormalizePublicIPv4(raw)
 }
 
 // verifyExecutionNetwork is an explicit operator action. The request is sent
