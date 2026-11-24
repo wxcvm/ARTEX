@@ -331,11 +331,19 @@ func TestIntentClaimTokenFencesStaleExecution(t *testing.T) {
 	if err != nil || node == nil || node.State != "running" {
 		t.Fatalf("new claim was modified by stale callback: node=%+v err=%v", node, err)
 	}
-	if changed, err := es.CompareAndSetClaimedIntentState(intentID, "new-run-token", "running", "done", ""); err != nil || !changed {
-		t.Fatalf("current run settlement: changed=%v err=%v", changed, err)
+	if changed, err := es.CompareAndSetClaimedIntentState(intentID, "new-run-token", "running", "paused", ""); err != nil || !changed {
+		t.Fatalf("pause current run: changed=%v err=%v", changed, err)
 	}
-	if changed, err := es.CompareAndSetClaimedIntentState(intentID, "old-run-token", "running", "blocked", ""); err != nil || changed {
-		t.Fatalf("old token settled after completion: changed=%v err=%v", changed, err)
+	if claimed, err := es.ClaimPausedIntentWithToken(intentID, "chat", "resumed-run-token"); err != nil || !claimed {
+		t.Fatalf("resume paused intent: claimed=%v err=%v", claimed, err)
+	}
+	for _, stale := range []string{"old-run-token", "new-run-token"} {
+		if changed, err := es.CompareAndSetClaimedIntentState(intentID, stale, "running", "blocked", ""); err != nil || changed {
+			t.Fatalf("stale token %q settled resumed claim: changed=%v err=%v", stale, changed, err)
+		}
+	}
+	if changed, err := es.CompareAndSetClaimedIntentState(intentID, "resumed-run-token", "running", "done", ""); err != nil || !changed {
+		t.Fatalf("resumed run settlement: changed=%v err=%v", changed, err)
 	}
 	node, err = es.GetNode(intentID)
 	if err != nil || node == nil || node.State != "done" {
