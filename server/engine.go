@@ -818,12 +818,29 @@ func (e *Engine) Run(ctx context.Context, t *Task) {
 	}
 	// Restart recovery mutates the exploration graph, so it must happen only
 	// after this process has acquired the task's durable owner lease.
-	if t.Store != nil {
-		if n, resetErr := t.Store.ResetRunningIntents(); resetErr != nil {
-			log.Printf("[engine] task %s could not recover stale running intents: %v", t.ID, resetErr)
-		} else if n > 0 {
-			log.Printf("[engine] task %s reset %d leftover running intents to open", t.ID, n)
+	if t.Store == nil {
+		if owner != nil {
+			_ = owner.release()
+			e.taskOwners.Delete(t.ID)
 		}
+		e.started.Delete(t.ID)
+		e.deleteMu.RUnlock()
+		log.Printf("[engine] task %s not started; exploration store is unavailable", t.ID)
+		return
+	}
+	if n, resetErr := t.Store.ResetRunningIntents(); resetErr != nil {
+		if owner != nil {
+			if releaseErr := owner.release(); releaseErr != nil {
+				log.Printf("[engine] task %s owner release after recovery failure: %v", t.ID, releaseErr)
+			}
+			e.taskOwners.Delete(t.ID)
+		}
+		e.started.Delete(t.ID)
+		e.deleteMu.RUnlock()
+		log.Printf("[engine] task %s not started; crash recovery could not reset stale intents: %v", t.ID, resetErr)
+		return
+	} else if n > 0 {
+		log.Printf("[engine] task %s reset %d leftover running intents to open", t.ID, n)
 	}
 	routineCount := 2 + workers // planner, workers, and initial frontier check
 	if owner != nil {
