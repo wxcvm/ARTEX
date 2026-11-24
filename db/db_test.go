@@ -28,8 +28,9 @@ func TestApplySchemaRetriesOnlyDeadlocks(t *testing.T) {
 			return nil, &pgconn.PgError{Code: "40P01", Message: "deadlock detected"}
 		}
 		return nil, nil
-	}), func(delay time.Duration) {
+	}), func(_ context.Context, delay time.Duration) error {
 		delays = append(delays, delay)
+		return nil
 	})
 	if err != nil {
 		t.Fatal(err)
@@ -46,8 +47,9 @@ func TestApplySchemaRetriesOnlyDeadlocks(t *testing.T) {
 	err = applySchemaWithRetry(t.Context(), schemaExecFunc(func(context.Context, string, ...any) (sql.Result, error) {
 		nonRetryableAttempts++
 		return nil, nonRetryable
-	}), func(time.Duration) {
+	}), func(context.Context, time.Duration) error {
 		t.Fatal("non-deadlock error must not be retried")
+		return nil
 	})
 	if !errors.Is(err, nonRetryable) || nonRetryableAttempts != 1 {
 		t.Fatalf("non-retryable result: attempts=%d err=%v", nonRetryableAttempts, err)
@@ -173,5 +175,28 @@ func TestEnsureDatabaseConcurrentCreation(t *testing.T) {
 	var count int
 	if err := admin.QueryRowContext(ctx, `SELECT count(*) FROM pg_database WHERE datname=$1`, name).Scan(&count); err != nil || count != 1 {
 		t.Fatalf("disposable database count=%d, err=%v", count, err)
+	}
+}
+
+func TestApplySchemaRetryWaitHonorsCancellation(t *testing.T) {
+	ctx, cancel := context.WithCancel(t.Context())
+	attempts := 0
+	err := applySchemaWithRetry(ctx, schemaExecFunc(func(context.Context, string, ...any) (sql.Result, error) {
+		attempts++
+		return nil, &pgconn.PgError{Code: "40P01", Message: "deadlock detected"}
+	}), func(ctx context.Context, _ time.Duration) error {
+		cancel()
+		return waitForSchemaRetry(ctx, time.Hour)
+	})
+	if !errors.Is(err, context.Canceled) || attempts != 1 {
+		t.Fatalf("retry cancellation: attempts=%d err=%v", attempts, err)
+	}
+}
+
+func TestOpenContextRejectsExpiredDeadline(t *testing.T) {
+	ctx, cancel := context.WithCancel(t.Context())
+	cancel()
+	if _, err := OpenContext(ctx, "postgres://127.0.0.1/artex"); !errors.Is(err, context.Canceled) {
+		t.Fatalf("OpenContext with canceled context: %v", err)
 	}
 }
