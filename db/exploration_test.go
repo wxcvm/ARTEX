@@ -294,3 +294,51 @@ func TestNodesPageQueryMatchesID(t *testing.T) {
 		t.Fatalf("non-existent id: total=%d nodes=%+v, want empty", total, nodes)
 	}
 }
+
+
+func TestIntentClaimTokenFencesStaleExecution(t *testing.T) {
+	d, err := Open(testDSN(t))
+	if err != nil {
+		t.Skipf("postgres unavailable (%v) — skipping", err)
+	}
+	defer d.Close()
+
+	expID, err := d.CreateExploration("claim fence", "stale worker settlement")
+	if err != nil {
+		t.Fatal(err)
+	}
+	defer d.Exec(`DELETE FROM explorations WHERE id=$1`, expID)
+	es := d.Exploration(expID)
+	intentID, err := es.AddIntent(map[string]any{"summary": "fenced intent"}, 1, nil, "planner")
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	if claimed, err := es.ClaimIntentWithToken(intentID, "worker-old", "old-run-token"); err != nil || !claimed {
+		t.Fatalf("old claim: claimed=%v err=%v", claimed, err)
+	}
+	if n, err := es.ResetRunningIntents(); err != nil || n != 1 {
+		t.Fatalf("crash recovery reset: count=%d err=%v", n, err)
+	}
+	if claimed, err := es.ClaimIntentWithToken(intentID, "worker-new", "new-run-token"); err != nil || !claimed {
+		t.Fatalf("new claim after recovery: claimed=%v err=%v", claimed, err)
+	}
+
+	if changed, err := es.CompareAndSetClaimedIntentState(intentID, "old-run-token", "running", "done", ""); err != nil || changed {
+		t.Fatalf("stale run settled newer claim: changed=%v err=%v", changed, err)
+	}
+	node, err := es.GetNode(intentID)
+	if err != nil || node == nil || node.State != "running" {
+		t.Fatalf("new claim was modified by stale callback: node=%+v err=%v", node, err)
+	}
+	if changed, err := es.CompareAndSetClaimedIntentState(intentID, "new-run-token", "running", "done", ""); err != nil || !changed {
+		t.Fatalf("current run settlement: changed=%v err=%v", changed, err)
+	}
+	if changed, err := es.CompareAndSetClaimedIntentState(intentID, "old-run-token", "running", "blocked", ""); err != nil || changed {
+		t.Fatalf("old token settled after completion: changed=%v err=%v", changed, err)
+	}
+	node, err = es.GetNode(intentID)
+	if err != nil || node == nil || node.State != "done" {
+		t.Fatalf("final state=%+v err=%v, want done", node, err)
+	}
+}
