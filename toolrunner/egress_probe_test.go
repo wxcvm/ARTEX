@@ -11,6 +11,24 @@ import (
 	"testing"
 )
 
+func TestNormalizePublicIPv4RejectsSpecialPurposeRanges(t *testing.T) {
+	for _, raw := range []string{
+		"", "127.0.0.1", "10.0.0.1", "100.64.0.1", "169.254.1.1",
+		"172.16.0.1", "192.0.0.8", "192.0.2.1", "192.88.99.1",
+		"192.168.1.1", "198.18.0.1", "198.51.100.1", "203.0.113.1",
+		"224.0.0.1", "240.0.0.1", "::ffff:1.1.1.1", "::1",
+	} {
+		if got, ok := NormalizePublicIPv4(raw); ok {
+			t.Fatalf("accepted non-public address %q as %q", raw, got)
+		}
+	}
+	for _, raw := range []string{"1.1.1.1", "8.8.8.8", "203.0.114.1"} {
+		if got, ok := NormalizePublicIPv4(raw); !ok || got != raw {
+			t.Fatalf("rejected public address %q as %q (ok=%v)", raw, got, ok)
+		}
+	}
+}
+
 func TestModeBProbeUsesOnlyExplicitProxy(t *testing.T) {
 	seen := make(chan string, 1)
 	proxy := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
@@ -92,7 +110,7 @@ func TestModeBEgressProbeHandlerRequiresModeBAndPublicExpectedIP(t *testing.T) {
 		handler.ServeHTTP(w, r)
 		return w
 	}
-	for _, invalid := range []string{"", "127.0.0.1", "10.0.0.1", "::1", "not-an-ip"} {
+	for _, invalid := range []string{"", "127.0.0.1", "10.0.0.1", "100.64.0.1", "192.0.2.1", "198.51.100.1", "203.0.113.1", "::1", "not-an-ip"} {
 		if got := request(invalid); got.Code != http.StatusBadRequest {
 			t.Fatalf("expected invalid exit %q to be rejected, got %d", invalid, got.Code)
 		}
