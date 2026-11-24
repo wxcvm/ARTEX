@@ -358,9 +358,9 @@ WHERE id=$2 AND exploration_id=$3 AND kind='intent'`, state, id, s.expID, termin
 	return err
 }
 
-// CompareAndSetIntentState transitions one local intent only when its current
-// state still matches expected. It is the state boundary used by pause/resume and
-// worker settlement, so a stale API read cannot overwrite a concurrent finish.
+// CompareAndSetIntentState transitions an intent only when its current state
+// still matches expected. It is for control transitions without a running claim
+// (for example paused→open); worker settlement must use the claim-token variant.
 func (s *ExplorationStore) CompareAndSetIntentState(id int64, expected, state string) (bool, error) {
 	terminal := state == "done" || state == "blocked" || state == "exhausted" || state == "stopped"
 	res, err := s.db.Exec(`UPDATE exploration_nodes
