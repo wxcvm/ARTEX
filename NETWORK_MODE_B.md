@@ -114,6 +114,35 @@ private expected IPs. Inspect the proxy logs and the host's DNS/IPv6 paths
 separately. A gateway outage test must be performed only while no live tasks
 are running; restoring it after the test is an explicit operator action.
 
+## ARTEX privacy page: explicit live executor egress comparison
+
+When the opt-in Compose stack is running, the ARTEX privacy page exposes
+**Verify ARTEX task egress**. The operator supplies the expected public IPv4
+of the selected final exit (VPS1 for the two-hop profile or VPS2 for the
+three-hop profile). After the button is clicked, the controller sends a
+scoped request over the existing private Unix runner broker. The isolated
+executor makes one fixed HTTPS request to `https://api.ipify.org` through
+the exact private `http://mode-b-egress:7890` gateway and compares the result
+with the supplied address.
+
+The probe accepts no arbitrary URL, command, proxy address or destination.
+It never asks the controller to make the outbound request, does not return or
+persist the observed public IP, and does not change network configuration.
+The comparison status and timestamp are held in memory and reset to
+`not_tested` after an ARTEX restart. The scoped Purge bridge overview can read
+that status; it cannot trigger the probe.
+
+**Evidence boundary:** `exit_ip_match` proves only that this one
+proxy-aware request from the isolated built-in executor observed the expected
+public IPv4 at that time. It does not prove airport/VPS1/VPS2 intermediate-hop
+use, raw-socket or UDP routing, host DNS/IPv6, external MCP/browser processes,
+the controller/LLM, native Windows traffic, or a gateway-outage kill switch.
+`fail_closed` therefore remains `not_tested`, and
+`verify_before_task` remains false. Do not treat this as task admission
+gating or a production-wide kill switch. The operator-run script above remains
+the separate check for the live Docker bridge's isolated IPv4/IPv6 gateway
+options and direct IPv4 denial.
+
 ## Three-hop proxy-chain variant (opt-in, no VPS1 routing changes)
 
 `network/mode-b/config.vps2.example.yaml` adds an explicit second remote
