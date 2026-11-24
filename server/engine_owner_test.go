@@ -4,8 +4,8 @@ import (
 	"context"
 	"database/sql"
 	"errors"
+	"strconv"
 	"testing"
-	"time"
 
 	"github.com/Autumn-27/artex/db"
 )
@@ -80,10 +80,3 @@ func TestRunFailsClosedWhenDurableOwnerCannotBeAcquired(t *testing.T) {
 	}
 }
 
-func TestTaskOwnerDrainKeepsLeaseUntilOperationsFinish(t *testing.T) {
-	owner := &fakeTaskOwner{renewErr: make(chan error, 4), releaseDone: make(chan struct{})}
-	rt := &taskRuntime{ctx: context.Background(), cancel: func() {},}
-	_ = owner
-	_ = rt
-	_ = time.Second
-}
