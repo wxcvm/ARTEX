@@ -63,9 +63,9 @@ type OutboundOverview struct {
 	ProxyConfigured int `json:"proxy_configured"`
 }
 
-// ExecutionNetworkOverview is deliberately configuration-only. The ARTEX
-// controller cannot infer Docker routes, actual proxy transit or VPS2 from
-// its environment. Do not advertise a working kill switch without observations.
+// ExecutionNetworkOverview reports Mode B configuration plus a short-lived,
+// aggregate egress comparison. It never exposes the observed IP or claims
+// visibility into Docker routes, individual hops, VPS2 or a working kill switch.
 type ExecutionNetworkOverview struct {
 	Mode string `json:"mode"`
 	Configuration string `json:"configuration"`
