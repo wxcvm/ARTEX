@@ -75,6 +75,7 @@ type Node struct {
 	State         string          `json:"state"`
 	Origin        string          `json:"origin,omitempty"`
 	Owner         string          `json:"owner,omitempty"`
+	ClaimToken    string          `json:"-"` // in-memory execution fence; never exposed in API payloads
 	BlockedReason string          `json:"blocked_reason,omitempty"`
 	DeleteReason  string          `json:"delete_reason,omitempty"` // non-empty only when an intent is soft-deleted (state='deleted')
 	Anchors       []int64         `json:"anchors,omitempty"`
@@ -310,7 +311,7 @@ func (s *ExplorationStore) DeleteGoal(id int64) error {
 // backend restart or crashed worker goroutine left it stuck) would otherwise spin
 // forever in the UI. Workers resume from their transcript, so reopening is safe.
 func (s *ExplorationStore) ResetRunningIntents() (int64, error) {
-	res, err := s.db.Exec(`UPDATE exploration_nodes SET state='open', completed_at=NULL, blocked_reason=NULL
+	res, err := s.db.Exec(`UPDATE exploration_nodes SET state='open', completed_at=NULL, blocked_reason=NULL, owner=NULL, claim_token=NULL
 WHERE exploration_id=$1 AND kind='intent' AND state='running'`, s.expID)
 	if err != nil {
 		return 0, err
@@ -352,7 +353,7 @@ func (s *ExplorationStore) SetIntentState(id int64, state string) error {
 	// terminal states stamp completed_at; reopening (back to open/running) clears it.
 	terminal := state == "done" || state == "blocked" || state == "exhausted" || state == "stopped"
 	_, err := s.db.Exec(`UPDATE exploration_nodes
-SET state=$1, blocked_reason=NULL, content_version=content_version+1, completed_at = CASE WHEN $4 THEN now() ELSE NULL END
+SET state=$1, blocked_reason=NULL, claim_token=CASE WHEN $1='running' THEN claim_token ELSE NULL END, content_version=content_version+1, completed_at = CASE WHEN $4 THEN now() ELSE NULL END
 WHERE id=$2 AND exploration_id=$3 AND kind='intent'`, state, id, s.expID, terminal)
 	return err
 }
@@ -363,7 +364,7 @@ WHERE id=$2 AND exploration_id=$3 AND kind='intent'`, state, id, s.expID, termin
 func (s *ExplorationStore) CompareAndSetIntentState(id int64, expected, state string) (bool, error) {
 	terminal := state == "done" || state == "blocked" || state == "exhausted" || state == "stopped"
 	res, err := s.db.Exec(`UPDATE exploration_nodes
-SET state=$1, blocked_reason=NULL, content_version=content_version+1, completed_at = CASE WHEN $5 THEN now() ELSE NULL END
+SET state=$1, blocked_reason=NULL, claim_token=CASE WHEN $1='running' THEN claim_token ELSE NULL END, content_version=content_version+1, completed_at = CASE WHEN $5 THEN now() ELSE NULL END
 WHERE id=$2 AND exploration_id=$3 AND kind='intent' AND state=$4`, state, id, s.expID, expected, terminal)
 	if err != nil {
 		return false, err
@@ -1214,15 +1215,69 @@ WHERE exploration_id=$1 AND kind='goal' AND state='open' ORDER BY id`, s.expID)
 	return strings.Join(ids, ","), rows.Err()
 }
 
-// ClaimIntent atomically moves an open intent to running. Returns true if claimed.
+// ClaimIntent atomically moves an open intent to running. Kept for legacy callers;
+// engine workers use ClaimIntentWithToken so stale completions cannot settle a new run.
 func (s *ExplorationStore) ClaimIntent(id int64, owner string) (bool, error) {
-	res, err := s.db.Exec(`UPDATE exploration_nodes SET state='running', owner=$1
+	res, err := s.db.Exec(`UPDATE exploration_nodes SET state='running', owner=$1, claim_token=NULL
 WHERE id=$2 AND exploration_id=$3 AND kind='intent' AND state='open'`, owner, id, s.expID)
 	if err != nil {
 		return false, err
 	}
 	n, _ := res.RowsAffected()
 	return n == 1, nil
+}
+
+// ClaimIntentWithToken claims an open intent and stores a unique execution fence.
+func (s *ExplorationStore) ClaimIntentWithToken(id int64, owner, token string) (bool, error) {
+	if strings.TrimSpace(token) == "" {
+		return false, errors.New("intent claim token is required")
+	}
+	res, err := s.db.Exec(`UPDATE exploration_nodes SET state='running', owner=$1, claim_token=$2
+WHERE id=$3 AND exploration_id=$4 AND kind='intent' AND state='open'`, owner, token, id, s.expID)
+	if err != nil {
+		return false, err
+	}
+	n, err := res.RowsAffected()
+	return n == 1, err
+}
+
+// ClaimPausedIntentWithToken resumes a paused intent under a new execution fence.
+func (s *ExplorationStore) ClaimPausedIntentWithToken(id int64, owner, token string) (bool, error) {
+	if strings.TrimSpace(token) == "" {
+		return false, errors.New("intent claim token is required")
+	}
+	res, err := s.db.Exec(`UPDATE exploration_nodes
+SET state='running', owner=$1, claim_token=$2, blocked_reason=NULL, completed_at=NULL,
+    content_version=content_version+1
+WHERE id=$3 AND exploration_id=$4 AND kind='intent' AND state='paused'`, owner, token, id, s.expID)
+	if err != nil {
+		return false, err
+	}
+	n, err := res.RowsAffected()
+	return n == 1, err
+}
+
+// CompareAndSetClaimedIntentState settles only the execution that currently owns
+// the claim. A callback from an earlier run cannot mutate a newer run's state.
+func (s *ExplorationStore) CompareAndSetClaimedIntentState(id int64, token, expected, state, blockedReason string) (bool, error) {
+	if strings.TrimSpace(token) == "" {
+		return false, errors.New("intent claim token is required")
+	}
+	if expected != "running" || state == "running" {
+		return false, errors.New("claimed intent transition must leave running state")
+	}
+	terminal := state == "done" || state == "blocked" || state == "exhausted" || state == "stopped"
+	res, err := s.db.Exec(`UPDATE exploration_nodes
+SET state=$1, blocked_reason=NULLIF($6,''), claim_token=NULL,
+    content_version=content_version+1,
+    completed_at=CASE WHEN $5 THEN now() ELSE NULL END
+WHERE id=$2 AND exploration_id=$3 AND kind='intent' AND state=$4 AND claim_token=$7`,
+		state, id, s.expID, expected, terminal, blockedReason, token)
+	if err != nil {
+		return false, err
+	}
+	n, err := res.RowsAffected()
+	return n == 1, err
 }
 
 // Stats returns node counts grouped by kind (for dashboard).
