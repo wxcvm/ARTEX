@@ -5,6 +5,7 @@ import (
 	"errors"
 	"net/http"
 	"net/http/httptest"
+	"time"
 	"strings"
 	"testing"
 
@@ -30,6 +31,24 @@ func modeBTestEnv(configured bool) func(string) string {
 		default:
 			return ""
 		}
+	}
+}
+
+func TestModeBProbeSnapshotExpires(t *testing.T) {
+	resetModeBProbeForTest()
+	t.Cleanup(resetModeBProbeForTest)
+	modeBProbeState.Lock()
+	modeBProbeState.snapshot = modeBProbeSnapshot{
+		Verification: "exit_ip_match",
+		FinalExit: "matched_expected",
+		ActualEgress: "matches_expected",
+		ObservedAt: time.Now().Add(-modeBProbeMaxAge - time.Second),
+	}
+	modeBProbeState.Unlock()
+	got := applyModeBProbeSnapshot(executionNetworkOverview(modeBTestEnv(true)))
+	if got.Verification != "not_tested" || got.FinalExit != "not_tested" ||
+		got.ActualEgress != "not_tested" || got.ObservedAt != nil {
+		t.Fatalf("stale verification remained active: %+v", got)
 	}
 }
 
