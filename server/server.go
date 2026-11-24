@@ -699,6 +699,7 @@ func (s *Server) Handler() http.Handler {
 	s.registerKnowledgeDocuments(mux)
 	mux.HandleFunc("GET /api/privacy/exposure", s.exposureStatus)
 	mux.HandleFunc("GET /api/privacy/overview", s.privacyOverview)
+	mux.HandleFunc("POST /api/privacy/execution-network/verify", s.verifyExecutionNetwork)
 	mux.HandleFunc("GET /api/privacy/storage-permissions", s.storagePermissions)
 	mux.HandleFunc("GET /api/privacy/bridge-overview", s.privacyBridgeOverview)
 	mux.HandleFunc("GET /api/privacy/model-keys", s.modelKeyDiagnostics)
