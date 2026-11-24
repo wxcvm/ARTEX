@@ -98,6 +98,11 @@ func (s *Service) handleEgressProbe(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "expected_exit_ip must be a public IPv4 address", http.StatusBadRequest)
 		return
 	}
+	if err := decoder.Decode(&struct{}{}); err != io.EOF {
+		http.Error(w, "invalid request body", http.StatusBadRequest)
+		return
+	}
+	expected := net.ParseIP(strings.TrimSpace(input.ExpectedExitIP)).To4().String()
 	proxyURL, err := modeBProxyURL(os.Getenv("ARTEX_RUNNER_PROXY_ADDR"))
 	if err != nil {
 		http.Error(w, "Mode B private egress gateway is not configured", http.StatusServiceUnavailable)
@@ -110,7 +115,7 @@ func (s *Service) handleEgressProbe(w http.ResponseWriter, r *http.Request) {
 		http.Error(w, "Mode B egress probe failed", http.StatusBadGateway)
 		return
 	}
-	result := EgressProbeResponse{OK: observed == input.ExpectedExitIP, Status: "exit_ip_mismatch"}
+	result := EgressProbeResponse{OK: observed == expected, Status: "exit_ip_mismatch"}
 	if result.OK {
 		result.Status = "exit_ip_match"
 	}
