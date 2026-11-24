@@ -8,10 +8,24 @@ $Version = $Version -replace '^v(?=\d)', ''
 $root = (Resolve-Path (Join-Path $PSScriptRoot "../..")).Path
 $stage = Join-Path $root (Join-Path $OutputDir "ARTEX-Windows-Desktop-amd64")
 $dist = Join-Path $root $OutputDir
-if (-not (Test-Path (Join-Path $stage "ARTEX.Desktop.exe")) -or
-    -not (Test-Path (Join-Path $stage "artex.exe")) -or
-    -not (Test-Path (Join-Path $stage "ARTEX.ico"))) {
-    throw "Desktop stage is incomplete. Run desktop/windows/package.ps1 first."
+# The installer consumes the whole stage. Reject local runtime state rather
+# than accidentally distributing it from a reused or manually modified stage.
+foreach ($relative in @("config.json", "data", "keys", ".env")) {
+    if (Test-Path -LiteralPath (Join-Path $stage $relative)) {
+        throw "Desktop stage contains local runtime state: $relative. Rebuild the portable package in a clean stage."
+    }
+}
+foreach ($relative in @(
+    "ARTEX.Desktop.exe", "artex.exe", "ARTEX.ico", "README-Windows.txt",
+    "knowledge/knowledge.db", "docs/USER_GUIDE_ZH.md", "extension/manifest.json",
+    "config.example.json", "start.bat"
+)) {
+    if (-not (Test-Path -LiteralPath (Join-Path $stage $relative) -PathType Leaf)) {
+        throw "Desktop stage is incomplete: $relative. Run desktop/windows/package.ps1 first."
+    }
+}
+if (-not (Test-Path -LiteralPath (Join-Path $stage "skills") -PathType Container)) {
+    throw "Desktop stage is incomplete: skills. Run desktop/windows/package.ps1 first."
 }
 New-Item -ItemType Directory -Path $dist -Force | Out-Null
 
