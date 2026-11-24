@@ -1693,10 +1693,10 @@ CREATE INDEX IF NOT EXISTS idx_account_audit_action ON account_audit(action, id 
 
 
 -- =====================================================================
--- Task budget journal, phase 1 (opt-in DB primitives; not wired to Engine).
--- This is NOT llm_usage: reservations and results must share a run epoch
--- and an idempotency key, and unresolved calls cannot be treated as free.
--- A restart must not silently mint a new run epoch.
+-- Durable task execution ownership and budget journal.
+-- Engine reuses the unique unclosed run across process restarts and holds its
+-- owner lease. Provider-call reservations are the next integration stage.
+-- This is NOT llm_usage: unresolved calls must never be treated as free.
 -- =====================================================================
 CREATE TABLE IF NOT EXISTS task_budget_runs (
     task_id       BIGINT NOT NULL REFERENCES tasks(id) ON DELETE CASCADE,
