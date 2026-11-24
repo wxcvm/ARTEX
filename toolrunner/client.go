@@ -77,6 +77,14 @@ func (c *Client) CloseSession(ctx context.Context, session string) error {
 	}{Session: session}, nil)
 }
 
+// ProbeEgress asks the isolated executor to compare its fixed HTTPS egress
+// observation with an operator-supplied expected public IPv4.
+func (c *Client) ProbeEgress(ctx context.Context, expectedExitIP string) (EgressProbeResponse, error) {
+	var result EgressProbeResponse
+	err := c.post(ctx, "/egress", EgressProbeRequest{ExpectedExitIP: expectedExitIP}, &result)
+	return result, err
+}
+
 // runnerToolEnv only forwards transport configuration. The control plane may
 // hold database passwords, provider keys and other secrets in its environment;
 // an execution runner must never inherit extra BashEnv entries by accident.

@@ -52,6 +52,7 @@ services:
     environment:
       HOME: /tmp
       ARTEX_RUNNER_REMOTE_PEER_ONLY: "1"
+      ARTEX_RUNNER_PROXY_ADDR: http://mode-b-egress:7890
       HTTP_PROXY: http://mode-b-egress:7890
       HTTPS_PROXY: http://mode-b-egress:7890
       ALL_PROXY: socks5h://mode-b-egress:7890

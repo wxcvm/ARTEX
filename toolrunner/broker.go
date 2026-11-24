@@ -26,7 +26,7 @@ func ServeBroker(ctx context.Context, socket, executorSocket string) error {
 		},
 	}
 	handler := http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		ok := r.Method == http.MethodPost && (r.URL.Path == "/call" || r.URL.Path == "/close")
+		ok := r.Method == http.MethodPost && (r.URL.Path == "/call" || r.URL.Path == "/egress" || r.URL.Path == "/close")
 		ok = ok || (r.Method == http.MethodGet && r.URL.Path == "/health")
 		if !ok {
 			http.Error(w, "unsupported runner broker operation", http.StatusNotFound)

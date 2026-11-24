@@ -59,6 +59,9 @@ func TestModeBExecutorHasOnlyIsolatedNetwork(t *testing.T) {
             t.Errorf("%s must use the isolated gateway, got %q", key, executor.Environment[key])
         }
     }
+    if got := executor.Environment["ARTEX_RUNNER_PROXY_ADDR"]; got != "http://mode-b-egress:7890" {
+        t.Fatalf("executor egress probe must use the private gateway, got %q", got)
+    }
     if got := profile.Services["artex"].Environment["ARTEX_RUNNER_PROXY_ADDR"]; got != "http://mode-b-egress:7890" {
         t.Fatalf("controller tool proxy rewrite must target gateway: %q", got)
     }
