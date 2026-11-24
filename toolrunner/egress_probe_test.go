@@ -4,6 +4,7 @@ import (
 	"context"
 	"encoding/json"
 	"net/http"
+	"net"
 	"net/http/httptest"
 	"net/url"
 	"strings"
@@ -33,6 +34,31 @@ func TestModeBProbeUsesOnlyExplicitProxy(t *testing.T) {
 		}
 	default:
 		t.Fatal("explicit proxy received no request")
+	}
+}
+
+func TestModeBProbeNeverFallsBackToDirectWhenProxyIsDown(t *testing.T) {
+	var directRequests int
+	target := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		directRequests++
+		_, _ = w.Write([]byte("1.1.1.1"))
+	}))
+	defer target.Close()
+	listener, err := net.Listen("tcp", "127.0.0.1:0")
+	if err != nil {
+		t.Fatal(err)
+	}
+	proxyAddress := listener.Addr().String()
+	_ = listener.Close()
+	proxyURL, err := url.Parse("http://" + proxyAddress)
+	if err != nil {
+		t.Fatal(err)
+	}
+	if _, err := probeModeBEgress(context.Background(), proxyURL, target.URL); err == nil {
+		t.Fatal("probe unexpectedly succeeded with its explicit proxy unavailable")
+	}
+	if directRequests != 0 {
+		t.Fatalf("probe fell back to direct traffic: %d requests", directRequests)
 	}
 }
 
