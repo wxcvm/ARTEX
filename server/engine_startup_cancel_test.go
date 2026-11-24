@@ -42,7 +42,7 @@ func TestRunStartupFrontierRetryIsStoppedWithTask(t *testing.T) {
 		t.Fatal(err)
 	}
 	pg := &db.DB{DB: conn}
-	m := &Manager{pg: pg, tasks: map[string]*Task{}}
+	m := &Manager{tasks: map[string]*Task{}}
 	e := NewEngine(m)
 	task := &Task{
 		ID:     "1",
