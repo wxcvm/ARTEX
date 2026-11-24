@@ -294,20 +294,8 @@ func (s *Server) restoreTaskRuntimes() {
 	// restore persisted paused state (so a task paused before restart stays paused).
 	for _, t := range m.LoadExisting() {
 		lifecycle := t.lifecycleSnapshot()
-		// clear stale 'running' intents from a prior crash/restart (no live worker
-		// owns them) so they re-claim instead of spinning forever in the UI.
-		if n, err := t.Store.ResetRunningIntents(); err != nil {
-			log.Printf("[engine] task %s could not recover stale running intents: %v", t.ID, err)
-		} else if n > 0 {
-			log.Printf("[engine] task %s reset %d leftover running intents to open", t.ID, n)
-		}
 		if lifecycle.Paused {
 			s.engine.Pause(t.ID, agent.AbortPausedOnReload)
-		}
-		// Task-level timeout: start a deadline coordinator for every non-terminal task with a timeout, independent of the planner/worker
-		// loop — inactive tasks also get wrapped up on time after a restart (an already-passed deadline runs the wrap-up sequence immediately).
-		if !isTerminalStatus(lifecycle.Status) {
-			s.engine.startDeadlineCoordinator(s.ctx, t)
 		}
 	}
 	// Restore every task that had already been admitted before shutdown. Starting
