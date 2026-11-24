@@ -816,6 +816,15 @@ func (e *Engine) Run(ctx context.Context, t *Task) {
 		log.Printf("[engine] task %s not started; durable execution owner unavailable: %v", t.ID, err)
 		return
 	}
+	// Restart recovery mutates the exploration graph, so it must happen only
+	// after this process has acquired the task's durable owner lease.
+	if t.Store != nil {
+		if n, resetErr := t.Store.ResetRunningIntents(); resetErr != nil {
+			log.Printf("[engine] task %s could not recover stale running intents: %v", t.ID, resetErr)
+		} else if n > 0 {
+			log.Printf("[engine] task %s reset %d leftover running intents to open", t.ID, n)
+		}
+	}
 	routineCount := 2 + workers // planner, workers, and initial frontier check
 	if owner != nil {
 		routineCount++ // the lease renewer remains alive until the other routines drain
