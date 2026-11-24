@@ -96,7 +96,7 @@ export function PrivacyOverviewPanel() {
     setSnapshot(null);
     try {
       const result = await http<Overview>("/privacy/overview");
-      if (!result?.listener || !result.model_keys || !result.config || !result.outbound) {
+      if (!result?.listener || !result.model_keys || !result.config || !result.outbound || !result.execution_network) {
         throw new Error("invalid overview");
       }
       setSnapshot(result);
