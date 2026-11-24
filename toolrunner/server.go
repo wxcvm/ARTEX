@@ -61,6 +61,7 @@ func (s *Service) Handler() http.Handler {
 		w.WriteHeader(http.StatusNoContent)
 	})
 	mux.HandleFunc("POST /call", s.handleCall)
+	mux.HandleFunc("POST /egress", s.handleEgressProbe)
 	mux.HandleFunc("POST /close", s.handleClose)
 	return mux
 }
