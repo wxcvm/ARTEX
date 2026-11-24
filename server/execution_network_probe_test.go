@@ -78,7 +78,6 @@ func TestVerifyExecutionNetworkRecordsOnlyExitComparison(t *testing.T) {
 func TestVerifyExecutionNetworkRejectsInvalidOrUnconfiguredRequests(t *testing.T) {
 	resetModeBProbeForTest()
 	t.Cleanup(resetModeBProbeForTest)
-	s := &Server{}
 	for _, tc := range []struct {
 		name, body string
 		getenv func(string) string
