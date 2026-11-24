@@ -128,8 +128,8 @@ with the supplied address.
 The probe accepts no arbitrary URL, command, proxy address or destination.
 It never asks the controller to make the outbound request, does not return or
 persist the observed public IP, and does not change network configuration.
-The comparison status and timestamp are held in memory and reset to
-`not_tested` after an ARTEX restart. The scoped Purge bridge overview can read
+The comparison status and timestamp are held in memory, expire after five
+minutes, and reset to `not_tested` after an ARTEX restart. The scoped Purge bridge overview can read
 that status; it cannot trigger the probe.
 
 **Evidence boundary:** `exit_ip_match` proves only that this one
