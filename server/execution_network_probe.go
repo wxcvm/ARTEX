@@ -12,6 +12,8 @@ import (
 	"github.com/Autumn-27/artex/toolrunner"
 )
 
+const modeBProbeMaxAge = 5 * time.Minute
+
 type modeBProbeSnapshot struct {
 	Verification string
 	FinalExit    string
@@ -44,7 +46,8 @@ func applyModeBProbeSnapshot(out ExecutionNetworkOverview) ExecutionNetworkOverv
 	modeBProbeState.RLock()
 	snapshot := modeBProbeState.snapshot
 	modeBProbeState.RUnlock()
-	if snapshot.ObservedAt.IsZero() {
+	age := time.Since(snapshot.ObservedAt)
+	if snapshot.ObservedAt.IsZero() || age < 0 || age > modeBProbeMaxAge {
 		return out
 	}
 	out.Verification = snapshot.Verification
@@ -75,6 +78,7 @@ func verifyExecutionNetworkWith(
 	getenv func(string) string,
 	probe func(context.Context, string) (toolrunner.EgressProbeResponse, error),
 ) {
+	w.Header().Set("Cache-Control", "no-store")
 	var input struct {
 		ExpectedExitIP string `json:"expected_exit_ip"`
 	}
