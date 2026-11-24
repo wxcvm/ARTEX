@@ -66,7 +66,7 @@ docker compose -f docker-compose.yml -f docker-compose.mode-b.yml exec -T tool-e
 
 # 2. Via gateway: must work after supplying real credentials.
 docker compose -f docker-compose.yml -f docker-compose.mode-b.yml exec -T tool-executor \
-  curl --proxy http://mode-b-egress:7890 --noproxy "" --connect-timeout 10 -fsS https://api.ipify.org
+  curl --proxy http://mode-b-egress:7890 --noproxy "" --connect-timeout 10 -fsS https://api4.ipify.org
 
 # 3. Stop gateway, then repeat (2): must fail, without direct fallback.
 docker compose -f docker-compose.yml -f docker-compose.mode-b.yml stop mode-b-egress
@@ -121,7 +121,7 @@ When the opt-in Compose stack is running, the ARTEX privacy page exposes
 of the selected final exit (VPS1 for the two-hop profile or VPS2 for the
 three-hop profile). After the button is clicked, the controller sends a
 scoped request over the existing private Unix runner broker. The isolated
-executor makes one fixed HTTPS request to `https://api.ipify.org` through
+executor makes one fixed HTTPS request to `https://api4.ipify.org` through
 the exact private `http://mode-b-egress:7890` gateway and compares the result
 with the supplied address.
 
