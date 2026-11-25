@@ -38,6 +38,13 @@ func (t *journaledTool) Call(ctx context.Context, input json.RawMessage, tc *act
 	ri := agent.RunInfoFrom(ctx)
 	if ri.TaskID == 0 {
 		ri = t.fallback
+	} else {
+		if ri.SessionID == "" {
+			ri.SessionID = t.fallback.SessionID
+		}
+		if ri.AgentKey == "" {
+			ri.AgentKey = t.fallback.AgentKey
+		}
 	}
 	if ri.TaskID <= 0 || t.pg == nil || t.CoreTool.IsReadOnly(input) {
 		return t.CoreTool.Call(ctx, input, tc)
