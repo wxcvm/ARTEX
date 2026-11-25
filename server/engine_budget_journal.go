@@ -49,16 +49,20 @@ func (j *taskBudgetAttemptJournal) Reserve(ctx context.Context, estimatedTokens 
 		return "", fmt.Errorf("generate provider call id: %w", err)
 	}
 	callID := hex.EncodeToString(raw[:])
-	created, err := j.owner.store.ReserveBudgetCall(db.BudgetCallReservation{
+	reservation := db.BudgetCallReservation{
 		TaskID: j.owner.taskID, RunID: j.owner.runID, OwnerEpoch: j.owner.epoch,
 		CallID: callID, IntentID: j.intentID, Tokens: estimatedTokens,
-	})
+	}
+	created, err := j.owner.store.ReserveBudgetCall(reservation)
+	if err != nil {
+		// The commit acknowledgement can be lost after PostgreSQL committed.
+		// Replaying the same key distinguishes that case from a failed write.
+		created, err = j.owner.store.ReserveBudgetCall(reservation)
+	}
 	if err != nil {
 		return "", err
 	}
-	if !created {
-		return "", errors.New("new provider call id already exists")
-	}
+	_ = created // false means this exact reservation was already committed.
 	return callID, nil
 }
 
@@ -66,8 +70,12 @@ func (j *taskBudgetAttemptJournal) Settle(ctx context.Context, callID string, ac
 	if j == nil || j.owner == nil || j.owner.store == nil {
 		return errors.New("durable task budget journal is unavailable")
 	}
-	if _, err := j.owner.store.SettleBudgetCall(j.owner.taskID, j.owner.runID, callID, actualTokens, j.owner.epoch); err != nil {
+	settle := func() error {
+		_, err := j.owner.store.SettleBudgetCall(j.owner.taskID, j.owner.runID, callID, actualTokens, j.owner.epoch)
 		return err
+	}
+	if err := settle(); err != nil {
+		return settle() // idempotent replay confirms a commit whose acknowledgement was lost.
 	}
 	return nil
 }
@@ -76,8 +84,12 @@ func (j *taskBudgetAttemptJournal) MarkUnknown(ctx context.Context, callID strin
 	if j == nil || j.owner == nil || j.owner.store == nil {
 		return errors.New("durable task budget journal is unavailable")
 	}
-	if _, err := j.owner.store.MarkBudgetCallUnknown(j.owner.taskID, j.owner.runID, callID, j.owner.epoch); err != nil {
+	mark := func() error {
+		_, err := j.owner.store.MarkBudgetCallUnknown(j.owner.taskID, j.owner.runID, callID, j.owner.epoch)
 		return err
+	}
+	if err := mark(); err != nil {
+		return mark() // unknown transitions are idempotent across a lost commit acknowledgement.
 	}
 	return nil
 }
