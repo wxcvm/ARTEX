@@ -188,6 +188,7 @@ func (r *Recorder) Stream(ctx context.Context, req llm.CompletionRequest) iter.S
 				thinkingBuf  strings.Builder
 				pending      []llm.StreamEvent
 				seenContent  bool
+				providerDone bool
 				stopped      bool
 			)
 			// The admission decision belongs to the actual provider attempt.
@@ -210,6 +211,8 @@ func (r *Recorder) Stream(ctx context.Context, req llm.CompletionRequest) iter.S
 					break
 				}
 				switch ev.Type {
+				case llm.SEMessageStop:
+					providerDone = true
 				case llm.SEMessageStart:
 					attemptUsage.Add(ev.Usage)
 				case llm.SEMessageDelta:
@@ -245,7 +248,8 @@ func (r *Recorder) Stream(ctx context.Context, req llm.CompletionRequest) iter.S
 					break
 				}
 			}
-			if journalErr := attemptScope.Finish(attemptUsage, streamErr == nil && !stopped && ctx.Err() == nil); journalErr != nil {
+			completed := streamErr == nil && ctx.Err() == nil && (providerDone || !stopped)
+			if journalErr := attemptScope.Finish(attemptUsage, completed); journalErr != nil {
 				if streamErr == nil {
 					streamErr = journalErr
 					if !stopped {
