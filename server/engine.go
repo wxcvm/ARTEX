@@ -880,6 +880,7 @@ func (e *Engine) Run(ctx context.Context, t *Task) {
 			t.Notify() // kick the first planning round (acted on once LLM is ready)
 		}
 	}
+}
 
 // retryInitialPlanning rechecks only the DB state after a transient read error.
 // Never infer an empty frontier from an unavailable DB, but do not leave a
