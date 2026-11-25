@@ -148,8 +148,9 @@ type Engine struct {
 	stamped      sync.Map // taskID -> bool, whether first_run_at has been stamped (once per process)
 	inflight     sync.Map // taskID -> *int64, count of in-flight planner.Plan + worker.Execute (for drain)
 	coordStarted sync.Map // taskID -> bool, whether the deadline coordinator has started (deduplicated across Run/reload)
-	budgets   sync.Map // taskID -> optional run budget ledger
-	honeypots sync.Map // taskID -> *agent.HoneypotRegistry
+	budgets    sync.Map // taskID -> optional run budget ledger
+	taskOwners sync.Map // taskID -> *durableTaskOwner
+	honeypots  sync.Map // taskID -> *agent.HoneypotRegistry
 
 	// resolve returns a task's dedicated planner/worker (wired by the server as the
 	// authoritative task-router). nil,nil means this task is deliberately unavailable
@@ -162,9 +163,12 @@ type Engine struct {
 }
 
 type taskRuntime struct {
-	ctx    context.Context
-	cancel context.CancelFunc
-	wg     sync.WaitGroup
+	ctx       context.Context
+	cancel    context.CancelFunc
+	wg        sync.WaitGroup
+	routineMu sync.Mutex
+	draining  bool
+	loops     sync.WaitGroup // planner, worker and deadline routines; excludes the owner-renewal routine
 }
 
 type workExecution struct {
@@ -243,10 +247,26 @@ func (e *Engine) registerTaskRoutines(parent context.Context, taskID string, cou
 }
 
 func runTaskRoutine(rt *taskRuntime, fn func(context.Context)) {
+	rt.routineMu.Lock()
+	if rt.draining {
+		rt.routineMu.Unlock()
+		rt.wg.Done()
+		return
+	}
+	rt.loops.Add(1)
+	rt.routineMu.Unlock()
 	go func() {
 		defer rt.wg.Done()
+		defer rt.loops.Done()
 		fn(rt.ctx)
 	}()
+}
+
+func drainTaskRoutines(rt *taskRuntime) {
+	rt.routineMu.Lock()
+	rt.draining = true
+	rt.routineMu.Unlock()
+	rt.loops.Wait()
 }
 
 // StopTask permanently stops every long-lived goroutine and removes all Engine
@@ -293,6 +313,7 @@ func (e *Engine) StopTask(taskID string) {
 	e.inflight.Delete(taskID)
 	e.coordStarted.Delete(taskID)
 	e.budgets.Delete(taskID)
+	e.taskOwners.Delete(taskID)
 	e.honeypots.Delete(taskID)
 	e.deleteMu.Lock()
 	e.deleting.Delete(taskID)
@@ -788,21 +809,67 @@ func (e *Engine) Run(ctx context.Context, t *Task) {
 		t.Notify() // already running — just nudge a planning round
 		return
 	}
-	// Reserve the initial frontier check (and any retry) in the task runtime as
-	// well, so StopTask waits for it before freeing task-owned resources.
-	rt := e.registerTaskRoutines(ctx, t.ID, 2+workers)
+	owner, err := e.acquireTaskOwner(t)
+	if err != nil {
+		e.started.Delete(t.ID)
+		e.deleteMu.RUnlock()
+		log.Printf("[engine] task %s not started; durable execution owner unavailable: %v", t.ID, err)
+		return
+	}
+	// Restart recovery mutates the exploration graph, so it must happen only
+	// after this process has acquired the task's durable owner lease.
+	if t.Store == nil {
+		if owner != nil {
+			_ = owner.release()
+			e.taskOwners.Delete(t.ID)
+		}
+		e.started.Delete(t.ID)
+		e.deleteMu.RUnlock()
+		log.Printf("[engine] task %s not started; exploration store is unavailable", t.ID)
+		return
+	}
+	if n, resetErr := t.Store.ResetRunningIntents(); resetErr != nil {
+		if owner != nil {
+			if releaseErr := owner.release(); releaseErr != nil {
+				log.Printf("[engine] task %s owner release after recovery failure: %v", t.ID, releaseErr)
+			}
+			e.taskOwners.Delete(t.ID)
+		}
+		e.started.Delete(t.ID)
+		e.deleteMu.RUnlock()
+		log.Printf("[engine] task %s not started; crash recovery could not reset stale intents: %v", t.ID, resetErr)
+		return
+	} else if n > 0 {
+		log.Printf("[engine] task %s reset %d leftover running intents to open", t.ID, n)
+	}
+	routineCount := 2 + workers // planner, workers, and initial frontier check
+	if owner != nil {
+		routineCount++ // the lease renewer remains alive until the other routines drain
+		e.taskOwners.Store(t.ID, owner)
+	}
+	// Reserve every task routine before releasing the delete barrier, so StopTask
+	// cannot race WaitGroup.Add with Wait.
+	rt := e.registerTaskRoutines(ctx, t.ID, routineCount)
 	e.deleteMu.RUnlock()
 	e.touch(t.ID)
+	// Register the deadline routine before starting the owner monitor. The monitor
+	// then renews from the beginning of the runtime, before any planner/worker work.
+	e.startDeadlineCoordinator(ctx, t) // task-level timeout timer (only when timeout>0; deduplicated)
+	if owner != nil {
+		go func() {
+			defer rt.wg.Done()
+			e.maintainTaskOwner(rt, t, owner)
+		}()
+	}
 	runTaskRoutine(rt, func(loopCtx context.Context) { e.plannerLoop(loopCtx, t) })
 	for i := 0; i < workers; i++ {
 		name := fmt.Sprintf("work#%d", i+1)
 		runTaskRoutine(rt, func(loopCtx context.Context) { e.workerLoop(loopCtx, t, name) })
 	}
-	e.startDeadlineCoordinator(ctx, t) // task-level timeout timer (only when timeout>0; deduplicated)
 	// Kick the first planning round only when there are no active intents at all
 	// (open+running). For a task with seeded intents: the seed is already open, or the
 	// worker just started above has claimed it as running first — both count as "work
-	// exists", so skip the first planner round: the worker runs the seed intent directly and NotifyDone/heartbeat wakes the planner when done.
+	// exists", so skip the first planning round: the worker runs the seed intent directly and NotifyDone/heartbeat wakes the planner when done.
 	// ⚠️ Do not use Frontier (counts only open): a worker claiming (open→running) races with this check and would kick spuriously. After a restart-driven auto-recovery only running intents may remain — skip then too.
 	if has, err := t.Store.HasActiveIntent(); err != nil {
 		log.Printf("[engine] task %s could not inspect active intents before initial planning: %v", t.ID, err)

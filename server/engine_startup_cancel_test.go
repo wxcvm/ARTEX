@@ -31,9 +31,7 @@ func TestPlannerLoopCancellationInterruptsDebounce(t *testing.T) {
 	}
 }
 
-func TestRunStartupFrontierRetryIsStoppedWithTask(t *testing.T) {
-	// A closed sql.DB forces the startup HasActiveIntent query to fail without
-	// requiring a live PostgreSQL server or a provider call.
+func TestRunFailsClosedWhenCrashRecoveryCannotResetIntents(t *testing.T) {
 	conn, err := sql.Open("pgx", "postgres://localhost/artex_test")
 	if err != nil {
 		t.Fatal(err)
@@ -41,43 +39,17 @@ func TestRunStartupFrontierRetryIsStoppedWithTask(t *testing.T) {
 	if err := conn.Close(); err != nil {
 		t.Fatal(err)
 	}
-	pg := &db.DB{DB: conn}
-	m := &Manager{pg: pg, tasks: map[string]*Task{}}
+	m := &Manager{tasks: map[string]*Task{}}
 	e := NewEngine(m)
-	task := &Task{
-		ID:     "1",
-		Store:  pg.Exploration(1),
-		notify: make(chan struct{}, 1),
-	}
-	m.tasks[task.ID] = task
+	task := &Task{ID: "1", Store: (&db.DB{DB: conn}).Exploration(1), notify: make(chan struct{}, 1)}
 	e.Run(context.Background(), task)
-	if !e.Started(task.ID) {
-		t.Fatal("task runtime was not registered")
+	if e.Started(task.ID) {
+		t.Fatal("task started even though crash recovery could not reset stale intents")
 	}
 	e.runtimeMu.Lock()
-	rt := e.runtimes[task.ID]
+	_, exists := e.runtimes[task.ID]
 	e.runtimeMu.Unlock()
-	if rt == nil {
-		t.Fatal("task runtime was not recorded")
-	}
-
-	stopped := make(chan struct{})
-	go func() {
-		e.StopTask(task.ID)
-		close(stopped)
-	}()
-	select {
-	case <-stopped:
-	case <-time.After(time.Second):
-		t.Fatal("task shutdown waited for the startup retry timer")
-	}
-	if rt.ctx.Err() == nil || e.Started(task.ID) {
-		t.Fatal("shutdown did not cancel and release the task runtime")
-	}
-	e.runtimeMu.Lock()
-	_, retained := e.runtimes[task.ID]
-	e.runtimeMu.Unlock()
-	if retained {
-		t.Fatal("shutdown retained a task runtime after stopping startup retry")
+	if exists {
+		t.Fatal("failed crash recovery left a task runtime behind")
 	}
 }
