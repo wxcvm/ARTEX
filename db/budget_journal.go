@@ -19,7 +19,8 @@ type BudgetRun struct {
 }
 
 // BudgetCallReservation identifies an LLM attempt before it is sent. The
-// caller must persist and reuse CallID on retries; IntentID=0 means planner.
+// caller reuses CallID when retrying the reservation write for the same HTTP attempt;
+// a new outbound HTTP retry gets a new CallID. IntentID=0 means planner.
 type BudgetCallReservation struct {
 	TaskID, IntentID, Tokens int64
 	OwnerEpoch              int64
