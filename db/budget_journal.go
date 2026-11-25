@@ -19,7 +19,8 @@ type BudgetRun struct {
 }
 
 // BudgetCallReservation identifies an LLM attempt before it is sent. The
-// caller must persist and reuse CallID on retries; IntentID=0 means planner.
+// caller reuses CallID when retrying the reservation write for the same HTTP attempt;
+// a new outbound HTTP retry gets a new CallID. IntentID=0 means planner.
 type BudgetCallReservation struct {
 	TaskID, IntentID, Tokens int64
 	OwnerEpoch              int64
@@ -345,3 +346,54 @@ WHERE task_id=$1 AND run_id=$2`, taskID, runID); err != nil {
 	}
 	return tx.Commit()
 }
+
+// MarkBudgetCallUnknown records an ambiguous provider outcome without discarding
+// the held reservation. The current owner may continue only within the remaining
+// budget; graceful release or process takeover promotes the run to recovery_required.
+func (d *DB) MarkBudgetCallUnknown(taskID int64, runID, callID string, ownerEpoch int64) (changed bool, err error) {
+	if err := validateBudgetIdentity(taskID, runID); err != nil {
+		return false, err
+	}
+	if callID == "" || len(callID) > 128 {
+		return false, errors.New("invalid budget call identity")
+	}
+	tx, err := d.Begin()
+	if err != nil {
+		return false, err
+	}
+	defer tx.Rollback() //nolint:errcheck
+
+	var actualEpoch int64
+	var leaseActive bool
+	var runState string
+	if err := tx.QueryRow(`SELECT owner_epoch,COALESCE(owner_until > clock_timestamp(),false),state
+FROM task_budget_runs WHERE task_id=$1 AND run_id=$2 FOR UPDATE`, taskID, runID).
+		Scan(&actualEpoch, &leaseActive, &runState); err != nil {
+		return false, err
+	}
+	if err := budgetOwnerValid(ownerEpoch, actualEpoch, leaseActive); err != nil {
+		return false, err
+	}
+	if runState == "closed" {
+		return false, errors.New("cannot mark a call unknown in a closed budget run")
+	}
+
+	var state string
+	if err := tx.QueryRow(`SELECT state FROM task_budget_calls
+WHERE task_id=$1 AND run_id=$2 AND call_id=$3 FOR UPDATE`, taskID, runID, callID).Scan(&state); err != nil {
+		return false, err
+	}
+	switch state {
+	case "unknown":
+		return false, tx.Commit()
+	case "reserved":
+		if _, err := tx.Exec(`UPDATE task_budget_calls SET state='unknown'
+WHERE task_id=$1 AND run_id=$2 AND call_id=$3 AND state='reserved'`, taskID, runID, callID); err != nil {
+			return false, err
+		}
+		return true, tx.Commit()
+	default:
+		return false, fmt.Errorf("cannot mark budget call in state %q unknown", state)
+	}
+}
+

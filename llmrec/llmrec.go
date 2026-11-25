@@ -188,6 +188,7 @@ func (r *Recorder) Stream(ctx context.Context, req llm.CompletionRequest) iter.S
 				thinkingBuf  strings.Builder
 				pending      []llm.StreamEvent
 				seenContent  bool
+				providerDone bool
 				stopped      bool
 			)
 			// The admission decision belongs to the actual provider attempt.
@@ -198,9 +199,10 @@ func (r *Recorder) Stream(ctx context.Context, req llm.CompletionRequest) iter.S
 				yield(llm.StreamEvent{}, admissionErr)
 				return
 			}
+			attemptCtx, attemptScope := NewAttemptScope(ctx, req)
 			// Hold metadata until the first content event. An empty reply
 			// never reaches the caller, and hence cannot appear successful.
-			for ev, err := range r.inner.Stream(ctx, req) {
+			for ev, err := range r.inner.Stream(attemptCtx, req) {
 				if err != nil {
 					streamErr = err
 					if !yield(ev, err) {
@@ -209,6 +211,8 @@ func (r *Recorder) Stream(ctx context.Context, req llm.CompletionRequest) iter.S
 					break
 				}
 				switch ev.Type {
+				case llm.SEMessageStop:
+					providerDone = true
 				case llm.SEMessageStart:
 					attemptUsage.Add(ev.Usage)
 				case llm.SEMessageDelta:
@@ -242,6 +246,18 @@ func (r *Recorder) Stream(ctx context.Context, req llm.CompletionRequest) iter.S
 				if stopped || !yield(ev, nil) {
 					stopped = true
 					break
+				}
+			}
+			completed := streamErr == nil && ctx.Err() == nil && (providerDone || !stopped)
+			if journalErr := attemptScope.Finish(attemptUsage, completed); journalErr != nil {
+				if streamErr == nil {
+					streamErr = journalErr
+					if !stopped {
+						yield(llm.StreamEvent{}, journalErr)
+					}
+				} else {
+					streamErr = errors.Join(streamErr, journalErr)
+					log.Printf("[llmrec] provider attempt journal also failed after stream error: %v", journalErr)
 				}
 			}
 			usage.Add(attemptUsage)
@@ -315,8 +331,12 @@ func (r *Recorder) Complete(ctx context.Context, req llm.CompletionRequest) (llm
 			err = admissionErr
 			break
 		}
+		attemptCtx, attemptScope := NewAttemptScope(ctx, req)
 		var nextUsage llm.Usage
-		msg, stopReason, nextUsage, err = r.inner.Complete(ctx, req)
+		msg, stopReason, nextUsage, err = r.inner.Complete(attemptCtx, req)
+		if journalErr := attemptScope.Finish(nextUsage, err == nil && ctx.Err() == nil); journalErr != nil {
+			err = errors.Join(err, journalErr)
+		}
 		meterPhysicalAttempt(ctx, nextUsage)
 		usage.Add(nextUsage)
 		if err != nil || ctx.Err() != nil || !emptyMessage(msg) {

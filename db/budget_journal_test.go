@@ -227,3 +227,50 @@ func TestBudgetJournalConcurrentReservationCannotOverbook(t *testing.T) {
 		t.Fatalf("parallel reservations were not serialized: wins=%d failures=%d state=%+v err=%v", wins, failures, st, err)
 	}
 }
+
+func TestBudgetJournalUnknownAttemptHoldsBudgetUntilRecovery(t *testing.T) {
+	d, taskID := budgetJournalTestTask(t)
+	const run = "ambiguous-live-owner"
+	if _, err := d.OpenBudgetRun(taskID, run, 100, 4); err != nil {
+		t.Fatal(err)
+	}
+	epoch, err := d.AcquireBudgetOwner(taskID, run, 10*time.Minute)
+	if err != nil {
+		t.Fatal(err)
+	}
+	unknown := BudgetCallReservation{TaskID: taskID, RunID: run, OwnerEpoch: epoch, CallID: "ambiguous", Tokens: 30}
+	if ok, err := d.ReserveBudgetCall(unknown); err != nil || !ok {
+		t.Fatalf("reserve ambiguous call: %v %v", ok, err)
+	}
+	if changed, err := d.MarkBudgetCallUnknown(taskID, run, unknown.CallID, epoch); err != nil || !changed {
+		t.Fatalf("mark unknown: changed=%v err=%v", changed, err)
+	}
+	if changed, err := d.MarkBudgetCallUnknown(taskID, run, unknown.CallID, epoch); err != nil || changed {
+		t.Fatalf("unknown transition must be idempotent: changed=%v err=%v", changed, err)
+	}
+	state, err := d.ReadBudgetRun(taskID, run)
+	if err != nil || state.State != "active" || state.HeldTokens != 30 || state.HeldTurns != 1 {
+		t.Fatalf("ambiguous call lost its reservation or prematurely blocked the live owner: %+v %v", state, err)
+	}
+
+	next := BudgetCallReservation{TaskID: taskID, RunID: run, OwnerEpoch: epoch, CallID: "next", Tokens: 20}
+	if ok, err := d.ReserveBudgetCall(next); err != nil || !ok {
+		t.Fatalf("live owner should continue only within remaining budget: %v %v", ok, err)
+	}
+	if changed, err := d.SettleBudgetCall(taskID, run, next.CallID, 10, epoch); err != nil || !changed {
+		t.Fatalf("settle subsequent call: %v %v", changed, err)
+	}
+	if changed, err := d.SettleBudgetCall(taskID, run, unknown.CallID, 0, epoch); err == nil || changed {
+		t.Fatalf("unknown call was silently settled as zero: %v %v", changed, err)
+	}
+
+	if err := d.ReleaseBudgetOwner(taskID, run, epoch); err != nil {
+		t.Fatalf("release owner: %v", err)
+	}
+	state, err = d.ReadBudgetRun(taskID, run)
+	if err != nil || state.State != "recovery_required" || state.HeldTokens != 30 || state.HeldTurns != 1 ||
+		state.SpentTokens != 10 || state.SpentTurns != 1 {
+		t.Fatalf("graceful release discarded the unknown reservation: %+v %v", state, err)
+	}
+}
+

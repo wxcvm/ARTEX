@@ -459,7 +459,21 @@ func (t quotaAwareTransport) RoundTrip(req *http.Request) (*http.Response, error
 	capt := llmrec.CaptureFrom(req.Context())
 	capt.SetRequest(requestBodySnapshot(req))
 
+	attempt, journalErr := llmrec.BeginTransportAttempt(req.Context())
+	if journalErr != nil {
+		return attemptJournalFailureResponse(req, journalErr), nil
+	}
 	resp, err := t.base.RoundTrip(req)
+	status := 0
+	if resp != nil {
+		status = resp.StatusCode
+	}
+	if finishErr := attempt.Complete(status, err); finishErr != nil {
+		if resp != nil && resp.Body != nil {
+			_ = resp.Body.Close()
+		}
+		return attemptJournalFailureResponse(req, finishErr), nil
+	}
 	if err != nil || resp == nil {
 		return resp, err
 	}
@@ -488,6 +502,18 @@ func (t quotaAwareTransport) RoundTrip(req *http.Request) (*http.Response, error
 // requestBodySnapshot copies an outgoing request body without consuming it.
 // norma builds every model request from a *bytes.Reader, so net/http populates
 // GetBody and the copy has no effect on what gets sent.
+func attemptJournalFailureResponse(req *http.Request, err error) *http.Response {
+	body := "ARTEX durable provider-attempt journal rejected the request: " + err.Error()
+	return &http.Response{
+		StatusCode:    http.StatusUnprocessableEntity,
+		Status:        "422 Unprocessable Entity",
+		Header:        make(http.Header),
+		Body:          io.NopCloser(strings.NewReader(body)),
+		ContentLength: int64(len(body)),
+		Request:       req,
+	}
+}
+
 func requestBodySnapshot(req *http.Request) string {
 	if req.GetBody == nil {
 		return ""
