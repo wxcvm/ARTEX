@@ -340,6 +340,15 @@ WHERE task_id=$1 AND run_id=$2 AND state <> 'settled')`, taskID, runID).
 	if unresolved {
 		return errors.New("cannot close a run with unresolved calls")
 	}
+	var unresolvedTools bool
+	if err := tx.QueryRow(`SELECT EXISTS(SELECT 1 FROM tool_executions
+WHERE task_id=$1 AND run_id=$2 AND state <> 'done')`, taskID, runID).
+		Scan(&unresolvedTools); err != nil {
+		return err
+	}
+	if unresolvedTools {
+		return errors.New("cannot close a run with unresolved tool executions")
+	}
 	if _, err := tx.Exec(`UPDATE task_budget_runs SET state='closed',updated_at=now()
 WHERE task_id=$1 AND run_id=$2`, taskID, runID); err != nil {
 		return err
