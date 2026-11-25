@@ -9,16 +9,19 @@ type ToolUsage struct {
 	ExplorationID int64  `json:"exploration_id"`
 	IntentID      int64  `json:"intent_id"`
 	SessionID     string `json:"session_id"`
+	ToolUseID     string `json:"tool_use_id,omitempty"`
 }
 
 // InsertToolUsage appends one ledger row. Runtime callers treat metering as
 // best-effort so a statistics failure never interrupts the tool itself.
 func (d *DB) InsertToolUsage(u *ToolUsage) error {
 	_, err := d.Exec(`
-INSERT INTO tool_usage(tool_key, agent_key, task_id, exploration_id, intent_id, session_id)
-VALUES ($1, NULLIF($2,''), $3, $4, $5, NULLIF($6,''))`,
+INSERT INTO tool_usage(tool_key, agent_key, task_id, exploration_id, intent_id, session_id, tool_use_id)
+VALUES ($1, NULLIF($2,''), $3, $4, $5, NULLIF($6,''), NULLIF($7,''))
+ON CONFLICT (task_id, session_id, tool_use_id)
+WHERE task_id IS NOT NULL AND session_id IS NOT NULL AND tool_use_id IS NOT NULL DO NOTHING`,
 		u.ToolKey, u.AgentKey, nullIfZero(u.TaskID), nullIfZero(u.ExplorationID),
-		nullIfZero(u.IntentID), u.SessionID)
+		nullIfZero(u.IntentID), u.SessionID, u.ToolUseID)
 	return err
 }
 
