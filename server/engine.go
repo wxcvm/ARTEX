@@ -852,12 +852,20 @@ func (e *Engine) Run(ctx context.Context, t *Task) {
 	rt := e.registerTaskRoutines(ctx, t.ID, routineCount)
 	e.deleteMu.RUnlock()
 	e.touch(t.ID)
+	// Register the deadline routine before starting the owner monitor. The monitor
+	// then renews from the beginning of the runtime, before any planner/worker work.
+	e.startDeadlineCoordinator(ctx, t) // task-level timeout timer (only when timeout>0; deduplicated)
+	if owner != nil {
+		go func() {
+			defer rt.wg.Done()
+			e.maintainTaskOwner(rt, t, owner)
+		}()
+	}
 	runTaskRoutine(rt, func(loopCtx context.Context) { e.plannerLoop(loopCtx, t) })
 	for i := 0; i < workers; i++ {
 		name := fmt.Sprintf("work#%d", i+1)
 		runTaskRoutine(rt, func(loopCtx context.Context) { e.workerLoop(loopCtx, t, name) })
 	}
-	e.startDeadlineCoordinator(ctx, t) // task-level timeout timer (only when timeout>0; deduplicated)
 	// Kick the first planning round only when there are no active intents at all
 	// (open+running). For a task with seeded intents: the seed is already open, or the
 	// worker just started above has claimed it as running first — both count as "work
@@ -872,13 +880,6 @@ func (e *Engine) Run(ctx context.Context, t *Task) {
 			t.Notify() // kick the first planning round (acted on once LLM is ready)
 		}
 	}
-	if owner != nil {
-		go func() {
-			defer rt.wg.Done()
-			e.maintainTaskOwner(rt, t, owner)
-		}()
-	}
-}
 
 // retryInitialPlanning rechecks only the DB state after a transient read error.
 // Never infer an empty frontier from an unavailable DB, but do not leave a
