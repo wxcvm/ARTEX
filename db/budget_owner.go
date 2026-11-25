@@ -79,13 +79,23 @@ updated_at=now() WHERE task_id=$1 AND run_id=$2`, taskID, runID, epoch, ms); err
 WHERE task_id=$1 AND run_id=$2 AND state='reserved'`, taskID, runID); err != nil {
 		return 0, err
 	}
-	var unresolved bool
-	if err = tx.QueryRow(`SELECT EXISTS(SELECT 1 FROM task_budget_calls
-WHERE task_id=$1 AND run_id=$2 AND state='unknown')`, taskID, runID).
-		Scan(&unresolved); err != nil {
+	if _, err = tx.Exec(`UPDATE tool_executions SET state='unknown',
+error='previous task owner lease expired during tool execution',finished_at=now()
+WHERE task_id=$1 AND run_id=$2 AND state='running' AND owner_epoch < $3`, taskID, runID, epoch); err != nil {
 		return 0, err
 	}
-	if unresolved {
+	var unresolvedBudget, unresolvedTools bool
+	if err = tx.QueryRow(`SELECT EXISTS(SELECT 1 FROM task_budget_calls
+WHERE task_id=$1 AND run_id=$2 AND state='unknown')`, taskID, runID).
+		Scan(&unresolvedBudget); err != nil {
+		return 0, err
+	}
+	if err = tx.QueryRow(`SELECT EXISTS(SELECT 1 FROM tool_executions
+WHERE task_id=$1 AND run_id=$2 AND state='unknown')`, taskID, runID).
+		Scan(&unresolvedTools); err != nil {
+		return 0, err
+	}
+	if unresolvedBudget || unresolvedTools {
 		if _, err = tx.Exec(`UPDATE task_budget_runs SET state='recovery_required',updated_at=now()
 WHERE task_id=$1 AND run_id=$2`, taskID, runID); err != nil {
 			return 0, err
@@ -159,13 +169,23 @@ FROM task_budget_runs WHERE task_id=$1 AND run_id=$2 FOR UPDATE`, taskID, runID)
 WHERE task_id=$1 AND run_id=$2 AND state='reserved'`, taskID, runID); err != nil {
 		return err
 	}
-	var unresolved bool
-	if err = tx.QueryRow(`SELECT EXISTS(SELECT 1 FROM task_budget_calls
-WHERE task_id=$1 AND run_id=$2 AND state='unknown')`, taskID, runID).
-		Scan(&unresolved); err != nil {
+	if _, err = tx.Exec(`UPDATE tool_executions SET state='unknown',
+error='task owner released while tool execution was still running',finished_at=now()
+WHERE task_id=$1 AND run_id=$2 AND owner_epoch=$3 AND state='running'`, taskID, runID, epoch); err != nil {
 		return err
 	}
-	if unresolved {
+	var unresolvedBudget, unresolvedTools bool
+	if err = tx.QueryRow(`SELECT EXISTS(SELECT 1 FROM task_budget_calls
+WHERE task_id=$1 AND run_id=$2 AND state='unknown')`, taskID, runID).
+		Scan(&unresolvedBudget); err != nil {
+		return err
+	}
+	if err = tx.QueryRow(`SELECT EXISTS(SELECT 1 FROM tool_executions
+WHERE task_id=$1 AND run_id=$2 AND state='unknown')`, taskID, runID).
+		Scan(&unresolvedTools); err != nil {
+		return err
+	}
+	if unresolvedBudget || unresolvedTools {
 		state = "recovery_required"
 	}
 	if _, err = tx.Exec(`UPDATE task_budget_runs SET owner_until=NULL,state=$3,updated_at=now()
