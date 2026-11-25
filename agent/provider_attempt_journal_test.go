@@ -9,6 +9,7 @@ import (
 	"strings"
 	"sync"
 	"testing"
+	"time"
 
 	"github.com/Autumn-27/artex/llmrec"
 	"github.com/Autumn-27/norma/llm"
@@ -60,6 +61,7 @@ func (j *transportAttemptJournalFixture) MarkUnknown(_ context.Context, id strin
 
 type statusSequenceTransport struct {
 	statuses []int
+	bodies   []string
 	calls    int
 }
 
@@ -67,13 +69,20 @@ func (t *statusSequenceTransport) RoundTrip(req *http.Request) (*http.Response, 
 	if t.calls >= len(t.statuses) {
 		return nil, errors.New("unexpected extra HTTP attempt")
 	}
-	status := t.statuses[t.calls]
+	index := t.calls
+	status := t.statuses[index]
 	t.calls++
+	body := "fixture response"
+	if index < len(t.bodies) {
+		body = t.bodies[index]
+	}
+	header := make(http.Header)
+	header.Set("Content-Type", "text/event-stream")
 	return &http.Response{
 		StatusCode: status,
 		Status:     fmt.Sprintf("%d %s", status, http.StatusText(status)),
-		Header:     make(http.Header),
-		Body:       io.NopCloser(strings.NewReader("fixture response")),
+		Header:     header,
+		Body:       io.NopCloser(strings.NewReader(body)),
 		Request:    req,
 	}, nil
 }
@@ -168,3 +177,44 @@ func TestQuotaAwareTransportDoesNotSendWhenReservationFails(t *testing.T) {
 		t.Fatalf("missing journal failure context: %s", body)
 	}
 }
+
+func TestQuotaAwareTransportJournalsNormaConnectionRetries(t *testing.T) {
+	journal := &transportAttemptJournalFixture{}
+	base := &statusSequenceTransport{
+		statuses: []int{http.StatusBadGateway, http.StatusOK},
+		bodies: []string{
+			"upstream unavailable",
+			"data: {\"choices\":[{\"index\":0,\"delta\":{\"content\":\"ok\"},\"finish_reason\":null}]}\n\n" +
+				"data: {\"choices\":[{\"index\":0,\"delta\":{},\"finish_reason\":\"stop\"}],\"usage\":{\"prompt_tokens\":9,\"completion_tokens\":4}}\n\n" +
+				"data: [DONE]\n\n",
+		},
+	}
+	client := &http.Client{Transport: quotaAwareTransport{base: base}}
+	inner, err := llm.NewProvider(llm.Config{
+		Format: llm.FormatOpenAI, BaseURL: "https://provider.invalid/v1",
+		APIKey: "fixture", Model: "fixture", HTTPClient: client,
+		MaxRetries: 1, RetryInterval: time.Millisecond,
+	})
+	if err != nil {
+		t.Fatal(err)
+	}
+	recorder := llmrec.Wrap(inner, nil, "fixture", "profile", "", "", func() bool { return false })
+	ctx := llmrec.WithAttemptJournal(context.Background(), journal)
+	for _, err := range recorder.Stream(ctx, llm.CompletionRequest{
+		System: []string{"system prompt"}, Messages: []llm.Message{llm.UserText("hello")}, MaxTokens: 32,
+	}) {
+		if err != nil {
+			t.Fatalf("Recorder.Stream: %v", err)
+		}
+	}
+	if base.calls != 2 || len(journal.reserved) != 2 {
+		t.Fatalf("Norma retries were not individually reserved: calls=%d reservations=%v", base.calls, journal.reserved)
+	}
+	if !journal.unknown["call-1"] {
+		t.Fatalf("first 502 attempt was not retained as unknown: %+v", journal)
+	}
+	if got := journal.settled["call-2"]; got != 13 {
+		t.Fatalf("successful retry settled at %d tokens; want 13", got)
+	}
+}
+
