@@ -32,3 +32,23 @@ func TaskOwnerFrom(ctx context.Context) (TaskOwner, bool) {
 	}
 	return owner, true
 }
+
+type toolUseIDContextKey struct{}
+
+// WithToolUseID makes the provider's stable tool-use identifier available to
+// tool implementations that support native idempotency keys.
+func WithToolUseID(ctx context.Context, toolUseID string) context.Context {
+	if ctx == nil || toolUseID == "" {
+		return ctx
+	}
+	return context.WithValue(ctx, toolUseIDContextKey{}, toolUseID)
+}
+
+// ToolUseIDFrom returns the stable tool-use identifier, when one is present.
+func ToolUseIDFrom(ctx context.Context) string {
+	if ctx == nil {
+		return ""
+	}
+	value, _ := ctx.Value(toolUseIDContextKey{}).(string)
+	return value
+}
