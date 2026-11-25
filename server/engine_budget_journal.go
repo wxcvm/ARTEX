@@ -32,6 +32,9 @@ func (r *taskLLMRuntime) withAttemptJournal(ctx context.Context) (context.Contex
 	if !ok || owner == nil {
 		return nil, &taskLLMError{taskID: r.taskID, cause: fmt.Errorf("%w: task %s has an invalid durable execution owner", llmrec.ErrAttemptJournal, r.taskID)}
 	}
+	ctx = llmrec.WithTaskOwner(ctx, llmrec.TaskOwner{
+		TaskID: owner.taskID, RunID: owner.runID, Epoch: owner.epoch,
+	})
 	return llmrec.WithAttemptJournal(ctx, &taskBudgetAttemptJournal{
 		owner: owner, intentID: agent.RunInfoFrom(ctx).IntentID,
 	}), nil
