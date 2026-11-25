@@ -303,6 +303,12 @@ func (r *taskLLMRuntime) streamHooks() taskLLMStreamHooks {
 
 func (r *taskLLMRuntime) Stream(ctx context.Context, req llm.CompletionRequest) iter.Seq2[llm.StreamEvent, error] {
 	ctx = llmrec.WithTaskID(ctx, r.taskID)
+	ctx, journalErr := r.withAttemptJournal(ctx)
+	if journalErr != nil {
+		return func(yield func(llm.StreamEvent, error) bool) {
+			yield(llm.StreamEvent{}, journalErr)
+		}
+	}
 	return streamTaskLLM(ctx, r.taskID, req, r.streamHooks())
 }
 
@@ -313,6 +319,10 @@ func (r *taskLLMRuntime) Stream(ctx context.Context, req llm.CompletionRequest) 
 // streaming path needs is unnecessary here).
 func (r *taskLLMRuntime) Complete(ctx context.Context, req llm.CompletionRequest) (llm.Message, string, llm.Usage, error) {
 	ctx = llmrec.WithTaskID(ctx, r.taskID)
+	ctx, journalErr := r.withAttemptJournal(ctx)
+	if journalErr != nil {
+		return llm.Message{}, "", llm.Usage{}, journalErr
+	}
 	return completeTaskLLM(ctx, r.taskID, req, r.streamHooks())
 }
 
