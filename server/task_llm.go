@@ -71,7 +71,10 @@ func (e *taskLLMError) Unwrap() error { return e.cause }
 
 func isTaskLLMRuntimeError(err error) bool {
 	var target *taskLLMError
-	return errors.As(err, &target)
+	if errors.As(err, &target) || errors.Is(err, llmrec.ErrAttemptJournal) {
+		return true
+	}
+	return err != nil && strings.Contains(strings.ToLower(err.Error()), "durable provider-attempt journal")
 }
 
 func isTaskLLMChainExhausted(err error) bool {
