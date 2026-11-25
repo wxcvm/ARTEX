@@ -22,15 +22,15 @@ func (r *taskLLMRuntime) withAttemptJournal(ctx context.Context) (context.Contex
 		return ctx, nil
 	}
 	if r.s.engine == nil {
-		return nil, errors.New("durable task execution owner is unavailable")
+		return nil, &taskLLMError{taskID: r.taskID, cause: fmt.Errorf("%w: durable task execution owner is unavailable", llmrec.ErrAttemptJournal)}
 	}
 	value, ok := r.s.engine.taskOwners.Load(r.taskID)
 	if !ok {
-		return nil, fmt.Errorf("task %s has no durable execution owner", r.taskID)
+		return nil, &taskLLMError{taskID: r.taskID, cause: fmt.Errorf("%w: task %s has no durable execution owner", llmrec.ErrAttemptJournal, r.taskID)}
 	}
 	owner, ok := value.(*durableTaskOwner)
 	if !ok || owner == nil {
-		return nil, fmt.Errorf("task %s has an invalid durable execution owner", r.taskID)
+		return nil, &taskLLMError{taskID: r.taskID, cause: fmt.Errorf("%w: task %s has an invalid durable execution owner", llmrec.ErrAttemptJournal, r.taskID)}
 	}
 	return llmrec.WithAttemptJournal(ctx, &taskBudgetAttemptJournal{
 		owner: owner, intentID: agent.RunInfoFrom(ctx).IntentID,
