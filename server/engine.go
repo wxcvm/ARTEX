@@ -846,6 +846,9 @@ func (e *Engine) Run(ctx context.Context, t *Task) {
 	if owner != nil {
 		routineCount++ // the lease renewer remains alive until the other routines drain
 		e.taskOwners.Store(t.ID, owner)
+		ctx = llmrec.WithTaskOwner(ctx, llmrec.TaskOwner{
+			TaskID: owner.taskID, RunID: owner.runID, Epoch: owner.epoch,
+		})
 	}
 	// Reserve every task routine before releasing the delete barrier, so StopTask
 	// cannot race WaitGroup.Add with Wait.
