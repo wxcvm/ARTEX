@@ -53,16 +53,15 @@ func (j *taskBudgetAttemptJournal) Reserve(ctx context.Context, estimatedTokens 
 		TaskID: j.owner.taskID, RunID: j.owner.runID, OwnerEpoch: j.owner.epoch,
 		CallID: callID, IntentID: j.intentID, Tokens: estimatedTokens,
 	}
-	created, err := j.owner.store.ReserveBudgetCall(reservation)
+	_, err := j.owner.store.ReserveBudgetCall(reservation)
 	if err != nil {
 		// The commit acknowledgement can be lost after PostgreSQL committed.
 		// Replaying the same key distinguishes that case from a failed write.
-		created, err = j.owner.store.ReserveBudgetCall(reservation)
+		_, err = j.owner.store.ReserveBudgetCall(reservation)
 	}
 	if err != nil {
 		return "", err
 	}
-	_ = created // false means this exact reservation was already committed.
 	return callID, nil
 }
 
