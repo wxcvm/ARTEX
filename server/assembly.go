@@ -281,7 +281,7 @@ func wireTools(pg *db.DB, domainReg map[string]actool.CoreTool) {
 		rows, err := pg.ListTools()
 		if err != nil {
 			log.Printf("[tools] failed to read tools table, passing through with code defaults: %v", err)
-			return tools
+			return journalTaskTools(tools, pg, agent.RunInfoFrom(ctx))
 		}
 		byKey := make(map[string]*db.Tool, len(rows))
 		for _, t := range rows {
@@ -374,7 +374,7 @@ func wireTools(pg *db.DB, domainReg map[string]actool.CoreTool) {
 				}
 			}
 		}
-		return out
+		return journalTaskTools(out, pg, runInfo)
 	}
 }
 
