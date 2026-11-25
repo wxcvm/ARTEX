@@ -13,6 +13,7 @@ import (
 
 	"github.com/Autumn-27/artex/agent"
 	"github.com/Autumn-27/artex/db"
+	"github.com/Autumn-27/artex/llmrec"
 	"github.com/Autumn-27/norma/harness"
 	"github.com/Autumn-27/norma/llm"
 )
@@ -714,3 +715,18 @@ func TestProfileDeleteRestoresQuotaBlockedIntentWhenFallbackAvailable(t *testing
 		t.Fatalf("task did not return to fallback state: %+v", state)
 	}
 }
+
+func TestTaskLLMRuntimeErrorRecognizesJournalAdmissionFailures(t *testing.T) {
+	for _, err := range []error{
+		fmt.Errorf("%w: database unavailable", llmrec.ErrAttemptJournal),
+		errors.New("ARTEX durable provider-attempt journal rejected the request: reservation failed"),
+	} {
+		if !isTaskLLMRuntimeError(err) {
+			t.Fatalf("journal failure was classified as a retryable model error: %v", err)
+		}
+	}
+	if isTaskLLMRuntimeError(errors.New("ordinary provider timeout")) {
+		t.Fatal("ordinary provider errors were misclassified as task-runtime failures")
+	}
+}
+
