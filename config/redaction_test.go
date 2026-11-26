@@ -16,6 +16,8 @@ func TestRedactLogText(t *testing.T) {
 		{"password='a secret with spaces' host=localhost", "password='***' host=localhost"},
 		{"{\"api_key\":\"secret with \\\"quotes\\\"\",\"model\":\"test\"}", "{\"api_key\":\"***\",\"model\":\"test\"}"},
 		{"OPENAI_API_KEY=private-key", "OPENAI_API_KEY=***"},
+		{"https://example.test/v1?client_secret=synthetic&passwd=synthetic&signature=synthetic&sig=synthetic&mode=test", "https://example.test/v1?client_secret=***&passwd=***&signature=***&sig=***&mode=test"},
+		{"passwd=synthetic host=localhost", "passwd=*** host=localhost"},
 		{"connection refused; model unavailable", "connection refused; model unavailable"},
 	}
 	for _, tc := range cases {

@@ -11,8 +11,8 @@ var (
 	logURLUserinfo = regexp.MustCompile("(?i)([a-z][a-z0-9+.-]*://)[^\\s/?#\"'<>]+@")
 	logAuthValue = regexp.MustCompile("(?i)(\\b(?:proxy-)?authorization\\b[\"']?[ \\t]*[:=][ \\t]*[\"']?(?:bearer|basic)[ \\t]+)[A-Za-z0-9._~+/-]+=*")
 	logBearer = regexp.MustCompile("(?i)(\\bbearer[ \\t]+)[A-Za-z0-9._~+/-]+=*")
-	logQuerySecret = regexp.MustCompile("(?i)([?&](?:api[_-]?key|access[_-]?token|refresh[_-]?token|token|password|secret|key)=)[^\\s&#\"'<>]+")
-	logNamedSecret = regexp.MustCompile("(?i)(\\b(?:api[_-]?key|password|client[_-]?secret|access[_-]?token|refresh[_-]?token|proxy[_-]?password|pgpassword|ARTEX_LLM_SECRET_KEY|ARTEX_PRIVACY_BRIDGE_TOKEN|OPENAI_API_KEY|ANTHROPIC_API_KEY)\\b[\"']?[ \\t]*[:=][ \\t]*)(?:\"(?:\\\\.|[^\"\\\\])*\"|'(?:\\\\.|[^'\\\\])*'|[^\\s,;}\\]&]+)")
+	logQuerySecret = regexp.MustCompile("(?i)([?&](?:api[_-]?key|access[_-]?token|refresh[_-]?token|token|password|passwd|client[_-]?secret|secret|key|sig|signature)=)[^\\s&#\"'<>]+")
+	logNamedSecret = regexp.MustCompile("(?i)(\\b(?:api[_-]?key|password|passwd|client[_-]?secret|access[_-]?token|refresh[_-]?token|proxy[_-]?password|pgpassword|ARTEX_LLM_SECRET_KEY|ARTEX_PRIVACY_BRIDGE_TOKEN|OPENAI_API_KEY|ANTHROPIC_API_KEY)\\b[\"']?[ \\t]*[:=][ \\t]*)(?:\"(?:\\\\.|[^\"\\\\])*\"|'(?:\\\\.|[^'\\\\])*'|[^\\s,;}\\]&]+)")
 )
 
 // RedactLogText masks common credential representations before diagnostics are
