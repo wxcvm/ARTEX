@@ -11,9 +11,8 @@
 #   --output-dir   where to write (default backups/, relative to the repo root)
 #
 # The database dump runs inside the postgres compose service, so no psql client
-# is needed on the host. Restore:
-#   gunzip -c backups/artex-db-<ts>.sql.gz | docker compose exec -T postgres \
-#     psql -U "$POSTGRES_USER" -d "$POSTGRES_DB"
+# is needed on the host. For isolated, empty-database restore and separately
+# protected configuration/key backups, see the README Backups section.
 set -euo pipefail
 cd "$(dirname "$0")/.."
 
