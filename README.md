@@ -252,12 +252,29 @@ scripts/backup.sh --with-data          # db dump + data/ archive, keep 14
 scripts/backup.sh --keep 7             # db only, keep 7
 ```
 
-Restore a dump into a running stack:
+The script is not a complete instance migration: the optional data archive
+does not include external configuration, a separately mounted keys directory,
+or the original model-key encryption secret. Protect those separately; do not
+store the encryption secret alongside the database dump. Quiesce ARTEX before
+a combined database/files backup so they are not modified independently.
+
+Test restoration in an isolated, empty PostgreSQL database before any
+production migration. Keep the original database and files intact. For a
+disposable Compose instance, set the matching POSTGRES_USER and POSTGRES_DB
+environment variables, stop the ARTEX application, and use:
 
 ```bash
-gunzip -c backups/artex-db-<timestamp>.sql.gz | docker compose exec -T postgres \
-  psql -U "$POSTGRES_USER" -d "$POSTGRES_DB"
+set -o pipefail
+dump=backups/artex-db-REPLACE_TIMESTAMP.sql.gz
+gzip -t "$dump" &&
+  gunzip -c "$dump" | docker compose exec -T postgres \
+    psql -X --set=ON_ERROR_STOP=1 --single-transaction -U "$POSTGRES_USER" -d "$POSTGRES_DB"
 ```
+
+Do not import this schema-and-data dump into an already initialized ARTEX
+database. Verify the restored database, application version, and any separately
+restored files before switching the application to it. Never delete the
+original database volume to make room for a restore.
 
 Daily cron example (03:20, operator crontab):
 
