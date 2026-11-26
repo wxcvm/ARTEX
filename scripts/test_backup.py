@@ -56,6 +56,29 @@ class BackupTest(unittest.TestCase):
                 self.assertEqual(list(out.iterdir()), [existing])
                 self.assertEqual(existing.read_bytes(), b"fixture")
 
+    def test_failed_dump_does_not_publish_or_prune(self):
+        out = self.root / "backups"
+        out.mkdir()
+        existing = out / "artex-db-existing.sql.gz"
+        existing.write_bytes(b"fixture")
+        (self.root / "bin" / "docker").write_text(
+            "#!/bin/sh\nprintf 'partial dump\\n'\nexit 1\n")
+        result = self.backup("--keep", "1")
+        self.assertNotEqual(result.returncode, 0)
+        self.assertEqual(list(out.iterdir()), [existing])
+        self.assertEqual(existing.read_bytes(), b"fixture")
+
+    def test_failed_data_archive_does_not_publish_database(self):
+        out = self.root / "backups"
+        out.mkdir()
+        existing = out / "artex-db-existing.sql.gz"
+        existing.write_bytes(b"fixture")
+        shutil.rmtree(self.root / "data")
+        result = self.backup("--with-data", "--keep", "1")
+        self.assertNotEqual(result.returncode, 0)
+        self.assertEqual(list(out.iterdir()), [existing])
+        self.assertEqual(existing.read_bytes(), b"fixture")
+
 
 if __name__ == "__main__":
     unittest.main()
