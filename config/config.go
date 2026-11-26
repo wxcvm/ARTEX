@@ -106,6 +106,11 @@ func readConfig(path string) (Config, error) {
 	if err != nil {
 		return Config{}, err
 	}
+	return decodeConfig(b, path)
+}
+
+// decodeConfig is shared by runtime loading and read-only diagnostics.
+func decodeConfig(b []byte, path string) (Config, error) {
 	var c *Config
 	if err := json.Unmarshal(b, &c); err != nil || c == nil {
 		return Config{}, fmt.Errorf("invalid JSON configuration in %s: expected a configuration object with valid field types", path)

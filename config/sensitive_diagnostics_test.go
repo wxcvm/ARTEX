@@ -64,3 +64,33 @@ func TestSensitiveConfigDiagnostics(t *testing.T) {
 	if err := os.Remove(path); err != nil { t.Fatal(err) }
 	if got := SensitiveConfigDiagnostics(); got.FileState != "missing" { t.Fatalf("missing file incorrectly classified: %+v", got) }
 }
+
+// Diagnostics must agree with the runtime loader, including a JSON null root.
+func TestSensitiveConfigDiagnosticsInvalidRoot(t *testing.T) {
+	path := filepath.Join(t.TempDir(), "config.json")
+	t.Setenv("ARTEX_CONFIG", path)
+	t.Setenv("ARTEX_PG_DSN", "")
+	t.Setenv("ARTEX_LLM_BASE_URL", "")
+	t.Setenv("ARTEX_LLM_PROXY", "")
+
+	for _, raw := range []string{"null", "[]", "42", `{"database":{"port":"wrong","password":"synthetic-secret"}}`} {
+		if err := os.WriteFile(path, []byte(raw), 0600); err != nil {
+			t.Fatal(err)
+		}
+		if _, err := readConfig(path); err == nil {
+			t.Fatal("runtime accepted invalid configuration")
+		}
+		got := SensitiveConfigDiagnostics()
+		if got.FileState != "invalid" || got.DatabaseSource != "missing" || len(got.Findings) != 0 {
+			t.Fatalf("unexpected diagnostics: %+v", got)
+		}
+	}
+	if err := os.WriteFile(path, []byte("null"), 0600); err != nil {
+		t.Fatal(err)
+	}
+	t.Setenv("ARTEX_PG_DSN", "postgres://localhost/db")
+	got := SensitiveConfigDiagnostics()
+	if got.FileState != "invalid" || got.DatabaseSource != "environment" {
+		t.Fatalf("environment override hid invalid file: %+v", got)
+	}
+}
