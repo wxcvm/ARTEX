@@ -61,6 +61,15 @@ func inspectStoragePermission(kind, path string) StoragePermissionItem {
 	var info windows.ByHandleFileInformation
 	if err := windows.GetFileInformationByHandle(h, &info); err != nil { return result }
 	if info.FileAttributes & windows.FILE_ATTRIBUTE_REPARSE_POINT != 0 { result.State = "skipped_reparse"; return result }
+	// A directory at a file location (or a file at the data root) is not
+	// evidence that the expected application storage is protected.
+	isDir := info.FileAttributes & windows.FILE_ATTRIBUTE_DIRECTORY != 0
+	switch kind {
+	case "config_file", "jwt_key":
+		if isDir { return result }
+	case "data_root":
+		if !isDir { return result }
+	}
 	sd, err := windows.GetSecurityInfo(h, windows.SE_FILE_OBJECT, windows.DACL_SECURITY_INFORMATION)
 	if err != nil { return result }
 	user, err := windows.GetCurrentProcessToken().GetTokenUser()
