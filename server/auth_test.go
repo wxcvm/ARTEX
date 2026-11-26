@@ -2,6 +2,7 @@ package server
 
 import (
 	"encoding/json"
+	"net/http"
 	"net/http/httptest"
 	"strings"
 	"testing"
@@ -96,6 +97,32 @@ func TestValidatePassword(t *testing.T) {
 		t.Run(tc.name, func(t *testing.T) {
 			if got := validatePassword(tc.pw); (got != "") != tc.wantErr {
 				t.Fatalf("validatePassword(%q)=%q, wantErr=%v", tc.pw, got, tc.wantErr)
+			}
+		})
+	}
+}
+
+
+// The no-store policy applies even when the data source is unavailable.
+func TestAuthResponsesNoStore(t *testing.T) {
+	s := &Server{m: &Manager{}}
+	for _, tc := range []struct {
+		name, method, path string
+		handler http.HandlerFunc
+	}{
+		{"status", "GET", "/api/auth/status", s.authStatus},
+		{"init", "POST", "/api/auth/init", s.authInit},
+		{"login", "POST", "/api/auth/login", s.authLogin},
+		{"change-password", "POST", "/api/auth/change-password", s.authChangePassword},
+	} {
+		t.Run(tc.name, func(t *testing.T) {
+			w := httptest.NewRecorder()
+			tc.handler(w, httptest.NewRequest(tc.method, tc.path, nil))
+			if w.Code != http.StatusServiceUnavailable {
+				t.Fatalf("status=%d, want 503", w.Code)
+			}
+			if got := w.Header().Get("Cache-Control"); got != "no-store" {
+				t.Fatalf("Cache-Control=%q, want no-store", got)
 			}
 		})
 	}
