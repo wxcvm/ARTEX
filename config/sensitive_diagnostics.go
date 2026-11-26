@@ -1,7 +1,6 @@
 package config
 
 import (
-	"encoding/json"
 	"errors"
 	"net"
 	"net/url"
@@ -105,8 +104,7 @@ func SensitiveConfigDiagnostics() SensitiveConfigStatus {
 	case err != nil:
 		s.FileState = "unreadable"
 	default:
-		var c Config
-		if err := json.Unmarshal(data, &c); err != nil {
+		if c, err := decodeConfig(data, path); err != nil {
 			s.FileState = "invalid"
 		} else {
 			s.FileState = "readable"
