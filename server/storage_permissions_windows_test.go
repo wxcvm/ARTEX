@@ -66,3 +66,27 @@ func TestInspectStoragePermissionFile(t *testing.T) {
 		t.Fatalf("UNC path: %+v", got)
 	}
 }
+
+func TestInspectStoragePermissionObjectType(t *testing.T) {
+	dir := t.TempDir()
+	file := filepath.Join(dir, "fixture.txt")
+	if err := os.WriteFile(file, []byte("fixture"), 0600); err != nil { t.Fatal(err) }
+	for _, tc := range []struct{ kind, path string }{
+		{"config_file", dir},
+		{"jwt_key", dir},
+		{"data_root", file},
+	} {
+		if got := inspectStoragePermission(tc.kind, tc.path); got.State != "unavailable" {
+			t.Fatalf("unexpected result for %s: %+v", tc.kind, got)
+		}
+	}
+	for _, tc := range []struct{ kind, path string }{
+		{"config_file", file},
+		{"jwt_key", file},
+		{"data_root", dir},
+	} {
+		if got := inspectStoragePermission(tc.kind, tc.path); got.State != "inspected" && got.State != "partial" {
+			t.Fatalf("correct object type not inspected for %s: %+v", tc.kind, got)
+		}
+	}
+}
