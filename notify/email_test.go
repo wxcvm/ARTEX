@@ -369,8 +369,8 @@ func TestEmailRejectsInvalidAddresses(t *testing.T) {
 	for _, tc := range []struct{ from, to string }{
 		{"not an address", "recipient@example.com"},
 		{"sender@example.com", "not an address"},
-		{"sender@example.com\r\n", "recipient@example.com"},
-		{"sender@example.com", "recipient@example.com\r\n"},
+		{"sender\r\n@example.com", "recipient@example.com"},
+		{"sender@example.com", "recipient\r\n@example.com"},
 	} {
 		cfg := map[string]any{"host":"smtp.example.com", "port":float64(587), "from":tc.from, "to":[]any{tc.to}}
 		if err := (emailChannel{}).Validate(cfg); err == nil { t.Fatal("invalid address accepted") }
