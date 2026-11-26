@@ -59,6 +59,9 @@ func TestExposureEndpointRequiresJWT(t *testing.T) {
 	if withToken.Code != http.StatusOK {
 		t.Fatalf("authenticated status=%d, want 200", withToken.Code)
 	}
+	if got := withToken.Header().Get("Cache-Control"); got != "no-store" {
+		t.Fatalf("sensitive diagnostics cache policy=%q, want no-store", got)
+	}
 	var info ExposureStatus
 	if err := json.Unmarshal(withToken.Body.Bytes(), &info); err != nil {
 		t.Fatal(err)
