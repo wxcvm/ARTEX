@@ -52,31 +52,46 @@ umask 077
 mkdir -p "$OUTPUT_DIR"
 TS=$(date -u +%Y%m%dT%H%M%SZ)
 DB_OUT="$OUTPUT_DIR/artex-db-$TS.sql.gz"
-if [ -e "$DB_OUT" ]; then
-  echo "refusing to overwrite $DB_OUT" >&2
+# Stage privately on the destination filesystem. Publish only validated files,
+# and never overwrite a completed backup with the same timestamp.
+STAGE=$(mktemp -d "$OUTPUT_DIR/.artex-backup.XXXXXXXX")
+trap 'rm -rf -- "$STAGE"' EXIT
+trap 'exit 130' INT
+trap 'exit 143' TERM
+DB_TMP="$STAGE/database.sql.gz"
+DATA_OUT="$OUTPUT_DIR/artex-data-$TS.tar.gz"
+DATA_TMP="$STAGE/data.tar.gz"
+if [ -e "$DB_OUT" ] || { [ "$WITH_DATA" -eq 1 ] && [ -e "$DATA_OUT" ]; }; then
+  echo "refusing to overwrite an existing backup for $TS" >&2
   exit 1
 fi
 
-if ! docker compose exec -T postgres pg_dump -U "$PGUSER_NAME" "$PGDATABASE_NAME" | gzip > "$DB_OUT"; then
-  rm -f "$DB_OUT"
+if ! docker compose exec -T postgres pg_dump -U "$PGUSER_NAME" "$PGDATABASE_NAME" | gzip > "$DB_TMP"; then
   echo "pg_dump failed (is the stack running?)" >&2
   exit 1
 fi
-gzip -t "$DB_OUT"
-echo "wrote $DB_OUT ($(du -h "$DB_OUT" | cut -f1))"
+gzip -t "$DB_TMP"
 
 if [ "$WITH_DATA" -eq 1 ]; then
-  DATA_OUT="$OUTPUT_DIR/artex-data-$TS.tar.gz"
-  # data/ contains files written by the container (root); unreadable ones make
-  # tar exit 2. Fail loudly rather than ship a partial archive.
-  if ! tar -czf "$DATA_OUT" data 2>"$OUTPUT_DIR/.tar.err"; then
-    rm -f "$DATA_OUT"
-    echo "data archive failed (run as root so container-written files are readable):" >&2
-    head -5 "$OUTPUT_DIR/.tar.err" >&2
-    rm -f "$OUTPUT_DIR/.tar.err"
+  if ! tar -czf "$DATA_TMP" data 2>"$STAGE/tar.err"; then
+    echo "data archive failed (check file access and whether data is changing):" >&2
+    head -5 "$STAGE/tar.err" >&2
     exit 1
   fi
-  rm -f "$OUTPUT_DIR/.tar.err"
+  gzip -t "$DATA_TMP"
+fi
+
+# Hard links publish complete files without a check-then-overwrite race.
+# If the destination does not support hard links, fail without pruning.
+ln -T -- "$DB_TMP" "$DB_OUT"
+if [ "$WITH_DATA" -eq 1 ]; then
+  if ! ln -T -- "$DATA_TMP" "$DATA_OUT"; then
+    rm -f -- "$DB_OUT"
+    exit 1
+  fi
+fi
+echo "wrote $DB_OUT ($(du -h "$DB_OUT" | cut -f1))"
+if [ "$WITH_DATA" -eq 1 ]; then
   echo "wrote $DATA_OUT ($(du -h "$DATA_OUT" | cut -f1))"
 fi
 
