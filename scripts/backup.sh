@@ -31,7 +31,10 @@ while [ $# -gt 0 ]; do
     *) echo "unknown option: $1" >&2; usage >&2; exit 2 ;;
   esac
 done
-case "$KEEP" in (*[!0-9]*|'') echo "--keep must be a positive integer" >&2; exit 2 ;; esac
+if ! [[ "$KEEP" =~ ^[1-9][0-9]{0,8}$ ]]; then
+  echo "--keep must be an integer between 1 and 999999999 (without leading zeros)" >&2
+  exit 2
+fi
 
 # Compose reads .env for credentials; source it for the dump command too.
 if [ -f .env ]; then
@@ -43,6 +46,9 @@ fi
 PGUSER_NAME="${POSTGRES_USER:-artex}"
 PGDATABASE_NAME="${POSTGRES_DB:-artex}"
 
+# Dumps may include credentials and private task data. Restrict new files
+# and directories even when the caller has a permissive umask.
+umask 077
 mkdir -p "$OUTPUT_DIR"
 TS=$(date -u +%Y%m%dT%H%M%SZ)
 DB_OUT="$OUTPUT_DIR/artex-db-$TS.sql.gz"
