@@ -43,6 +43,11 @@ func TestToolExecutionJournalReplaysOnlyCompletedMatchingCalls(t *testing.T) {
 	if err := d.CompleteToolExecution(req, stored); err != nil {
 		t.Fatalf("complete: %v", err)
 	}
+	var storedTool, storedHash string
+	if err := d.QueryRow(`SELECT tool_key,input_hash FROM tool_executions WHERE task_id=$1 AND session_id=$2 AND tool_use_id=$3`, taskID, req.SessionID, req.ToolUseID).Scan(&storedTool, &storedHash); err != nil {
+		t.Fatal(err)
+	}
+	t.Logf("journal identity: stored tool=%q hash=%q; request tool=%q hash=%q", storedTool, storedHash, req.ToolKey, req.InputHash)
 	if err := d.CompleteToolExecution(req, stored); err != nil {
 		t.Fatalf("idempotent complete replay: %v", err)
 	}
