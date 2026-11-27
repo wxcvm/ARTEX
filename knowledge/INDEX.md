@@ -1,6 +1,6 @@
 # 知识库索引
 
-共 **672** 条，其中已验证 **378** 条。数据源 `knowledge.db`（SQLite + FTS5，`knowledge_dir` 直接加载）。
+共 **2672** 条，其中已验证 **378** 条。数据源 `knowledge.db`（SQLite + FTS5，`knowledge_dir` 直接加载）。
 
 生成：`python knowledge/tools/export_docs.py`；体检：`python knowledge/tools/kb_check.py`
 
@@ -8,6 +8,8 @@
 
 | category | 条数 |
 |---|---|
+| `kev` | 1805 |
+| `nvd` | 195 |
 | `info-leak` | 86 |
 | `auth-bypass` | 74 |
 | `absorbed` | 60 |
@@ -41,8 +43,8 @@
 
 | kind | 条数 |
 |---|---|
+| `markdown` | 2201 |
 | `script` | 217 |
-| `markdown` | 201 |
 | `poc` | 150 |
 | `exp` | 46 |
 | `template` | 44 |
@@ -725,3 +727,2003 @@
 | 679 | VIP/等级接口参数篡改（免费拿高等级权益） | gray-market | markdown |  | vip,level,等级,权益,参数篡改,会员,gray-market,fujiang |
 | 680 | 提现审核接口越权（读他人银行卡 / 改审核状态） | gray-market | markdown |  | 提现,withdraw,审核,approve,银行卡,越权,gray-market,fujiang |
 | 681 | 提现银行卡越权替换（把别人提现收进自己卡） | gray-market | markdown |  | 提现,银行卡,越权,替换,资金,withdraw,gray-market,fujiang |
+| 4682 | SAP NetWeaver Remote Code Execution Vulnerability | kev | markdown |  | CVE-2010-5326,cve-arsenal,cisa-kev,kev,in-the-wild,cvss-critical,SAP,N |
+| 4683 | HP OpenView Network Node Manager Remote Code Execution Vulnerability | kev | markdown |  | CVE-2005-2773,cve-arsenal,cisa-kev,kev,in-the-wild,cvss-critical,Hewle |
+| 4684 | Alcatel OmniPCX Enterprise Remote Code Execution Vulnerability | kev | markdown |  | CVE-2007-3010,cve-arsenal,cisa-kev,kev,in-the-wild,cvss-critical,Alcat |
+| 4685 | phpMyAdmin Remote Code Execution Vulnerability | kev | markdown |  | CVE-2009-1151,cve-arsenal,cisa-kev,kev,in-the-wild,cvss-critical,phpMy |
+| 4686 | Oracle JRE Unspecified Vulnerability | kev | markdown |  | CVE-2010-0840,cve-arsenal,cisa-kev,kev,in-the-wild,cvss-critical,Oracl |
+| 4687 | Adobe ColdFusion Directory Traversal Vulnerability | kev | markdown |  | CVE-2010-2861,cve-arsenal,cisa-kev,kev,in-the-wild,ransomware,cvss-cri |
+| 4688 | Exim Heap-Based Buffer Overflow Vulnerability | kev | markdown |  | CVE-2010-4344,cve-arsenal,cisa-kev,kev,in-the-wild,cvss-critical,Exim |
+| 4689 | Microsoft Forefront TMG Remote Code Execution Vulnerability | kev | markdown |  | CVE-2011-1889,cve-arsenal,cisa-kev,kev,in-the-wild,cvss-critical,Micro |
+| 4690 | Adobe Reader and Acrobat Universal 3D Memory Corruption Vulnerability | kev | markdown |  | CVE-2011-2462,cve-arsenal,cisa-kev,kev,in-the-wild,cvss-critical,Adobe |
+| 4691 | Oracle Java SE Runtime Environment (JRE) Arbitrary Code Execution Vulnerability | kev | markdown |  | CVE-2011-3544,cve-arsenal,cisa-kev,kev,in-the-wild,cvss-critical,Oracl |
+| 4692 | Apache Struts 2 Improper Input Validation Vulnerability | kev | markdown |  | CVE-2012-0391,cve-arsenal,cisa-kev,kev,in-the-wild,cvss-critical,Apach |
+| 4693 | Oracle Fusion Middleware Unspecified Vulnerability | kev | markdown |  | CVE-2012-1710,cve-arsenal,cisa-kev,kev,in-the-wild,ransomware,cvss-cri |
+| 4694 | Oracle Java SE Runtime Environment (JRE) Arbitrary Code Execution Vulnerability | kev | markdown |  | CVE-2012-4681,cve-arsenal,cisa-kev,kev,in-the-wild,ransomware,cvss-cri |
+| 4695 | Adobe ColdFusion Authentication Bypass Vulnerability | kev | markdown |  | CVE-2013-0625,cve-arsenal,cisa-kev,kev,in-the-wild,cvss-critical,Adobe |
+| 4696 | Adobe ColdFusion Authentication Bypass Vulnerability | kev | markdown |  | CVE-2013-0632,cve-arsenal,cisa-kev,kev,in-the-wild,cvss-critical,Adobe |
+| 4697 | Apache Struts Improper Input Validation Vulnerability | kev | markdown |  | CVE-2013-2251,cve-arsenal,cisa-kev,kev,in-the-wild,cvss-critical,Apach |
+| 4698 | Adobe Reader and Acrobat Arbitrary Integer Overflow Vulnerability | kev | markdown |  | CVE-2013-2729,cve-arsenal,cisa-kev,kev,in-the-wild,cvss-critical,Adobe |
+| 4699 | Adobe Reader and Acrobat Memory Corruption Vulnerability | kev | markdown |  | CVE-2013-3346,cve-arsenal,cisa-kev,kev,in-the-wild,cvss-critical,Adobe |
+| 4700 | HP Multiple Products Remote Code Execution Vulnerability | kev | markdown |  | CVE-2013-4810,cve-arsenal,cisa-kev,kev,in-the-wild,cvss-critical,Hewle |
+| 4701 | Adobe Flash Player Integer Underflow Vulnerablity | kev | markdown |  | CVE-2014-0497,cve-arsenal,cisa-kev,kev,in-the-wild,cvss-critical,Adobe |
+| 4702 | Adobe Reader and Acrobat Sandbox Bypass Vulnerability | kev | markdown |  | CVE-2014-0546,cve-arsenal,cisa-kev,kev,in-the-wild,cvss-critical,Adobe |
+| 4703 | InduSoft Web Studio NTWebServer Directory Traversal Vulnerability | kev | markdown |  | CVE-2014-0780,cve-arsenal,cisa-kev,kev,in-the-wild,cvss-critical,InduS |
+| 4704 | Multi-Router Looking Glass (MRLG) Buffer Overflow Vulnerability | kev | markdown |  | CVE-2014-3931,cve-arsenal,cisa-kev,kev,in-the-wild,cvss-critical,Looki |
+| 4705 | GNU Bourne-Again Shell (Bash) Arbitrary Code Execution Vulnerability | kev | markdown |  | CVE-2014-6271,cve-arsenal,cisa-kev,kev,in-the-wild,cvss-critical,GNU,B |
+| 4706 | Rejetto HTTP File Server (HFS) Remote Code Execution Vulnerability | kev | markdown |  | CVE-2014-6287,cve-arsenal,cisa-kev,kev,in-the-wild,cvss-critical,Rejet |
+| 4707 | GNU Bourne-Again Shell (Bash) Arbitrary Code Execution Vulnerability | kev | markdown |  | CVE-2014-7169,cve-arsenal,cisa-kev,kev,in-the-wild,cvss-critical,GNU,B |
+| 4708 | Realtek SDK Improper Input Validation Vulnerability | kev | markdown |  | CVE-2014-8361,cve-arsenal,cisa-kev,kev,in-the-wild,cvss-critical,Realt |
+| 4709 | Adobe Flash Player Remote Code Execution Vulnerability | kev | markdown |  | CVE-2015-0311,cve-arsenal,cisa-kev,kev,in-the-wild,cvss-critical,Adobe |
+| 4710 | Adobe Flash Player Use-After-Free Vulnerability | kev | markdown |  | CVE-2015-0313,cve-arsenal,cisa-kev,kev,in-the-wild,cvss-critical,Adobe |
+| 4711 | D-Link and TRENDnet Multiple Devices Remote Code Execution Vulnerability | kev | markdown |  | CVE-2015-1187,cve-arsenal,cisa-kev,kev,in-the-wild,cvss-critical,D-Lin |
+| 4712 | Elasticsearch Groovy Scripting Engine Remote Code Execution Vulnerability | kev | markdown |  | CVE-2015-1427,cve-arsenal,cisa-kev,kev,in-the-wild,cvss-critical,Elast |
+| 4713 | Oracle Java SE and Java SE Embedded Remote Code Execution Vulnerability | kev | markdown |  | CVE-2015-2590,cve-arsenal,cisa-kev,kev,in-the-wild,cvss-critical,Oracl |
+| 4714 | Adobe Flash Player Memory Corruption Vulnerability | kev | markdown |  | CVE-2015-3043,cve-arsenal,cisa-kev,kev,in-the-wild,cvss-critical,Adobe |
+| 4715 | Adobe Flash Player Heap-Based Buffer Overflow Vulnerability | kev | markdown |  | CVE-2015-3113,cve-arsenal,cisa-kev,kev,in-the-wild,cvss-critical,Adobe |
+| 4716 | Oracle WebLogic Server Deserialization of Untrusted Data Vulnerability | kev | markdown |  | CVE-2015-4852,cve-arsenal,cisa-kev,kev,in-the-wild,cvss-critical,Oracl |
+| 4717 | Adobe Flash Player Use-After-Free Vulnerability | kev | markdown |  | CVE-2015-5119,cve-arsenal,cisa-kev,kev,in-the-wild,cvss-critical,Adobe |
+| 4718 | Adobe Flash Player Use-After-Free Vulnerability | kev | markdown |  | CVE-2015-5122,cve-arsenal,cisa-kev,kev,in-the-wild,cvss-critical,Adobe |
+| 4719 | Adobe Flash Player Use-After-Free Vulnerability | kev | markdown |  | CVE-2015-5123,cve-arsenal,cisa-kev,kev,in-the-wild,cvss-critical,Adobe |
+| 4720 | IBM WebSphere Application Server and Server Hypervisor Edition Code Injection. | kev | markdown |  | CVE-2015-7450,cve-arsenal,cisa-kev,kev,in-the-wild,cvss-critical,IBM,W |
+| 4721 | Juniper ScreenOS Improper Authentication Vulnerability | kev | markdown |  | CVE-2015-7755,cve-arsenal,cisa-kev,kev,in-the-wild,cvss-critical,Junip |
+| 4722 | PHPMailer Command Injection Vulnerability | kev | markdown |  | CVE-2016-10033,cve-arsenal,cisa-kev,kev,in-the-wild,cvss-critical,PHP, |
+| 4723 | NETGEAR WNR2000v5 Router Buffer Overflow Vulnerability | kev | markdown |  | CVE-2016-10174,cve-arsenal,cisa-kev,kev,in-the-wild,cvss-critical,NETG |
+| 4724 | Adobe Flash Player Arbitrary Code Execution Vulnerability | kev | markdown |  | CVE-2016-1019,cve-arsenal,cisa-kev,kev,in-the-wild,ransomware,cvss-cri |
+| 4725 | NETGEAR Multiple WAP Devices Command Injection Vulnerability | kev | markdown |  | CVE-2016-1555,cve-arsenal,cisa-kev,kev,in-the-wild,cvss-critical,NETGE |
+| 4726 | SAP NetWeaver SQL Injection Vulnerability | kev | markdown |  | CVE-2016-2386,cve-arsenal,cisa-kev,kev,in-the-wild,cvss-critical,SAP,N |
+| 4727 | Apache ActiveMQ Improper Input Validation Vulnerability | kev | markdown |  | CVE-2016-3088,cve-arsenal,cisa-kev,kev,in-the-wild,cvss-critical,Apach |
+| 4728 | Oracle Java SE and JRockit Unspecified Vulnerability | kev | markdown |  | CVE-2016-3427,cve-arsenal,cisa-kev,kev,in-the-wild,cvss-critical,Oracl |
+| 4729 | Adobe Flash Player Arbitrary Code Execution Vulnerability | kev | markdown |  | CVE-2016-4117,cve-arsenal,cisa-kev,kev,in-the-wild,ransomware,cvss-cri |
+| 4730 | Adobe Flash Player Remote Code Execution Vulnerability | kev | markdown |  | CVE-2016-4171,cve-arsenal,cisa-kev,kev,in-the-wild,cvss-critical,Adobe |
+| 4731 | Apache Shiro Code Execution Vulnerability | kev | markdown |  | CVE-2016-4437,cve-arsenal,cisa-kev,kev,in-the-wild,cvss-critical,Apach |
+| 4732 | SKYSEA Client View Improper Authentication Vulnerability | kev | markdown |  | CVE-2016-7836,cve-arsenal,cisa-kev,kev,in-the-wild,cvss-critical,SKYSE |
+| 4733 | Apache Tomcat Remote Code Execution Vulnerability | kev | markdown |  | CVE-2016-8735,cve-arsenal,cisa-kev,kev,in-the-wild,cvss-critical,Apach |
+| 4734 | Jenkins Remote Code Execution Vulnerability | kev | markdown |  | CVE-2017-1000353,cve-arsenal,cisa-kev,kev,in-the-wild,cvss-critical,Je |
+| 4735 | Primetek Primefaces Remote Code Execution Vulnerability | kev | markdown |  | CVE-2017-1000486,cve-arsenal,cisa-kev,kev,in-the-wild,cvss-critical,Pr |
+| 4736 | Telerik UI for ASP.NET AJAX Unrestricted File Upload Vulnerability | kev | markdown |  | CVE-2017-11317,cve-arsenal,cisa-kev,kev,in-the-wild,cvss-critical,Tele |
+| 4737 | Telerik UI for ASP.NET AJAX Insecure Direct Object Reference Vulnerability | kev | markdown |  | CVE-2017-11357,cve-arsenal,cisa-kev,kev,in-the-wild,ransomware,cvss-cr |
+| 4738 | Red Hat JBoss Application Server Remote Code Execution Vulnerability | kev | markdown |  | CVE-2017-12149,cve-arsenal,cisa-kev,kev,in-the-wild,ransomware,cvss-cr |
+| 4739 | Cisco IOS and IOS XE Software DHCP Remote Code Execution Vulnerability | kev | markdown |  | CVE-2017-12240,cve-arsenal,cisa-kev,kev,in-the-wild,cvss-critical,Cisc |
+| 4740 | Palo Alto Networks PAN-OS Remote Code Execution Vulnerability | kev | markdown |  | CVE-2017-15944,cve-arsenal,cisa-kev,kev,in-the-wild,cvss-critical,Palo |
+| 4741 | Kaseya VSA SQL Injection Vulnerability | kev | markdown |  | CVE-2017-18362,cve-arsenal,cisa-kev,kev,in-the-wild,ransomware,cvss-cr |
+| 4742 | Adobe ColdFusion Deserialization Vulnerability | kev | markdown |  | CVE-2017-3066,cve-arsenal,cisa-kev,kev,in-the-wild,cvss-critical,Adobe |
+| 4743 | Cisco IOS and IOS XE Remote Code Execution Vulnerability | kev | markdown |  | CVE-2017-3881,cve-arsenal,cisa-kev,kev,in-the-wild,cvss-critical,Cisco |
+| 4744 | Apache Struts Remote Code Execution Vulnerability | kev | markdown |  | CVE-2017-5638,cve-arsenal,cisa-kev,kev,in-the-wild,ransomware,cvss-cri |
+| 4745 | Intel Active Management Technology (AMT), Small Business Technology (SBT), and Standard Manageability Privilege Escalation Vulnerability | kev | markdown |  | CVE-2017-5689,cve-arsenal,cisa-kev,kev,in-the-wild,cvss-critical,Intel |
+| 4746 | NETGEAR DGN2200 Remote Code Execution Vulnerability | kev | markdown |  | CVE-2017-6077,cve-arsenal,cisa-kev,kev,in-the-wild,cvss-critical,NETGE |
+| 4747 | Citrix Multiple Products Remote Code Execution Vulnerability | kev | markdown |  | CVE-2017-6316,cve-arsenal,cisa-kev,kev,in-the-wild,cvss-critical,Citri |
+| 4748 | NETGEAR Multiple Devices Buffer Overflow Vulnerability | kev | markdown |  | CVE-2017-6862,cve-arsenal,cisa-kev,kev,in-the-wild,cvss-critical,NETGE |
+| 4749 | Microsoft Windows Server Buffer Overflow Vulnerability | kev | markdown |  | CVE-2017-7269,cve-arsenal,cisa-kev,kev,in-the-wild,cvss-critical,Micro |
+| 4750 | Samba Remote Code Execution Vulnerability | kev | markdown |  | CVE-2017-7494,cve-arsenal,cisa-kev,kev,in-the-wild,ransomware,cvss-cri |
+| 4751 | Hikvision Multiple Products Improper Authentication Vulnerability | kev | markdown |  | CVE-2017-7921,cve-arsenal,cisa-kev,kev,in-the-wild,cvss-critical,Hikvi |
+| 4752 | Microsoft Windows Search Remote Code Execution Vulnerability | kev | markdown |  | CVE-2017-8543,cve-arsenal,cisa-kev,kev,in-the-wild,cvss-critical,Micro |
+| 4753 | Progress Telerik UI for ASP.NET AJAX and Sitefinity Cryptographic Weakness Vulnerability | kev | markdown |  | CVE-2017-9248,cve-arsenal,cisa-kev,kev,in-the-wild,cvss-critical,Progr |
+| 4754 | Apache Struts 1 Improper Input Validation Vulnerability | kev | markdown |  | CVE-2017-9791,cve-arsenal,cisa-kev,kev,in-the-wild,cvss-critical,Apach |
+| 4755 | PHPUnit Command Injection Vulnerability | kev | markdown |  | CVE-2017-9841,cve-arsenal,cisa-kev,kev,in-the-wild,cvss-critical,PHPUn |
+| 4756 | Cisco VPN Routers Remote Code Execution Vulnerability | kev | markdown |  | CVE-2018-0125,cve-arsenal,cisa-kev,kev,in-the-wild,cvss-critical,Cisco |
+| 4757 | Cisco Secure Access Control System Java Deserialization Vulnerability | kev | markdown |  | CVE-2018-0147,cve-arsenal,cisa-kev,kev,in-the-wild,cvss-critical,Cisco |
+| 4758 | Cisco IOS Software and Cisco IOS XE Software Quality of Service Remote Code Execution Vulnerability | kev | markdown |  | CVE-2018-0151,cve-arsenal,cisa-kev,kev,in-the-wild,cvss-critical,Cisco |
+| 4759 | Cisco IOS and IOS XE Software Smart Install Remote Code Execution Vulnerability | kev | markdown |  | CVE-2018-0171,cve-arsenal,cisa-kev,kev,in-the-wild,cvss-critical,Cisco |
+| 4760 | Jenkins Stapler Web Framework Deserialization of Untrusted Data Vulnerability | kev | markdown |  | CVE-2018-1000861,cve-arsenal,cisa-kev,kev,in-the-wild,cvss-critical,Je |
+| 4761 | Dasan GPON Routers Authentication Bypass Vulnerability | kev | markdown |  | CVE-2018-10561,cve-arsenal,cisa-kev,kev,in-the-wild,cvss-critical,Dasa |
+| 4762 | Dasan GPON Routers Command Injection Vulnerability | kev | markdown |  | CVE-2018-10562,cve-arsenal,cisa-kev,kev,in-the-wild,ransomware,cvss-cr |
+| 4763 | Quest KACE System Management Appliance Remote Command Execution Vulnerability | kev | markdown |  | CVE-2018-11138,cve-arsenal,cisa-kev,kev,in-the-wild,ransomware,cvss-cr |
+| 4764 | VMware Tanzu Spring Data Commons Property Binder Vulnerability | kev | markdown |  | CVE-2018-1273,cve-arsenal,cisa-kev,kev,in-the-wild,ransomware,cvss-cri |
+| 4765 | Tenda AC7, AC9, and AC10 Routers Command Injection Vulnerability | kev | markdown |  | CVE-2018-14558,cve-arsenal,cisa-kev,kev,in-the-wild,cvss-critical,Tend |
+| 4766 | Red Hat JBoss RichFaces Framework Expression Language Injection Vulnerability | kev | markdown |  | CVE-2018-14667,cve-arsenal,cisa-kev,kev,in-the-wild,cvss-critical,Red  |
+| 4767 | NUUO NVRmini Devices OS Command Injection Vulnerability | kev | markdown |  | CVE-2018-14933,cve-arsenal,cisa-kev,kev,in-the-wild,cvss-critical,NUUO |
+| 4768 | Adobe ColdFusion Unrestricted File Upload Vulnerability | kev | markdown |  | CVE-2018-15961,cve-arsenal,cisa-kev,kev,in-the-wild,cvss-critical,Adob |
+| 4769 | GIGABYTE Multiple Products Privilege Escalation Vulnerability | kev | markdown |  | CVE-2018-19323,cve-arsenal,cisa-kev,kev,in-the-wild,ransomware,cvss-cr |
+| 4770 | Paessler PRTG Network Monitor Local File Inclusion Vulnerability | kev | markdown |  | CVE-2018-19410,cve-arsenal,cisa-kev,kev,in-the-wild,cvss-critical,Paes |
+| 4771 | ThinkPHP "noneCms" Remote Code Execution Vulnerability | kev | markdown |  | CVE-2018-20062,cve-arsenal,cisa-kev,kev,in-the-wild,cvss-critical,Thin |
+| 4772 | Kaseya VSA Remote Code Execution Vulnerability | kev | markdown |  | CVE-2018-20753,cve-arsenal,cisa-kev,kev,in-the-wild,ransomware,cvss-cr |
+| 4773 | Oracle WebLogic Server Unspecified Vulnerability | kev | markdown |  | CVE-2018-2628,cve-arsenal,cisa-kev,kev,in-the-wild,cvss-critical,Oracl |
+| 4774 | Adobe ColdFusion Deserialization of Untrusted Data Vulnerability | kev | markdown |  | CVE-2018-4939,cve-arsenal,cisa-kev,kev,in-the-wild,cvss-critical,Adobe |
+| 4775 | D-Link Multiple Routers OS Command Injection Vulnerability | kev | markdown |  | CVE-2018-6530,cve-arsenal,cisa-kev,kev,in-the-wild,ransomware,cvss-cri |
+| 4776 | Exim Buffer Overflow Vulnerability | kev | markdown |  | CVE-2018-6789,cve-arsenal,cisa-kev,kev,in-the-wild,ransomware,cvss-cri |
+| 4777 | MikroTik RouterOS Stack-Based Buffer Overflow Vulnerability | kev | markdown |  | CVE-2018-7445,cve-arsenal,cisa-kev,kev,in-the-wild,cvss-critical,Mikro |
+| 4778 | Drupal Core Remote Code Execution Vulnerability | kev | markdown |  | CVE-2018-7600,cve-arsenal,cisa-kev,kev,in-the-wild,ransomware,cvss-cri |
+| 4779 | Drupal Core Remote Code Execution Vulnerability | kev | markdown |  | CVE-2018-7602,cve-arsenal,cisa-kev,kev,in-the-wild,ransomware,cvss-cri |
+| 4780 | Oracle Fusion Middleware Unspecified Vulnerability | kev | markdown |  | CVE-2012-3152,cve-arsenal,cisa-kev,kev,in-the-wild,cvss-critical,Oracl |
+| 4781 | Arcserve Unified Data Protection (UDP) Directory Traversal Vulnerability | kev | markdown |  | CVE-2015-4068,cve-arsenal,cisa-kev,kev,in-the-wild,cvss-critical,Arcse |
+| 4782 | MikroTik Router OS Directory Traversal Vulnerability | kev | markdown |  | CVE-2018-14847,cve-arsenal,cisa-kev,kev,in-the-wild,cvss-critical,Mikr |
+| 4783 | Microsoft Windows Privilege Escalation Vulnerability | kev | markdown |  | CVE-2002-0367,cve-arsenal,cisa-kev,kev,in-the-wild,Microsoft,Windows |
+| 4784 | Microsoft Windows Privilege Escalation Vulnerability | kev | markdown |  | CVE-2004-0210,cve-arsenal,cisa-kev,kev,in-the-wild,Microsoft,Windows |
+| 4785 | Cisco IOS Denial-of-Service Vulnerability | kev | markdown |  | CVE-2004-1464,cve-arsenal,cisa-kev,kev,in-the-wild,Cisco,IOS |
+| 4786 | Apache Struts 1 ActionForm Denial-of-Service Vulnerability | kev | markdown |  | CVE-2006-1547,cve-arsenal,cisa-kev,kev,in-the-wild,Apache,Struts 1 |
+| 4787 | Microsoft Word Malformed Object Pointer Vulnerability | kev | markdown |  | CVE-2006-2492,cve-arsenal,cisa-kev,kev,in-the-wild,Microsoft,Word |
+| 4788 | Microsoft Office Excel Remote Code Execution Vulnerability | kev | markdown |  | CVE-2007-0671,cve-arsenal,cisa-kev,kev,in-the-wild,Microsoft,Office |
+| 4789 | Adobe Acrobat and Reader Buffer Overflow Vulnerability | kev | markdown |  | CVE-2007-5659,cve-arsenal,cisa-kev,kev,in-the-wild,Adobe,Acrobat and R |
+| 4790 | Microsoft Windows Video ActiveX Control Remote Code Execution Vulnerability | kev | markdown |  | CVE-2008-0015,cve-arsenal,cisa-kev,kev,in-the-wild,Microsoft,Windows |
+| 4791 | Adobe Acrobat and Reader Unspecified Vulnerability | kev | markdown |  | CVE-2008-0655,cve-arsenal,cisa-kev,kev,in-the-wild,Adobe,Acrobat and R |
+| 4792 | Adobe Reader and Acrobat Input Validation Vulnerability | kev | markdown |  | CVE-2008-2992,cve-arsenal,cisa-kev,kev,in-the-wild,ransomware,Adobe,Ac |
+| 4793 | Oracle VirtualBox Insufficient Input Validation Vulnerability | kev | markdown |  | CVE-2008-3431,cve-arsenal,cisa-kev,kev,in-the-wild,Oracle,VirtualBox |
+| 4794 | Cisco IOS Cross-Site Request Forgery Vulnerability | kev | markdown |  | CVE-2008-4128,cve-arsenal,cisa-kev,kev,in-the-wild,Cisco,IOS |
+| 4795 | Microsoft Windows Buffer Overflow Vulnerability | kev | markdown |  | CVE-2008-4250,cve-arsenal,cisa-kev,kev,in-the-wild,Microsoft,Windows |
+| 4796 | Microsoft Office Remote Code Execution | kev | markdown |  | CVE-2009-0238,cve-arsenal,cisa-kev,kev,in-the-wild,Microsoft,Office |
+| 4797 | Microsoft Office PowerPoint Code Injection Vulnerability | kev | markdown |  | CVE-2009-0556,cve-arsenal,cisa-kev,kev,in-the-wild,Microsoft,Office |
+| 4798 | Microsoft Office Object Record Corruption Vulnerability | kev | markdown |  | CVE-2009-0557,cve-arsenal,cisa-kev,kev,in-the-wild,Microsoft,Office |
+| 4799 | Microsoft Office Buffer Overflow Vulnerability | kev | markdown |  | CVE-2009-0563,cve-arsenal,cisa-kev,kev,in-the-wild,Microsoft,Office |
+| 4800 | Adobe Reader and Adobe Acrobat Stack-Based Buffer Overflow Vulnerability | kev | markdown |  | CVE-2009-0927,cve-arsenal,cisa-kev,kev,in-the-wild,Adobe,Reader and Ac |
+| 4801 | Microsoft Windows Improper Input Validation Vulnerability | kev | markdown |  | CVE-2009-1123,cve-arsenal,cisa-kev,kev,in-the-wild,Microsoft,Windows |
+| 4802 | Microsoft DirectX NULL Byte Overwrite Vulnerability | kev | markdown |  | CVE-2009-1537,cve-arsenal,cisa-kev,kev,in-the-wild,Microsoft,DirectX |
+| 4803 | Adobe Acrobat and Reader, Flash Player Unspecified Vulnerability | kev | markdown |  | CVE-2009-1862,cve-arsenal,cisa-kev,kev,in-the-wild,Adobe,Acrobat and R |
+| 4804 | Cisco IOS XR Border Gateway Protocol (BGP) Denial-of-Service Vulnerability | kev | markdown |  | CVE-2009-2055,cve-arsenal,cisa-kev,kev,in-the-wild,Cisco,IOS XR |
+| 4805 | Microsoft Excel Featheader Record Memory Corruption Vulnerability | kev | markdown |  | CVE-2009-3129,cve-arsenal,cisa-kev,kev,in-the-wild,Microsoft,Excel |
+| 4806 | Adobe Acrobat and Reader Heap-Based Buffer Overflow Vulnerability | kev | markdown |  | CVE-2009-3459,cve-arsenal,cisa-kev,kev,in-the-wild,Adobe,Acrobat and R |
+| 4807 | Adobe Acrobat and Reader Universal 3D Remote Code Execution Vulnerability | kev | markdown |  | CVE-2009-3953,cve-arsenal,cisa-kev,kev,in-the-wild,Adobe,Acrobat and R |
+| 4808 | Adobe BlazeDS Information Disclosure Vulnerability | kev | markdown |  | CVE-2009-3960,cve-arsenal,cisa-kev,kev,in-the-wild,ransomware,Adobe,Bl |
+| 4809 | Adobe Acrobat and Reader Use-After-Free Vulnerability | kev | markdown |  | CVE-2009-4324,cve-arsenal,cisa-kev,kev,in-the-wild,Adobe,Acrobat and R |
+| 4810 | Adobe Reader and Acrobat Arbitrary Code Execution Vulnerability | kev | markdown |  | CVE-2010-0188,cve-arsenal,cisa-kev,kev,in-the-wild,ransomware,Adobe,Re |
+| 4811 | Microsoft Windows Kernel Exception Handler Vulnerability | kev | markdown |  | CVE-2010-0232,cve-arsenal,cisa-kev,kev,in-the-wild,Microsoft,Windows |
+| 4812 | Microsoft Internet Explorer Use-After-Free Vulnerability | kev | markdown |  | CVE-2010-0249,cve-arsenal,cisa-kev,kev,in-the-wild,Microsoft,Internet  |
+| 4813 | Red Hat JBoss Authentication Bypass Vulnerability | kev | markdown |  | CVE-2010-0738,cve-arsenal,cisa-kev,kev,in-the-wild,ransomware,Red Hat, |
+| 4814 | Microsoft Internet Explorer Use-After-Free Vulnerability | kev | markdown |  | CVE-2010-0806,cve-arsenal,cisa-kev,kev,in-the-wild,Microsoft,Internet  |
+| 4815 | Adobe Flash Player Memory Corruption Vulnerability | kev | markdown |  | CVE-2010-1297,cve-arsenal,cisa-kev,kev,in-the-wild,Adobe,Flash Player |
+| 4816 | Red Hat JBoss Information Disclosure Vulnerability | kev | markdown |  | CVE-2010-1428,cve-arsenal,cisa-kev,kev,in-the-wild,ransomware,Red Hat, |
+| 4817 | Red Hat Linux JBoss Seam 2 Remote Code Execution Vulnerability | kev | markdown |  | CVE-2010-1871,cve-arsenal,cisa-kev,kev,in-the-wild,Red Hat,JBoss Seam  |
+| 4818 | Microsoft Windows Remote Code Execution Vulnerability | kev | markdown |  | CVE-2010-2568,cve-arsenal,cisa-kev,kev,in-the-wild,Microsoft,Windows |
+| 4819 | Microsoft PowerPoint Buffer Overflow Vulnerability | kev | markdown |  | CVE-2010-2572,cve-arsenal,cisa-kev,kev,in-the-wild,Microsoft,PowerPoin |
+| 4820 | Adobe Acrobat and Reader Stack-Based Buffer Overflow Vulnerability | kev | markdown |  | CVE-2010-2883,cve-arsenal,cisa-kev,kev,in-the-wild,Adobe,Acrobat and R |
+| 4821 | Cisco IOS XR Border Gateway Protocol (BGP) Denial-of-Service Vulnerability | kev | markdown |  | CVE-2010-3035,cve-arsenal,cisa-kev,kev,in-the-wild,Cisco,IOS XR |
+| 4822 | Microsoft Office Stack-based Buffer Overflow Vulnerability | kev | markdown |  | CVE-2010-3333,cve-arsenal,cisa-kev,kev,in-the-wild,Microsoft,Office |
+| 4823 | Mozilla Multiple Products Remote Code Execution Vulnerability | kev | markdown |  | CVE-2010-3765,cve-arsenal,cisa-kev,kev,in-the-wild,Mozilla,Multiple Pr |
+| 4824 | Linux Kernel Improper Input Validation Vulnerability | kev | markdown |  | CVE-2010-3904,cve-arsenal,cisa-kev,kev,in-the-wild,Linux,Kernel |
+| 4825 | Microsoft Internet Explorer Uninitialized Memory Corruption Vulnerability | kev | markdown |  | CVE-2010-3962,cve-arsenal,cisa-kev,kev,in-the-wild,Microsoft,Internet  |
+| 4826 | Exim Privilege Escalation Vulnerability | kev | markdown |  | CVE-2010-4345,cve-arsenal,cisa-kev,kev,in-the-wild,Exim |
+| 4827 | Microsoft Windows Kernel Stack-Based Buffer Overflow Vulnerability | kev | markdown |  | CVE-2010-4398,cve-arsenal,cisa-kev,kev,in-the-wild,Microsoft,Windows |
+| 4828 | Ubiquiti AirOS Command Injection Vulnerability | kev | markdown |  | CVE-2010-5330,cve-arsenal,cisa-kev,kev,in-the-wild,Ubiquiti,AirOS |
+| 4829 | Adobe Flash Player Unspecified Vulnerability | kev | markdown |  | CVE-2011-0609,cve-arsenal,cisa-kev,kev,in-the-wild,Adobe,Flash Player |
+| 4830 | Adobe Flash Player Remote Code Execution Vulnerability | kev | markdown |  | CVE-2011-0611,cve-arsenal,cisa-kev,kev,in-the-wild,Adobe,Flash Player |
+| 4831 | Android OS Privilege Escalation Vulnerability | kev | markdown |  | CVE-2011-1823,cve-arsenal,cisa-kev,kev,in-the-wild,Android,Android OS |
+| 4832 | Microsoft Ancillary Function Driver (afd.sys) Improper Input Validation Vulnerability | kev | markdown |  | CVE-2011-2005,cve-arsenal,cisa-kev,kev,in-the-wild,Microsoft,Ancillary |
+| 4833 | Microsoft Windows Remote Code Execution Vulnerability | kev | markdown |  | CVE-2011-3402,cve-arsenal,cisa-kev,kev,in-the-wild,Microsoft,Windows |
+| 4834 | D-Link DIR-300 Router Cleartext Storage of a Password Vulnerability | kev | markdown |  | CVE-2011-4723,cve-arsenal,cisa-kev,kev,in-the-wild,D-Link,DIR-300 Rout |
+| 4835 | Microsoft Windows Authenticode Signature Verification Remote Code Execution Vulnerability | kev | markdown |  | CVE-2012-0151,cve-arsenal,cisa-kev,kev,in-the-wild,Microsoft,Windows |
+| 4836 | Microsoft MSCOMCTL.OCX Remote Code Execution Vulnerability | kev | markdown |  | CVE-2012-0158,cve-arsenal,cisa-kev,kev,in-the-wild,ransomware,Microsof |
+| 4837 | Oracle Java SE Runtime Environment (JRE) Arbitrary Code Execution Vulnerability | kev | markdown |  | CVE-2012-0507,cve-arsenal,cisa-kev,kev,in-the-wild,ransomware,Oracle,J |
+| 4838 | Oracle Fusion Middleware Unspecified Vulnerability | kev | markdown |  | CVE-2012-0518,cve-arsenal,cisa-kev,kev,in-the-wild,Oracle,Fusion Middl |
+| 4839 | Adobe Flash Player Memory Corruption Vulnerability | kev | markdown |  | CVE-2012-0754,cve-arsenal,cisa-kev,kev,in-the-wild,Adobe,Flash Player |
+| 4840 | Adobe Flash Player Cross-Site Scripting (XSS) Vulnerability | kev | markdown |  | CVE-2012-0767,cve-arsenal,cisa-kev,kev,in-the-wild,Adobe,Flash Player |
+| 4841 | Adobe Flash Player Arbitrary Code Execution Vulnerability | kev | markdown |  | CVE-2012-1535,cve-arsenal,cisa-kev,kev,in-the-wild,Adobe,Flash Player |
+| 4842 | Oracle Java SE Runtime Environment (JRE) Arbitrary Code Execution Vulnerability | kev | markdown |  | CVE-2012-1723,cve-arsenal,cisa-kev,kev,in-the-wild,ransomware,Oracle,J |
+| 4843 | PHP-CGI Query String Parameter Vulnerability | kev | markdown |  | CVE-2012-1823,cve-arsenal,cisa-kev,kev,in-the-wild,PHP |
+| 4844 | Microsoft Visual Basic for Applications Insecure Library Loading Vulnerability | kev | markdown |  | CVE-2012-1854,cve-arsenal,cisa-kev,kev,in-the-wild,Microsoft,Visual Ba |
+| 4845 | Microsoft Office MSCOMCTL.OCX Remote Code Execution Vulnerability | kev | markdown |  | CVE-2012-1856,cve-arsenal,cisa-kev,kev,in-the-wild,Microsoft,Office |
+| 4846 | Microsoft XML Core Services Memory Corruption Vulnerability | kev | markdown |  | CVE-2012-1889,cve-arsenal,cisa-kev,kev,in-the-wild,Microsoft,XML Core  |
+| 4847 | Adobe Flash Player Memory Corruption Vulnerability | kev | markdown |  | CVE-2012-2034,cve-arsenal,cisa-kev,kev,in-the-wild,Adobe,Flash Player |
+| 4848 | Microsoft Word Remote Code Execution Vulnerability | kev | markdown |  | CVE-2012-2539,cve-arsenal,cisa-kev,kev,in-the-wild,Microsoft,Word |
+| 4849 | Microsoft Internet Explorer Use-After-Free Vulnerability | kev | markdown |  | CVE-2012-4792,cve-arsenal,cisa-kev,kev,in-the-wild,Microsoft,Internet  |
+| 4850 | Microsoft Internet Explorer Use-After-Free Vulnerability | kev | markdown |  | CVE-2012-4969,cve-arsenal,cisa-kev,kev,in-the-wild,Microsoft,Internet  |
+| 4851 | Adobe Flash Player Integer Overflow Vulnerability | kev | markdown |  | CVE-2012-5054,cve-arsenal,cisa-kev,kev,in-the-wild,Adobe,Flash Player |
+| 4852 | Oracle Java SE Sandbox Bypass Vulnerability | kev | markdown |  | CVE-2012-5076,cve-arsenal,cisa-kev,kev,in-the-wild,Oracle,Java SE |
+| 4853 | Microsoft Silverlight Double Dereference Vulnerability | kev | markdown |  | CVE-2013-0074,cve-arsenal,cisa-kev,kev,in-the-wild,ransomware,Microsof |
+| 4854 | Oracle JRE Remote Code Execution Vulnerability | kev | markdown |  | CVE-2013-0422,cve-arsenal,cisa-kev,kev,in-the-wild,ransomware,Oracle,J |
+| 4855 | Oracle JRE Sandbox Bypass Vulnerability | kev | markdown |  | CVE-2013-0431,cve-arsenal,cisa-kev,kev,in-the-wild,ransomware,Oracle,J |
+| 4856 | Adobe ColdFusion Directory Traversal Vulnerability | kev | markdown |  | CVE-2013-0629,cve-arsenal,cisa-kev,kev,in-the-wild,Adobe,ColdFusion |
+| 4857 | Adobe ColdFusion Information Disclosure Vulnerability | kev | markdown |  | CVE-2013-0631,cve-arsenal,cisa-kev,kev,in-the-wild,Adobe,ColdFusion |
+| 4858 | Adobe Reader and Acrobat Memory Corruption Vulnerability | kev | markdown |  | CVE-2013-0640,cve-arsenal,cisa-kev,kev,in-the-wild,Adobe,Reader and Ac |
+| 4859 | Adobe Reader Buffer Overflow Vulnerability | kev | markdown |  | CVE-2013-0641,cve-arsenal,cisa-kev,kev,in-the-wild,Adobe,Reader |
+| 4860 | Adobe Flash Player Incorrect Default Permissions Vulnerability | kev | markdown |  | CVE-2013-0643,cve-arsenal,cisa-kev,kev,in-the-wild,Adobe,Flash Player |
+| 4861 | Adobe Flash Player Code Execution Vulnerability | kev | markdown |  | CVE-2013-0648,cve-arsenal,cisa-kev,kev,in-the-wild,Adobe,Flash Player |
+| 4862 | Microsoft Office Buffer Overflow Vulnerability | kev | markdown |  | CVE-2013-1331,cve-arsenal,cisa-kev,kev,in-the-wild,Microsoft,Office |
+| 4863 | Microsoft Internet Explorer Remote Code Execution Vulnerability | kev | markdown |  | CVE-2013-1347,cve-arsenal,cisa-kev,kev,in-the-wild,Microsoft,Internet  |
+| 4864 | Mozilla Firefox Information Disclosure Vulnerability | kev | markdown |  | CVE-2013-1675,cve-arsenal,cisa-kev,kev,in-the-wild,Mozilla,Firefox |
+| 4865 | Mozilla Firefox and Thunderbird Denial-of-Service Vulnerability | kev | markdown |  | CVE-2013-1690,cve-arsenal,cisa-kev,kev,in-the-wild,Mozilla,Firefox and |
+| 4866 | Linux Kernel Privilege Escalation Vulnerability | kev | markdown |  | CVE-2013-2094,cve-arsenal,cisa-kev,kev,in-the-wild,Linux,Kernel |
+| 4867 | Oracle JRE Unspecified Vulnerability | kev | markdown |  | CVE-2013-2423,cve-arsenal,cisa-kev,kev,in-the-wild,Oracle,Java Runtime |
+| 4868 | Oracle Java SE Unspecified Vulnerability | kev | markdown |  | CVE-2013-2465,cve-arsenal,cisa-kev,kev,in-the-wild,ransomware,Oracle,J |
+| 4869 | Microsoft Internet Explorer Use-After-Free Vulnerability | kev | markdown |  | CVE-2013-2551,cve-arsenal,cisa-kev,kev,in-the-wild,ransomware,Microsof |
+| 4870 | Linux Kernel Integer Overflow Vulnerability | kev | markdown |  | CVE-2013-2596,cve-arsenal,cisa-kev,kev,in-the-wild,Linux,Kernel |
+| 4871 | Code Aurora ACDB Audio Driver Stack-based Buffer Overflow Vulnerability | kev | markdown |  | CVE-2013-2597,cve-arsenal,cisa-kev,kev,in-the-wild,Code Aurora,ACDB Au |
+| 4872 | Microsoft Internet Explorer Memory Corruption Vulnerability | kev | markdown |  | CVE-2013-3163,cve-arsenal,cisa-kev,kev,in-the-wild,Microsoft,Internet  |
+| 4873 | Microsoft Win32k Privilege Escalation Vulnerability | kev | markdown |  | CVE-2013-3660,cve-arsenal,cisa-kev,kev,in-the-wild,Microsoft,Win32k |
+| 4874 | Microsoft Internet Explorer Resource Management Errors Vulnerability | kev | markdown |  | CVE-2013-3893,cve-arsenal,cisa-kev,kev,in-the-wild,Microsoft,Internet  |
+| 4875 | Microsoft Silverlight Information Disclosure Vulnerability | kev | markdown |  | CVE-2013-3896,cve-arsenal,cisa-kev,kev,in-the-wild,Microsoft,Silverlig |
+| 4876 | Microsoft Internet Explorer Use-After-Free Vulnerability | kev | markdown |  | CVE-2013-3897,cve-arsenal,cisa-kev,kev,in-the-wild,Microsoft,Internet  |
+| 4877 | Microsoft WinVerifyTrust function Remote Code Execution | kev | markdown |  | CVE-2013-3900,cve-arsenal,cisa-kev,kev,in-the-wild,Microsoft,WinVerify |
+| 4878 | Microsoft Graphics Component Memory Corruption Vulnerability | kev | markdown |  | CVE-2013-3906,cve-arsenal,cisa-kev,kev,in-the-wild,Microsoft,Graphics  |
+| 4879 | Microsoft Windows Out-of-Bounds Write Vulnerability | kev | markdown |  | CVE-2013-3918,cve-arsenal,cisa-kev,kev,in-the-wild,Microsoft,Windows |
+| 4880 | IBM InfoSphere BigInsights Invalid Input Vulnerability | kev | markdown |  | CVE-2013-3993,cve-arsenal,cisa-kev,kev,in-the-wild,ransomware,IBM,Info |
+| 4881 | Microsoft Windows Kernel Privilege Escalation Vulnerability | kev | markdown |  | CVE-2013-5065,cve-arsenal,cisa-kev,kev,in-the-wild,Microsoft,Windows |
+| 4882 | D-Link DSL-2760U Gateway Cross-Site Scripting Vulnerability | kev | markdown |  | CVE-2013-5223,cve-arsenal,cisa-kev,kev,in-the-wild,D-Link,DSL-2760U |
+| 4883 | Linux Kernel Improper Input Validation Vulnerability | kev | markdown |  | CVE-2013-6282,cve-arsenal,cisa-kev,kev,in-the-wild,Linux,Kernel |
+| 4884 | Microsoft Internet Explorer Information Disclosure Vulnerability | kev | markdown |  | CVE-2013-7331,cve-arsenal,cisa-kev,kev,in-the-wild,Microsoft,Internet  |
+| 4885 | Ruby on Rails Directory Traversal Vulnerability | kev | markdown |  | CVE-2014-0130,cve-arsenal,cisa-kev,kev,in-the-wild,Rails,Ruby on Rails |
+| 4886 | OpenSSL Information Disclosure Vulnerability | kev | markdown |  | CVE-2014-0160,cve-arsenal,cisa-kev,kev,in-the-wild,OpenSSL |
+| 4887 | Linux Kernel Race Condition Vulnerability | kev | markdown |  | CVE-2014-0196,cve-arsenal,cisa-kev,kev,in-the-wild,Linux,Kernel |
+| 4888 | Microsoft Internet Explorer Use-After-Free Vulnerability | kev | markdown |  | CVE-2014-0322,cve-arsenal,cisa-kev,kev,in-the-wild,Microsoft,Internet  |
+| 4889 | Adobe Reader and Acrobat Use-After-Free Vulnerability | kev | markdown |  | CVE-2014-0496,cve-arsenal,cisa-kev,kev,in-the-wild,Adobe,Reader and Ac |
+| 4890 | Adobe Flash Player Double Free Vulnerablity | kev | markdown |  | CVE-2014-0502,cve-arsenal,cisa-kev,kev,in-the-wild,Adobe,Flash Player |
+| 4891 | D-Link DIR-600 Router Cross-Site Request Forgery (CSRF) Vulnerability | kev | markdown |  | CVE-2014-100005,cve-arsenal,cisa-kev,kev,in-the-wild,D-Link,DIR-600 Ro |
+| 4892 | Microsoft Word Memory Corruption Vulnerability | kev | markdown |  | CVE-2014-1761,cve-arsenal,cisa-kev,kev,in-the-wild,Microsoft,Word |
+| 4893 | Microsoft Internet Explorer Memory Corruption Vulnerability | kev | markdown |  | CVE-2014-1776,cve-arsenal,cisa-kev,kev,in-the-wild,Microsoft,Internet  |
+| 4894 | Microsoft Windows Group Policy Preferences Password Privilege Escalation Vulnerability | kev | markdown |  | CVE-2014-1812,cve-arsenal,cisa-kev,kev,in-the-wild,ransomware,Microsof |
+| 4895 | Cisco Adaptive Security Appliance (ASA) Cross-Site Scripting (XSS) Vulnerability | kev | markdown |  | CVE-2014-2120,cve-arsenal,cisa-kev,kev,in-the-wild,Cisco,Adaptive Secu |
+| 4896 | Microsoft Internet Explorer Privilege Escalation Vulnerability | kev | markdown |  | CVE-2014-2817,cve-arsenal,cisa-kev,kev,in-the-wild,Microsoft,Internet  |
+| 4897 | Elasticsearch Remote Code Execution Vulnerability | kev | markdown |  | CVE-2014-3120,cve-arsenal,cisa-kev,kev,in-the-wild,Elastic,Elasticsear |
+| 4898 | Linux Kernel Privilege Escalation Vulnerability | kev | markdown |  | CVE-2014-3153,cve-arsenal,cisa-kev,kev,in-the-wild,Linux,Kernel |
+| 4899 | Microsoft IME Japanese Privilege Escalation Vulnerability | kev | markdown |  | CVE-2014-4077,cve-arsenal,cisa-kev,kev,in-the-wild,Microsoft,Input Met |
+| 4900 | Microsoft Win32k Privilege Escalation Vulnerability | kev | markdown |  | CVE-2014-4113,cve-arsenal,cisa-kev,kev,in-the-wild,Microsoft,Win32k |
+| 4901 | Microsoft Windows Object Linking & Embedding (OLE) Remote Code Execution Vulnerability | kev | markdown |  | CVE-2014-4114,cve-arsenal,cisa-kev,kev,in-the-wild,Microsoft,Windows |
+| 4902 | Microsoft Internet Explorer Privilege Escalation Vulnerability | kev | markdown |  | CVE-2014-4123,cve-arsenal,cisa-kev,kev,in-the-wild,Microsoft,Internet  |
+| 4903 | Microsoft Windows Remote Code Execution Vulnerability | kev | markdown |  | CVE-2014-4148,cve-arsenal,cisa-kev,kev,in-the-wild,Microsoft,Windows |
+| 4904 | Apple OS X Heap-Based Buffer Overflow Vulnerability | kev | markdown |  | CVE-2014-4404,cve-arsenal,cisa-kev,kev,in-the-wild,Apple,OS X |
+| 4905 | GNU Bash OS Command Injection Vulnerability | kev | markdown |  | CVE-2014-6278,cve-arsenal,cisa-kev,kev,in-the-wild,GNU,GNU Bash |
+| 4906 | Microsoft Kerberos Key Distribution Center (KDC) Privilege Escalation Vulnerability | kev | markdown |  | CVE-2014-6324,cve-arsenal,cisa-kev,kev,in-the-wild,Microsoft,Kerberos  |
+| 4907 | Microsoft Windows Object Linking & Embedding (OLE) Automation Array Remote Code Execution Vulnerability | kev | markdown |  | CVE-2014-6332,cve-arsenal,cisa-kev,kev,in-the-wild,Microsoft,Windows |
+| 4908 | Microsoft Windows Code Injection Vulnerability | kev | markdown |  | CVE-2014-6352,cve-arsenal,cisa-kev,kev,in-the-wild,Microsoft,Windows |
+| 4909 | Adobe Flash Player Dereferenced Pointer Vulnerability | kev | markdown |  | CVE-2014-8439,cve-arsenal,cisa-kev,kev,in-the-wild,Adobe,Flash Player |
+| 4910 | Adobe Flash Player Stack-Based Buffer Overflow Vulnerability | kev | markdown |  | CVE-2014-9163,cve-arsenal,cisa-kev,kev,in-the-wild,Adobe,Flash Player |
+| 4911 | Microsoft Windows TS WebProxy Directory Traversal Vulnerability | kev | markdown |  | CVE-2015-0016,cve-arsenal,cisa-kev,kev,in-the-wild,Microsoft,Windows |
+| 4912 | Microsoft Internet Explorer ASLR Bypass Vulnerability | kev | markdown |  | CVE-2015-0071,cve-arsenal,cisa-kev,kev,in-the-wild,Microsoft,Internet  |
+| 4913 | Adobe Flash Player ASLR Bypass Vulnerability | kev | markdown |  | CVE-2015-0310,cve-arsenal,cisa-kev,kev,in-the-wild,Adobe,Flash Player |
+| 4914 | Cisco Prime Data Center Network Manager (DCNM) Directory Traversal Vulnerability | kev | markdown |  | CVE-2015-0666,cve-arsenal,cisa-kev,kev,in-the-wild,Cisco,Prime Data Ce |
+| 4915 | Apple OS X Authentication Bypass Vulnerability | kev | markdown |  | CVE-2015-1130,cve-arsenal,cisa-kev,kev,in-the-wild,Apple,OS X |
+| 4916 | Microsoft HTTP.sys Remote Code Execution Vulnerability | kev | markdown |  | CVE-2015-1635,cve-arsenal,cisa-kev,kev,in-the-wild,Microsoft,HTTP.sys |
+| 4917 | Microsoft Office Memory Corruption Vulnerability | kev | markdown |  | CVE-2015-1641,cve-arsenal,cisa-kev,kev,in-the-wild,Microsoft,Office |
+| 4918 | Microsoft Office Memory Corruption Vulnerability | kev | markdown |  | CVE-2015-1642,cve-arsenal,cisa-kev,kev,in-the-wild,Microsoft,Office |
+| 4919 | Microsoft Windows Remote Code Execution Vulnerability | kev | markdown |  | CVE-2015-1671,cve-arsenal,cisa-kev,kev,in-the-wild,Microsoft,Windows |
+| 4920 | Microsoft Win32k Privilege Escalation Vulnerability | kev | markdown |  | CVE-2015-1701,cve-arsenal,cisa-kev,kev,in-the-wild,ransomware,Microsof |
+| 4921 | Microsoft Windows Mount Manager Privilege Escalation Vulnerability | kev | markdown |  | CVE-2015-1769,cve-arsenal,cisa-kev,kev,in-the-wild,Microsoft,Windows |
+| 4922 | Microsoft Office Uninitialized Memory Use Vulnerability | kev | markdown |  | CVE-2015-1770,cve-arsenal,cisa-kev,kev,in-the-wild,Microsoft,Office |
+| 4923 | D-Link DIR-645 Router Remote Code Execution Vulnerability | kev | markdown |  | CVE-2015-2051,cve-arsenal,cisa-kev,kev,in-the-wild,D-Link,DIR-645 Rout |
+| 4924 | Intel Ethernet Diagnostics Driver for Windows Denial-of-Service Vulnerability | kev | markdown |  | CVE-2015-2291,cve-arsenal,cisa-kev,kev,in-the-wild,ransomware,Intel,Et |
+| 4925 | Microsoft Win32k Privilege Escalation Vulnerability | kev | markdown |  | CVE-2015-2360,cve-arsenal,cisa-kev,kev,in-the-wild,Microsoft,Win32k |
+| 4926 | Microsoft ATM Font Driver Privilege Escalation Vulnerability | kev | markdown |  | CVE-2015-2387,cve-arsenal,cisa-kev,kev,in-the-wild,Microsoft,ATM Font  |
+| 4927 | Microsoft Internet Explorer Memory Corruption Vulnerability | kev | markdown |  | CVE-2015-2419,cve-arsenal,cisa-kev,kev,in-the-wild,Microsoft,Internet  |
+| 4928 | Microsoft PowerPoint Memory Corruption Vulnerability | kev | markdown |  | CVE-2015-2424,cve-arsenal,cisa-kev,kev,in-the-wild,Microsoft,PowerPoin |
+| 4929 | Microsoft Internet Explorer Memory Corruption Vulnerability | kev | markdown |  | CVE-2015-2425,cve-arsenal,cisa-kev,kev,in-the-wild,Microsoft,Internet  |
+| 4930 | Microsoft Windows Adobe Type Manager Library Remote Code Execution Vulnerability | kev | markdown |  | CVE-2015-2426,cve-arsenal,cisa-kev,kev,in-the-wild,Microsoft,Windows |
+| 4931 | Microsoft Internet Explorer Memory Corruption Vulnerability | kev | markdown |  | CVE-2015-2502,cve-arsenal,cisa-kev,kev,in-the-wild,Microsoft,Internet  |
+| 4932 | Microsoft Office Malformed EPS File Vulnerability | kev | markdown |  | CVE-2015-2545,cve-arsenal,cisa-kev,kev,in-the-wild,Microsoft,Office |
+| 4933 | Microsoft Win32k Memory Corruption Vulnerability | kev | markdown |  | CVE-2015-2546,cve-arsenal,cisa-kev,kev,in-the-wild,ransomware,Microsof |
+| 4934 | TP-Link Multiple Archer Devices Directory Traversal Vulnerability | kev | markdown |  | CVE-2015-3035,cve-arsenal,cisa-kev,kev,in-the-wild,TP-Link,Multiple Ar |
+| 4935 | Red Hat Libuser Race Condition Vulnerability | kev | markdown |  | CVE-2015-3246,cve-arsenal,cisa-kev,kev,in-the-wild,Red Hat,Libuser |
+| 4936 | ProFTPD Improper Access Control Vulnerability | kev | markdown |  | CVE-2015-3306,cve-arsenal,cisa-kev,kev,in-the-wild,ProFTPD |
+| 4937 | Mozilla Firefox Security Feature Bypass Vulnerability | kev | markdown |  | CVE-2015-4495,cve-arsenal,cisa-kev,kev,in-the-wild,Mozilla,Firefox |
+| 4938 | Oracle Java SE Integrity Check Vulnerability | kev | markdown |  | CVE-2015-4902,cve-arsenal,cisa-kev,kev,in-the-wild,Oracle,Java SE |
+| 4939 | Red Hat Automatic Bug Reporting Tool Privilege Escalation Vulnerability | kev | markdown |  | CVE-2015-5287,cve-arsenal,cisa-kev,kev,in-the-wild,Red Hat,Automatic B |
+| 4940 | Jenkins User Interface (UI) Information Disclosure Vulnerability | kev | markdown |  | CVE-2015-5317,cve-arsenal,cisa-kev,kev,in-the-wild,Jenkins,Jenkins Use |
+| 4941 | ISC BIND Data Processing Errors Vulnerability | kev | markdown |  | CVE-2015-5477,cve-arsenal,cisa-kev,kev,in-the-wild,ISC,BIND |
+| 4942 | Microsoft Windows Kernel Privilege Escalation Vulnerability | kev | markdown |  | CVE-2015-6175,cve-arsenal,cisa-kev,kev,in-the-wild,Microsoft,Windows |
+| 4943 | Adobe Flash Player Arbitrary Code Execution Vulnerability | kev | markdown |  | CVE-2015-7645,cve-arsenal,cisa-kev,kev,in-the-wild,ransomware,Adobe,Fl |
+| 4944 | Adobe Flash Player Integer Overflow Vulnerability | kev | markdown |  | CVE-2015-8651,cve-arsenal,cisa-kev,kev,in-the-wild,Adobe,Flash Player |
+| 4945 | Microsoft Silverlight Runtime Remote Code Execution Vulnerability | kev | markdown |  | CVE-2016-0034,cve-arsenal,cisa-kev,kev,in-the-wild,ransomware,Microsof |
+| 4946 | Microsoft Windows Kernel Privilege Escalation Vulnerability | kev | markdown |  | CVE-2016-0040,cve-arsenal,cisa-kev,kev,in-the-wild,Microsoft,Windows |
+| 4947 | Microsoft Windows Secondary Logon Service Privilege Escalation Vulnerability | kev | markdown |  | CVE-2016-0099,cve-arsenal,cisa-kev,kev,in-the-wild,ransomware,Microsof |
+| 4948 | Microsoft Windows CSRSS Security Feature Bypass Vulnerability | kev | markdown |  | CVE-2016-0151,cve-arsenal,cisa-kev,kev,in-the-wild,ransomware,Microsof |
+| 4949 | Microsoft Internet Explorer Information Disclosure Vulnerability | kev | markdown |  | CVE-2016-0162,cve-arsenal,cisa-kev,kev,in-the-wild,Microsoft,Internet  |
+| 4950 | Microsoft Win32k Privilege Escalation Vulnerability | kev | markdown |  | CVE-2016-0165,cve-arsenal,cisa-kev,kev,in-the-wild,Microsoft,Win32k |
+| 4951 | Microsoft Win32k Privilege Escalation Vulnerability | kev | markdown |  | CVE-2016-0167,cve-arsenal,cisa-kev,kev,in-the-wild,ransomware,Microsof |
+| 4952 | Microsoft Windows Media Center Remote Code Execution Vulnerability | kev | markdown |  | CVE-2016-0185,cve-arsenal,cisa-kev,kev,in-the-wild,Microsoft,Windows |
+| 4953 | Microsoft Internet Explorer Memory Corruption Vulnerability | kev | markdown |  | CVE-2016-0189,cve-arsenal,cisa-kev,kev,in-the-wild,ransomware,Microsof |
+| 4954 | Ruby on Rails Directory Traversal Vulnerability | kev | markdown |  | CVE-2016-0752,cve-arsenal,cisa-kev,kev,in-the-wild,Rails,Ruby on Rails |
+| 4955 | Adobe Flash Player and AIR Use-After-Free Vulnerability | kev | markdown |  | CVE-2016-0984,cve-arsenal,cisa-kev,kev,in-the-wild,Adobe,Flash Player  |
+| 4956 | Adobe Flash Player and AIR Integer Overflow Vulnerability | kev | markdown |  | CVE-2016-1010,cve-arsenal,cisa-kev,kev,in-the-wild,Adobe,Flash Player  |
+| 4957 | D-Link DCS-930L Devices OS Command Injection Vulnerability | kev | markdown |  | CVE-2016-11021,cve-arsenal,cisa-kev,kev,in-the-wild,D-Link,DCS-930L De |
+| 4958 | Google Chromium V8 Out-of-Bounds Read Vulnerability | kev | markdown |  | CVE-2016-1646,cve-arsenal,cisa-kev,kev,in-the-wild,Google,Chromium V8 |
+| 4959 | D-Link DSL-2750B Devices Command Injection Vulnerability | kev | markdown |  | CVE-2016-20017,cve-arsenal,cisa-kev,kev,in-the-wild,D-Link,DSL-2750B D |
+| 4960 | SAP NetWeaver Information Disclosure Vulnerability | kev | markdown |  | CVE-2016-2388,cve-arsenal,cisa-kev,kev,in-the-wild,SAP,NetWeaver |
+| 4961 | Apache Struts Command Injection Vulnerability | kev | markdown |  | CVE-2016-3081,cve-arsenal,cisa-kev,kev,in-the-wild,Apache,Struts |
+| 4962 | Microsoft Office OLE DLL Side Loading Vulnerability | kev | markdown |  | CVE-2016-3235,cve-arsenal,cisa-kev,kev,in-the-wild,Microsoft,Office |
+| 4963 | Microsoft Internet Explorer Messaging API Information Disclosure Vulnerability | kev | markdown |  | CVE-2016-3298,cve-arsenal,cisa-kev,kev,in-the-wild,Microsoft,Internet  |
+| 4964 | Microsoft Windows Kernel Privilege Escalation Vulnerability | kev | markdown |  | CVE-2016-3309,cve-arsenal,cisa-kev,kev,in-the-wild,ransomware,Microsof |
+| 4965 | Microsoft Internet Explorer and Edge Information Disclosure Vulnerability | kev | markdown |  | CVE-2016-3351,cve-arsenal,cisa-kev,kev,in-the-wild,ransomware,Microsof |
+| 4966 | Microsoft Windows Graphics Device Interface (GDI) Remote Code Execution Vulnerability | kev | markdown |  | CVE-2016-3393,cve-arsenal,cisa-kev,kev,in-the-wild,Microsoft,Windows |
+| 4967 | SolarWinds Virtualization Manager Privilege Escalation Vulnerability | kev | markdown |  | CVE-2016-3643,cve-arsenal,cisa-kev,kev,in-the-wild,SolarWinds,Virtuali |
+| 4968 | ImageMagick Improper Input Validation Vulnerability | kev | markdown |  | CVE-2016-3714,cve-arsenal,cisa-kev,kev,in-the-wild,ImageMagick |
+| 4969 | ImageMagick Arbitrary File Deletion Vulnerability | kev | markdown |  | CVE-2016-3715,cve-arsenal,cisa-kev,kev,in-the-wild,ImageMagick |
+| 4970 | ImageMagick Server-Side Request Forgery (SSRF) Vulnerability | kev | markdown |  | CVE-2016-3718,cve-arsenal,cisa-kev,kev,in-the-wild,ImageMagick |
+| 4971 | SAP NetWeaver Directory Traversal Vulnerability | kev | markdown |  | CVE-2016-3976,cve-arsenal,cisa-kev,kev,in-the-wild,SAP,NetWeaver |
+| 4972 | Trihedral VTScada (formerly VTS) Denial-of-Service Vulnerability | kev | markdown |  | CVE-2016-4523,cve-arsenal,cisa-kev,kev,in-the-wild,Trihedral,VTScada ( |
+| 4973 | Apple iOS Information Disclosure Vulnerability | kev | markdown |  | CVE-2016-4655,cve-arsenal,cisa-kev,kev,in-the-wild,Apple,iOS |
+| 4974 | Apple iOS Memory Corruption Vulnerability | kev | markdown |  | CVE-2016-4656,cve-arsenal,cisa-kev,kev,in-the-wild,Apple,iOS |
+| 4975 | Apple iOS Webkit Memory Corruption Vulnerability | kev | markdown |  | CVE-2016-4657,cve-arsenal,cisa-kev,kev,in-the-wild,Apple,iOS |
+| 4976 | Linux Kernel Race Condition Vulnerability | kev | markdown |  | CVE-2016-5195,cve-arsenal,cisa-kev,kev,in-the-wild,Linux,Kernel |
+| 4977 | Google Chromium V8 Out-of-Bounds Memory Vulnerability | kev | markdown |  | CVE-2016-5198,cve-arsenal,cisa-kev,kev,in-the-wild,Google,Chromium V8 |
+| 4978 | NETGEAR Multiple Routers Remote Code Execution Vulnerability | kev | markdown |  | CVE-2016-6277,cve-arsenal,cisa-kev,kev,in-the-wild,NETGEAR,Multiple Ro |
+| 4979 | Cisco Adaptive Security Appliance (ASA) SNMP Buffer Overflow Vulnerability | kev | markdown |  | CVE-2016-6366,cve-arsenal,cisa-kev,kev,in-the-wild,Cisco,Adaptive Secu |
+| 4980 | Cisco Adaptive Security Appliance (ASA) CLI Remote Code Execution Vulnerability | kev | markdown |  | CVE-2016-6367,cve-arsenal,cisa-kev,kev,in-the-wild,Cisco,Adaptive Secu |
+| 4981 | Cisco IOS, IOS XR, and IOS XE IKEv1 Information Disclosure Vulnerability | kev | markdown |  | CVE-2016-6415,cve-arsenal,cisa-kev,kev,in-the-wild,Cisco,IOS, IOS XR,  |
+| 4982 | Microsoft Office Memory Corruption Vulnerability | kev | markdown |  | CVE-2016-7193,cve-arsenal,cisa-kev,kev,in-the-wild,Microsoft,Office |
+| 4983 | Microsoft Edge Memory Corruption Vulnerability | kev | markdown |  | CVE-2016-7200,cve-arsenal,cisa-kev,kev,in-the-wild,Microsoft,Edge |
+| 4984 | Microsoft Edge Memory Corruption Vulnerability | kev | markdown |  | CVE-2016-7201,cve-arsenal,cisa-kev,kev,in-the-wild,Microsoft,Edge |
+| 4985 | Microsoft Win32k Privilege Escalation Vulnerability | kev | markdown |  | CVE-2016-7255,cve-arsenal,cisa-kev,kev,in-the-wild,ransomware,Microsof |
+| 4986 | Microsoft Windows Open Type Font Remote Code Execution Vulnerability | kev | markdown |  | CVE-2016-7256,cve-arsenal,cisa-kev,kev,in-the-wild,Microsoft,Windows |
+| 4987 | Microsoft Office Security Feature Bypass Vulnerability | kev | markdown |  | CVE-2016-7262,cve-arsenal,cisa-kev,kev,in-the-wild,Microsoft,Excel |
+| 4988 | Adobe Flash Player Use-After-Free Vulnerability | kev | markdown |  | CVE-2016-7855,cve-arsenal,cisa-kev,kev,in-the-wild,Adobe,Flash Player |
+| 4989 | Adobe Flash Player Use-After-Free Vulnerability | kev | markdown |  | CVE-2016-7892,cve-arsenal,cisa-kev,kev,in-the-wild,Adobe,Flash Player |
+| 4990 | Siemens SIMATIC CP 1543-1 Improper Privilege Management Vulnerability | kev | markdown |  | CVE-2016-8562,cve-arsenal,cisa-kev,kev,in-the-wild,Siemens,SIMATIC CP |
+| 4991 | Mozilla Firefox, Firefox ESR, and Thunderbird Use-After-Free Vulnerability | kev | markdown |  | CVE-2016-9079,cve-arsenal,cisa-kev,kev,in-the-wild,Mozilla,Firefox, Fi |
+| 4992 | SAP NetWeaver XML External Entity (XXE) Vulnerability | kev | markdown |  | CVE-2016-9563,cve-arsenal,cisa-kev,kev,in-the-wild,SAP,NetWeaver |
+| 4993 | Microsoft Graphics Device Interface (GDI) Privilege Escalation Vulnerability | kev | markdown |  | CVE-2017-0001,cve-arsenal,cisa-kev,kev,in-the-wild,Microsoft,Graphics  |
+| 4994 | Microsoft Windows Graphics Device Interface (GDI) Privilege Escalation Vulnerability | kev | markdown |  | CVE-2017-0005,cve-arsenal,cisa-kev,kev,in-the-wild,Microsoft,Windows |
+| 4995 | Microsoft XML Core Services Information Disclosure Vulnerability | kev | markdown |  | CVE-2017-0022,cve-arsenal,cisa-kev,kev,in-the-wild,Microsoft,XML Core  |
+| 4996 | Microsoft Edge and Internet Explorer Type Confusion Vulnerability | kev | markdown |  | CVE-2017-0037,cve-arsenal,cisa-kev,kev,in-the-wild,Microsoft,Edge and  |
+| 4997 | Microsoft Internet Explorer Information Disclosure Vulnerability | kev | markdown |  | CVE-2017-0059,cve-arsenal,cisa-kev,kev,in-the-wild,Microsoft,Internet  |
+| 4998 | Microsoft Windows Transaction Manager Privilege Escalation Vulnerability | kev | markdown |  | CVE-2017-0101,cve-arsenal,cisa-kev,kev,in-the-wild,ransomware,Microsof |
+| 4999 | Microsoft Windows Server Message Block (SMBv1) Remote Code Execution Vulnerability | kev | markdown |  | CVE-2017-0143,cve-arsenal,cisa-kev,kev,in-the-wild,ransomware,Microsof |
+| 5000 | Microsoft SMBv1 Remote Code Execution Vulnerability | kev | markdown |  | CVE-2017-0144,cve-arsenal,cisa-kev,kev,in-the-wild,ransomware,Microsof |
+| 5001 | Microsoft SMBv1 Remote Code Execution Vulnerability | kev | markdown |  | CVE-2017-0145,cve-arsenal,cisa-kev,kev,in-the-wild,ransomware,Microsof |
+| 5002 | Microsoft Windows SMB Remote Code Execution Vulnerability | kev | markdown |  | CVE-2017-0146,cve-arsenal,cisa-kev,kev,in-the-wild,ransomware,Microsof |
+| 5003 | Microsoft Windows SMBv1 Information Disclosure Vulnerability | kev | markdown |  | CVE-2017-0147,cve-arsenal,cisa-kev,kev,in-the-wild,ransomware,Microsof |
+| 5004 | Microsoft SMBv1 Server Remote Code Execution Vulnerability | kev | markdown |  | CVE-2017-0148,cve-arsenal,cisa-kev,kev,in-the-wild,ransomware,Microsof |
+| 5005 | Microsoft Internet Explorer Memory Corruption Vulnerability | kev | markdown |  | CVE-2017-0149,cve-arsenal,cisa-kev,kev,in-the-wild,Microsoft,Internet  |
+| 5006 | Microsoft Office and WordPad Remote Code Execution Vulnerability | kev | markdown |  | CVE-2017-0199,cve-arsenal,cisa-kev,kev,in-the-wild,ransomware,Microsof |
+| 5007 | Microsoft Internet Explorer Privilege Escalation Vulnerability | kev | markdown |  | CVE-2017-0210,cve-arsenal,cisa-kev,kev,in-the-wild,Microsoft,Internet  |
+| 5008 | Microsoft Windows Privilege Escalation Vulnerability | kev | markdown |  | CVE-2017-0213,cve-arsenal,cisa-kev,kev,in-the-wild,ransomware,Microsof |
+| 5009 | Microsoft Internet Explorer Remote Code Execution Vulnerability | kev | markdown |  | CVE-2017-0222,cve-arsenal,cisa-kev,kev,in-the-wild,Microsoft,Internet  |
+| 5010 | Microsoft Office Use-After-Free Vulnerability | kev | markdown |  | CVE-2017-0261,cve-arsenal,cisa-kev,kev,in-the-wild,Microsoft,Office |
+| 5011 | Microsoft Office Remote Code Execution Vulnerability | kev | markdown |  | CVE-2017-0262,cve-arsenal,cisa-kev,kev,in-the-wild,Microsoft,Office |
+| 5012 | Microsoft Win32k Privilege Escalation Vulnerability | kev | markdown |  | CVE-2017-0263,cve-arsenal,cisa-kev,kev,in-the-wild,Microsoft,Win32k |
+| 5013 | Linux Kernel PIE Stack Buffer Corruption Vulnerability | kev | markdown |  | CVE-2017-1000253,cve-arsenal,cisa-kev,kev,in-the-wild,ransomware,Linux |
+| 5014 | Oracle Corporation WebLogic Server Remote Code Execution Vulnerability | kev | markdown |  | CVE-2017-10271,cve-arsenal,cisa-kev,kev,in-the-wild,ransomware,Oracle, |
+| 5015 | Adobe Flash Player Type Confusion Vulnerability | kev | markdown |  | CVE-2017-11292,cve-arsenal,cisa-kev,kev,in-the-wild,Adobe,Flash Player |
+| 5016 | Microsoft Office Outlook Security Feature Bypass Vulnerability | kev | markdown |  | CVE-2017-11774,cve-arsenal,cisa-kev,kev,in-the-wild,Microsoft,Office |
+| 5017 | Microsoft Office Remote Code Execution Vulnerability | kev | markdown |  | CVE-2017-11826,cve-arsenal,cisa-kev,kev,in-the-wild,Microsoft,Office |
+| 5018 | Microsoft Office Memory Corruption Vulnerability | kev | markdown |  | CVE-2017-11882,cve-arsenal,cisa-kev,kev,in-the-wild,ransomware,Microso |
+| 5019 | Cisco IOS Software Network Address Translation Denial-of-Service Vulnerability | kev | markdown |  | CVE-2017-12231,cve-arsenal,cisa-kev,kev,in-the-wild,Cisco,IOS software |
+| 5020 | Cisco IOS Software for Cisco Integrated Services Routers Denial-of-Service Vulnerability | kev | markdown |  | CVE-2017-12232,cve-arsenal,cisa-kev,kev,in-the-wild,Cisco,IOS software |
+| 5021 | Cisco IOS Software Common Industrial Protocol Request Denial-of-Service Vulnerability | kev | markdown |  | CVE-2017-12233,cve-arsenal,cisa-kev,kev,in-the-wild,Cisco,IOS software |
+| 5022 | Cisco IOS Software Common Industrial Protocol Request Denial-of-Service Vulnerability | kev | markdown |  | CVE-2017-12234,cve-arsenal,cisa-kev,kev,in-the-wild,Cisco,IOS software |
+| 5023 | Cisco IOS Software for Cisco Industrial Ethernet Switches PROFINET Denial-of-Service Vulnerability | kev | markdown |  | CVE-2017-12235,cve-arsenal,cisa-kev,kev,in-the-wild,Cisco,IOS software |
+| 5024 | Cisco IOS and IOS XE Software Internet Key Exchange Denial-of-Service Vulnerability | kev | markdown |  | CVE-2017-12237,cve-arsenal,cisa-kev,kev,in-the-wild,Cisco,IOS and IOS  |
+| 5025 | Cisco Catalyst 6800 Series Switches VPLS Denial-of-Service Vulnerability | kev | markdown |  | CVE-2017-12238,cve-arsenal,cisa-kev,kev,in-the-wild,Cisco,Catalyst 680 |
+| 5026 | Cisco IOS XE Software Ethernet Virtual Private Network Border Gateway Protocol Denial-of-Service Vulnerability | kev | markdown |  | CVE-2017-12319,cve-arsenal,cisa-kev,kev,in-the-wild,Cisco,IOS XE Softw |
+| 5027 | Apache Tomcat on Windows Remote Code Execution Vulnerability | kev | markdown |  | CVE-2017-12615,cve-arsenal,cisa-kev,kev,in-the-wild,ransomware,Apache, |
+| 5028 | Apache Tomcat Remote Code Execution Vulnerability | kev | markdown |  | CVE-2017-12617,cve-arsenal,cisa-kev,kev,in-the-wild,Apache,Tomcat |
+| 5029 | SAP NetWeaver Directory Traversal Vulnerability | kev | markdown |  | CVE-2017-12637,cve-arsenal,cisa-kev,kev,in-the-wild,SAP,NetWeaver |
+| 5030 | Roundcube Webmail File Disclosure Vulnerability | kev | markdown |  | CVE-2017-16651,cve-arsenal,cisa-kev,kev,in-the-wild,Roundcube,Roundcub |
+| 5031 | Embedthis GoAhead Remote Code Execution Vulnerability | kev | markdown |  | CVE-2017-17562,cve-arsenal,cisa-kev,kev,in-the-wild,Embedthis,GoAhead |
+| 5032 | Zyxel P660HN-T1A Routers Command Injection Vulnerability | kev | markdown |  | CVE-2017-18368,cve-arsenal,cisa-kev,kev,in-the-wild,Zyxel,P660HN-T1A R |
+| 5033 | Oracle WebLogic Server OS Command Injection Vulnerability | kev | markdown |  | CVE-2017-3506,cve-arsenal,cisa-kev,kev,in-the-wild,Oracle,WebLogic Ser |
+| 5034 | Google Chromium V8 Memory Corruption Vulnerability | kev | markdown |  | CVE-2017-5030,cve-arsenal,cisa-kev,kev,in-the-wild,Google,Chromium V8 |
+| 5035 | Google Chromium V8 Type Confusion Vulnerability | kev | markdown |  | CVE-2017-5070,cve-arsenal,cisa-kev,kev,in-the-wild,Google,Chromium V8 |
+| 5036 | NETGEAR Multiple Devices Exposure of Sensitive Information Vulnerability | kev | markdown |  | CVE-2017-5521,cve-arsenal,cisa-kev,kev,in-the-wild,NETGEAR,Multiple De |
+| 5037 | Symantec Messaging Gateway Remote Code Execution Vulnerability | kev | markdown |  | CVE-2017-6327,cve-arsenal,cisa-kev,kev,in-the-wild,Symantec,Symantec M |
+| 5038 | NETGEAR DGN2200 Devices OS Command Injection Vulnerability | kev | markdown |  | CVE-2017-6334,cve-arsenal,cisa-kev,kev,in-the-wild,NETGEAR,DGN2200 Dev |
+| 5039 | Cisco IOS Software and Cisco IOS XE Software UDP Packet Processing Denial-of-Service Vulnerability | kev | markdown |  | CVE-2017-6627,cve-arsenal,cisa-kev,kev,in-the-wild,Cisco,IOS and IOS X |
+| 5040 | Cisco IOS Software and Cisco IOS XE Software Denial-of-Service Vulnerability | kev | markdown |  | CVE-2017-6663,cve-arsenal,cisa-kev,kev,in-the-wild,Cisco,IOS and IOS X |
+| 5041 | Cisco IOS and IOS XE Software SNMP Remote Code Execution Vulnerability | kev | markdown |  | CVE-2017-6736,cve-arsenal,cisa-kev,kev,in-the-wild,Cisco,IOS and IOS X |
+| 5042 | Cisco IOS and IOS XE Software SNMP Remote Code Execution Vulnerability | kev | markdown |  | CVE-2017-6737,cve-arsenal,cisa-kev,kev,in-the-wild,Cisco,IOS and IOS X |
+| 5043 | Cisco IOS and IOS XE Software SNMP Remote Code Execution Vulnerability | kev | markdown |  | CVE-2017-6738,cve-arsenal,cisa-kev,kev,in-the-wild,Cisco,IOS and IOS X |
+| 5044 | Cisco IOS and IOS XE Software SNMP Remote Code Execution Vulnerability | kev | markdown |  | CVE-2017-6739,cve-arsenal,cisa-kev,kev,in-the-wild,Cisco,IOS and IOS X |
+| 5045 | Cisco IOS and IOS XE Software SNMP Remote Code Execution Vulnerability | kev | markdown |  | CVE-2017-6740,cve-arsenal,cisa-kev,kev,in-the-wild,Cisco,IOS and IOS X |
+| 5046 | Cisco IOS and IOS XE Software SNMP Remote Code Execution Vulnerability | kev | markdown |  | CVE-2017-6742,cve-arsenal,cisa-kev,kev,in-the-wild,Cisco,IOS and IOS X |
+| 5047 | Cisco IOS and IOS XE Software SNMP Remote Code Execution Vulnerability | kev | markdown |  | CVE-2017-6743,cve-arsenal,cisa-kev,kev,in-the-wild,Cisco,IOS and IOS X |
+| 5048 | Cisco IOS Software SNMP Remote Code Execution Vulnerability | kev | markdown |  | CVE-2017-6744,cve-arsenal,cisa-kev,kev,in-the-wild,Cisco,IOS software |
+| 5049 | Zyxel EMG2926 Routers Command Injection Vulnerability | kev | markdown |  | CVE-2017-6884,cve-arsenal,cisa-kev,kev,in-the-wild,ransomware,Zyxel,EM |
+| 5050 | Artifex Ghostscript Type Confusion Vulnerability | kev | markdown |  | CVE-2017-8291,cve-arsenal,cisa-kev,kev,in-the-wild,Artifex,Ghostscript |
+| 5051 | Microsoft Windows Shell (.lnk) Remote Code Execution Vulnerability | kev | markdown |  | CVE-2017-8464,cve-arsenal,cisa-kev,kev,in-the-wild,Microsoft,Windows |
+| 5052 | Microsoft Malware Protection Engine Improper Restriction of Operations Vulnerability | kev | markdown |  | CVE-2017-8540,cve-arsenal,cisa-kev,kev,in-the-wild,Microsoft,Malware P |
+| 5053 | Microsoft Office Remote Code Execution Vulnerability | kev | markdown |  | CVE-2017-8570,cve-arsenal,cisa-kev,kev,in-the-wild,Microsoft,Office |
+| 5054 | Microsoft .NET Framework Remote Code Execution Vulnerability | kev | markdown |  | CVE-2017-8759,cve-arsenal,cisa-kev,kev,in-the-wild,Microsoft,.NET Fram |
+| 5055 | Apache Struts Deserialization of Untrusted Data Vulnerability | kev | markdown |  | CVE-2017-9805,cve-arsenal,cisa-kev,kev,in-the-wild,Apache,Struts |
+| 5056 | DotNetNuke (DNN) Remote Code Execution Vulnerability | kev | markdown |  | CVE-2017-9822,cve-arsenal,cisa-kev,kev,in-the-wild,ransomware,DotNetNu |
+| 5057 | Cisco IOS Software Integrated Services Module for VPN Denial-of-Service Vulnerability | kev | markdown |  | CVE-2018-0154,cve-arsenal,cisa-kev,kev,in-the-wild,Cisco,IOS Software |
+| 5058 | Cisco Catalyst Bidirectional Forwarding Detection Denial-of-Service Vulnerability | kev | markdown |  | CVE-2018-0155,cve-arsenal,cisa-kev,kev,in-the-wild,Cisco,Catalyst 4500 |
+| 5059 | Cisco IOS Software and Cisco IOS XE Software Smart Install Denial-of-Service Vulnerability | kev | markdown |  | CVE-2018-0156,cve-arsenal,cisa-kev,kev,in-the-wild,Cisco,IOS Software  |
+| 5060 | Cisco IOS and XE Software Internet Key Exchange Memory Leak Vulnerability | kev | markdown |  | CVE-2018-0158,cve-arsenal,cisa-kev,kev,in-the-wild,Cisco,IOS Software  |
+| 5061 | Cisco IOS and XE Software Internet Key Exchange Version 1 Denial-of-Service Vulnerability | kev | markdown |  | CVE-2018-0159,cve-arsenal,cisa-kev,kev,in-the-wild,Cisco,IOS Software  |
+| 5062 | Cisco IOS Software Resource Management Errors Vulnerability | kev | markdown |  | CVE-2018-0161,cve-arsenal,cisa-kev,kev,in-the-wild,Cisco,IOS Software |
+| 5063 | Cisco IOS, XR, and XE Software Buffer Overflow Vulnerability | kev | markdown |  | CVE-2018-0167,cve-arsenal,cisa-kev,kev,in-the-wild,Cisco,IOS, XR, and  |
+| 5064 | Cisco IOS and IOS XE Software Improper Input Validation Vulnerability | kev | markdown |  | CVE-2018-0172,cve-arsenal,cisa-kev,kev,in-the-wild,Cisco,IOS and IOS X |
+| 5065 | Cisco IOS and IOS XE Software Improper Input Validation Vulnerability | kev | markdown |  | CVE-2018-0173,cve-arsenal,cisa-kev,kev,in-the-wild,Cisco,IOS and IOS X |
+| 5066 | Cisco IOS Software and Cisco IOS XE Software Improper Input Validation Vulnerability | kev | markdown |  | CVE-2018-0174,cve-arsenal,cisa-kev,kev,in-the-wild,Cisco,IOS XE Softwa |
+| 5067 | Cisco IOS, XR, and XE Software Buffer Overflow Vulnerability | kev | markdown |  | CVE-2018-0175,cve-arsenal,cisa-kev,kev,in-the-wild,Cisco,IOS, XR, and  |
+| 5068 | Cisco IOS Software Denial-of-Service Vulnerability | kev | markdown |  | CVE-2018-0179,cve-arsenal,cisa-kev,kev,in-the-wild,Cisco,IOS Software |
+| 5069 | Cisco IOS Software Denial-of-Service Vulnerability | kev | markdown |  | CVE-2018-0180,cve-arsenal,cisa-kev,kev,in-the-wild,Cisco,IOS Software |
+| 5070 | Cisco Adaptive Security Appliance (ASA) Denial-of-Service Vulnerability | kev | markdown |  | CVE-2018-0296,cve-arsenal,cisa-kev,kev,in-the-wild,Cisco,Adaptive Secu |
+| 5071 | Microsoft Office Memory Corruption Vulnerability | kev | markdown |  | CVE-2018-0798,cve-arsenal,cisa-kev,kev,in-the-wild,Microsoft,Office |
+| 5072 | Microsoft Office Memory Corruption Vulnerability | kev | markdown |  | CVE-2018-0802,cve-arsenal,cisa-kev,kev,in-the-wild,ransomware,Microsof |
+| 5073 | Microsoft COM for Windows Deserialization of Untrusted Data Vulnerability | kev | markdown |  | CVE-2018-0824,cve-arsenal,cisa-kev,kev,in-the-wild,Microsoft,Windows |
+| 5074 | Apache Struts Remote Code Execution Vulnerability | kev | markdown |  | CVE-2018-11776,cve-arsenal,cisa-kev,kev,in-the-wild,Apache,Struts |
+| 5075 | Fortinet FortiOS and FortiADC Improper Access Control Vulnerability | kev | markdown |  | CVE-2018-13374,cve-arsenal,cisa-kev,kev,in-the-wild,ransomware,Fortine |
+| 5076 | Fortinet FortiOS SSL VPN Path Traversal Vulnerability | kev | markdown |  | CVE-2018-13379,cve-arsenal,cisa-kev,kev,in-the-wild,ransomware,Fortine |
+| 5077 | Fortinet FortiOS and FortiProxy Improper Authorization | kev | markdown |  | CVE-2018-13382,cve-arsenal,cisa-kev,kev,in-the-wild,ransomware,Fortine |
+| 5078 | Fortinet FortiOS and FortiProxy Out-of-bounds Write | kev | markdown |  | CVE-2018-13383,cve-arsenal,cisa-kev,kev,in-the-wild,ransomware,Fortine |
+| 5079 | Linux Kernel Integer Overflow Vulnerability | kev | markdown |  | CVE-2018-14634,cve-arsenal,cisa-kev,kev,in-the-wild,Linux,Kernel |
+| 5080 | LG N1A1 NAS Remote Command Execution Vulnerability | kev | markdown |  | CVE-2018-14839,cve-arsenal,cisa-kev,kev,in-the-wild,LG,N1A1 NAS |
+| 5081 | Laravel Deserialization of Untrusted Data Vulnerability | kev | markdown |  | CVE-2018-15133,cve-arsenal,cisa-kev,kev,in-the-wild,Laravel,Laravel Fr |
+| 5082 | DotNetNuke (DNN) Inadequate Encryption Strength Vulnerability | kev | markdown |  | CVE-2018-15811,cve-arsenal,cisa-kev,kev,in-the-wild,DotNetNuke (DNN) |
+| 5083 | Adobe Flash Player Use-After-Free Vulnerability | kev | markdown |  | CVE-2018-15982,cve-arsenal,cisa-kev,kev,in-the-wild,ransomware,Adobe,F |
+| 5084 | Google Chromium V8 Remote Code Execution Vulnerability | kev | markdown |  | CVE-2018-17463,cve-arsenal,cisa-kev,kev,in-the-wild,Google,Chromium V8 |
+| 5085 | Google Chromium V8 Out-of-Bounds Write Vulnerability | kev | markdown |  | CVE-2018-17480,cve-arsenal,cisa-kev,kev,in-the-wild,Google,Chromium V8 |
+| 5086 | DotNetNuke (DNN) Inadequate Encryption Strength Vulnerability | kev | markdown |  | CVE-2018-18325,cve-arsenal,cisa-kev,kev,in-the-wild,DotNetNuke (DNN) |
+| 5087 | TIBCO JasperReports Library Directory Traversal Vulnerability | kev | markdown |  | CVE-2018-18809,cve-arsenal,cisa-kev,kev,in-the-wild,TIBCO,JasperReport |
+| 5088 | GIGABYTE Multiple Products Unspecified Vulnerability | kev | markdown |  | CVE-2018-19320,cve-arsenal,cisa-kev,kev,in-the-wild,ransomware,GIGABYT |
+| 5089 | GIGABYTE Multiple Products Privilege Escalation Vulnerability | kev | markdown |  | CVE-2018-19321,cve-arsenal,cisa-kev,kev,in-the-wild,ransomware,GIGABYT |
+| 5090 | GIGABYTE Multiple Products Code Execution Vulnerability | kev | markdown |  | CVE-2018-19322,cve-arsenal,cisa-kev,kev,in-the-wild,ransomware,GIGABYT |
+| 5091 | QNAP NAS File Station Cross-Site Scripting Vulnerability | kev | markdown |  | CVE-2018-19943,cve-arsenal,cisa-kev,kev,in-the-wild,ransomware,QNAP,Ne |
+| 5092 | QNAP NAS File Station Command Injection Vulnerability | kev | markdown |  | CVE-2018-19949,cve-arsenal,cisa-kev,kev,in-the-wild,ransomware,QNAP,Ne |
+| 5093 | QNAP NAS File Station Cross-Site Scripting Vulnerability | kev | markdown |  | CVE-2018-19953,cve-arsenal,cisa-kev,kev,in-the-wild,ransomware,QNAP,Ne |
+| 5094 | WinRAR Absolute Path Traversal Vulnerability | kev | markdown |  | CVE-2018-20250,cve-arsenal,cisa-kev,kev,in-the-wild,ransomware,RARLAB, |
+| 5095 | SAP Customer Relationship Management (CRM) Path Traversal Vulnerability | kev | markdown |  | CVE-2018-2380,cve-arsenal,cisa-kev,kev,in-the-wild,ransomware,SAP,Cust |
+| 5096 | Sierra Wireless AirLink ALEOS Unrestricted Upload of File with Dangerous Type Vulnerability | kev | markdown |  | CVE-2018-4063,cve-arsenal,cisa-kev,kev,in-the-wild,Sierra Wireless,Air |
+| 5097 | Apple Multiple Products Memory Corruption Vulnerability | kev | markdown |  | CVE-2018-4344,cve-arsenal,cisa-kev,kev,in-the-wild,Apple,Multiple Prod |
+| 5098 | Adobe Flash Player Use-After-Free Vulnerability | kev | markdown |  | CVE-2018-4878,cve-arsenal,cisa-kev,kev,in-the-wild,ransomware,Adobe,Fl |
+| 5099 | Adobe Acrobat and Reader Double Free Vulnerability | kev | markdown |  | CVE-2018-4990,cve-arsenal,cisa-kev,kev,in-the-wild,Adobe,Acrobat and R |
+| 5100 | Adobe Flash Player Stack-based Buffer Overflow Vulnerability | kev | markdown |  | CVE-2018-5002,cve-arsenal,cisa-kev,kev,in-the-wild,Adobe,Flash Player |
+| 5101 | TIBCO JasperReports Server Information Disclosure Vulnerability | kev | markdown |  | CVE-2018-5430,cve-arsenal,cisa-kev,kev,in-the-wild,TIBCO,JasperReports |
+| 5102 | Google Chromium V8 Integer Overflow Vulnerability | kev | markdown |  | CVE-2018-6065,cve-arsenal,cisa-kev,kev,in-the-wild,Google,Chromium V8 |
+| 5103 | Synacor Zimbra Collaboration Suite (ZCS) Cross-Site Scripting (XSS) Vulnerability | kev | markdown |  | CVE-2018-6882,cve-arsenal,cisa-kev,kev,in-the-wild,ransomware,Synacor, |
+| 5104 | VMware SD-WAN Edge by VeloCloud Command Injection Vulnerability | kev | markdown |  | CVE-2018-6961,cve-arsenal,cisa-kev,kev,in-the-wild,VMware,SD-WAN Edge |
+| 5105 | Schneider Electric U.motion Builder SQL Injection Vulnerability | kev | markdown |  | CVE-2018-7841,cve-arsenal,cisa-kev,kev,in-the-wild,Schneider Electric, |
+| 5106 | Microsoft Win32k Privilege Escalation Vulnerability | kev | markdown |  | CVE-2018-8120,cve-arsenal,cisa-kev,kev,in-the-wild,ransomware,Microsof |
+| 5107 | Microsoft Windows VBScript Engine Out-of-Bounds Write Vulnerability | kev | markdown |  | CVE-2018-8174,cve-arsenal,cisa-kev,kev,in-the-wild,ransomware,Microsof |
+| 5108 | ChakraCore Scripting Engine Type Confusion Vulnerability | kev | markdown |  | CVE-2018-8298,cve-arsenal,cisa-kev,kev,in-the-wild,ChakraCore,ChakraCo |
+| 5109 | Microsoft Scripting Engine Memory Corruption Vulnerability | kev | markdown |  | CVE-2018-8373,cve-arsenal,cisa-kev,kev,in-the-wild,Microsoft,Internet  |
+| 5110 | Microsoft DirectX Graphics Kernel Privilege Escalation Vulnerability | kev | markdown |  | CVE-2018-8405,cve-arsenal,cisa-kev,kev,in-the-wild,ransomware,Microsof |
+| 5111 | Microsoft DirectX Graphics Kernel Privilege Escalation Vulnerability | kev | markdown |  | CVE-2018-8406,cve-arsenal,cisa-kev,kev,in-the-wild,ransomware,Microsof |
+| 5112 | Microsoft Windows Shell Remote Code Execution Vulnerability | kev | markdown |  | CVE-2018-8414,cve-arsenal,cisa-kev,kev,in-the-wild,Microsoft,Windows |
+| 5113 | Microsoft Windows Privilege Escalation Vulnerability | kev | markdown |  | CVE-2018-8440,cve-arsenal,cisa-kev,kev,in-the-wild,ransomware,Microsof |
+| 5114 | Microsoft Win32k Privilege Escalation Vulnerability | kev | markdown |  | CVE-2018-8453,cve-arsenal,cisa-kev,kev,in-the-wild,ransomware,Microsof |
+| 5115 | Microsoft Exchange Server Privilege Escalation Vulnerability | kev | markdown |  | CVE-2018-8581,cve-arsenal,cisa-kev,kev,in-the-wild,ransomware,Microsof |
+| 5116 | Microsoft Win32k Privilege Escalation Vulnerability | kev | markdown |  | CVE-2018-8589,cve-arsenal,cisa-kev,kev,in-the-wild,Microsoft,Win32k |
+| 5117 | Microsoft Windows Kernel Privilege Escalation Vulnerability | kev | markdown |  | CVE-2018-8611,cve-arsenal,cisa-kev,kev,in-the-wild,Microsoft,Windows |
+| 5118 | Microsoft Windows Win32k Improper Resource Shutdown or Release Vulnerability | kev | markdown |  | CVE-2018-8639,cve-arsenal,cisa-kev,kev,in-the-wild,ransomware,Microsof |
+| 5119 | Microsoft Internet Explorer Scripting Engine Memory Corruption Vulnerability | kev | markdown |  | CVE-2018-8653,cve-arsenal,cisa-kev,kev,in-the-wild,Microsoft,Internet  |
+| 5120 | Paessler PRTG Network Monitor OS Command Injection Vulnerability | kev | markdown |  | CVE-2018-9276,cve-arsenal,cisa-kev,kev,in-the-wild,Paessler,PRTG Netwo |
+| 5121 | Apache Solr DataImportHandler Code Injection Vulnerability | kev | markdown |  | CVE-2019-0193,cve-arsenal,cisa-kev,kev,in-the-wild,Apache,Solr |
+| 5122 | Apache HTTP Server Privilege Escalation Vulnerability | kev | markdown |  | CVE-2019-0211,cve-arsenal,cisa-kev,kev,in-the-wild,Apache,HTTP Server |
+| 5123 | SAP Commerce Cloud Deserialization of Untrusted Data Vulnerability | kev | markdown |  | CVE-2019-0344,cve-arsenal,cisa-kev,kev,in-the-wild,SAP,Commerce Cloud |
+| 5124 | Microsoft MSHTML Remote Code Execution Vulnerability | kev | markdown |  | CVE-2019-0541,cve-arsenal,cisa-kev,kev,in-the-wild,Microsoft,MSHTML |
+| 5125 | Microsoft Windows Privilege Escalation Vulnerability | kev | markdown |  | CVE-2019-0543,cve-arsenal,cisa-kev,kev,in-the-wild,ransomware,Microsof |
+| 5126 | Microsoft SharePoint Remote Code Execution Vulnerability | kev | markdown |  | CVE-2019-0604,cve-arsenal,cisa-kev,kev,in-the-wild,ransomware,Microsof |
+| 5127 | Microsoft Internet Explorer Information Disclosure Vulnerability | kev | markdown |  | CVE-2019-0676,cve-arsenal,cisa-kev,kev,in-the-wild,Microsoft,Internet  |
+| 5128 | Microsoft Windows SMB Information Disclosure Vulnerability | kev | markdown |  | CVE-2019-0703,cve-arsenal,cisa-kev,kev,in-the-wild,Microsoft,Windows |
+| 5129 | Microsoft Remote Desktop Services Remote Code Execution Vulnerability | kev | markdown |  | CVE-2019-0708,cve-arsenal,cisa-kev,kev,in-the-wild,ransomware,Microsof |
+| 5130 | Microsoft Internet Explorer Type Confusion Vulnerability | kev | markdown |  | CVE-2019-0752,cve-arsenal,cisa-kev,kev,in-the-wild,ransomware,Microsof |
+| 5131 | Microsoft Win32k Privilege Escalation Vulnerability | kev | markdown |  | CVE-2019-0797,cve-arsenal,cisa-kev,kev,in-the-wild,Microsoft,Win32k |
+| 5132 | Microsoft Win32k Privilege Escalation Vulnerability | kev | markdown |  | CVE-2019-0803,cve-arsenal,cisa-kev,kev,in-the-wild,ransomware,Microsof |
+| 5133 | Microsoft Win32k Privilege Escalation Vulnerability | kev | markdown |  | CVE-2019-0808,cve-arsenal,cisa-kev,kev,in-the-wild,Microsoft,Win32k |
+| 5134 | Microsoft Windows AppX Deployment Service (AppXSVC) Privilege Escalation Vulnerability | kev | markdown |  | CVE-2019-0841,cve-arsenal,cisa-kev,kev,in-the-wild,ransomware,Microsof |
+| 5135 | Microsoft Win32k Privilege Escalation Vulnerability | kev | markdown |  | CVE-2019-0859,cve-arsenal,cisa-kev,kev,in-the-wild,ransomware,Microsof |
+| 5136 | Microsoft Windows Error Reporting (WER) Privilege Escalation Vulnerability | kev | markdown |  | CVE-2019-0863,cve-arsenal,cisa-kev,kev,in-the-wild,Microsoft,Windows |
+| 5137 | Microsoft Windows Privilege Escalation Vulnerability | kev | markdown |  | CVE-2019-0880,cve-arsenal,cisa-kev,kev,in-the-wild,Microsoft,Windows |
+| 5138 | Microsoft GDI Remote Code Execution Vulnerability | kev | markdown |  | CVE-2019-0903,cve-arsenal,cisa-kev,kev,in-the-wild,Microsoft,Graphics  |
+| 5139 | Jenkins Script Security Plugin Sandbox Bypass Vulnerability | kev | markdown |  | CVE-2019-1003029,cve-arsenal,cisa-kev,kev,in-the-wild,Jenkins,Script S |
+| 5140 | Jenkins Matrix Project Plugin Remote Code Execution Vulnerability | kev | markdown |  | CVE-2019-1003030,cve-arsenal,cisa-kev,kev,in-the-wild,Jenkins,Matrix P |
+| 5141 | Kentico Xperience Deserialization of Untrusted Data Vulnerability | kev | markdown |  | CVE-2019-10068,cve-arsenal,cisa-kev,kev,in-the-wild,Kentico,Xperience |
+| 5142 | Exim Mail Transfer Agent (MTA) Improper Input Validation | kev | markdown |  | CVE-2019-10149,cve-arsenal,cisa-kev,kev,in-the-wild,Exim,Mail Transfer |
+| 5143 | Microsoft Windows AppX Deployment Service (AppXSVC) Privilege Escalation Vulnerability | kev | markdown |  | CVE-2019-1064,cve-arsenal,cisa-kev,kev,in-the-wild,ransomware,Microsof |
+| 5144 | Microsoft SQL Server Remote Code Execution Vulnerability | kev | markdown |  | CVE-2019-1068,cve-arsenal,cisa-kev,kev,in-the-wild,Microsoft,SQL Serve |
+| 5145 | Microsoft Task Scheduler Privilege Escalation Vulnerability | kev | markdown |  | CVE-2019-1069,cve-arsenal,cisa-kev,kev,in-the-wild,ransomware,Microsof |
+| 5146 | MongoDB mongo-express Remote Code Execution Vulnerability | kev | markdown |  | CVE-2019-10758,cve-arsenal,cisa-kev,kev,in-the-wild,MongoDB,mongo-expr |
+| 5147 | Reolink Multiple IP Cameras OS Command Injection Vulnerability | kev | markdown |  | CVE-2019-11001,cve-arsenal,cisa-kev,kev,in-the-wild,Reolink,Multiple I |
+| 5148 | PHP FastCGI Process Manager (FPM) Buffer Overflow Vulnerability | kev | markdown |  | CVE-2019-11043,cve-arsenal,cisa-kev,kev,in-the-wild,ransomware,PHP,Fas |
+| 5149 | Microsoft Windows AppX Deployment Service (AppXSVC) Privilege Escalation Vulnerability | kev | markdown |  | CVE-2019-1129,cve-arsenal,cisa-kev,kev,in-the-wild,ransomware,Microsof |
+| 5150 | Microsoft Windows AppX Deployment Service Privilege Escalation Vulnerability | kev | markdown |  | CVE-2019-1130,cve-arsenal,cisa-kev,kev,in-the-wild,ransomware,Microsof |
+| 5151 | Microsoft Win32k Privilege Escalation Vulnerability | kev | markdown |  | CVE-2019-1132,cve-arsenal,cisa-kev,kev,in-the-wild,Microsoft,Win32k |
+| 5152 | Ivanti Pulse Connect Secure Arbitrary File Read Vulnerability | kev | markdown |  | CVE-2019-11510,cve-arsenal,cisa-kev,kev,in-the-wild,ransomware,Ivanti, |
+| 5153 | Ivanti Pulse Connect Secure and Policy Secure Command Injection Vulnerability | kev | markdown |  | CVE-2019-11539,cve-arsenal,cisa-kev,kev,in-the-wild,ransomware,Ivanti, |
+| 5154 | Atlassian Crowd and Crowd Data Center Remote Code Execution Vulnerability | kev | markdown |  | CVE-2019-11580,cve-arsenal,cisa-kev,kev,in-the-wild,ransomware,Atlassi |
+| 5155 | Atlassian Jira Server and Data Center Server-Side Template Injection Vulnerability | kev | markdown |  | CVE-2019-11581,cve-arsenal,cisa-kev,kev,in-the-wild,Atlassian,Jira Ser |
+| 5156 | Citrix Workspace Application and Receiver for Windows Remote Code Execution Vulnerability | kev | markdown |  | CVE-2019-11634,cve-arsenal,cisa-kev,kev,in-the-wild,ransomware,Citrix, |
+| 5157 | Mozilla Firefox and Thunderbird Type Confusion Vulnerability | kev | markdown |  | CVE-2019-11707,cve-arsenal,cisa-kev,kev,in-the-wild,Mozilla,Firefox an |
+| 5158 | Mozilla Firefox and Thunderbird Sandbox Escape Vulnerability | kev | markdown |  | CVE-2019-11708,cve-arsenal,cisa-kev,kev,in-the-wild,Mozilla,Firefox an |
+| 5159 | Microsoft Windows Privilege Common Log File System (CLFS) Escalation Vulnerability | kev | markdown |  | CVE-2019-1214,cve-arsenal,cisa-kev,kev,in-the-wild,Microsoft,Windows |
+| 5160 | Microsoft Windows Privilege Escalation Vulnerability | kev | markdown |  | CVE-2019-1215,cve-arsenal,cisa-kev,kev,in-the-wild,ransomware,Microsof |
+| 5161 | Microsoft Windows AppX Deployment Server Privilege Escalation Vulnerability | kev | markdown |  | CVE-2019-1253,cve-arsenal,cisa-kev,kev,in-the-wild,ransomware,Microsof |
+| 5162 | Microsoft Excel Remote Code Execution Vulnerability | kev | markdown |  | CVE-2019-1297,cve-arsenal,cisa-kev,kev,in-the-wild,Microsoft,Excel |
+| 5163 | Citrix SD-WAN and NetScaler SQL Injection Vulnerability | kev | markdown |  | CVE-2019-12989,cve-arsenal,cisa-kev,kev,in-the-wild,Citrix,SD-WAN and  |
+| 5164 | Citrix SD-WAN and NetScaler Command Injection Vulnerability | kev | markdown |  | CVE-2019-12991,cve-arsenal,cisa-kev,kev,in-the-wild,Citrix,SD-WAN and  |
+| 5165 | Microsoft Windows Error Reporting Manager Privilege Escalation Vulnerability | kev | markdown |  | CVE-2019-1315,cve-arsenal,cisa-kev,kev,in-the-wild,ransomware,Microsof |
+| 5166 | Microsoft Windows Privilege Escalation Vulnerability | kev | markdown |  | CVE-2019-1322,cve-arsenal,cisa-kev,kev,in-the-wild,ransomware,Microsof |
+| 5167 | Linux Kernel Improper Privilege Management Vulnerability | kev | markdown |  | CVE-2019-13272,cve-arsenal,cisa-kev,kev,in-the-wild,Linux,Kernel |
+| 5168 | Citrix StoreFront Server XML External Entity (XXE) Processing Vulnerability | kev | markdown |  | CVE-2019-13608,cve-arsenal,cisa-kev,kev,in-the-wild,ransomware,Citrix, |
+| 5169 | Microsoft Internet Explorer Scripting Engine Memory Corruption Vulnerability | kev | markdown |  | CVE-2019-1367,cve-arsenal,cisa-kev,kev,in-the-wild,ransomware,Microsof |
+| 5170 | Google Chrome WebAudio Use-After-Free Vulnerability | kev | markdown |  | CVE-2019-13720,cve-arsenal,cisa-kev,kev,in-the-wild,Google,Chrome WebA |
+| 5171 | Microsoft Windows AppX Deployment Extensions Privilege Escalation Vulnerability | kev | markdown |  | CVE-2019-1385,cve-arsenal,cisa-kev,kev,in-the-wild,ransomware,Microsof |
+| 5172 | Microsoft Windows Certificate Dialog Privilege Escalation Vulnerability | kev | markdown |  | CVE-2019-1388,cve-arsenal,cisa-kev,kev,in-the-wild,ransomware,Microsof |
+| 5173 | Microsoft Windows Universal Plug and Play (UPnP) Service Privilege Escalation Vulnerability | kev | markdown |  | CVE-2019-1405,cve-arsenal,cisa-kev,kev,in-the-wild,ransomware,Microsof |
+| 5174 | Microsoft Internet Explorer Scripting Engine Memory Corruption Vulnerability | kev | markdown |  | CVE-2019-1429,cve-arsenal,cisa-kev,kev,in-the-wild,Microsoft,Internet  |
+| 5175 | Microsoft Win32k Privilege Escalation Vulnerability | kev | markdown |  | CVE-2019-1458,cve-arsenal,cisa-kev,kev,in-the-wild,ransomware,Microsof |
+| 5176 | Webmin Command Injection Vulnerability | kev | markdown |  | CVE-2019-15107,cve-arsenal,cisa-kev,kev,in-the-wild,ransomware,Webmin |
+| 5177 | Cisco RV Series Routers Deserialization of Untrusted Data Vulnerability | kev | markdown |  | CVE-2019-15271,cve-arsenal,cisa-kev,kev,in-the-wild,Cisco,RV Series Ro |
+| 5178 | Docker Desktop Community Edition Privilege Escalation Vulnerability | kev | markdown |  | CVE-2019-15752,cve-arsenal,cisa-kev,kev,in-the-wild,Docker,Desktop Com |
+| 5179 | Palo Alto Networks PAN-OS Remote Code Execution Vulnerability | kev | markdown |  | CVE-2019-1579,cve-arsenal,cisa-kev,kev,in-the-wild,ransomware,Palo Alt |
+| 5180 | Nagios XI Remote Code Execution Vulnerability | kev | markdown |  | CVE-2019-15949,cve-arsenal,cisa-kev,kev,in-the-wild,Nagios,Nagios XI |
+| 5181 | D-Link DNS-320 Remote Code Execution Vulnerability | kev | markdown |  | CVE-2019-16057,cve-arsenal,cisa-kev,kev,in-the-wild,ransomware,D-Link, |
+| 5182 | SIMalliance Toolbox Browser Command Injection Vulnerability | kev | markdown |  | CVE-2019-16256,cve-arsenal,cisa-kev,kev,in-the-wild,SIMalliance,Toolbo |
+| 5183 | Nostromo nhttpd Directory Traversal Vulnerability | kev | markdown |  | CVE-2019-16278,cve-arsenal,cisa-kev,kev,in-the-wild,Nostromo,nhttpd |
+| 5184 | Cisco Small Business Routers Improper Input Validation Vulnerability | kev | markdown |  | CVE-2019-1652,cve-arsenal,cisa-kev,kev,in-the-wild,Cisco,Small Busines |
+| 5185 | Cisco Small Business RV320 and RV325 Routers Information Disclosure Vulnerability | kev | markdown |  | CVE-2019-1653,cve-arsenal,cisa-kev,kev,in-the-wild,Cisco,Small Busines |
+| 5186 | vBulletin PHP Module Remote Code Execution Vulnerability | kev | markdown |  | CVE-2019-16759,cve-arsenal,cisa-kev,kev,in-the-wild,vBulletin |
+| 5187 | D-Link Multiple Routers Command Injection Vulnerability | kev | markdown |  | CVE-2019-16920,cve-arsenal,cisa-kev,kev,in-the-wild,D-Link,Multiple Ro |
+| 5188 | Exim Out-of-bounds Write Vulnerability | kev | markdown |  | CVE-2019-16928,cve-arsenal,cisa-kev,kev,in-the-wild,Exim,Exim Internet |
+| 5189 | Mozilla Firefox And Thunderbird Type Confusion Vulnerability | kev | markdown |  | CVE-2019-17026,cve-arsenal,cisa-kev,kev,in-the-wild,Mozilla,Firefox an |
+| 5190 | Apache Solr VelocityResponseWriter Plug-In Remote Code Execution Vulnerability | kev | markdown |  | CVE-2019-17558,cve-arsenal,cisa-kev,kev,in-the-wild,Apache,Solr |
+| 5191 | D-Link DIR-859 Router Command Execution Vulnerability | kev | markdown |  | CVE-2019-17621,cve-arsenal,cisa-kev,kev,in-the-wild,D-Link,DIR-859 Rou |
+| 5192 | Trend Micro OfficeScan Directory Traversal Vulnerability | kev | markdown |  | CVE-2019-18187,cve-arsenal,cisa-kev,kev,in-the-wild,Trend Micro,Office |
+| 5193 | WhatsApp Cross-Site Scripting Vulnerability | kev | markdown |  | CVE-2019-18426,cve-arsenal,cisa-kev,kev,in-the-wild,Meta Platforms,Wha |
+| 5194 | Progress Telerik UI for ASP.NET AJAX Deserialization of Untrusted Data Vulnerability | kev | markdown |  | CVE-2019-18935,cve-arsenal,cisa-kev,kev,in-the-wild,ransomware,Progres |
+| 5195 | TeamViewer Desktop Bypass Remote Login Vulnerability | kev | markdown |  | CVE-2019-18988,cve-arsenal,cisa-kev,kev,in-the-wild,TeamViewer,Desktop |
+| 5196 | Sangoma FreePBX Improper Authentication Vulnerability | kev | markdown |  | CVE-2019-19006,cve-arsenal,cisa-kev,kev,in-the-wild,Sangoma,FreePBX |
+| 5197 | Netis WF2419 Devices Remote Code Execution Vulnerability | kev | markdown |  | CVE-2019-19356,cve-arsenal,cisa-kev,kev,in-the-wild,Netis,WF2419 Devic |
+| 5198 | Citrix ADC, Gateway, and SD-WAN WANOP Appliance Code Execution Vulnerability | kev | markdown |  | CVE-2019-19781,cve-arsenal,cisa-kev,kev,in-the-wild,ransomware,Citrix, |
+| 5199 | TVT NVMS-1000 Directory Traversal Vulnerability | kev | markdown |  | CVE-2019-20085,cve-arsenal,cisa-kev,kev,in-the-wild,TVT,NVMS-1000 |
+| 5200 | D-Link DWL-2600AP Access Point Command Injection Vulnerability | kev | markdown |  | CVE-2019-20500,cve-arsenal,cisa-kev,kev,in-the-wild,D-Link,DWL-2600AP  |
+| 5201 | Android Kernel Use-After-Free Vulnerability | kev | markdown |  | CVE-2019-2215,cve-arsenal,cisa-kev,kev,in-the-wild,Android,Android Ker |
+| 5202 | Oracle BI Publisher Unauthorized Access Vulnerability | kev | markdown |  | CVE-2019-2616,cve-arsenal,cisa-kev,kev,in-the-wild,Oracle,BI Publisher |
+| 5203 | Oracle WebLogic Server, Injection | kev | markdown |  | CVE-2019-2725,cve-arsenal,cisa-kev,kev,in-the-wild,ransomware,Oracle,W |
+| 5204 | Oracle Solaris Privilege Escalation Vulnerability | kev | markdown |  | CVE-2019-3010,cve-arsenal,cisa-kev,kev,in-the-wild,Oracle,Solaris |
+| 5205 | Atlassian Confluence Server and Data Center Server-Side Template Injection Vulnerability | kev | markdown |  | CVE-2019-3396,cve-arsenal,cisa-kev,kev,in-the-wild,ransomware,Atlassia |
+| 5206 | Atlassian Confluence Server and Data Center Path Traversal Vulnerability | kev | markdown |  | CVE-2019-3398,cve-arsenal,cisa-kev,kev,in-the-wild,Atlassian,Confluenc |
+| 5207 | WhatsApp VOIP Stack Buffer Overflow Vulnerability | kev | markdown |  | CVE-2019-3568,cve-arsenal,cisa-kev,kev,in-the-wild,Meta Platforms,What |
+| 5208 | Crestron Multiple Products Command Injection Vulnerability | kev | markdown |  | CVE-2019-3929,cve-arsenal,cisa-kev,kev,in-the-wild,Crestron,Multiple P |
+| 5209 | IBM Planning Analytics Remote Code Execution Vulnerability | kev | markdown |  | CVE-2019-4716,cve-arsenal,cisa-kev,kev,in-the-wild,IBM,Planning Analyt |
+| 5210 | Rails Ruby on Rails Path Traversal Vulnerability | kev | markdown |  | CVE-2019-5418,cve-arsenal,cisa-kev,kev,in-the-wild,Rails,Ruby on Rails |
+| 5211 | VMware ESXi and Horizon DaaS OpenSLP Heap-Based Buffer Overflow Vulnerability | kev | markdown |  | CVE-2019-5544,cve-arsenal,cisa-kev,kev,in-the-wild,ransomware,VMware,V |
+| 5212 | Fortinet FortiOS Default Configuration Vulnerability | kev | markdown |  | CVE-2019-5591,cve-arsenal,cisa-kev,kev,in-the-wild,ransomware,Fortinet |
+| 5213 | Google Chrome Blink Use-After-Free Vulnerability | kev | markdown |  | CVE-2019-5786,cve-arsenal,cisa-kev,kev,in-the-wild,Google,Chrome Blink |
+| 5214 | Google Chromium V8 Out-of-Bounds Write Vulnerability | kev | markdown |  | CVE-2019-5825,cve-arsenal,cisa-kev,kev,in-the-wild,Google,Chromium V8 |
+| 5215 | Apple iOS and macOS Group Facetime Vulnerability | kev | markdown |  | CVE-2019-6223,cve-arsenal,cisa-kev,kev,in-the-wild,Apple,iOS and macOS |
+| 5216 | Drupal Core Remote Code Execution Vulnerability | kev | markdown |  | CVE-2019-6340,cve-arsenal,cisa-kev,kev,in-the-wild,Drupal,Core |
+| 5217 | Fortinet FortiOS Use of Hard-Coded Credentials Vulnerability | kev | markdown |  | CVE-2019-6693,cve-arsenal,cisa-kev,kev,in-the-wild,ransomware,Fortinet |
+| 5218 | QNAP Photo Station Improper Access Control Vulnerability | kev | markdown |  | CVE-2019-7192,cve-arsenal,cisa-kev,kev,in-the-wild,ransomware,QNAP,Pho |
+| 5219 | QNAP QTS Improper Input Validation Vulnerability | kev | markdown |  | CVE-2019-7193,cve-arsenal,cisa-kev,kev,in-the-wild,ransomware,QNAP,QTS |
+| 5220 | QNAP Photo Station Path Traversal Vulnerability | kev | markdown |  | CVE-2019-7194,cve-arsenal,cisa-kev,kev,in-the-wild,ransomware,QNAP,Pho |
+| 5221 | QNAP Photo Station Path Traversal Vulnerability | kev | markdown |  | CVE-2019-7195,cve-arsenal,cisa-kev,kev,in-the-wild,ransomware,QNAP,Pho |
+| 5222 | Sonatype Nexus Repository Manager Incorrect Access Control Vulnerability | kev | markdown |  | CVE-2019-7238,cve-arsenal,cisa-kev,kev,in-the-wild,Sonatype,Nexus Repo |
+| 5223 | Nice Linear eMerge E3-Series OS Command Injection Vulnerability | kev | markdown |  | CVE-2019-7256,cve-arsenal,cisa-kev,kev,in-the-wild,Nice,Linear eMerge  |
+| 5224 | Apple Multiple Products Memory Corruption Vulnerability | kev | markdown |  | CVE-2019-7286,cve-arsenal,cisa-kev,kev,in-the-wild,Apple,Multiple Prod |
+| 5225 | Apple iOS Memory Corruption Vulnerability | kev | markdown |  | CVE-2019-7287,cve-arsenal,cisa-kev,kev,in-the-wild,Apple,iOS |
+| 5226 | SonicWall SMA100 SQL Injection Vulnerability | kev | markdown |  | CVE-2019-7481,cve-arsenal,cisa-kev,kev,in-the-wild,ransomware,SonicWal |
+| 5227 | SonicWall SMA100 Directory Traversal Vulnerability | kev | markdown |  | CVE-2019-7483,cve-arsenal,cisa-kev,kev,in-the-wild,SonicWall,SMA100 |
+| 5228 | Kibana Arbitrary Code Execution | kev | markdown |  | CVE-2019-7609,cve-arsenal,cisa-kev,kev,in-the-wild,Elastic,Kibana |
+| 5229 | Zoho ManageEngine ServiceDesk Plus (SDP) File Upload Vulnerability | kev | markdown |  | CVE-2019-8394,cve-arsenal,cisa-kev,kev,in-the-wild,Zoho,ManageEngine |
+| 5230 | Apple Multiple Products Type Confusion Vulnerability | kev | markdown |  | CVE-2019-8506,cve-arsenal,cisa-kev,kev,in-the-wild,Apple,Multiple Prod |
+| 5231 | Apple macOS Use-After-Free Vulnerability | kev | markdown |  | CVE-2019-8526,cve-arsenal,cisa-kev,kev,in-the-wild,Apple,macOS |
+| 5232 | Apple Multiple Products Use-After-Free Vulnerability | kev | markdown |  | CVE-2019-8605,cve-arsenal,cisa-kev,kev,in-the-wild,Apple,Multiple Prod |
+| 5233 | WebKitGTK Memory Corruption Vulnerability | kev | markdown |  | CVE-2019-8720,cve-arsenal,cisa-kev,kev,in-the-wild,WebKitGTK |
+| 5234 | ThinkPHP Remote Code Execution Vulnerability | kev | markdown |  | CVE-2019-9082,cve-arsenal,cisa-kev,kev,in-the-wild,ThinkPHP |
+| 5235 | Synacor Zimbra Collaboration Suite (ZCS) Server-Side Request Forgery (SSRF) Vulnerability | kev | markdown |  | CVE-2019-9621,cve-arsenal,cisa-kev,kev,in-the-wild,Synacor,Zimbra Coll |
+| 5236 | Synacor Zimbra Collaboration Suite (ZCS) Improper Restriction of XML External Entity Reference | kev | markdown |  | CVE-2019-9670,cve-arsenal,cisa-kev,kev,in-the-wild,Synacor,Zimbra Coll |
+| 5237 | Sitecore CMS and Experience Platform (XP) Deserialization Vulnerability | kev | markdown |  | CVE-2019-9874,cve-arsenal,cisa-kev,kev,in-the-wild,Sitecore,CMS and Ex |
+| 5238 | Sitecore CMS and Experience Platform (XP) Deserialization Vulnerability | kev | markdown |  | CVE-2019-9875,cve-arsenal,cisa-kev,kev,in-the-wild,Sitecore,CMS and Ex |
+| 5239 | WordPress Social Warfare Plugin Cross-Site Scripting (XSS) Vulnerability | kev | markdown |  | CVE-2019-9978,cve-arsenal,cisa-kev,kev,in-the-wild,WordPress,Social Wa |
+| 5240 | Android Kernel Out-of-Bounds Write Vulnerability | kev | markdown |  | CVE-2020-0041,cve-arsenal,cisa-kev,kev,in-the-wild,Android,Android Ker |
+| 5241 | Mediatek Multiple Chipsets Insufficient Input Validation Vulnerability | kev | markdown |  | CVE-2020-0069,cve-arsenal,cisa-kev,kev,in-the-wild,MediaTek,Multiple C |
+| 5242 | Microsoft Windows CryptoAPI Spoofing Vulnerability | kev | markdown |  | CVE-2020-0601,cve-arsenal,cisa-kev,kev,in-the-wild,Microsoft,Windows |
+| 5243 | Microsoft SQL Server Reporting Services Remote Code Execution Vulnerability | kev | markdown |  | CVE-2020-0618,cve-arsenal,cisa-kev,kev,in-the-wild,ransomware,Microsof |
+| 5244 | Microsoft Update Notification Manager Privilege Escalation Vulnerability | kev | markdown |  | CVE-2020-0638,cve-arsenal,cisa-kev,kev,in-the-wild,ransomware,Microsof |
+| 5245 | Microsoft .NET Framework Remote Code Execution Vulnerability | kev | markdown |  | CVE-2020-0646,cve-arsenal,cisa-kev,kev,in-the-wild,Microsoft,.NET Fram |
+| 5246 | Microsoft Internet Explorer Scripting Engine Memory Corruption Vulnerability | kev | markdown |  | CVE-2020-0674,cve-arsenal,cisa-kev,kev,in-the-wild,Microsoft,Internet  |
+| 5247 | Microsoft Windows Installer Privilege Escalation Vulnerability | kev | markdown |  | CVE-2020-0683,cve-arsenal,cisa-kev,kev,in-the-wild,Microsoft,Windows |
+| 5248 | Microsoft Exchange Server Validation Key Remote Code Execution Vulnerability | kev | markdown |  | CVE-2020-0688,cve-arsenal,cisa-kev,kev,in-the-wild,ransomware,Microsof |
+| 5249 | Microsoft Windows Background Intelligent Transfer Service (BITS) Improper Privilege Management Vulnerability | kev | markdown |  | CVE-2020-0787,cve-arsenal,cisa-kev,kev,in-the-wild,ransomware,Microsof |
+| 5250 | Microsoft SMBv3 Remote Code Execution Vulnerability | kev | markdown |  | CVE-2020-0796,cve-arsenal,cisa-kev,kev,in-the-wild,ransomware,Microsof |
+| 5251 | Microsoft Edge and Internet Explorer Memory Corruption Vulnerability | kev | markdown |  | CVE-2020-0878,cve-arsenal,cisa-kev,kev,in-the-wild,ransomware,Microsof |
+| 5252 | Microsoft Windows Adobe Font Manager Library Remote Code Execution Vulnerability | kev | markdown |  | CVE-2020-0938,cve-arsenal,cisa-kev,kev,in-the-wild,Microsoft,Windows |
+| 5253 | Microsoft Internet Explorer Scripting Engine Memory Corruption Vulnerability | kev | markdown |  | CVE-2020-0968,cve-arsenal,cisa-kev,kev,in-the-wild,ransomware,Microsof |
+| 5254 | Microsoft Windows Kernel Privilege Escalation Vulnerability | kev | markdown |  | CVE-2020-0986,cve-arsenal,cisa-kev,kev,in-the-wild,Microsoft,Windows |
+| 5255 | SolarWinds Orion Authentication Bypass Vulnerability | kev | markdown |  | CVE-2020-10148,cve-arsenal,cisa-kev,kev,in-the-wild,SolarWinds,Orion |
+| 5256 | Sumavision EMR Cross-Site Request Forgery (CSRF) Vulnerability | kev | markdown |  | CVE-2020-10181,cve-arsenal,cisa-kev,kev,in-the-wild,Sumavision,Enhance |
+| 5257 | Zoho ManageEngine Desktop Central File Upload Vulnerability | kev | markdown |  | CVE-2020-10189,cve-arsenal,cisa-kev,kev,in-the-wild,Zoho,ManageEngine |
+| 5258 | Sonatype Nexus Repository Remote Code Execution Vulnerability | kev | markdown |  | CVE-2020-10199,cve-arsenal,cisa-kev,kev,in-the-wild,Sonatype,Nexus Rep |
+| 5259 | Microsoft Windows Adobe Font Manager Library Remote Code Execution Vulnerability | kev | markdown |  | CVE-2020-1020,cve-arsenal,cisa-kev,kev,in-the-wild,Microsoft,Windows |
+| 5260 | rConfig OS Command Injection Vulnerability | kev | markdown |  | CVE-2020-10221,cve-arsenal,cisa-kev,kev,in-the-wild,rConfig |
+| 5261 | Microsoft Windows Kernel Privilege Escalation Vulnerability | kev | markdown |  | CVE-2020-1027,cve-arsenal,cisa-kev,kev,in-the-wild,Microsoft,Windows |
+| 5262 | Microsoft Hyper-V RemoteFX vGPU Remote Code Execution Vulnerability | kev | markdown |  | CVE-2020-1040,cve-arsenal,cisa-kev,kev,in-the-wild,Microsoft,Hyper-V R |
+| 5263 | Microsoft Win32k Privilege Escalation Vulnerability | kev | markdown |  | CVE-2020-1054,cve-arsenal,cisa-kev,kev,in-the-wild,Microsoft,Win32k |
+| 5264 | Tenda AC1900 Router AC15 Model Remote Code Execution Vulnerability | kev | markdown |  | CVE-2020-10987,cve-arsenal,cisa-kev,kev,in-the-wild,Tenda,AC1900 Route |
+| 5265 | JQuery Cross-Site Scripting (XSS) Vulnerability | kev | markdown |  | CVE-2020-11023,cve-arsenal,cisa-kev,kev,in-the-wild,JQuery |
+| 5266 | Qualcomm Multiple Chipsets Improper Input Validation Vulnerability | kev | markdown |  | CVE-2020-11261,cve-arsenal,cisa-kev,kev,in-the-wild,Qualcomm,Snapdrago |
+| 5267 | Microsoft .NET Framework, SharePoint, and Visual Studio Remote Code Execution Vulnerability | kev | markdown |  | CVE-2020-1147,cve-arsenal,cisa-kev,kev,in-the-wild,Microsoft,.NET Fram |
+| 5268 | SaltStack Salt Authentication Bypass Vulnerability | kev | markdown |  | CVE-2020-11651,cve-arsenal,cisa-kev,kev,in-the-wild,SaltStack,Salt |
+| 5269 | SaltStack Salt Path Traversal Vulnerability | kev | markdown |  | CVE-2020-11652,cve-arsenal,cisa-kev,kev,in-the-wild,SaltStack,Salt |
+| 5270 | WordPress Snap Creek Duplicator Plugin File Download Vulnerability | kev | markdown |  | CVE-2020-11738,cve-arsenal,cisa-kev,kev,in-the-wild,WordPress,Snap Cre |
+| 5271 | Treck TCP/IP stack Out-of-Bounds Read Vulnerability | kev | markdown |  | CVE-2020-11899,cve-arsenal,cisa-kev,kev,in-the-wild,Treck TCP/IP stack |
+| 5272 | Apache Airflow Command Injection | kev | markdown |  | CVE-2020-11978,cve-arsenal,cisa-kev,kev,in-the-wild,Apache,Airflow |
+| 5273 | Sophos SFOS SQL Injection Vulnerability | kev | markdown |  | CVE-2020-12271,cve-arsenal,cisa-kev,kev,in-the-wild,ransomware,Sophos, |
+| 5274 | Roundcube Webmail Remote Code Execution Vulnerability | kev | markdown |  | CVE-2020-12641,cve-arsenal,cisa-kev,kev,in-the-wild,Roundcube,Roundcub |
+| 5275 | Fortinet FortiOS SSL VPN Improper Authentication Vulnerability | kev | markdown |  | CVE-2020-12812,cve-arsenal,cisa-kev,kev,in-the-wild,ransomware,Fortine |
+| 5276 | Microsoft Windows DNS Server Remote Code Execution Vulnerability | kev | markdown |  | CVE-2020-1350,cve-arsenal,cisa-kev,kev,in-the-wild,Microsoft,Windows |
+| 5277 | Drupal core Un-restricted Upload of File | kev | markdown |  | CVE-2020-13671,cve-arsenal,cisa-kev,kev,in-the-wild,Drupal,Drupal core |
+| 5278 | Microsoft Internet Explorer Scripting Engine Memory Corruption Vulnerability | kev | markdown |  | CVE-2020-1380,cve-arsenal,cisa-kev,kev,in-the-wild,Microsoft,Internet  |
+| 5279 | Apache Airflow's Experimental API Authentication Bypass | kev | markdown |  | CVE-2020-13927,cve-arsenal,cisa-kev,kev,in-the-wild,Apache,Airflow's E |
+| 5280 | Roundcube Webmail Cross-Site Scripting (XSS) Vulnerability | kev | markdown |  | CVE-2020-13965,cve-arsenal,cisa-kev,kev,in-the-wild,Roundcube,Webmail |
+| 5281 | Microsoft Windows Spoofing Vulnerability | kev | markdown |  | CVE-2020-1464,cve-arsenal,cisa-kev,kev,in-the-wild,Microsoft,Windows |
+| 5282 | Oracle WebLogic Server Remote Code Execution Vulnerability | kev | markdown |  | CVE-2020-14644,cve-arsenal,cisa-kev,kev,in-the-wild,Oracle,WebLogic Se |
+| 5283 | Microsoft Netlogon Privilege Escalation Vulnerability | kev | markdown |  | CVE-2020-1472,cve-arsenal,cisa-kev,kev,in-the-wild,ransomware,Microsof |
+| 5284 | Oracle WebLogic Server Remote Code Execution Vulnerability | kev | markdown |  | CVE-2020-14750,cve-arsenal,cisa-kev,kev,in-the-wild,Oracle,WebLogic Se |
+| 5285 | Oracle Business Intelligence Enterprise Edition Path Transversal | kev | markdown |  | CVE-2020-14864,cve-arsenal,cisa-kev,kev,in-the-wild,Oracle,Intelligenc |
+| 5286 | Oracle Solaris and Zettabyte File System (ZFS) Unspecified Vulnerability | kev | markdown |  | CVE-2020-14871,cve-arsenal,cisa-kev,kev,in-the-wild,Oracle,Solaris and |
+| 5287 | Oracle WebLogic Server Remote Code Execution Vulnerability | kev | markdown |  | CVE-2020-14882,cve-arsenal,cisa-kev,kev,in-the-wild,Oracle,WebLogic Se |
+| 5288 | Oracle WebLogic Server Unspecified Vulnerability | kev | markdown |  | CVE-2020-14883,cve-arsenal,cisa-kev,kev,in-the-wild,Oracle,WebLogic Se |
+| 5289 | Sophos XG Firewall Buffer Overflow Vulnerability | kev | markdown |  | CVE-2020-15069,cve-arsenal,cisa-kev,kev,in-the-wild,Sophos,XG Firewall |
+| 5290 | DrayTek Multiple Vigor Routers OS Command Injection Vulnerability | kev | markdown |  | CVE-2020-15415,cve-arsenal,cisa-kev,kev,in-the-wild,DrayTek,Multiple V |
+| 5291 | Ivanti MobileIron Multiple Products Remote Code Execution Vulnerability | kev | markdown |  | CVE-2020-15505,cve-arsenal,cisa-kev,kev,in-the-wild,Ivanti,MobileIron  |
+| 5292 | Google Chrome FreeType Heap Buffer Overflow Vulnerability | kev | markdown |  | CVE-2020-15999,cve-arsenal,cisa-kev,kev,in-the-wild,Google,Chrome Free |
+| 5293 | Google Chromium V8 Type Confusion Vulnerability | kev | markdown |  | CVE-2020-16009,cve-arsenal,cisa-kev,kev,in-the-wild,Google,Chromium V8 |
+| 5294 | Google Chrome for Android UI Heap Buffer Overflow Vulnerability | kev | markdown |  | CVE-2020-16010,cve-arsenal,cisa-kev,kev,in-the-wild,Google,Chrome for  |
+| 5295 | Google Chromium V8 Incorrect Implementation Vulnerabililty | kev | markdown |  | CVE-2020-16013,cve-arsenal,cisa-kev,kev,in-the-wild,Google,Chromium V8 |
+| 5296 | Google Chrome Use-After-Free Vulnerability | kev | markdown |  | CVE-2020-16017,cve-arsenal,cisa-kev,kev,in-the-wild,Google,Chrome |
+| 5297 | Juniper Junos OS Path Traversal Vulnerability | kev | markdown |  | CVE-2020-1631,cve-arsenal,cisa-kev,kev,in-the-wild,Juniper,Junos OS |
+| 5298 | SaltStack Salt Shell Injection Vulnerability | kev | markdown |  | CVE-2020-16846,cve-arsenal,cisa-kev,kev,in-the-wild,SaltStack,Salt |
+| 5299 | Microsoft Windows Kernel Privilege Escalation Vulnerability | kev | markdown |  | CVE-2020-17087,cve-arsenal,cisa-kev,kev,in-the-wild,Microsoft,Windows |
+| 5300 | Microsoft Exchange Server Remote Code Execution Vulnerability | kev | markdown |  | CVE-2020-17144,cve-arsenal,cisa-kev,kev,in-the-wild,Microsoft,Exchange |
+| 5301 | Fuel CMS SQL Injection Vulnerability | kev | markdown |  | CVE-2020-17463,cve-arsenal,cisa-kev,kev,in-the-wild,Fuel CMS |
+| 5302 | vBulletin PHP Module Remote Code Execution Vulnerability | kev | markdown |  | CVE-2020-17496,cve-arsenal,cisa-kev,kev,in-the-wild,vBulletin |
+| 5303 | Apache Flink Improper Access Control Vulnerability | kev | markdown |  | CVE-2020-17519,cve-arsenal,cisa-kev,kev,in-the-wild,Apache,Flink |
+| 5304 | Apache Struts Remote Code Execution Vulnerability | kev | markdown |  | CVE-2020-17530,cve-arsenal,cisa-kev,kev,in-the-wild,Apache,Struts |
+| 5305 | Apache Tomcat Improper Privilege Management Vulnerability | kev | markdown |  | CVE-2020-1938,cve-arsenal,cisa-kev,kev,in-the-wild,Apache,Tomcat |
+| 5306 | Apache Kylin OS Command Injection Vulnerability | kev | markdown |  | CVE-2020-1956,cve-arsenal,cisa-kev,kev,in-the-wild,Apache,Kylin |
+| 5307 | Palo Alto Networks PAN-OS Authentication Bypass Vulnerability | kev | markdown |  | CVE-2020-2021,cve-arsenal,cisa-kev,kev,in-the-wild,ransomware,Palo Alt |
+| 5308 | TP-link TL-WA855RE Missing Authentication for Critical Function Vulnerability | kev | markdown |  | CVE-2020-24363,cve-arsenal,cisa-kev,kev,in-the-wild,TP-Link,TL-WA855RE |
+| 5309 | Trend Micro Multiple Products Improper Access Control Vulnerability | kev | markdown |  | CVE-2020-24557,cve-arsenal,cisa-kev,kev,in-the-wild,Trend Micro,Apex O |
+| 5310 | QNAP Helpdesk Improper Access Control Vulnerability | kev | markdown |  | CVE-2020-2506,cve-arsenal,cisa-kev,kev,in-the-wild,QNAP Systems,Helpde |
+| 5311 | D-Link DCS-2530L and DCS-2670L Devices Unspecified Vulnerability | kev | markdown |  | CVE-2020-25078,cve-arsenal,cisa-kev,kev,in-the-wild,D-Link,DCS-2530L a |
+| 5312 | D-Link DCS-2530L and DCS-2670L Command Injection Vulnerability | kev | markdown |  | CVE-2020-25079,cve-arsenal,cisa-kev,kev,in-the-wild,D-Link,DCS-2530L a |
+| 5313 | QNAP Network-Attached Storage (NAS) Command Injection Vulnerability | kev | markdown |  | CVE-2020-2509,cve-arsenal,cisa-kev,kev,in-the-wild,QNAP,QNAP Network-A |
+| 5314 | WordPress File Manager Plugin Remote Code Execution Vulnerability | kev | markdown |  | CVE-2020-25213,cve-arsenal,cisa-kev,kev,in-the-wild,WordPress,File Man |
+| 5315 | Sophos SG UTM Remote Code Execution Vulnerability | kev | markdown |  | CVE-2020-25223,cve-arsenal,cisa-kev,kev,in-the-wild,Sophos,SG UTM |
+| 5316 | D-Link DNS-320 Device Command Injection Vulnerability | kev | markdown |  | CVE-2020-25506,cve-arsenal,cisa-kev,kev,in-the-wild,D-Link,DNS-320 Dev |
+| 5317 | Oracle Fusion Middleware Unspecified Vulnerability | kev | markdown |  | CVE-2020-2551,cve-arsenal,cisa-kev,kev,in-the-wild,Oracle,Fusion Middl |
+| 5318 | Oracle Multiple Products Remote Code Execution Vulnerability | kev | markdown |  | CVE-2020-2555,cve-arsenal,cisa-kev,kev,in-the-wild,Oracle,Multiple Pro |
+| 5319 | Netgear JGS516PE Devices Missing Function Level Access Control Vulnerability | kev | markdown |  | CVE-2020-26919,cve-arsenal,cisa-kev,kev,in-the-wild,NETGEAR,JGS516PE D |
+| 5320 | Apple Multiple Products Memory Corruption Vulnerability | kev | markdown |  | CVE-2020-27930,cve-arsenal,cisa-kev,kev,in-the-wild,Apple,Multiple Pro |
+| 5321 | Apple Multiple Products Type Confusion Vulnerability | kev | markdown |  | CVE-2020-27932,cve-arsenal,cisa-kev,kev,in-the-wild,Apple,Multiple Pro |
+| 5322 | Apple Multiple Products Memory Initialization Vulnerability | kev | markdown |  | CVE-2020-27950,cve-arsenal,cisa-kev,kev,in-the-wild,Apple,Multiple Pro |
+| 5323 | Oracle WebLogic Server Unspecified Vulnerability | kev | markdown |  | CVE-2020-2883,cve-arsenal,cisa-kev,kev,in-the-wild,Oracle,WebLogic Ser |
+| 5324 | PEAR Archive_Tar Deserialization of Untrusted Data Vulnerability | kev | markdown |  | CVE-2020-28949,cve-arsenal,cisa-kev,kev,in-the-wild,PEAR,Archive_Tar |
+| 5325 | D-Link DIR-825 R1 Devices Buffer Overflow Vulnerability | kev | markdown |  | CVE-2020-29557,cve-arsenal,cisa-kev,kev,in-the-wild,D-Link,DIR-825 R1  |
+| 5326 | CyberoamOS (CROS) SQL Injection Vulnerability | kev | markdown |  | CVE-2020-29574,cve-arsenal,cisa-kev,kev,in-the-wild,ransomware,Sophos, |
+| 5327 | Zyxel Multiple Products Use of Hard-Coded Credentials Vulnerability | kev | markdown |  | CVE-2020-29583,cve-arsenal,cisa-kev,kev,in-the-wild,Zyxel,Multiple Pro |
+| 5328 | Cisco IOS XR Software Discovery Protocol Format String Vulnerability | kev | markdown |  | CVE-2020-3118,cve-arsenal,cisa-kev,kev,in-the-wild,Cisco,IOS XR |
+| 5329 | Cisco AnyConnect Secure Mobility Client for Windows Uncontrolled Search Path Vulnerability | kev | markdown |  | CVE-2020-3153,cve-arsenal,cisa-kev,kev,in-the-wild,ransomware,Cisco,An |
+| 5330 | Cisco IP Phones Web Server Remote Code Execution and Denial-of-Service Vulnerability | kev | markdown |  | CVE-2020-3161,cve-arsenal,cisa-kev,kev,in-the-wild,Cisco,Cisco IP Phon |
+| 5331 | Cisco ASA and FTD Information Disclosure Vulnerability | kev | markdown |  | CVE-2020-3259,cve-arsenal,cisa-kev,kev,in-the-wild,ransomware,Cisco,Ad |
+| 5332 | Cisco AnyConnect Secure Mobility Client for Windows DLL Hijacking Vulnerability | kev | markdown |  | CVE-2020-3433,cve-arsenal,cisa-kev,kev,in-the-wild,ransomware,Cisco,An |
+| 5333 | Cisco ASA and FTD Read-Only Path Traversal Vulnerability | kev | markdown |  | CVE-2020-3452,cve-arsenal,cisa-kev,kev,in-the-wild,Cisco,Adaptive Secu |
+| 5334 | Cisco IOS XR Software DVMRP Memory Exhaustion Vulnerability | kev | markdown |  | CVE-2020-3566,cve-arsenal,cisa-kev,kev,in-the-wild,Cisco,IOS XR |
+| 5335 | Cisco IOS XR Software DVMRP Memory Exhaustion Vulnerability | kev | markdown |  | CVE-2020-3569,cve-arsenal,cisa-kev,kev,in-the-wild,Cisco,IOS XR |
+| 5336 | Roundcube Webmail Cross-Site Scripting (XSS) Vulnerability | kev | markdown |  | CVE-2020-35730,cve-arsenal,cisa-kev,kev,in-the-wild,Roundcube,Roundcub |
+| 5337 | Cisco ASA and FTD Cross-Site Scripting (XSS) Vulnerability | kev | markdown |  | CVE-2020-3580,cve-arsenal,cisa-kev,kev,in-the-wild,ransomware,Cisco,Ad |
+| 5338 | PEAR Archive_Tar Improper Link Resolution Vulnerability | kev | markdown |  | CVE-2020-36193,cve-arsenal,cisa-kev,kev,in-the-wild,PEAR,Archive_Tar |
+| 5339 | Apple Multiple Products Memory Corruption Vulnerability | kev | markdown |  | CVE-2020-3837,cve-arsenal,cisa-kev,kev,in-the-wild,Apple,Multiple Prod |
+| 5340 | VMware Multiple Products Privilege Escalation Vulnerability | kev | markdown |  | CVE-2020-3950,cve-arsenal,cisa-kev,kev,in-the-wild,VMware,Multiple Pro |
+| 5341 | VMware vCenter Server Information Disclosure Vulnerability | kev | markdown |  | CVE-2020-3952,cve-arsenal,cisa-kev,kev,in-the-wild,VMware,vCenter Serv |
+| 5342 | VMware ESXi OpenSLP Use-After-Free Vulnerability | kev | markdown |  | CVE-2020-3992,cve-arsenal,cisa-kev,kev,in-the-wild,ransomware,VMware,E |
+| 5343 | Multiple VMware Products Command Injection Vulnerability | kev | markdown |  | CVE-2020-4006,cve-arsenal,cisa-kev,kev,in-the-wild,VMware,Multiple Pro |
+| 5344 | IBM Data Risk Manager Security Bypass Vulnerability | kev | markdown |  | CVE-2020-4427,cve-arsenal,cisa-kev,kev,in-the-wild,IBM,Data Risk Manag |
+| 5345 | IBM Data Risk Manager Remote Code Execution Vulnerability | kev | markdown |  | CVE-2020-4428,cve-arsenal,cisa-kev,kev,in-the-wild,IBM,Data Risk Manag |
+| 5346 | IBM Data Risk Manager Directory Traversal Vulnerability | kev | markdown |  | CVE-2020-4430,cve-arsenal,cisa-kev,kev,in-the-wild,IBM,Data Risk Manag |
+| 5347 | SonicWall SonicOS Buffer Overflow Vulnerability | kev | markdown |  | CVE-2020-5135,cve-arsenal,cisa-kev,kev,in-the-wild,ransomware,SonicWal |
+| 5348 | VMware Tanzu Spring Cloud Config Directory Traversal Vulnerability | kev | markdown |  | CVE-2020-5410,cve-arsenal,cisa-kev,kev,in-the-wild,VMware Tanzu,Spring |
+| 5349 | Grandstream Networks UCM6200 Series SQL Injection Vulnerability | kev | markdown |  | CVE-2020-5722,cve-arsenal,cisa-kev,kev,in-the-wild,Grandstream,UCM6200 |
+| 5350 | Amcrest Cameras and NVR Stack-based Buffer Overflow Vulnerability | kev | markdown |  | CVE-2020-5735,cve-arsenal,cisa-kev,kev,in-the-wild,Amcrest,Cameras and |
+| 5351 | Plex Media Server Remote Code Execution Vulnerability | kev | markdown |  | CVE-2020-5741,cve-arsenal,cisa-kev,kev,in-the-wild,Plex,Media Server |
+| 5352 | Unraid Remote Code Execution Vulnerability | kev | markdown |  | CVE-2020-5847,cve-arsenal,cisa-kev,kev,in-the-wild,Unraid |
+| 5353 | Unraid Authentication Bypass Vulnerability | kev | markdown |  | CVE-2020-5849,cve-arsenal,cisa-kev,kev,in-the-wild,Unraid |
+| 5354 | F5 BIG-IP Traffic Management User Interface (TMUI) Remote Code Execution Vulnerability | kev | markdown |  | CVE-2020-5902,cve-arsenal,cisa-kev,kev,in-the-wild,ransomware,F5,BIG-I |
+| 5355 | SAP Solution Manager Missing Authentication for Critical Function Vulnerability | kev | markdown |  | CVE-2020-6207,cve-arsenal,cisa-kev,kev,in-the-wild,SAP,Solution Manage |
+| 5356 | SAP NetWeaver Missing Authentication for Critical Function Vulnerability | kev | markdown |  | CVE-2020-6287,cve-arsenal,cisa-kev,kev,in-the-wild,SAP,NetWeaver |
+| 5357 | Google Chromium V8 Type Confusion Vulnerability | kev | markdown |  | CVE-2020-6418,cve-arsenal,cisa-kev,kev,in-the-wild,Google,Chromium V8 |
+| 5358 | Google Chrome Media Use-After-Free Vulnerability | kev | markdown |  | CVE-2020-6572,cve-arsenal,cisa-kev,kev,in-the-wild,Google,Chrome Media |
+| 5359 | Mozilla Firefox And Thunderbird Use-After-Free Vulnerability | kev | markdown |  | CVE-2020-6819,cve-arsenal,cisa-kev,kev,in-the-wild,Mozilla,Firefox and |
+| 5360 | Mozilla Firefox And Thunderbird Use-After-Free Vulnerability | kev | markdown |  | CVE-2020-6820,cve-arsenal,cisa-kev,kev,in-the-wild,Mozilla,Firefox and |
+| 5361 | OpenSMTPD Remote Code Execution Vulnerability | kev | markdown |  | CVE-2020-7247,cve-arsenal,cisa-kev,kev,in-the-wild,OpenBSD,OpenSMTPD |
+| 5362 | Synacor Zimbra Collaboration Suite (ZCS) Server-Side Request Forgery Vulnerability | kev | markdown |  | CVE-2020-7796,cve-arsenal,cisa-kev,kev,in-the-wild,Synacor,Zimbra Coll |
+| 5363 | Liferay Portal Deserialization of Untrusted Data Vulnerability | kev | markdown |  | CVE-2020-7961,cve-arsenal,cisa-kev,kev,in-the-wild,Liferay,Liferay Por |
+| 5364 | Citrix ADC, Gateway, and SD-WAN WANOP Appliance Authorization Bypass Vulnerability | kev | markdown |  | CVE-2020-8193,cve-arsenal,cisa-kev,kev,in-the-wild,Citrix,Application  |
+| 5365 | Citrix ADC, Gateway, and SD-WAN WANOP Appliance Information Disclosure Vulnerability | kev | markdown |  | CVE-2020-8195,cve-arsenal,cisa-kev,kev,in-the-wild,Citrix,Application  |
+| 5366 | Citrix ADC, Gateway, and SD-WAN WANOP Appliance Information Disclosure Vulnerability | kev | markdown |  | CVE-2020-8196,cve-arsenal,cisa-kev,kev,in-the-wild,Citrix,Application  |
+| 5367 | Pulse Connect Secure Code Injection Vulnerability | kev | markdown |  | CVE-2020-8218,cve-arsenal,cisa-kev,kev,in-the-wild,Pulse Secure,Pulse  |
+| 5368 | Ivanti Pulse Connect Secure Code Execution Vulnerability | kev | markdown |  | CVE-2020-8243,cve-arsenal,cisa-kev,kev,in-the-wild,Ivanti,Pulse Connec |
+| 5369 | Ivanti Pulse Connect Secure Code Execution Vulnerability | kev | markdown |  | CVE-2020-8260,cve-arsenal,cisa-kev,kev,in-the-wild,Ivanti,Pulse Connec |
+| 5370 | Trend Micro Apex One and OfficeScan Remote Code Execution Vulnerability | kev | markdown |  | CVE-2020-8467,cve-arsenal,cisa-kev,kev,in-the-wild,Trend Micro,Apex On |
+| 5371 | Trend Micro Multiple Products Content Validation Escape Vulnerability | kev | markdown |  | CVE-2020-8468,cve-arsenal,cisa-kev,kev,in-the-wild,Trend Micro,Apex On |
+| 5372 | Multiple DrayTek Vigor Routers Web Management Page Vulnerability | kev | markdown |  | CVE-2020-8515,cve-arsenal,cisa-kev,kev,in-the-wild,DrayTek,Multiple Vi |
+| 5373 | Trend Micro Apex One and OfficeScan Authentication Bypass Vulnerability | kev | markdown |  | CVE-2020-8599,cve-arsenal,cisa-kev,kev,in-the-wild,Trend Micro,Apex On |
+| 5374 | PlaySMS Server-Side Template Injection Vulnerability | kev | markdown |  | CVE-2020-8644,cve-arsenal,cisa-kev,kev,in-the-wild,PlaySMS |
+| 5375 | EyesOfNetwork Improper Privilege Management Vulnerability | kev | markdown |  | CVE-2020-8655,cve-arsenal,cisa-kev,kev,in-the-wild,EyesOfNetwork |
+| 5376 | EyesOfNetwork Use of Hard-Coded Credentials Vulnerability | kev | markdown |  | CVE-2020-8657,cve-arsenal,cisa-kev,kev,in-the-wild,EyesOfNetwork |
+| 5377 | Pi-Hole AdminLTE Remote Code Execution Vulnerability | kev | markdown |  | CVE-2020-8816,cve-arsenal,cisa-kev,kev,in-the-wild,Pi-hole,AdminLTE |
+| 5378 | Zyxel Multiple NAS Devices OS Command Injection Vulnerability | kev | markdown |  | CVE-2020-9054,cve-arsenal,cisa-kev,kev,in-the-wild,Zyxel,Multiple Netw |
+| 5379 | D-Link DIR-610 Devices Remote Command Execution | kev | markdown |  | CVE-2020-9377,cve-arsenal,cisa-kev,kev,in-the-wild,D-Link,DIR-610 Devi |
+| 5380 | Adobe Acrobat Use-After-Free Vulnerability | kev | markdown |  | CVE-2020-9715,cve-arsenal,cisa-kev,kev,in-the-wild,Adobe,Acrobat |
+| 5381 | Apple iOS, iPadOS, and watchOS Out-of-Bounds Write Vulnerability | kev | markdown |  | CVE-2020-9818,cve-arsenal,cisa-kev,kev,in-the-wild,Apple,iOS, iPadOS,  |
+| 5382 | Apple iOS, iPadOS, and watchOS Memory Corruption Vulnerability | kev | markdown |  | CVE-2020-9819,cve-arsenal,cisa-kev,kev,in-the-wild,Apple,iOS, iPadOS,  |
+| 5383 | Apple Multiple Products Code Execution Vulnerability | kev | markdown |  | CVE-2020-9859,cve-arsenal,cisa-kev,kev,in-the-wild,Apple,Multiple Prod |
+| 5384 | Apple Multiple Products Memory Corruption Vulnerability | kev | markdown |  | CVE-2020-9907,cve-arsenal,cisa-kev,kev,in-the-wild,Apple,Multiple Prod |
+| 5385 | Apple iOS, iPadOS, and macOS Input Validation Vulnerability | kev | markdown |  | CVE-2020-9934,cve-arsenal,cisa-kev,kev,in-the-wild,Apple,iOS, iPadOS,  |
+| 5386 | Android Kernel Race Condition Vulnerability | kev | markdown |  | CVE-2021-0920,cve-arsenal,cisa-kev,kev,in-the-wild,Android,Kernel |
+| 5387 | Android Kernel Use-After-Free Vulnerability | kev | markdown |  | CVE-2021-1048,cve-arsenal,cisa-kev,kev,in-the-wild,Android,Kernel |
+| 5388 | Cisco HyperFlex HX Installer Virtual Machine Command Injection Vulnerability | kev | markdown |  | CVE-2021-1497,cve-arsenal,cisa-kev,kev,in-the-wild,Cisco,HyperFlex HX |
+| 5389 | Cisco HyperFlex HX Data Platform Command Injection Vulnerability | kev | markdown |  | CVE-2021-1498,cve-arsenal,cisa-kev,kev,in-the-wild,Cisco,HyperFlex HX |
+| 5390 | Microsoft Defender Remote Code Execution Vulnerability | kev | markdown |  | CVE-2021-1647,cve-arsenal,cisa-kev,kev,in-the-wild,Microsoft,Defender |
+| 5391 | Microsoft Windows Print Spooler Remote Code Execution Vulnerability | kev | markdown |  | CVE-2021-1675,cve-arsenal,cisa-kev,kev,in-the-wild,ransomware,Microsof |
+| 5392 | Microsoft Win32k Privilege Escalation Vulnerability | kev | markdown |  | CVE-2021-1732,cve-arsenal,cisa-kev,kev,in-the-wild,ransomware,Microsof |
+| 5393 | Apple Multiple Products Race Condition Vulnerability | kev | markdown |  | CVE-2021-1782,cve-arsenal,cisa-kev,kev,in-the-wild,Apple,Multiple Prod |
+| 5394 | Apple Multiple Products Type Confusion Vulnerability | kev | markdown |  | CVE-2021-1789,cve-arsenal,cisa-kev,kev,in-the-wild,Apple,Multiple Prod |
+| 5395 | Apple iOS, iPadOS, and macOS WebKit Remote Code Execution Vulnerability | kev | markdown |  | CVE-2021-1870,cve-arsenal,cisa-kev,kev,in-the-wild,Apple,iOS, iPadOS,  |
+| 5396 | Apple iOS, iPadOS, and macOS WebKit Remote Code Execution Vulnerability | kev | markdown |  | CVE-2021-1871,cve-arsenal,cisa-kev,kev,in-the-wild,Apple,iOS, iPadOS,  |
+| 5397 | Apple iOS, iPadOS, and watchOS WebKit Cross-Site Scripting (XSS) Vulnerability | kev | markdown |  | CVE-2021-1879,cve-arsenal,cisa-kev,kev,in-the-wild,Apple,iOS, iPadOS,  |
+| 5398 | Qualcomm Multiple Chipsets Use-After-Free Vulnerability | kev | markdown |  | CVE-2021-1905,cve-arsenal,cisa-kev,kev,in-the-wild,Qualcomm,Multiple C |
+| 5399 | Qualcomm Multiple Chipsets Detection of Error Condition Without Action Vulnerability | kev | markdown |  | CVE-2021-1906,cve-arsenal,cisa-kev,kev,in-the-wild,Qualcomm,Multiple C |
+| 5400 | SonicWall SSLVPN SMA100 SQL Injection Vulnerability | kev | markdown |  | CVE-2021-20016,cve-arsenal,cisa-kev,kev,in-the-wild,ransomware,SonicWa |
+| 5401 | SonicWall Email Security Improper Privilege Management Vulnerability | kev | markdown |  | CVE-2021-20021,cve-arsenal,cisa-kev,kev,in-the-wild,ransomware,SonicWa |
+| 5402 | SonicWall Email Security Unrestricted Upload of File Vulnerability | kev | markdown |  | CVE-2021-20022,cve-arsenal,cisa-kev,kev,in-the-wild,ransomware,SonicWa |
+| 5403 | SonicWall Email Security Path Traversal Vulnerability | kev | markdown |  | CVE-2021-20023,cve-arsenal,cisa-kev,kev,in-the-wild,ransomware,SonicWa |
+| 5404 | SonicWall Secure Remote Access (SRA) SQL Injection Vulnerability | kev | markdown |  | CVE-2021-20028,cve-arsenal,cisa-kev,kev,in-the-wild,ransomware,SonicWa |
+| 5405 | SonicWall SMA100 Appliances OS Command Injection Vulnerability | kev | markdown |  | CVE-2021-20035,cve-arsenal,cisa-kev,kev,in-the-wild,SonicWall,SMA100 A |
+| 5406 | SonicWall SMA 100 Appliances Stack-Based Buffer Overflow Vulnerability | kev | markdown |  | CVE-2021-20038,cve-arsenal,cisa-kev,kev,in-the-wild,ransomware,SonicWa |
+| 5407 | Arcadyan Buffalo Firmware Path Traversal Vulnerability | kev | markdown |  | CVE-2021-20090,cve-arsenal,cisa-kev,kev,in-the-wild,Arcadyan,Buffalo F |
+| 5408 | Draytek VigorConnect Path Traversal Vulnerability | kev | markdown |  | CVE-2021-20123,cve-arsenal,cisa-kev,kev,in-the-wild,DrayTek,VigorConne |
+| 5409 | Draytek VigorConnect Path Traversal Vulnerability | kev | markdown |  | CVE-2021-20124,cve-arsenal,cisa-kev,kev,in-the-wild,DrayTek,VigorConne |
+| 5410 | Adobe Acrobat and Reader Heap-based Buffer Overflow Vulnerability | kev | markdown |  | CVE-2021-21017,cve-arsenal,cisa-kev,kev,in-the-wild,Adobe,Acrobat and  |
+| 5411 | Google Chromium V8 Heap Buffer Overflow Vulnerability | kev | markdown |  | CVE-2021-21148,cve-arsenal,cisa-kev,kev,in-the-wild,Google,Chromium V8 |
+| 5412 | Google Chromium Race Condition Vulnerability | kev | markdown |  | CVE-2021-21166,cve-arsenal,cisa-kev,kev,in-the-wild,Google,Chromium |
+| 5413 | Google Chromium Blink Use-After-Free Vulnerability | kev | markdown |  | CVE-2021-21193,cve-arsenal,cisa-kev,kev,in-the-wild,Google,Chromium Bl |
+| 5414 | Google Chromium Blink Use-After-Free Vulnerability | kev | markdown |  | CVE-2021-21206,cve-arsenal,cisa-kev,kev,in-the-wild,Google,Chromium Bl |
+| 5415 | Google Chromium V8 Improper Input Validation Vulnerability | kev | markdown |  | CVE-2021-21220,cve-arsenal,cisa-kev,kev,in-the-wild,Google,Chromium V8 |
+| 5416 | Google Chromium V8 Type Confusion Vulnerability | kev | markdown |  | CVE-2021-21224,cve-arsenal,cisa-kev,kev,in-the-wild,Google,Chromium V8 |
+| 5417 | Adminer Server-Side Request Forgery Vulnerability | kev | markdown |  | CVE-2021-21311,cve-arsenal,cisa-kev,kev,in-the-wild,Adminer |
+| 5418 | System Information Library for Node.JS Command Injection | kev | markdown |  | CVE-2021-21315,cve-arsenal,cisa-kev,kev,in-the-wild,Npm package,System |
+| 5419 | Dell dbutil Driver Insufficient Access Control Vulnerability | kev | markdown |  | CVE-2021-21551,cve-arsenal,cisa-kev,kev,in-the-wild,Dell,dbutil Driver |
+| 5420 | VMware vCenter Server Remote Code Execution Vulnerability | kev | markdown |  | CVE-2021-21972,cve-arsenal,cisa-kev,kev,in-the-wild,ransomware,VMware, |
+| 5421 | VMware vCenter Server and Cloud Foundation Server Side Request Forgery (SSRF) Vulnerability | kev | markdown |  | CVE-2021-21973,cve-arsenal,cisa-kev,kev,in-the-wild,VMware,vCenter Ser |
+| 5422 | VMware Server Side Request Forgery in vRealize Operations Manager API | kev | markdown |  | CVE-2021-21975,cve-arsenal,cisa-kev,kev,in-the-wild,ransomware,VMware, |
+| 5423 | VMware vCenter Server Improper Input Validation Vulnerability | kev | markdown |  | CVE-2021-21985,cve-arsenal,cisa-kev,kev,in-the-wild,ransomware,VMware, |
+| 5424 | VMware vCenter Server File Upload Vulnerability | kev | markdown |  | CVE-2021-22005,cve-arsenal,cisa-kev,kev,in-the-wild,ransomware,VMware, |
+| 5425 | VMware vCenter Server Improper Access Control | kev | markdown |  | CVE-2021-22017,cve-arsenal,cisa-kev,kev,in-the-wild,VMware,vCenter Ser |
+| 5426 | Omnissa Workspace ONE Server-Side Request Forgery | kev | markdown |  | CVE-2021-22054,cve-arsenal,cisa-kev,kev,in-the-wild,Omnissa,Workspace  |
+| 5427 | GitLab Server-Side Request Forgery (SSRF) Vulnerability | kev | markdown |  | CVE-2021-22175,cve-arsenal,cisa-kev,kev,in-the-wild,GitLab |
+| 5428 | ExifTool Remote Code Execution Vulnerability | kev | markdown |  | CVE-2021-22204,cve-arsenal,cisa-kev,kev,in-the-wild,Perl,Exiftool |
+| 5429 | GitLab Community and Enterprise Editions Remote Code Execution Vulnerability | kev | markdown |  | CVE-2021-22205,cve-arsenal,cisa-kev,kev,in-the-wild,ransomware,GitLab, |
+| 5430 | Micro Focus Operation Bridge Report (OBR) Remote Code Execution Vulnerability | kev | markdown |  | CVE-2021-22502,cve-arsenal,cisa-kev,kev,in-the-wild,Micro Focus,Operat |
+| 5431 | Micro Focus Access Manager Information Leakage Vulnerability | kev | markdown |  | CVE-2021-22506,cve-arsenal,cisa-kev,kev,in-the-wild,Micro Focus,Micro  |
+| 5432 | Linux Kernel Heap Out-of-Bounds Write Vulnerability | kev | markdown |  | CVE-2021-22555,cve-arsenal,cisa-kev,kev,in-the-wild,Linux,Kernel |
+| 5433 | Linux Kernel Privilege Escalation Vulnerability | kev | markdown |  | CVE-2021-22600,cve-arsenal,cisa-kev,kev,in-the-wild,Linux,Kernel |
+| 5434 | Rockwell Multiple Products Insufficient Protected Credentials Vulnerability | kev | markdown |  | CVE-2021-22681,cve-arsenal,cisa-kev,kev,in-the-wild,Rockwell,Multiple  |
+| 5435 | Ivanti Pulse Connect Secure Use-After-Free Vulnerability | kev | markdown |  | CVE-2021-22893,cve-arsenal,cisa-kev,kev,in-the-wild,ransomware,Ivanti, |
+| 5436 | Ivanti Pulse Connect Secure Collaboration Suite Buffer Overflow Vulnerability | kev | markdown |  | CVE-2021-22894,cve-arsenal,cisa-kev,kev,in-the-wild,Ivanti,Pulse Conne |
+| 5437 | Ivanti Pulse Connect Secure Command Injection Vulnerability | kev | markdown |  | CVE-2021-22899,cve-arsenal,cisa-kev,kev,in-the-wild,Ivanti,Pulse Conne |
+| 5438 | Ivanti Pulse Connect Secure Unrestricted File Upload Vulnerability | kev | markdown |  | CVE-2021-22900,cve-arsenal,cisa-kev,kev,in-the-wild,Ivanti,Pulse Conne |
+| 5439 | Citrix ShareFile Improper Access Control Vulnerability | kev | markdown |  | CVE-2021-22941,cve-arsenal,cisa-kev,kev,in-the-wild,ransomware,Citrix, |
+| 5440 | F5 BIG-IP and BIG-IQ Centralized Management iControl REST Remote Code Execution Vulnerability | kev | markdown |  | CVE-2021-22986,cve-arsenal,cisa-kev,kev,in-the-wild,ransomware,F5,BIG- |
+| 5441 | F5 BIG-IP Traffic Management Microkernel Buffer Overflow | kev | markdown |  | CVE-2021-22991,cve-arsenal,cisa-kev,kev,in-the-wild,F5,BIG-IP Traffic  |
+| 5442 | Ajax.NET Professional Deserialization of Untrusted Data Vulnerability | kev | markdown |  | CVE-2021-23758,cve-arsenal,cisa-kev,kev,in-the-wild,Ajax.NET Professio |
+| 5443 | McAfee Total Protection (MTP) Improper Privilege Management Vulnerability | kev | markdown |  | CVE-2021-23874,cve-arsenal,cisa-kev,kev,in-the-wild,McAfee,McAfee Tota |
+| 5444 | Nagios XI OS Command Injection | kev | markdown |  | CVE-2021-25296,cve-arsenal,cisa-kev,kev,in-the-wild,Nagios,Nagios XI |
+| 5445 | Nagios XI OS Command Injection | kev | markdown |  | CVE-2021-25297,cve-arsenal,cisa-kev,kev,in-the-wild,Nagios,Nagios XI |
+| 5446 | Nagios XI OS Command Injection | kev | markdown |  | CVE-2021-25298,cve-arsenal,cisa-kev,kev,in-the-wild,Nagios,Nagios XI |
+| 5447 | Samsung Mobile Devices Improper Access Control Vulnerability | kev | markdown |  | CVE-2021-25337,cve-arsenal,cisa-kev,kev,in-the-wild,Samsung,Mobile Dev |
+| 5448 | Samsung Mobile Devices Improper Access Control Vulnerability | kev | markdown |  | CVE-2021-25369,cve-arsenal,cisa-kev,kev,in-the-wild,Samsung,Mobile Dev |
+| 5449 | Samsung Mobile Devices Memory Corruption Vulnerability | kev | markdown |  | CVE-2021-25370,cve-arsenal,cisa-kev,kev,in-the-wild,Samsung,Mobile Dev |
+| 5450 | Samsung Mobile Devices Unspecified Vulnerability | kev | markdown |  | CVE-2021-25371,cve-arsenal,cisa-kev,kev,in-the-wild,Samsung,Mobile Dev |
+| 5451 | Samsung Mobile Devices Improper Boundary Check Vulnerability | kev | markdown |  | CVE-2021-25372,cve-arsenal,cisa-kev,kev,in-the-wild,Samsung,Mobile Dev |
+| 5452 | Samsung Mobile Devices Race Condition Vulnerability | kev | markdown |  | CVE-2021-25394,cve-arsenal,cisa-kev,kev,in-the-wild,Samsung,Mobile Dev |
+| 5453 | Samsung Mobile Devices Race Condition Vulnerability | kev | markdown |  | CVE-2021-25395,cve-arsenal,cisa-kev,kev,in-the-wild,Samsung,Mobile Dev |
+| 5454 | Samsung Mobile Devices Out-of-Bounds Read Vulnerability | kev | markdown |  | CVE-2021-25487,cve-arsenal,cisa-kev,kev,in-the-wild,Samsung,Mobile Dev |
+| 5455 | Samsung Mobile Devices Improper Input Validation Vulnerability | kev | markdown |  | CVE-2021-25489,cve-arsenal,cisa-kev,kev,in-the-wild,Samsung,Mobile Dev |
+| 5456 | Atlassian Confluence Server and Data Center Object-Graph Navigation Language (OGNL) Injection Vulnerability | kev | markdown |  | CVE-2021-26084,cve-arsenal,cisa-kev,kev,in-the-wild,ransomware,Atlassi |
+| 5457 | Atlassian Confluence Server Pre-Authorization Arbitrary File Read Vulnerability | kev | markdown |  | CVE-2021-26085,cve-arsenal,cisa-kev,kev,in-the-wild,ransomware,Atlassi |
+| 5458 | Atlassian Jira Server and Data Center Path Traversal Vulnerability | kev | markdown |  | CVE-2021-26086,cve-arsenal,cisa-kev,kev,in-the-wild,Atlassian,Jira Ser |
+| 5459 | Microsoft Internet Explorer Memory Corruption Vulnerability | kev | markdown |  | CVE-2021-26411,cve-arsenal,cisa-kev,kev,in-the-wild,ransomware,Microso |
+| 5460 | OpenPLC ScadaBR Unrestricted Upload of File with Dangerous Type Vulnerability | kev | markdown |  | CVE-2021-26828,cve-arsenal,cisa-kev,kev,in-the-wild,OpenPLC,ScadaBR |
+| 5461 | OpenPLC ScadaBR Cross-site Scripting Vulnerability | kev | markdown |  | CVE-2021-26829,cve-arsenal,cisa-kev,kev,in-the-wild,OpenPLC,ScadaBR |
+| 5462 | Microsoft Exchange Server Remote Code Execution Vulnerability | kev | markdown |  | CVE-2021-26855,cve-arsenal,cisa-kev,kev,in-the-wild,ransomware,Microso |
+| 5463 | Microsoft Exchange Server Remote Code Execution Vulnerability | kev | markdown |  | CVE-2021-26857,cve-arsenal,cisa-kev,kev,in-the-wild,ransomware,Microso |
+| 5464 | Microsoft Exchange Server Remote Code Execution Vulnerability | kev | markdown |  | CVE-2021-26858,cve-arsenal,cisa-kev,kev,in-the-wild,ransomware,Microso |
+| 5465 | Microsoft Office Remote Code Execution Vulnerability | kev | markdown |  | CVE-2021-27059,cve-arsenal,cisa-kev,kev,in-the-wild,Microsoft,Office |
+| 5466 | Microsoft Exchange Server Remote Code Execution Vulnerability | kev | markdown |  | CVE-2021-27065,cve-arsenal,cisa-kev,kev,in-the-wild,ransomware,Microso |
+| 5467 | Microsoft Internet Explorer Remote Code Execution Vulnerability | kev | markdown |  | CVE-2021-27085,cve-arsenal,cisa-kev,kev,in-the-wild,Microsoft,Internet |
+| 5468 | Accellion FTA SQL Injection Vulnerability | kev | markdown |  | CVE-2021-27101,cve-arsenal,cisa-kev,kev,in-the-wild,ransomware,Accelli |
+| 5469 | Accellion FTA OS Command Injection Vulnerability | kev | markdown |  | CVE-2021-27102,cve-arsenal,cisa-kev,kev,in-the-wild,ransomware,Accelli |
+| 5470 | Accellion FTA Server-Side Request Forgery (SSRF) Vulnerability | kev | markdown |  | CVE-2021-27103,cve-arsenal,cisa-kev,kev,in-the-wild,ransomware,Accelli |
+| 5471 | Accellion FTA OS Command Injection Vulnerability | kev | markdown |  | CVE-2021-27104,cve-arsenal,cisa-kev,kev,in-the-wild,ransomware,Accelli |
+| 5472 | DD-WRT Stack-Based Buffer Overflow Vulnerability | kev | markdown |  | CVE-2021-27137,cve-arsenal,cisa-kev,kev,in-the-wild,DD-WRT |
+| 5473 | Yealink Device Management Server-Side Request Forgery (SSRF) Vulnerability | kev | markdown |  | CVE-2021-27561,cve-arsenal,cisa-kev,kev,in-the-wild,Yealink,Device Man |
+| 5474 | Arm Trusted Firmware Out-of-Bounds Write Vulnerability | kev | markdown |  | CVE-2021-27562,cve-arsenal,cisa-kev,kev,in-the-wild,Arm,Trusted Firmwa |
+| 5475 | Checkbox Survey Deserialization of Untrusted Data Vulnerability | kev | markdown |  | CVE-2021-27852,cve-arsenal,cisa-kev,kev,in-the-wild,Checkbox,Checkbox  |
+| 5476 | FatPipe WARP, IPVPN, and MPVPN Configuration Upload exploit | kev | markdown |  | CVE-2021-27860,cve-arsenal,cisa-kev,kev,in-the-wild,FatPipe,WARP, IPVP |
+| 5477 | Veritas Backup Exec Agent File Access Vulnerability | kev | markdown |  | CVE-2021-27876,cve-arsenal,cisa-kev,kev,in-the-wild,ransomware,Veritas |
+| 5478 | Veritas Backup Exec Agent Improper Authentication Vulnerability | kev | markdown |  | CVE-2021-27877,cve-arsenal,cisa-kev,kev,in-the-wild,ransomware,Veritas |
+| 5479 | Veritas Backup Exec Agent Command Execution Vulnerability | kev | markdown |  | CVE-2021-27878,cve-arsenal,cisa-kev,kev,in-the-wild,ransomware,Veritas |
+| 5480 | Microsoft Win32k Privilege Escalation Vulnerability | kev | markdown |  | CVE-2021-28310,cve-arsenal,cisa-kev,kev,in-the-wild,Microsoft,Win32k |
+| 5481 | Adobe Acrobat and Reader Use-After-Free Vulnerability | kev | markdown |  | CVE-2021-28550,cve-arsenal,cisa-kev,kev,in-the-wild,Adobe,Acrobat and  |
+| 5482 | Arm Mali Graphics Processing Unit (GPU) Use-After-Free Vulnerability | kev | markdown |  | CVE-2021-28663,cve-arsenal,cisa-kev,kev,in-the-wild,Arm,Mali Graphics  |
+| 5483 | Arm Mali Graphics Processing Unit (GPU) Unspecified Vulnerability | kev | markdown |  | CVE-2021-28664,cve-arsenal,cisa-kev,kev,in-the-wild,Arm,Mali Graphics  |
+| 5484 | QNAP NAS Improper Authorization Vulnerability | kev | markdown |  | CVE-2021-28799,cve-arsenal,cisa-kev,kev,in-the-wild,ransomware,QNAP,Ne |
+| 5485 | Arm Mali GPU Kernel Driver Use-After-Free Vulnerability | kev | markdown |  | CVE-2021-29256,cve-arsenal,cisa-kev,kev,in-the-wild,Arm,Mali Graphics  |
+| 5486 | Kaseya Virtual System/Server Administrator (VSA) Information Disclosure Vulnerability | kev | markdown |  | CVE-2021-30116,cve-arsenal,cisa-kev,kev,in-the-wild,ransomware,Kaseya, |
+| 5487 | Google Chromium PopupBlocker Security Bypass Vulnerability | kev | markdown |  | CVE-2021-30533,cve-arsenal,cisa-kev,kev,in-the-wild,Google,Chromium Po |
+| 5488 | Google Chromium V8 Type Confusion Vulnerability | kev | markdown |  | CVE-2021-30551,cve-arsenal,cisa-kev,kev,in-the-wild,Google,Chromium V8 |
+| 5489 | Google Chromium WebGL Use-After-Free Vulnerability | kev | markdown |  | CVE-2021-30554,cve-arsenal,cisa-kev,kev,in-the-wild,Google,Chromium We |
+| 5490 | Google Chromium V8 Type Confusion Vulnerability | kev | markdown |  | CVE-2021-30563,cve-arsenal,cisa-kev,kev,in-the-wild,Google,Chromium V8 |
+| 5491 | Google Chromium V8 Out-of-Bounds Write Vulnerability | kev | markdown |  | CVE-2021-30632,cve-arsenal,cisa-kev,kev,in-the-wild,Google,Chromium V8 |
+| 5492 | Google Chromium Indexed DB API Use-After-Free Vulnerability | kev | markdown |  | CVE-2021-30633,cve-arsenal,cisa-kev,kev,in-the-wild,Google,Chromium In |
+| 5493 | Apple macOS Unspecified Vulnerability | kev | markdown |  | CVE-2021-30657,cve-arsenal,cisa-kev,kev,in-the-wild,Apple,macOS |
+| 5494 | Apple Multiple Products WebKit Storage Use-After-Free Vulnerability | kev | markdown |  | CVE-2021-30661,cve-arsenal,cisa-kev,kev,in-the-wild,Apple,Multiple Pro |
+| 5495 | Apple Multiple Products WebKit Integer Overflow Vulnerability | kev | markdown |  | CVE-2021-30663,cve-arsenal,cisa-kev,kev,in-the-wild,Apple,Multiple Pro |
+| 5496 | Apple Multiple Products WebKit Memory Corruption Vulnerability | kev | markdown |  | CVE-2021-30665,cve-arsenal,cisa-kev,kev,in-the-wild,Apple,Multiple Pro |
+| 5497 | Apple iOS WebKit Buffer Overflow Vulnerability | kev | markdown |  | CVE-2021-30666,cve-arsenal,cisa-kev,kev,in-the-wild,Apple,iOS |
+| 5498 | Apple macOS Unspecified Vulnerability | kev | markdown |  | CVE-2021-30713,cve-arsenal,cisa-kev,kev,in-the-wild,Apple,macOS |
+| 5499 | Apple iOS WebKit Memory Corruption Vulnerability | kev | markdown |  | CVE-2021-30761,cve-arsenal,cisa-kev,kev,in-the-wild,Apple,iOS |
+| 5500 | Apple iOS WebKit Use-After-Free Vulnerability | kev | markdown |  | CVE-2021-30762,cve-arsenal,cisa-kev,kev,in-the-wild,Apple,iOS |
+| 5501 | Apple Multiple Products Memory Corruption Vulnerability | kev | markdown |  | CVE-2021-30807,cve-arsenal,cisa-kev,kev,in-the-wild,Apple,Multiple Pro |
+| 5502 | Apple iOS, iPadOS, macOS Use-After-Free Vulnerability | kev | markdown |  | CVE-2021-30858,cve-arsenal,cisa-kev,kev,in-the-wild,Apple,iOS, iPadOS, |
+| 5503 | Apple Multiple Products Integer Overflow Vulnerability | kev | markdown |  | CVE-2021-30860,cve-arsenal,cisa-kev,kev,in-the-wild,Apple,Multiple Pro |
+| 5504 | Apple iOS, iPadOS, and macOS Type Confusion Vulnerability | kev | markdown |  | CVE-2021-30869,cve-arsenal,cisa-kev,kev,in-the-wild,Apple,iOS, iPadOS, |
+| 5505 | Apple Multiple Products Memory Corruption Vulnerability | kev | markdown |  | CVE-2021-30883,cve-arsenal,cisa-kev,kev,in-the-wild,Apple,Multiple Pro |
+| 5506 | Apple iOS, iPadOS, and macOS Out-of-Bounds Write Vulnerability | kev | markdown |  | CVE-2021-30900,cve-arsenal,cisa-kev,kev,in-the-wild,Apple,iOS, iPadOS, |
+| 5507 | Apple Multiple Products Integer Overflow or Wraparound Vulnerability | kev | markdown |  | CVE-2021-30952,cve-arsenal,cisa-kev,kev,in-the-wild,Apple,Multiple Pro |
+| 5508 | Apple iOS and iPadOS Buffer Overflow Vulnerability | kev | markdown |  | CVE-2021-30983,cve-arsenal,cisa-kev,kev,in-the-wild,Apple,iOS and iPad |
+| 5509 | Apple iOS, macOS, watchOS Sandbox Bypass Vulnerability | kev | markdown |  | CVE-2021-31010,cve-arsenal,cisa-kev,kev,in-the-wild,Apple,iOS, macOS,  |
+| 5510 | Microsoft HTTP Protocol Stack Remote Code Execution Vulnerability | kev | markdown |  | CVE-2021-31166,cve-arsenal,cisa-kev,kev,in-the-wild,Microsoft,HTTP Pro |
+| 5511 | Microsoft Exchange Server Information Disclosure Vulnerability | kev | markdown |  | CVE-2021-31196,cve-arsenal,cisa-kev,kev,in-the-wild,Microsoft,Exchange |
+| 5512 | Microsoft Enhanced Cryptographic Provider Privilege Escalation Vulnerability | kev | markdown |  | CVE-2021-31199,cve-arsenal,cisa-kev,kev,in-the-wild,Microsoft,Enhanced |
+| 5513 | Microsoft Enhanced Cryptographic Provider Privilege Escalation Vulnerability | kev | markdown |  | CVE-2021-31201,cve-arsenal,cisa-kev,kev,in-the-wild,Microsoft,Enhanced |
+| 5514 | Microsoft Exchange Server Security Feature Bypass Vulnerability | kev | markdown |  | CVE-2021-31207,cve-arsenal,cisa-kev,kev,in-the-wild,ransomware,Microso |
+| 5515 | Laravel Ignition File Upload Vulnerability | kev | markdown |  | CVE-2021-3129,cve-arsenal,cisa-kev,kev,in-the-wild,ransomware,Laravel, |
+| 5516 | Sudo Heap-Based Buffer Overflow Vulnerability | kev | markdown |  | CVE-2021-3156,cve-arsenal,cisa-kev,kev,in-the-wild,Sudo |
+| 5517 | Tenda AC11 Router Stack Buffer Overflow Vulnerability | kev | markdown |  | CVE-2021-31755,cve-arsenal,cisa-kev,kev,in-the-wild,Tenda,AC11 Router |
+| 5518 | Microsoft Windows Kernel Information Disclosure Vulnerability | kev | markdown |  | CVE-2021-31955,cve-arsenal,cisa-kev,kev,in-the-wild,Microsoft,Windows |
+| 5519 | Microsoft Windows NTFS Privilege Escalation Vulnerability | kev | markdown |  | CVE-2021-31956,cve-arsenal,cisa-kev,kev,in-the-wild,Microsoft,Windows |
+| 5520 | Microsoft Windows Kernel Privilege Escalation Vulnerability | kev | markdown |  | CVE-2021-31979,cve-arsenal,cisa-kev,kev,in-the-wild,Microsoft,Windows |
+| 5521 | ONLYOFFICE Docs Server Path Traversal Vulnerability | kev | markdown |  | CVE-2021-3199,cve-arsenal,cisa-kev,kev,in-the-wild,ONLYOFFICE,Docs |
+| 5522 | ASUS Routers Improper Authentication Vulnerability | kev | markdown |  | CVE-2021-32030,cve-arsenal,cisa-kev,kev,in-the-wild,ASUS,Routers |
+| 5523 | October CMS Improper Authentication | kev | markdown |  | CVE-2021-32648,cve-arsenal,cisa-kev,kev,in-the-wild,October CMS |
+| 5524 | Dahua IP Camera Authentication Bypass Vulnerability | kev | markdown |  | CVE-2021-33044,cve-arsenal,cisa-kev,kev,in-the-wild,Dahua,IP Camera Fi |
+| 5525 | Dahua IP Camera Authentication Bypass Vulnerability | kev | markdown |  | CVE-2021-33045,cve-arsenal,cisa-kev,kev,in-the-wild,Dahua,IP Camera Fi |
+| 5526 | Microsoft Desktop Window Manager (DWM) Core Library Privilege Escalation Vulnerability | kev | markdown |  | CVE-2021-33739,cve-arsenal,cisa-kev,kev,in-the-wild,Microsoft,Windows |
+| 5527 | Microsoft Windows MSHTML Platform Remote Code Execution Vulnerability | kev | markdown |  | CVE-2021-33742,cve-arsenal,cisa-kev,kev,in-the-wild,Microsoft,Windows |
+| 5528 | Microsoft Exchange Server Information Disclosure | kev | markdown |  | CVE-2021-33766,cve-arsenal,cisa-kev,kev,in-the-wild,Microsoft,Exchange |
+| 5529 | Microsoft Windows Kernel Privilege Escalation Vulnerability | kev | markdown |  | CVE-2021-33771,cve-arsenal,cisa-kev,kev,in-the-wild,Microsoft,Windows |
+| 5530 | Microsoft Windows Scripting Engine Memory Corruption Vulnerability | kev | markdown |  | CVE-2021-34448,cve-arsenal,cisa-kev,kev,in-the-wild,Microsoft,Windows |
+| 5531 | Microsoft Exchange Server Remote Code Execution Vulnerability | kev | markdown |  | CVE-2021-34473,cve-arsenal,cisa-kev,kev,in-the-wild,ransomware,Microso |
+| 5532 | Microsoft Windows User Profile Service Privilege Escalation Vulnerability | kev | markdown |  | CVE-2021-34484,cve-arsenal,cisa-kev,kev,in-the-wild,Microsoft,Windows |
+| 5533 | Microsoft Windows Event Tracing Privilege Escalation Vulnerability | kev | markdown |  | CVE-2021-34486,cve-arsenal,cisa-kev,kev,in-the-wild,Microsoft,Windows |
+| 5534 | Microsoft Exchange Server Privilege Escalation Vulnerability | kev | markdown |  | CVE-2021-34523,cve-arsenal,cisa-kev,kev,in-the-wild,ransomware,Microso |
+| 5535 | Microsoft Windows Print Spooler Remote Code Execution Vulnerability | kev | markdown |  | CVE-2021-34527,cve-arsenal,cisa-kev,kev,in-the-wild,ransomware,Microso |
+| 5536 | Linux Kernel Privilege Escalation Vulnerability | kev | markdown |  | CVE-2021-3493,cve-arsenal,cisa-kev,kev,in-the-wild,Linux,Kernel |
+| 5537 | SolarWinds Serv-U Remote Code Execution Vulnerability | kev | markdown |  | CVE-2021-35211,cve-arsenal,cisa-kev,kev,in-the-wild,ransomware,SolarWi |
+| 5538 | SolarWinds Serv-U Improper Input Validation Vulnerability | kev | markdown |  | CVE-2021-35247,cve-arsenal,cisa-kev,kev,in-the-wild,SolarWinds,Serv-U |
+| 5539 | Realtek Jungle SDK Remote Code Execution Vulnerability | kev | markdown |  | CVE-2021-35394,cve-arsenal,cisa-kev,kev,in-the-wild,Realtek,Jungle Sof |
+| 5540 | Realtek AP-Router SDK Buffer Overflow Vulnerability | kev | markdown |  | CVE-2021-35395,cve-arsenal,cisa-kev,kev,in-the-wild,Realtek,AP-Router  |
+| 5541 | ForgeRock Access Management (AM) Core Server Remote Code Execution Vulnerability | kev | markdown |  | CVE-2021-35464,cve-arsenal,cisa-kev,kev,in-the-wild,ransomware,ForgeRo |
+| 5542 | Oracle Fusion Middleware Unspecified Vulnerability | kev | markdown |  | CVE-2021-35587,cve-arsenal,cisa-kev,kev,in-the-wild,Oracle,Fusion Midd |
+| 5543 | Red Hat Polkit Incorrect Authorization Vulnerability | kev | markdown |  | CVE-2021-3560,cve-arsenal,cisa-kev,kev,in-the-wild,Red Hat,Polkit |
+| 5544 | Hikvision Improper Input Validation | kev | markdown |  | CVE-2021-36260,cve-arsenal,cisa-kev,kev,in-the-wild,Hikvision,Security |
+| 5545 | Sunhillo SureLine OS Command Injection Vulnerablity | kev | markdown |  | CVE-2021-36380,cve-arsenal,cisa-kev,kev,in-the-wild,Sunhillo,SureLine |
+| 5546 | Trend Micro Multiple Products Improper Input Validation Vulnerability | kev | markdown |  | CVE-2021-36741,cve-arsenal,cisa-kev,kev,in-the-wild,Trend Micro,Apex O |
+| 5547 | Trend Micro Multiple Products Improper Input Validation Vulnerability | kev | markdown |  | CVE-2021-36742,cve-arsenal,cisa-kev,kev,in-the-wild,Trend Micro,Apex O |
+| 5548 | Microsoft Windows SAM Local Privilege Escalation Vulnerability | kev | markdown |  | CVE-2021-36934,cve-arsenal,cisa-kev,kev,in-the-wild,Microsoft,Windows |
+| 5549 | Microsoft Windows Local Security Authority (LSA) Spoofing Vulnerability | kev | markdown |  | CVE-2021-36942,cve-arsenal,cisa-kev,kev,in-the-wild,ransomware,Microso |
+| 5550 | Microsoft Windows Update Medic Service Privilege Escalation Vulnerability | kev | markdown |  | CVE-2021-36948,cve-arsenal,cisa-kev,kev,in-the-wild,Microsoft,Windows |
+| 5551 | Microsoft Windows Common Log File System (CLFS) Driver Privilege Escalation Vulnerability | kev | markdown |  | CVE-2021-36955,cve-arsenal,cisa-kev,kev,in-the-wild,ransomware,Microso |
+| 5552 | Zoho ManageEngine ServiceDesk Authentication Bypass Vulnerability | kev | markdown |  | CVE-2021-37415,cve-arsenal,cisa-kev,kev,in-the-wild,Zoho,ManageEngine  |
+| 5553 | Google Chromium Portals Use-After-Free Vulnerability | kev | markdown |  | CVE-2021-37973,cve-arsenal,cisa-kev,kev,in-the-wild,Google,Chromium Po |
+| 5554 | Google Chromium V8 Use-After-Free Vulnerability | kev | markdown |  | CVE-2021-37975,cve-arsenal,cisa-kev,kev,in-the-wild,Google,Chromium V8 |
+| 5555 | Google Chromium Information Disclosure Vulnerability | kev | markdown |  | CVE-2021-37976,cve-arsenal,cisa-kev,kev,in-the-wild,Google,Chromium |
+| 5556 | Google Chromium Intents Improper Input Validation Vulnerability | kev | markdown |  | CVE-2021-38000,cve-arsenal,cisa-kev,kev,in-the-wild,Google,Chromium In |
+| 5557 | Google Chromium V8 Memory Corruption Vulnerability | kev | markdown |  | CVE-2021-38003,cve-arsenal,cisa-kev,kev,in-the-wild,Google,Chromium V8 |
+| 5558 | SAP NetWeaver Unrestricted File Upload Vulnerability | kev | markdown |  | CVE-2021-38163,cve-arsenal,cisa-kev,kev,in-the-wild,SAP,NetWeaver |
+| 5559 | Delta Electronics DOPSoft 2 Improper Input Validation Vulnerability | kev | markdown |  | CVE-2021-38406,cve-arsenal,cisa-kev,kev,in-the-wild,Delta Electronics, |
+| 5560 | Microsoft Open Management Infrastructure (OMI) Privilege Escalation Vulnerability | kev | markdown |  | CVE-2021-38645,cve-arsenal,cisa-kev,kev,in-the-wild,Microsoft,Open Man |
+| 5561 | Microsoft Office Access Connectivity Engine Remote Code Execution Vulnerability | kev | markdown |  | CVE-2021-38646,cve-arsenal,cisa-kev,kev,in-the-wild,ransomware,Microso |
+| 5562 | Microsoft Open Management Infrastructure (OMI) Remote Code Execution Vulnerability | kev | markdown |  | CVE-2021-38647,cve-arsenal,cisa-kev,kev,in-the-wild,ransomware,Microso |
+| 5563 | Microsoft Open Management Infrastructure (OMI) Privilege Escalation Vulnerability | kev | markdown |  | CVE-2021-38648,cve-arsenal,cisa-kev,kev,in-the-wild,Microsoft,Open Man |
+| 5564 | Microsoft Open Management Infrastructure (OMI) Privilege Escalation Vulnerability | kev | markdown |  | CVE-2021-38649,cve-arsenal,cisa-kev,kev,in-the-wild,Microsoft,Open Man |
+| 5565 | XStream Remote Code Execution Vulnerability | kev | markdown |  | CVE-2021-39144,cve-arsenal,cisa-kev,kev,in-the-wild,XStream |
+| 5566 | Grafana Authentication Bypass Vulnerability | kev | markdown |  | CVE-2021-39226,cve-arsenal,cisa-kev,kev,in-the-wild,Grafana Labs,Grafa |
+| 5567 | Google Pixel Out-of-Bounds Write Vulnerability | kev | markdown |  | CVE-2021-39793,cve-arsenal,cisa-kev,kev,in-the-wild,Google,Pixel |
+| 5568 | GitLab Community and Enterprise Editions Server-Side Request Forgery (SSRF) Vulnerability | kev | markdown |  | CVE-2021-39935,cve-arsenal,cisa-kev,kev,in-the-wild,GitLab,Community a |
+| 5569 | Red Hat Polkit Out-of-Bounds Read and Write Vulnerability | kev | markdown |  | CVE-2021-4034,cve-arsenal,cisa-kev,kev,in-the-wild,ransomware,Red Hat, |
+| 5570 | Reolink RLC-410W IP Camera OS Command Injection Vulnerability | kev | markdown |  | CVE-2021-40407,cve-arsenal,cisa-kev,kev,in-the-wild,Reolink,RLC-410W I |
+| 5571 | Apache HTTP Server-Side Request Forgery (SSRF) | kev | markdown |  | CVE-2021-40438,cve-arsenal,cisa-kev,kev,in-the-wild,ransomware,Apache |
+| 5572 | Microsoft MSHTML Remote Code Execution Vulnerability | kev | markdown |  | CVE-2021-40444,cve-arsenal,cisa-kev,kev,in-the-wild,ransomware,Microso |
+| 5573 | Microsoft Windows Win32k Privilege Escalation Vulnerability | kev | markdown |  | CVE-2021-40449,cve-arsenal,cisa-kev,kev,in-the-wild,ransomware,Microso |
+| 5574 | Microsoft Win32k Privilege Escalation Vulnerability | kev | markdown |  | CVE-2021-40450,cve-arsenal,cisa-kev,kev,in-the-wild,Microsoft,Win32k |
+| 5575 | Zoho ManageEngine ADSelfService Plus Authentication Bypass Vulnerability | kev | markdown |  | CVE-2021-40539,cve-arsenal,cisa-kev,kev,in-the-wild,ransomware,Zoho,Ma |
+| 5576 | D-Link DIR-605 Router Information Disclosure Vulnerability | kev | markdown |  | CVE-2021-40655,cve-arsenal,cisa-kev,kev,in-the-wild,D-Link,DIR-605 Rou |
+| 5577 | Aviatrix Controller Unrestricted Upload of File | kev | markdown |  | CVE-2021-40870,cve-arsenal,cisa-kev,kev,in-the-wild,Aviatrix,Aviatrix  |
+| 5578 | Google Chromium V8 Use-After-Free Vulnerability | kev | markdown |  | CVE-2021-4102,cve-arsenal,cisa-kev,kev,in-the-wild,Google,Chromium V8 |
+| 5579 | Metabase GeoJSON API Local File Inclusion Vulnerability | kev | markdown |  | CVE-2021-41277,cve-arsenal,cisa-kev,kev,in-the-wild,Metabase |
+| 5580 | Microsoft Win32k Privilege Escalation Vulnerability | kev | markdown |  | CVE-2021-41357,cve-arsenal,cisa-kev,kev,in-the-wild,Microsoft,Win32k |
+| 5581 | Microsoft Windows Installer Privilege Escalation Vulnerability | kev | markdown |  | CVE-2021-41379,cve-arsenal,cisa-kev,kev,in-the-wild,ransomware,Microso |
+| 5582 | Apache HTTP Server Path Traversal Vulnerability | kev | markdown |  | CVE-2021-41773,cve-arsenal,cisa-kev,kev,in-the-wild,ransomware,Apache, |
+| 5583 | Apache HTTP Server Path Traversal Vulnerability | kev | markdown |  | CVE-2021-42013,cve-arsenal,cisa-kev,kev,in-the-wild,ransomware,Apache, |
+| 5584 | Sitecore XP Remote Command Execution Vulnerability | kev | markdown |  | CVE-2021-42237,cve-arsenal,cisa-kev,kev,in-the-wild,ransomware,Sitecor |
+| 5585 | BQE BillQuick Web Suite SQL Injection Vulnerability | kev | markdown |  | CVE-2021-42258,cve-arsenal,cisa-kev,kev,in-the-wild,ransomware,BQE,Bil |
+| 5586 | Microsoft Active Directory Domain Services Privilege Escalation Vulnerability | kev | markdown |  | CVE-2021-42278,cve-arsenal,cisa-kev,kev,in-the-wild,ransomware,Microso |
+| 5587 | Microsoft Active Directory Domain Services Privilege Escalation Vulnerability | kev | markdown |  | CVE-2021-42287,cve-arsenal,cisa-kev,kev,in-the-wild,ransomware,Microso |
+| 5588 | Microsoft Excel Security Feature Bypass | kev | markdown |  | CVE-2021-42292,cve-arsenal,cisa-kev,kev,in-the-wild,Microsoft,Office |
+| 5589 | Microsoft Exchange Server Remote Code Execution Vulnerability | kev | markdown |  | CVE-2021-42321,cve-arsenal,cisa-kev,kev,in-the-wild,ransomware,Microso |
+| 5590 | Microsoft Windows Privilege Escalation Vulnerability | kev | markdown |  | CVE-2021-43226,cve-arsenal,cisa-kev,kev,in-the-wild,ransomware,Microso |
+| 5591 | Grafana Path Traversal Vulnerability | kev | markdown |  | CVE-2021-43798,cve-arsenal,cisa-kev,kev,in-the-wild,Grafana Labs,Grafa |
+| 5592 | Microsoft Windows AppX Installer Spoofing Vulnerability | kev | markdown |  | CVE-2021-43890,cve-arsenal,cisa-kev,kev,in-the-wild,ransomware,Microso |
+| 5593 | Roundcube Webmail SQL Injection Vulnerability | kev | markdown |  | CVE-2021-44026,cve-arsenal,cisa-kev,kev,in-the-wild,Roundcube,Roundcub |
+| 5594 | Zoho ManageEngine ServiceDesk Plus Remote Code Execution Vulnerability | kev | markdown |  | CVE-2021-44077,cve-arsenal,cisa-kev,kev,in-the-wild,Zoho,ManageEngine  |
+| 5595 | Fortinet FortiOS Arbitrary File Download | kev | markdown |  | CVE-2021-44168,cve-arsenal,cisa-kev,kev,in-the-wild,Fortinet,FortiOS |
+| 5596 | Acclaim Systems USAHERDS Use of Hard-Coded Credentials Vulnerability | kev | markdown |  | CVE-2021-44207,cve-arsenal,cisa-kev,kev,in-the-wild,Acclaim Systems,US |
+| 5597 | Apache Log4j2 Remote Code Execution Vulnerability | kev | markdown |  | CVE-2021-44228,cve-arsenal,cisa-kev,kev,in-the-wild,ransomware,Apache, |
+| 5598 | Zoho Desktop Central Authentication Bypass Vulnerability | kev | markdown |  | CVE-2021-44515,cve-arsenal,cisa-kev,kev,in-the-wild,Zoho,Desktop Centr |
+| 5599 | Ivanti Endpoint Manager Cloud Service Appliance (EPM CSA) Code Injection Vulnerability | kev | markdown |  | CVE-2021-44529,cve-arsenal,cisa-kev,kev,in-the-wild,ransomware,Ivanti, |
+| 5600 | Apache Log4j2 Deserialization of Untrusted Data Vulnerability | kev | markdown |  | CVE-2021-45046,cve-arsenal,cisa-kev,kev,in-the-wild,ransomware,Apache, |
+| 5601 | D-Link Multiple Routers Remote Code Execution Vulnerability | kev | markdown |  | CVE-2021-45382,cve-arsenal,cisa-kev,kev,in-the-wild,D-Link,Multiple Ro |
+| 5602 | Palo Alto Networks PAN-OS Reflected Amplification Denial-of-Service Vulnerability | kev | markdown |  | CVE-2022-0028,cve-arsenal,cisa-kev,kev,in-the-wild,Palo Alto Networks, |
+| 5603 | Linux Kernel Heap-Based Buffer Overflow Vulnerability | kev | markdown |  | CVE-2022-0185,cve-arsenal,cisa-kev,kev,in-the-wild,Linux,Kernel |
+| 5604 | Linux Kernel Improper Authentication Vulnerability | kev | markdown |  | CVE-2022-0492,cve-arsenal,cisa-kev,kev,in-the-wild,Linux,Kernel |
+| 5605 | Debian-specific Redis Server Lua Sandbox Escape Vulnerability | kev | markdown |  | CVE-2022-0543,cve-arsenal,cisa-kev,kev,in-the-wild,Redis,Debian-specif |
+| 5606 | Google Chromium Animation Use-After-Free Vulnerability | kev | markdown |  | CVE-2022-0609,cve-arsenal,cisa-kev,kev,in-the-wild,Google,Chromium Ani |
+| 5607 | Linux Kernel Privilege Escalation Vulnerability | kev | markdown |  | CVE-2022-0847,cve-arsenal,cisa-kev,kev,in-the-wild,Linux,Kernel |
+| 5608 | Linux Kernel Out-of-Bounds Write Vulnerability | kev | markdown |  | CVE-2022-0995,cve-arsenal,cisa-kev,kev,in-the-wild,Linux,Kernel |
+| 5609 | Sophos Firewall Authentication Bypass Vulnerability | kev | markdown |  | CVE-2022-1040,cve-arsenal,cisa-kev,kev,in-the-wild,Sophos,Firewall |
+| 5610 | Google Chromium V8 Type Confusion Vulnerability | kev | markdown |  | CVE-2022-1096,cve-arsenal,cisa-kev,kev,in-the-wild,Google,Chromium V8 |
+| 5611 | Google Chromium V8 Type Confusion Vulnerability | kev | markdown |  | CVE-2022-1364,cve-arsenal,cisa-kev,kev,in-the-wild,Google,Chromium V8 |
+| 5612 | F5 BIG-IP Missing Authentication Vulnerability | kev | markdown |  | CVE-2022-1388,cve-arsenal,cisa-kev,kev,in-the-wild,ransomware,F5,BIG-I |
+| 5613 | Cisco Small Business RV Series Routers Stack-based Buffer Overflow Vulnerability | kev | markdown |  | CVE-2022-20699,cve-arsenal,cisa-kev,kev,in-the-wild,Cisco,Small Busine |
+| 5614 | Cisco Small Business RV Series Routers Stack-based Buffer Overflow Vulnerability | kev | markdown |  | CVE-2022-20700,cve-arsenal,cisa-kev,kev,in-the-wild,Cisco,Small Busine |
+| 5615 | Cisco Small Business RV Series Routers Stack-based Buffer Overflow Vulnerability | kev | markdown |  | CVE-2022-20701,cve-arsenal,cisa-kev,kev,in-the-wild,Cisco,Small Busine |
+| 5616 | Cisco Small Business RV Series Routers Stack-based Buffer Overflow Vulnerability | kev | markdown |  | CVE-2022-20703,cve-arsenal,cisa-kev,kev,in-the-wild,Cisco,Small Busine |
+| 5617 | Cisco Small Business RV Series Routers Stack-based Buffer Overflow Vulnerability | kev | markdown |  | CVE-2022-20708,cve-arsenal,cisa-kev,kev,in-the-wild,Cisco,Small Busine |
+| 5618 | Cisco SD-WAN Path Traversal Vulnerability | kev | markdown |  | CVE-2022-20775,cve-arsenal,cisa-kev,kev,in-the-wild,Cisco,SD-WAN |
+| 5619 | Cisco IOS XR Open Port Vulnerability | kev | markdown |  | CVE-2022-20821,cve-arsenal,cisa-kev,kev,in-the-wild,Cisco,IOS XR |
+| 5620 | Oracle ADF Faces Deserialization of Untrusted Data Vulnerability | kev | markdown |  | CVE-2022-21445,cve-arsenal,cisa-kev,kev,in-the-wild,Oracle,ADF Faces |
+| 5621 | Oracle E-Business Suite Unspecified Vulnerability | kev | markdown |  | CVE-2022-21587,cve-arsenal,cisa-kev,kev,in-the-wild,ransomware,Oracle, |
+| 5622 | Microsoft Win32k Privilege Escalation Vulnerability | kev | markdown |  | CVE-2022-21882,cve-arsenal,cisa-kev,kev,in-the-wild,ransomware,Microso |
+| 5623 | Microsoft Windows User Profile Service Privilege Escalation Vulnerability | kev | markdown |  | CVE-2022-21919,cve-arsenal,cisa-kev,kev,in-the-wild,Microsoft,Windows |
+| 5624 | Microsoft Windows Runtime Remote Code Execution Vulnerability | kev | markdown |  | CVE-2022-21971,cve-arsenal,cisa-kev,kev,in-the-wild,Microsoft,Windows |
+| 5625 | Microsoft Windows Print Spooler Privilege Escalation Vulnerability | kev | markdown |  | CVE-2022-21999,cve-arsenal,cisa-kev,kev,in-the-wild,ransomware,Microso |
+| 5626 | Microsoft Windows Client Server Runtime Subsystem (CSRSS) Privilege Escalation Vulnerability | kev | markdown |  | CVE-2022-22047,cve-arsenal,cisa-kev,kev,in-the-wild,Microsoft,Windows |
+| 5627 | Qualcomm Multiple Chipsets Use-After-Free Vulnerability | kev | markdown |  | CVE-2022-22071,cve-arsenal,cisa-kev,kev,in-the-wild,Qualcomm,Multiple  |
+| 5628 | Samsung Mobile Devices Use-After-Free Vulnerability | kev | markdown |  | CVE-2022-22265,cve-arsenal,cisa-kev,kev,in-the-wild,Samsung,Mobile Dev |
+| 5629 | SAP Multiple Products HTTP Request Smuggling Vulnerability | kev | markdown |  | CVE-2022-22536,cve-arsenal,cisa-kev,kev,in-the-wild,SAP,Multiple Produ |
+| 5630 | Apple Memory Corruption Vulnerability | kev | markdown |  | CVE-2022-22587,cve-arsenal,cisa-kev,kev,in-the-wild,Apple,iOS and macO |
+| 5631 | Apple iOS, iPadOS, and macOS Webkit Use-After-Free Vulnerability | kev | markdown |  | CVE-2022-22620,cve-arsenal,cisa-kev,kev,in-the-wild,Apple,iOS, iPadOS, |
+| 5632 | Apple macOS Out-of-Bounds Read Vulnerability | kev | markdown |  | CVE-2022-22674,cve-arsenal,cisa-kev,kev,in-the-wild,Apple,macOS |
+| 5633 | Apple macOS Out-of-Bounds Write Vulnerability | kev | markdown |  | CVE-2022-22675,cve-arsenal,cisa-kev,kev,in-the-wild,Apple,macOS |
+| 5634 | Arm Mali GPU Kernel Driver Unspecified Vulnerability | kev | markdown |  | CVE-2022-22706,cve-arsenal,cisa-kev,kev,in-the-wild,Arm,Mali Graphics  |
+| 5635 | Microsoft Windows Print Spooler Privilege Escalation Vulnerability | kev | markdown |  | CVE-2022-22718,cve-arsenal,cisa-kev,kev,in-the-wild,Microsoft,Windows |
+| 5636 | WebRTC Heap Buffer Overflow Vulnerability | kev | markdown |  | CVE-2022-2294,cve-arsenal,cisa-kev,kev,in-the-wild,ransomware,WebRTC |
+| 5637 | VMware Spring Cloud Gateway Code Injection Vulnerability | kev | markdown |  | CVE-2022-22947,cve-arsenal,cisa-kev,kev,in-the-wild,VMware,Spring Clou |
+| 5638 | VMware vCenter Server Incorrect Default File Permissions Vulnerability | kev | markdown |  | CVE-2022-22948,cve-arsenal,cisa-kev,kev,in-the-wild,VMware,vCenter Ser |
+| 5639 | VMware Workspace ONE Access and Identity Manager Server-Side Template Injection Vulnerability | kev | markdown |  | CVE-2022-22954,cve-arsenal,cisa-kev,kev,in-the-wild,ransomware,VMware, |
+| 5640 | VMware Multiple Products Privilege Escalation Vulnerability | kev | markdown |  | CVE-2022-22960,cve-arsenal,cisa-kev,kev,in-the-wild,VMware,Multiple Pr |
+| 5641 | VMware Tanzu Spring Cloud Function Remote Code Execution Vulnerability | kev | markdown |  | CVE-2022-22963,cve-arsenal,cisa-kev,kev,in-the-wild,VMware Tanzu,Sprin |
+| 5642 | Spring Framework JDK 9+ Remote Code Execution Vulnerability | kev | markdown |  | CVE-2022-22965,cve-arsenal,cisa-kev,kev,in-the-wild,VMware,Spring Fram |
+| 5643 | Zabbix Frontend Authentication Bypass Vulnerability | kev | markdown |  | CVE-2022-23131,cve-arsenal,cisa-kev,kev,in-the-wild,Zabbix,Frontend |
+| 5644 | Zabbix Frontend Improper Access Control Vulnerability | kev | markdown |  | CVE-2022-23134,cve-arsenal,cisa-kev,kev,in-the-wild,Zabbix,Frontend |
+| 5645 | WatchGuard Firebox and XTM Privilege Escalation Vulnerability | kev | markdown |  | CVE-2022-23176,cve-arsenal,cisa-kev,kev,in-the-wild,WatchGuard,Firebox |
+| 5646 | NUUO NVRmini2 Devices Missing Authentication Vulnerability | kev | markdown |  | CVE-2022-23227,cve-arsenal,cisa-kev,kev,in-the-wild,NUUO,NVRmini2 Devi |
+| 5647 | Dante Discovery Process Control Vulnerability | kev | markdown |  | CVE-2022-23748,cve-arsenal,cisa-kev,kev,in-the-wild,Audinate,Dante Dis |
+| 5648 | Adobe Commerce and Magento Open Source Improper Input Validation Vulnerability | kev | markdown |  | CVE-2022-24086,cve-arsenal,cisa-kev,kev,in-the-wild,Adobe,Commerce and |
+| 5649 | Apache APISIX Authentication Bypass Vulnerability | kev | markdown |  | CVE-2022-24112,cve-arsenal,cisa-kev,kev,in-the-wild,Apache,APISIX |
+| 5650 | Microsoft Windows CLFS Driver Privilege Escalation Vulnerability | kev | markdown |  | CVE-2022-24521,cve-arsenal,cisa-kev,kev,in-the-wild,ransomware,Microso |
+| 5651 | Synacor Zimbra Collaborate Suite (ZCS) Cross-Site Scripting Vulnerability | kev | markdown |  | CVE-2022-24682,cve-arsenal,cisa-kev,kev,in-the-wild,ransomware,Synacor |
+| 5652 | Apache CouchDB Insecure Default Initialization of Resource Vulnerability | kev | markdown |  | CVE-2022-24706,cve-arsenal,cisa-kev,kev,in-the-wild,Apache,CouchDB |
+| 5653 | OSGeo GeoServer JAI-EXT Code Injection Vulnerability | kev | markdown |  | CVE-2022-24816,cve-arsenal,cisa-kev,kev,in-the-wild,OSGeo,JAI-EXT |
+| 5654 | TerraMaster OS Remote Command Execution Vulnerability | kev | markdown |  | CVE-2022-24990,cve-arsenal,cisa-kev,kev,in-the-wild,ransomware,TerraMa |
+| 5655 | Linux Kernel Use-After-Free Vulnerability | kev | markdown |  | CVE-2022-2586,cve-arsenal,cisa-kev,kev,in-the-wild,Linux,Kernel |
+| 5656 | Atlassian Confluence Server and Data Center Remote Code Execution Vulnerability | kev | markdown |  | CVE-2022-26134,cve-arsenal,cisa-kev,kev,in-the-wild,ransomware,Atlassi |
+| 5657 | Atlassian Questions For Confluence App Hard-coded Credentials Vulnerability | kev | markdown |  | CVE-2022-26138,cve-arsenal,cisa-kev,kev,in-the-wild,Atlassian,Confluen |
+| 5658 | MiCollab, MiVoice Business Express Access Control Vulnerability | kev | markdown |  | CVE-2022-26143,cve-arsenal,cisa-kev,kev,in-the-wild,Mitel,MiCollab, Mi |
+| 5659 | D-Link DIR-820L Remote Code Execution Vulnerability | kev | markdown |  | CVE-2022-26258,cve-arsenal,cisa-kev,kev,in-the-wild,D-Link,DIR-820L |
+| 5660 | WatchGuard Firebox and XTM Appliances Arbitrary Code Execution | kev | markdown |  | CVE-2022-26318,cve-arsenal,cisa-kev,kev,in-the-wild,WatchGuard,Firebox |
+| 5661 | dotCMS Unrestricted Upload of File Vulnerability | kev | markdown |  | CVE-2022-26352,cve-arsenal,cisa-kev,kev,in-the-wild,ransomware,dotCMS |
+| 5662 | Mozilla Firefox Use-After-Free Vulnerability | kev | markdown |  | CVE-2022-26485,cve-arsenal,cisa-kev,kev,in-the-wild,Mozilla,Firefox |
+| 5663 | Mozilla Firefox Use-After-Free Vulnerability | kev | markdown |  | CVE-2022-26486,cve-arsenal,cisa-kev,kev,in-the-wild,Mozilla,Firefox |
+| 5664 | Veeam Backup & Replication Remote Code Execution Vulnerability | kev | markdown |  | CVE-2022-26500,cve-arsenal,cisa-kev,kev,in-the-wild,ransomware,Veeam,B |
+| 5665 | Veeam Backup & Replication Remote Code Execution Vulnerability | kev | markdown |  | CVE-2022-26501,cve-arsenal,cisa-kev,kev,in-the-wild,ransomware,Veeam,B |
+| 5666 | Trend Micro Apex Central Arbitrary File Upload Vulnerability | kev | markdown |  | CVE-2022-26871,cve-arsenal,cisa-kev,kev,in-the-wild,Trend Micro,Apex C |
+| 5667 | Microsoft Windows User Profile Service Privilege Escalation Vulnerability | kev | markdown |  | CVE-2022-26904,cve-arsenal,cisa-kev,kev,in-the-wild,Microsoft,Windows |
+| 5668 | Microsoft Active Directory Domain Services Privilege Escalation Vulnerability | kev | markdown |  | CVE-2022-26923,cve-arsenal,cisa-kev,kev,in-the-wild,Microsoft,Active D |
+| 5669 | Microsoft Windows LSA Spoofing Vulnerability | kev | markdown |  | CVE-2022-26925,cve-arsenal,cisa-kev,kev,in-the-wild,Microsoft,Windows |
+| 5670 | Citrix Application Delivery Controller (ADC) and Gateway Authentication Bypass Vulnerability | kev | markdown |  | CVE-2022-27518,cve-arsenal,cisa-kev,kev,in-the-wild,Citrix,Application |
+| 5671 | QNAP Photo Station Externally Controlled Reference Vulnerability | kev | markdown |  | CVE-2022-27593,cve-arsenal,cisa-kev,kev,in-the-wild,ransomware,QNAP,Ph |
+| 5672 | Synacor Zimbra Collaboration Suite (ZCS) Command Injection Vulnerability | kev | markdown |  | CVE-2022-27924,cve-arsenal,cisa-kev,kev,in-the-wild,ransomware,Synacor |
+| 5673 | Synacor Zimbra Collaboration Suite (ZCS) Arbitrary File Upload Vulnerability | kev | markdown |  | CVE-2022-27925,cve-arsenal,cisa-kev,kev,in-the-wild,ransomware,Synacor |
+| 5674 | Synacor Zimbra Collaboration Suite (ZCS) Cross-Site Scripting (XSS) Vulnerability | kev | markdown |  | CVE-2022-27926,cve-arsenal,cisa-kev,kev,in-the-wild,Synacor,Zimbra Col |
+| 5675 | Google Chromium Intents Insufficient Input Validation Vulnerability | kev | markdown |  | CVE-2022-2856,cve-arsenal,cisa-kev,kev,in-the-wild,Google,Chromium Int |
+| 5676 | Zoho ManageEngine ADSelfService Plus Remote Code Execution Vulnerability | kev | markdown |  | CVE-2022-28810,cve-arsenal,cisa-kev,kev,in-the-wild,Zoho,ManageEngine |
+| 5677 | SolarView Compact Command Injection Vulnerability | kev | markdown |  | CVE-2022-29303,cve-arsenal,cisa-kev,kev,in-the-wild,SolarView,Compact |
+| 5678 | WSO2 Multiple Products Unrestrictive Upload of File Vulnerability | kev | markdown |  | CVE-2022-29464,cve-arsenal,cisa-kev,kev,in-the-wild,ransomware,WSO2,Mu |
+| 5679 | Mitel MiVoice Connect Data Validation Vulnerability | kev | markdown |  | CVE-2022-29499,cve-arsenal,cisa-kev,kev,in-the-wild,ransomware,Mitel,M |
+| 5680 | Microsoft Windows Support Diagnostic Tool (MSDT) Remote Code Execution Vulnerability | kev | markdown |  | CVE-2022-30190,cve-arsenal,cisa-kev,kev,in-the-wild,ransomware,Microso |
+| 5681 | RARLAB UnRAR Directory Traversal Vulnerability | kev | markdown |  | CVE-2022-30333,cve-arsenal,cisa-kev,kev,in-the-wild,ransomware,RARLAB, |
+| 5682 | Google Chromium Network Service Use-After-Free Vulnerability | kev | markdown |  | CVE-2022-3038,cve-arsenal,cisa-kev,kev,in-the-wild,Google,Chromium Net |
+| 5683 | Zyxel Multiple Firewalls OS Command Injection Vulnerability | kev | markdown |  | CVE-2022-30525,cve-arsenal,cisa-kev,kev,in-the-wild,Zyxel,Multiple Fir |
+| 5684 | Google Chromium Mojo Insufficient Data Validation Vulnerability | kev | markdown |  | CVE-2022-3075,cve-arsenal,cisa-kev,kev,in-the-wild,Google,Chromium Moj |
+| 5685 | Netwrix Auditor Insecure Object Deserialization Vulnerability | kev | markdown |  | CVE-2022-31199,cve-arsenal,cisa-kev,kev,in-the-wild,ransomware,Netwrix |
+| 5686 | Sophos Firewall Code Injection Vulnerability | kev | markdown |  | CVE-2022-3236,cve-arsenal,cisa-kev,kev,in-the-wild,Sophos,Firewall |
+| 5687 | Apple iOS and macOS Out-of-Bounds Write Vulnerability | kev | markdown |  | CVE-2022-32893,cve-arsenal,cisa-kev,kev,in-the-wild,Apple,iOS and macO |
+| 5688 | Apple iOS and macOS Out-of-Bounds Write Vulnerability | kev | markdown |  | CVE-2022-32894,cve-arsenal,cisa-kev,kev,in-the-wild,Apple,iOS and macO |
+| 5689 | Apple iOS, iPadOS, and macOS Remote Code Execution Vulnerability | kev | markdown |  | CVE-2022-32917,cve-arsenal,cisa-kev,kev,in-the-wild,Apple,iOS, iPadOS, |
+| 5690 | Apache Spark Command Injection Vulnerability | kev | markdown |  | CVE-2022-33891,cve-arsenal,cisa-kev,kev,in-the-wild,Apache,Spark |
+| 5691 | Microsoft Windows Support Diagnostic Tool (MSDT) Remote Code Execution Vulnerability | kev | markdown |  | CVE-2022-34713,cve-arsenal,cisa-kev,kev,in-the-wild,Microsoft,Windows |
+| 5692 | Zoho ManageEngine Multiple Products Remote Code Execution Vulnerability | kev | markdown |  | CVE-2022-35405,cve-arsenal,cisa-kev,kev,in-the-wild,Zoho,ManageEngine |
+| 5693 | Teclib GLPI Remote Code Execution Vulnerability | kev | markdown |  | CVE-2022-35914,cve-arsenal,cisa-kev,kev,in-the-wild,Teclib,GLPI |
+| 5694 | ZK Framework AuUploader Unspecified Vulnerability | kev | markdown |  | CVE-2022-36537,cve-arsenal,cisa-kev,kev,in-the-wild,ransomware,ZK Fram |
+| 5695 | Atlassian Bitbucket Server and Data Center Command Injection Vulnerability | kev | markdown |  | CVE-2022-36804,cve-arsenal,cisa-kev,kev,in-the-wild,Atlassian,Bitbucke |
+| 5696 | Synacor Zimbra Collaboration Suite (ZCS) Authentication Bypass Vulnerability | kev | markdown |  | CVE-2022-37042,cve-arsenal,cisa-kev,kev,in-the-wild,ransomware,Synacor |
+| 5697 | D-Link Routers Buffer Overflow Vulnerability | kev | markdown |  | CVE-2022-37055,cve-arsenal,cisa-kev,kev,in-the-wild,D-Link,Routers |
+| 5698 | Google Chromium V8 Type Confusion Vulnerability | kev | markdown |  | CVE-2022-3723,cve-arsenal,cisa-kev,kev,in-the-wild,Google,Chromium V8 |
+| 5699 | Microsoft Windows Common Log File System (CLFS) Driver Privilege Escalation Vulnerability | kev | markdown |  | CVE-2022-37969,cve-arsenal,cisa-kev,kev,in-the-wild,ransomware,Microso |
+| 5700 | Microsoft Windows Print Spooler Privilege Escalation Vulnerability | kev | markdown |  | CVE-2022-38028,cve-arsenal,cisa-kev,kev,in-the-wild,Microsoft,Windows |
+| 5701 | Arm Mali GPU Kernel Driver Use-After-Free Vulnerability | kev | markdown |  | CVE-2022-38181,cve-arsenal,cisa-kev,kev,in-the-wild,Arm,Mali Graphics  |
+| 5702 | Fortra Cobalt Strike Teamserver Cross-Site Scripting (XSS) Vulnerability | kev | markdown |  | CVE-2022-39197,cve-arsenal,cisa-kev,kev,in-the-wild,Fortra,Cobalt Stri |
+| 5703 | Trend Micro Apex One and Apex One as a Service Improper Validation Vulnerability | kev | markdown |  | CVE-2022-40139,cve-arsenal,cisa-kev,kev,in-the-wild,Trend Micro,Apex O |
+| 5704 | Fortinet Multiple Products Authentication Bypass Vulnerability | kev | markdown |  | CVE-2022-40684,cve-arsenal,cisa-kev,kev,in-the-wild,ransomware,Fortine |
+| 5705 | Mitel MiVoice Connect Command Injection Vulnerability | kev | markdown |  | CVE-2022-40765,cve-arsenal,cisa-kev,kev,in-the-wild,ransomware,Mitel,M |
+| 5706 | D-Link DNR-322L Download of Code Without Integrity Check Vulnerability | kev | markdown |  | CVE-2022-40799,cve-arsenal,cisa-kev,kev,in-the-wild,D-Link,DNR-322L |
+| 5707 | Microsoft Windows COM+ Event System Service Privilege Escalation Vulnerability | kev | markdown |  | CVE-2022-41033,cve-arsenal,cisa-kev,kev,in-the-wild,Microsoft,Windows  |
+| 5708 | Microsoft Exchange Server Server-Side Request Forgery Vulnerability | kev | markdown |  | CVE-2022-41040,cve-arsenal,cisa-kev,kev,in-the-wild,ransomware,Microso |
+| 5709 | Microsoft Windows Mark of the Web (MOTW) Security Feature Bypass Vulnerability | kev | markdown |  | CVE-2022-41049,cve-arsenal,cisa-kev,kev,in-the-wild,Microsoft,Windows |
+| 5710 | Microsoft Windows Print Spooler Privilege Escalation Vulnerability | kev | markdown |  | CVE-2022-41073,cve-arsenal,cisa-kev,kev,in-the-wild,ransomware,Microso |
+| 5711 | Microsoft Exchange Server Privilege Escalation Vulnerability | kev | markdown |  | CVE-2022-41080,cve-arsenal,cisa-kev,kev,in-the-wild,ransomware,Microso |
+| 5712 | Microsoft Exchange Server Remote Code Execution Vulnerability | kev | markdown |  | CVE-2022-41082,cve-arsenal,cisa-kev,kev,in-the-wild,ransomware,Microso |
+| 5713 | Microsoft Windows Mark of the Web (MOTW) Security Feature Bypass Vulnerability | kev | markdown |  | CVE-2022-41091,cve-arsenal,cisa-kev,kev,in-the-wild,ransomware,Microso |
+| 5714 | Microsoft Windows CNG Key Isolation Service Privilege Escalation Vulnerability | kev | markdown |  | CVE-2022-41125,cve-arsenal,cisa-kev,kev,in-the-wild,Microsoft,Windows |
+| 5715 | Microsoft Windows Scripting Languages Remote Code Execution Vulnerability | kev | markdown |  | CVE-2022-41128,cve-arsenal,cisa-kev,kev,in-the-wild,Microsoft,Windows |
+| 5716 | Mitel MiVoice Connect Code Injection Vulnerability | kev | markdown |  | CVE-2022-41223,cve-arsenal,cisa-kev,kev,in-the-wild,ransomware,Mitel,M |
+| 5717 | Fortinet FortiOS Path Traversal Vulnerability | kev | markdown |  | CVE-2022-41328,cve-arsenal,cisa-kev,kev,in-the-wild,Fortinet,FortiOS |
+| 5718 | Google Chromium GPU Heap Buffer Overflow Vulnerability | kev | markdown |  | CVE-2022-4135,cve-arsenal,cisa-kev,kev,in-the-wild,Google,Chromium GPU |
+| 5719 | Synacor Zimbra Collaboration Suite (ZCS) Arbitrary File Upload Vulnerability | kev | markdown |  | CVE-2022-41352,cve-arsenal,cisa-kev,kev,in-the-wild,ransomware,Synacor |
+| 5720 | Fortinet FortiOS Heap-Based Buffer Overflow Vulnerability | kev | markdown |  | CVE-2022-42475,cve-arsenal,cisa-kev,kev,in-the-wild,ransomware,Fortine |
+| 5721 | Google Chromium V8 Type Confusion Vulnerability | kev | markdown |  | CVE-2022-4262,cve-arsenal,cisa-kev,kev,in-the-wild,Google,Chromium V8 |
+| 5722 | Apple iOS and iPadOS Out-of-Bounds Write Vulnerability | kev | markdown |  | CVE-2022-42827,cve-arsenal,cisa-kev,kev,in-the-wild,Apple,iOS and iPad |
+| 5723 | Apple iOS Type Confusion Vulnerability | kev | markdown |  | CVE-2022-42856,cve-arsenal,cisa-kev,kev,in-the-wild,Apple,iOS |
+| 5724 | Fortra Cobalt Strike User Interface Remote Code Execution Vulnerability | kev | markdown |  | CVE-2022-42948,cve-arsenal,cisa-kev,kev,in-the-wild,Fortra,Cobalt Stri |
+| 5725 | Hitachi Vantara Pentaho BA Server Special Element Injection Vulnerability | kev | markdown |  | CVE-2022-43769,cve-arsenal,cisa-kev,kev,in-the-wild,Hitachi Vantara,Pe |
+| 5726 | Hitachi Vantara Pentaho BA Server Authorization Bypass Vulnerability | kev | markdown |  | CVE-2022-43939,cve-arsenal,cisa-kev,kev,in-the-wild,Hitachi Vantara,Pe |
+| 5727 | Microsoft Defender SmartScreen Security Feature Bypass Vulnerability | kev | markdown |  | CVE-2022-44698,cve-arsenal,cisa-kev,kev,in-the-wild,ransomware,Microso |
+| 5728 | CWP Control Web Panel OS Command Injection Vulnerability | kev | markdown |  | CVE-2022-44877,cve-arsenal,cisa-kev,kev,in-the-wild,CWP,Control Web Pa |
+| 5729 | Cacti Command Injection Vulnerability | kev | markdown |  | CVE-2022-46169,cve-arsenal,cisa-kev,kev,in-the-wild,Cacti |
+| 5730 | Zoho ManageEngine Multiple Products Remote Code Execution Vulnerability | kev | markdown |  | CVE-2022-47966,cve-arsenal,cisa-kev,kev,in-the-wild,ransomware,Zoho,Ma |
+| 5731 | IBM Aspera Faspex Code Execution Vulnerability | kev | markdown |  | CVE-2022-47986,cve-arsenal,cisa-kev,kev,in-the-wild,ransomware,IBM,Asp |
+| 5732 | Apple Multiple Products Unspecified Vulnerability | kev | markdown |  | CVE-2022-48503,cve-arsenal,cisa-kev,kev,in-the-wild,Apple,Multiple Pro |
+| 5733 | Apple Multiple Products Memory Corruption Vulnerability | kev | markdown |  | CVE-2022-48618,cve-arsenal,cisa-kev,kev,in-the-wild,Apple,Multiple Pro |
+| 5734 | Linux Kernel Use-After-Free Vulnerability | kev | markdown |  | CVE-2023-0266,cve-arsenal,cisa-kev,kev,in-the-wild,Linux,Kernel |
+| 5735 | Linux Kernel Improper Ownership Management Vulnerability | kev | markdown |  | CVE-2023-0386,cve-arsenal,cisa-kev,kev,in-the-wild,Linux,Kernel |
+| 5736 | Fortra GoAnywhere MFT Remote Code Execution Vulnerability | kev | markdown |  | CVE-2023-0669,cve-arsenal,cisa-kev,kev,in-the-wild,ransomware,Fortra,G |
+| 5737 | TP-Link Archer AX-21 Command Injection Vulnerability | kev | markdown |  | CVE-2023-1389,cve-arsenal,cisa-kev,kev,in-the-wild,TP-Link,Archer AX21 |
+| 5738 | Sophos Web Appliance Command Injection Vulnerability | kev | markdown |  | CVE-2023-1671,cve-arsenal,cisa-kev,kev,in-the-wild,Sophos,Web Applianc |
+| 5739 | Cisco IOS and IOS XE Group Encrypted Transport VPN Out-of-Bounds Write Vulnerability | kev | markdown |  | CVE-2023-20109,cve-arsenal,cisa-kev,kev,in-the-wild,Cisco,IOS and IOS  |
+| 5740 | Cisco Small Business RV Series Routers Command Injection Vulnerability | kev | markdown |  | CVE-2023-20118,cve-arsenal,cisa-kev,kev,in-the-wild,Cisco,Small Busine |
+| 5741 | Cisco IOS XE Web UI Privilege Escalation Vulnerability | kev | markdown |  | CVE-2023-20198,cve-arsenal,cisa-kev,kev,in-the-wild,Cisco,IOS XE Web U |
+| 5742 | Cisco Adaptive Security Appliance and Firepower Threat Defense Unauthorized Access Vulnerability | kev | markdown |  | CVE-2023-20269,cve-arsenal,cisa-kev,kev,in-the-wild,ransomware,Cisco,A |
+| 5743 | Cisco IOS XE Web UI Command Injection Vulnerability | kev | markdown |  | CVE-2023-20273,cve-arsenal,cisa-kev,kev,in-the-wild,Cisco,Cisco IOS XE |
+| 5744 | Google Chromium V8 Type Confusion Vulnerability | kev | markdown |  | CVE-2023-2033,cve-arsenal,cisa-kev,kev,in-the-wild,Google,Chromium V8 |
+| 5745 | VMware Tools Authentication Bypass Vulnerability | kev | markdown |  | CVE-2023-20867,cve-arsenal,cisa-kev,kev,in-the-wild,VMware,Tools |
+| 5746 | Vmware Aria Operations for Networks Command Injection Vulnerability | kev | markdown |  | CVE-2023-20887,cve-arsenal,cisa-kev,kev,in-the-wild,VMware,Aria Operat |
+| 5747 | Android Framework Privilege Escalation Vulnerability | kev | markdown |  | CVE-2023-20963,cve-arsenal,cisa-kev,kev,in-the-wild,Android,Framework |
+| 5748 | Android Pixel Information Disclosure Vulnerability | kev | markdown |  | CVE-2023-21237,cve-arsenal,cisa-kev,kev,in-the-wild,Android,Pixel |
+| 5749 | Google Chrome Skia Integer Overflow Vulnerability | kev | markdown |  | CVE-2023-2136,cve-arsenal,cisa-kev,kev,in-the-wild,Google,Chromium Ski |
+| 5750 | Samsung Mobile Devices Insertion of Sensitive Information Into Log File Vulnerability | kev | markdown |  | CVE-2023-21492,cve-arsenal,cisa-kev,kev,in-the-wild,Samsung,Mobile Dev |
+| 5751 | Microsoft Exchange Server Deserialization of Untrusted Data Vulnerability | kev | markdown |  | CVE-2023-21529,cve-arsenal,cisa-kev,kev,in-the-wild,ransomware,Microso |
+| 5752 | Adobe Acrobat and Reader Use-After-Free Vulnerability | kev | markdown |  | CVE-2023-21608,cve-arsenal,cisa-kev,kev,in-the-wild,Adobe,Acrobat and  |
+| 5753 | Microsoft Windows Advanced Local Procedure Call (ALPC) Privilege Escalation Vulnerability | kev | markdown |  | CVE-2023-21674,cve-arsenal,cisa-kev,kev,in-the-wild,Microsoft,Windows |
+| 5754 | Microsoft Office Publisher Security Feature Bypass Vulnerability | kev | markdown |  | CVE-2023-21715,cve-arsenal,cisa-kev,kev,in-the-wild,Microsoft,Office |
+| 5755 | Microsoft Windows Graphic Component Privilege Escalation Vulnerability | kev | markdown |  | CVE-2023-21823,cve-arsenal,cisa-kev,kev,in-the-wild,Microsoft,Windows |
+| 5756 | Oracle WebLogic Server Unspecified Vulnerability | kev | markdown |  | CVE-2023-21839,cve-arsenal,cisa-kev,kev,in-the-wild,Oracle,WebLogic Se |
+| 5757 | Atlassian Confluence Data Center and Server Broken Access Control Vulnerability | kev | markdown |  | CVE-2023-22515,cve-arsenal,cisa-kev,kev,in-the-wild,ransomware,Atlassi |
+| 5758 | Atlassian Confluence Data Center and Server Improper Authorization Vulnerability | kev | markdown |  | CVE-2023-22518,cve-arsenal,cisa-kev,kev,in-the-wild,ransomware,Atlassi |
+| 5759 | Atlassian Confluence Data Center and Server Template Injection Vulnerability | kev | markdown |  | CVE-2023-22527,cve-arsenal,cisa-kev,kev,in-the-wild,ransomware,Atlassi |
+| 5760 | Strapi Cleartext Storage of Sensitive Information Vulnerability | kev | markdown |  | CVE-2023-22894,cve-arsenal,cisa-kev,kev,in-the-wild,Strapi |
+| 5761 | Multiple SugarCRM Products Remote Code Execution Vulnerability | kev | markdown |  | CVE-2023-22952,cve-arsenal,cisa-kev,kev,in-the-wild,SugarCRM,Multiple  |
+| 5762 | Microsoft Windows Common Log File System (CLFS) Driver Privilege Escalation Vulnerability | kev | markdown |  | CVE-2023-23376,cve-arsenal,cisa-kev,kev,in-the-wild,ransomware,Microso |
+| 5763 | Microsoft Office Outlook Privilege Escalation Vulnerability | kev | markdown |  | CVE-2023-23397,cve-arsenal,cisa-kev,kev,in-the-wild,Microsoft,Office |
+| 5764 | Apple Multiple Products WebKit Type Confusion Vulnerability | kev | markdown |  | CVE-2023-23529,cve-arsenal,cisa-kev,kev,in-the-wild,Apple,Multiple Pro |
+| 5765 | Joomla! Improper Access Control Vulnerability | kev | markdown |  | CVE-2023-23752,cve-arsenal,cisa-kev,kev,in-the-wild,Joomla! |
+| 5766 | Citrix Content Collaboration ShareFile Improper Access Control Vulnerability | kev | markdown |  | CVE-2023-24489,cve-arsenal,cisa-kev,kev,in-the-wild,Citrix,Content Col |
+| 5767 | Microsoft Windows SmartScreen Security Feature Bypass Vulnerability | kev | markdown |  | CVE-2023-24880,cve-arsenal,cisa-kev,kev,in-the-wild,ransomware,Microso |
+| 5768 | Microsoft SharePoint Server Code Injection Vulnerability | kev | markdown |  | CVE-2023-24955,cve-arsenal,cisa-kev,kev,in-the-wild,ransomware,Microso |
+| 5769 | D-Link DIR-820 Router OS Command Injection Vulnerability | kev | markdown |  | CVE-2023-25280,cve-arsenal,cisa-kev,kev,in-the-wild,D-Link,DIR-820 Rou |
+| 5770 | PaperCut NG/MF Cross-Site Request Forgery (CSRF) Vulnerability | kev | markdown |  | CVE-2023-2533,cve-arsenal,cisa-kev,kev,in-the-wild,PaperCut,NG/MF |
+| 5771 | Multiple Ruckus Wireless Products CSRF and RCE Vulnerability | kev | markdown |  | CVE-2023-25717,cve-arsenal,cisa-kev,kev,in-the-wild,Ruckus Wireless,Mu |
+| 5772 | Danfoss AK-SM 800A Series Path Traversal Vulnerability | kev | markdown |  | CVE-2023-25914,cve-arsenal,cisa-kev,kev,in-the-wild,Danfoss,AK-SM 800A |
+| 5773 | Danfoss AK-SM 800A Series Improper Input Validation Vulnerability | kev | markdown |  | CVE-2023-25915,cve-arsenal,cisa-kev,kev,in-the-wild,Danfoss,AK-SM 800A |
+| 5774 | Arm Mali GPU Kernel Driver Information Disclosure Vulnerability | kev | markdown |  | CVE-2023-26083,cve-arsenal,cisa-kev,kev,in-the-wild,Arm,Mali Graphics  |
+| 5775 | Adobe ColdFusion Deserialization of Untrusted Data Vulnerability | kev | markdown |  | CVE-2023-26359,cve-arsenal,cisa-kev,kev,in-the-wild,Adobe,ColdFusion |
+| 5776 | Adobe ColdFusion Deserialization of Untrusted Data Vulnerability | kev | markdown |  | CVE-2023-26360,cve-arsenal,cisa-kev,kev,in-the-wild,Adobe,ColdFusion |
+| 5777 | Adobe Acrobat and Reader Out-of-Bounds Write Vulnerability | kev | markdown |  | CVE-2023-26369,cve-arsenal,cisa-kev,kev,in-the-wild,Adobe,Acrobat and  |
+| 5778 | PaperCut MF/NG Improper Access Control Vulnerability | kev | markdown |  | CVE-2023-27350,cve-arsenal,cisa-kev,kev,in-the-wild,ransomware,PaperCu |
+| 5779 | PaperCut NG/MF Improper Authentication Vulnerability | kev | markdown |  | CVE-2023-27351,cve-arsenal,cisa-kev,kev,in-the-wild,ransomware,PaperCu |
+| 5780 | Apache Superset Insecure Default Initialization of Resource Vulnerability | kev | markdown |  | CVE-2023-27524,cve-arsenal,cisa-kev,kev,in-the-wild,Apache,Superset |
+| 5781 | Veeam Backup & Replication Cloud Connect Missing Authentication for Critical Function Vulnerability | kev | markdown |  | CVE-2023-27532,cve-arsenal,cisa-kev,kev,in-the-wild,ransomware,Veeam,B |
+| 5782 | Zyxel Multiple NAS Devices Command Injection Vulnerability | kev | markdown |  | CVE-2023-27992,cve-arsenal,cisa-kev,kev,in-the-wild,Zyxel,Multiple Net |
+| 5783 | Fortinet FortiOS and FortiProxy SSL-VPN Heap-Based Buffer Overflow Vulnerability | kev | markdown |  | CVE-2023-27997,cve-arsenal,cisa-kev,kev,in-the-wild,ransomware,Fortine |
+| 5784 | Apple Multiple Products WebKit Out-of-Bounds Read Vulnerability | kev | markdown |  | CVE-2023-28204,cve-arsenal,cisa-kev,kev,in-the-wild,Apple,Multiple Pro |
+| 5785 | Apple Multiple Products WebKit Use-After-Free Vulnerability | kev | markdown |  | CVE-2023-28205,cve-arsenal,cisa-kev,kev,in-the-wild,Apple,Multiple Pro |
+| 5786 | Apple iOS, iPadOS, and macOS IOSurfaceAccelerator Out-of-Bounds Write Vulnerability | kev | markdown |  | CVE-2023-28206,cve-arsenal,cisa-kev,kev,in-the-wild,Apple,iOS, iPadOS, |
+| 5787 | Microsoft Windows CNG Key Isolation Service Privilege Escalation Vulnerability | kev | markdown |  | CVE-2023-28229,cve-arsenal,cisa-kev,kev,in-the-wild,Microsoft,Windows  |
+| 5788 | Microsoft Windows Common Log File System (CLFS) Driver Privilege Escalation Vulnerability | kev | markdown |  | CVE-2023-28252,cve-arsenal,cisa-kev,kev,in-the-wild,ransomware,Microso |
+| 5789 | MinIO Information Disclosure Vulnerability | kev | markdown |  | CVE-2023-28432,cve-arsenal,cisa-kev,kev,in-the-wild,MinIO |
+| 5790 | MinIO Security Feature Bypass Vulnerability | kev | markdown |  | CVE-2023-28434,cve-arsenal,cisa-kev,kev,in-the-wild,MinIO |
+| 5791 | Array Networks AG and vxAG ArrayOS Missing Authentication for Critical Function Vulnerability | kev | markdown |  | CVE-2023-28461,cve-arsenal,cisa-kev,kev,in-the-wild,ransomware,Array N |
+| 5792 | Barracuda Networks ESG Appliance Improper Input Validation Vulnerability | kev | markdown |  | CVE-2023-2868,cve-arsenal,cisa-kev,kev,in-the-wild,Barracuda Networks, |
+| 5793 | Zyxel Multiple Firewalls OS Command Injection Vulnerability | kev | markdown |  | CVE-2023-28771,cve-arsenal,cisa-kev,kev,in-the-wild,Zyxel,Multiple Fir |
+| 5794 | Adobe ColdFusion Improper Access Control Vulnerability | kev | markdown |  | CVE-2023-29298,cve-arsenal,cisa-kev,kev,in-the-wild,Adobe,ColdFusion |
+| 5795 | Adobe ColdFusion Deserialization of Untrusted Data Vulnerability | kev | markdown |  | CVE-2023-29300,cve-arsenal,cisa-kev,kev,in-the-wild,ransomware,Adobe,C |
+| 5796 | Microsoft Win32K Privilege Escalation Vulnerability | kev | markdown |  | CVE-2023-29336,cve-arsenal,cisa-kev,kev,in-the-wild,Microsoft,Win32k |
+| 5797 | Microsoft SharePoint Server Privilege Escalation Vulnerability | kev | markdown |  | CVE-2023-29357,cve-arsenal,cisa-kev,kev,in-the-wild,ransomware,Microso |
+| 5798 | Microsoft Streaming Service Untrusted Pointer Dereference Vulnerability | kev | markdown |  | CVE-2023-29360,cve-arsenal,cisa-kev,kev,in-the-wild,Microsoft,Streamin |
+| 5799 | Novi Survey Insecure Deserialization Vulnerability | kev | markdown |  | CVE-2023-29492,cve-arsenal,cisa-kev,kev,in-the-wild,Novi Survey |
+| 5800 | Service Location Protocol (SLP) Denial-of-Service Vulnerability | kev | markdown |  | CVE-2023-29552,cve-arsenal,cisa-kev,kev,in-the-wild,IETF,Service Locat |
+| 5801 | Google Chromium V8 Type Confusion Vulnerability | kev | markdown |  | CVE-2023-3079,cve-arsenal,cisa-kev,kev,in-the-wild,Google,Chromium V8 |
+| 5802 | Microsoft Windows MSHTML Platform Privilege Escalation Vulnerability | kev | markdown |  | CVE-2023-32046,cve-arsenal,cisa-kev,kev,in-the-wild,Microsoft,Windows |
+| 5803 | Microsoft Windows Defender SmartScreen Security Feature Bypass Vulnerability | kev | markdown |  | CVE-2023-32049,cve-arsenal,cisa-kev,kev,in-the-wild,Microsoft,Windows |
+| 5804 | Ignite Realtime Openfire Path Traversal Vulnerability | kev | markdown |  | CVE-2023-32315,cve-arsenal,cisa-kev,kev,in-the-wild,Ignite Realtime,Op |
+| 5805 | Apple Multiple Products WebKit Use-After-Free Vulnerability | kev | markdown |  | CVE-2023-32373,cve-arsenal,cisa-kev,kev,in-the-wild,Apple,Multiple Pro |
+| 5806 | Apple Multiple Products WebKit Sandbox Escape Vulnerability | kev | markdown |  | CVE-2023-32409,cve-arsenal,cisa-kev,kev,in-the-wild,Apple,Multiple Pro |
+| 5807 | Apple Multiple Products Integer Overflow Vulnerability | kev | markdown |  | CVE-2023-32434,cve-arsenal,cisa-kev,kev,in-the-wild,Apple,Multiple Pro |
+| 5808 | Apple Multiple Products WebKit Memory Corruption Vulnerability | kev | markdown |  | CVE-2023-32435,cve-arsenal,cisa-kev,kev,in-the-wild,Apple,Multiple Pro |
+| 5809 | Apple Multiple Products WebKit Type Confusion Vulnerability | kev | markdown |  | CVE-2023-32439,cve-arsenal,cisa-kev,kev,in-the-wild,Apple,Multiple Pro |
+| 5810 | Zyxel Multiple Firewalls Buffer Overflow Vulnerability | kev | markdown |  | CVE-2023-33009,cve-arsenal,cisa-kev,kev,in-the-wild,Zyxel,Multiple Fir |
+| 5811 | Zyxel Multiple Firewalls Buffer Overflow Vulnerability | kev | markdown |  | CVE-2023-33010,cve-arsenal,cisa-kev,kev,in-the-wild,Zyxel,Multiple Fir |
+| 5812 | Qualcomm Multiple Chipsets Use-After-Free Vulnerability | kev | markdown |  | CVE-2023-33063,cve-arsenal,cisa-kev,kev,in-the-wild,Qualcomm,Multiple  |
+| 5813 | Qualcomm Multiple Chipsets Use of Out-of-Range Pointer Offset Vulnerability | kev | markdown |  | CVE-2023-33106,cve-arsenal,cisa-kev,kev,in-the-wild,Qualcomm,Multiple  |
+| 5814 | Qualcomm Multiple Chipsets Integer Overflow Vulnerability | kev | markdown |  | CVE-2023-33107,cve-arsenal,cisa-kev,kev,in-the-wild,Qualcomm,Multiple  |
+| 5815 | Apache RocketMQ Command Execution Vulnerability | kev | markdown |  | CVE-2023-33246,cve-arsenal,cisa-kev,kev,in-the-wild,Apache,RocketMQ |
+| 5816 | TP-Link Multiple Routers Command Injection Vulnerability | kev | markdown |  | CVE-2023-33538,cve-arsenal,cisa-kev,kev,in-the-wild,TP-Link,Multiple R |
+| 5817 | VMware vCenter Server Out-of-Bounds Write Vulnerability | kev | markdown |  | CVE-2023-34048,cve-arsenal,cisa-kev,kev,in-the-wild,VMware,vCenter Ser |
+| 5818 | Synacor Zimbra Collaboration Suite (ZCS) Cross-Site Scripting (XSS) Vulnerability | kev | markdown |  | CVE-2023-34192,cve-arsenal,cisa-kev,kev,in-the-wild,Synacor,Zimbra Col |
+| 5819 | Progress MOVEit Transfer SQL Injection Vulnerability | kev | markdown |  | CVE-2023-34362,cve-arsenal,cisa-kev,kev,in-the-wild,ransomware,Progres |
+| 5820 | Ivanti Endpoint Manager Mobile Authentication Bypass Vulnerability | kev | markdown |  | CVE-2023-35078,cve-arsenal,cisa-kev,kev,in-the-wild,ransomware,Ivanti, |
+| 5821 | Ivanti Endpoint Manager Mobile (EPMM) Path Traversal Vulnerability | kev | markdown |  | CVE-2023-35081,cve-arsenal,cisa-kev,kev,in-the-wild,Ivanti,Endpoint Ma |
+| 5822 | Ivanti Endpoint Manager Mobile (EPMM) and MobileIron Core Authentication Bypass Vulnerability | kev | markdown |  | CVE-2023-35082,cve-arsenal,cisa-kev,kev,in-the-wild,ransomware,Ivanti, |
+| 5823 | Citrix NetScaler ADC and NetScaler Gateway Code Injection Vulnerability | kev | markdown |  | CVE-2023-3519,cve-arsenal,cisa-kev,kev,in-the-wild,ransomware,Citrix,N |
+| 5824 | Microsoft Outlook Security Feature Bypass Vulnerability | kev | markdown |  | CVE-2023-35311,cve-arsenal,cisa-kev,kev,in-the-wild,Microsoft,Outlook |
+| 5825 | Android Framework Privilege Escalation Vulnerability | kev | markdown |  | CVE-2023-35674,cve-arsenal,cisa-kev,kev,in-the-wild,Android,Framework |
+| 5826 | Microsoft Windows SmartScreen Security Feature Bypass Vulnerability | kev | markdown |  | CVE-2023-36025,cve-arsenal,cisa-kev,kev,in-the-wild,Microsoft,Windows |
+| 5827 | Microsoft Windows Desktop Window Manager (DWM) Core Library Privilege Escalation Vulnerability | kev | markdown |  | CVE-2023-36033,cve-arsenal,cisa-kev,kev,in-the-wild,Microsoft,Windows |
+| 5828 | Microsoft Windows Cloud Files Mini Filter Driver Privilege Escalation Vulnerability | kev | markdown |  | CVE-2023-36036,cve-arsenal,cisa-kev,kev,in-the-wild,Microsoft,Windows |
+| 5829 | Microsoft Windows Out-of-Bounds Read Vulnerability | kev | markdown |  | CVE-2023-36424,cve-arsenal,cisa-kev,kev,in-the-wild,Microsoft,Windows |
+| 5830 | Microsoft WordPad Information Disclosure Vulnerability | kev | markdown |  | CVE-2023-36563,cve-arsenal,cisa-kev,kev,in-the-wild,Microsoft,WordPad |
+| 5831 | Microsoft Windows Mark of the Web (MOTW) Security Feature Bypass Vulnerability | kev | markdown |  | CVE-2023-36584,cve-arsenal,cisa-kev,kev,in-the-wild,Microsoft,Windows |
+| 5832 | Microsoft Word Information Disclosure Vulnerability | kev | markdown |  | CVE-2023-36761,cve-arsenal,cisa-kev,kev,in-the-wild,Microsoft,Word |
+| 5833 | Microsoft Streaming Service Proxy Privilege Escalation Vulnerability | kev | markdown |  | CVE-2023-36802,cve-arsenal,cisa-kev,kev,in-the-wild,Microsoft,Streamin |
+| 5834 | Juniper Junos OS EX Series PHP External Variable Modification Vulnerability | kev | markdown |  | CVE-2023-36844,cve-arsenal,cisa-kev,kev,in-the-wild,Juniper,Junos OS |
+| 5835 | Juniper Junos OS EX Series and SRX Series PHP External Variable Modification Vulnerability | kev | markdown |  | CVE-2023-36845,cve-arsenal,cisa-kev,kev,in-the-wild,Juniper,Junos OS |
+| 5836 | Juniper Junos OS SRX Series Missing Authentication for Critical Function Vulnerability | kev | markdown |  | CVE-2023-36846,cve-arsenal,cisa-kev,kev,in-the-wild,Juniper,Junos OS |
+| 5837 | Juniper Junos OS EX Series Missing Authentication for Critical Function Vulnerability | kev | markdown |  | CVE-2023-36847,cve-arsenal,cisa-kev,kev,in-the-wild,Juniper,Junos OS |
+| 5838 | Juniper Junos OS SRX Series Missing Authentication for Critical Function Vulnerability | kev | markdown |  | CVE-2023-36851,cve-arsenal,cisa-kev,kev,in-the-wild,Juniper,Junos OS |
+| 5839 | Microsoft Windows Error Reporting Service Privilege Escalation Vulnerability | kev | markdown |  | CVE-2023-36874,cve-arsenal,cisa-kev,kev,in-the-wild,Microsoft,Windows |
+| 5840 | Microsoft Windows Search Remote Code Execution Vulnerability | kev | markdown |  | CVE-2023-36884,cve-arsenal,cisa-kev,kev,in-the-wild,ransomware,Microso |
+| 5841 | Apple Multiple Products WebKit Code Execution Vulnerability | kev | markdown |  | CVE-2023-37450,cve-arsenal,cisa-kev,kev,in-the-wild,Apple,Multiple Pro |
+| 5842 | Synacor Zimbra Collaboration Suite (ZCS) Cross-Site Scripting (XSS) Vulnerability | kev | markdown |  | CVE-2023-37580,cve-arsenal,cisa-kev,kev,in-the-wild,Synacor,Zimbra Col |
+| 5843 | Ivanti Sentry Authentication Bypass Vulnerability | kev | markdown |  | CVE-2023-38035,cve-arsenal,cisa-kev,kev,in-the-wild,ransomware,Ivanti, |
+| 5844 | Microsoft .NET Core and Visual Studio Denial-of-Service Vulnerability | kev | markdown |  | CVE-2023-38180,cve-arsenal,cisa-kev,kev,in-the-wild,Microsoft,.NET Cor |
+| 5845 | Adobe ColdFusion Deserialization of Untrusted Data Vulnerability | kev | markdown |  | CVE-2023-38203,cve-arsenal,cisa-kev,kev,in-the-wild,ransomware,Adobe,C |
+| 5846 | Adobe ColdFusion Improper Access Control Vulnerability | kev | markdown |  | CVE-2023-38205,cve-arsenal,cisa-kev,kev,in-the-wild,Adobe,ColdFusion |
+| 5847 | Apple Multiple Products Kernel Unspecified Vulnerability | kev | markdown |  | CVE-2023-38606,cve-arsenal,cisa-kev,kev,in-the-wild,Apple,Multiple Pro |
+| 5848 | RARLAB WinRAR Code Execution Vulnerability | kev | markdown |  | CVE-2023-38831,cve-arsenal,cisa-kev,kev,in-the-wild,ransomware,RARLAB, |
+| 5849 | ZKTeco BioTime Path Traversal Vulnerability | kev | markdown |  | CVE-2023-38950,cve-arsenal,cisa-kev,kev,in-the-wild,ZKTeco,BioTime |
+| 5850 | ASUS RT-AX55 Routers OS Command Injection Vulnerability | kev | markdown |  | CVE-2023-39780,cve-arsenal,cisa-kev,kev,in-the-wild,ASUS,RT-AX55 Route |
+| 5851 | Progress WS_FTP Server Deserialization of Untrusted Data Vulnerability | kev | markdown |  | CVE-2023-40044,cve-arsenal,cisa-kev,kev,in-the-wild,ransomware,Progres |
+| 5852 | Apple iOS, iPadOS, and watchOS Wallet Code Execution Vulnerability | kev | markdown |  | CVE-2023-41061,cve-arsenal,cisa-kev,kev,in-the-wild,Apple,iOS, iPadOS, |
+| 5853 | Apple iOS, iPadOS, and macOS ImageIO Buffer Overflow Vulnerability | kev | markdown |  | CVE-2023-41064,cve-arsenal,cisa-kev,kev,in-the-wild,Apple,iOS, iPadOS, |
+| 5854 | Trend Micro Apex One and Worry-Free Business Security Remote Code Execution Vulnerability | kev | markdown |  | CVE-2023-41179,cve-arsenal,cisa-kev,kev,in-the-wild,Trend Micro,Apex O |
+| 5855 | Qlik Sense HTTP Tunneling Vulnerability | kev | markdown |  | CVE-2023-41265,cve-arsenal,cisa-kev,kev,in-the-wild,ransomware,Qlik,Se |
+| 5856 | Qlik Sense Path Traversal Vulnerability | kev | markdown |  | CVE-2023-41266,cve-arsenal,cisa-kev,kev,in-the-wild,ransomware,Qlik,Se |
+| 5857 | Microsoft Skype for Business Privilege Escalation Vulnerability | kev | markdown |  | CVE-2023-41763,cve-arsenal,cisa-kev,kev,in-the-wild,Microsoft,Skype fo |
+| 5858 | Apple iOS and iPadOS Use-After-Free Vulnerability | kev | markdown |  | CVE-2023-41974,cve-arsenal,cisa-kev,kev,in-the-wild,Apple,iOS and iPad |
+| 5859 | Apple Multiple Products Code Execution Vulnerability | kev | markdown |  | CVE-2023-41990,cve-arsenal,cisa-kev,kev,in-the-wild,Apple,Multiple Pro |
+| 5860 | Apple Multiple Products Improper Certificate Validation Vulnerability | kev | markdown |  | CVE-2023-41991,cve-arsenal,cisa-kev,kev,in-the-wild,Apple,Multiple Pro |
+| 5861 | Apple Multiple Products Kernel Privilege Escalation Vulnerability | kev | markdown |  | CVE-2023-41992,cve-arsenal,cisa-kev,kev,in-the-wild,Apple,Multiple Pro |
+| 5862 | Apple Multiple Products WebKit Code Execution Vulnerability | kev | markdown |  | CVE-2023-41993,cve-arsenal,cisa-kev,kev,in-the-wild,Apple,Multiple Pro |
+| 5863 | Arm Mali GPU Kernel Driver Use-After-Free Vulnerability | kev | markdown |  | CVE-2023-4211,cve-arsenal,cisa-kev,kev,in-the-wild,Arm,Mali GPU Kernel |
+| 5864 | JetBrains TeamCity Authentication Bypass Vulnerability | kev | markdown |  | CVE-2023-42793,cve-arsenal,cisa-kev,kev,in-the-wild,ransomware,JetBrai |
+| 5865 | Apple iOS and iPadOS Kernel Privilege Escalation Vulnerability | kev | markdown |  | CVE-2023-42824,cve-arsenal,cisa-kev,kev,in-the-wild,Apple,iOS and iPad |
+| 5866 | Apple Multiple Products WebKit Out-of-Bounds Read Vulnerability | kev | markdown |  | CVE-2023-42916,cve-arsenal,cisa-kev,kev,in-the-wild,Apple,Multiple Pro |
+| 5867 | Apple Multiple Products WebKit Memory Corruption Vulnerability | kev | markdown |  | CVE-2023-42917,cve-arsenal,cisa-kev,kev,in-the-wild,Apple,Multiple Pro |
+| 5868 | Apple Multiple products Use-After-Free Vulnerability | kev | markdown |  | CVE-2023-43000,cve-arsenal,cisa-kev,kev,in-the-wild,Apple,Multiple Pro |
+| 5869 | NextGen Healthcare Mirth Connect Deserialization of Untrusted Data Vulnerability | kev | markdown |  | CVE-2023-43208,cve-arsenal,cisa-kev,kev,in-the-wild,ransomware,NextGen |
+| 5870 | KNX Association KNX Protocol Connection Authorization Option 1 Overly Restrictive Account Lockout Mechanism Vulnerability | kev | markdown |  | CVE-2023-4346,cve-arsenal,cisa-kev,kev,in-the-wild,KNX Association,KNX |
+| 5871 | Roundcube Webmail Persistent Cross-Site Scripting (XSS) Vulnerability | kev | markdown |  | CVE-2023-43770,cve-arsenal,cisa-kev,kev,in-the-wild,Roundcube,Webmail |
+| 5872 | SonicWall SMA100 Appliances OS Command Injection Vulnerability | kev | markdown |  | CVE-2023-44221,cve-arsenal,cisa-kev,kev,in-the-wild,SonicWall,SMA100 A |
+| 5873 | HTTP/2 Rapid Reset Attack Vulnerability | kev | markdown |  | CVE-2023-44487,cve-arsenal,cisa-kev,kev,in-the-wild,IETF,HTTP/2 |
+| 5874 | Acronis Cyber Infrastructure (ACI) Insecure Default Password Vulnerability | kev | markdown |  | CVE-2023-45249,cve-arsenal,cisa-kev,kev,in-the-wild,Acronis,Cyber Infr |
+| 5875 | North Grid Proself Improper Restriction of XML External Entity (XXE) Reference Vulnerability | kev | markdown |  | CVE-2023-45727,cve-arsenal,cisa-kev,kev,in-the-wild,North Grid,Proself |
+| 5876 | Apache ActiveMQ Deserialization of Untrusted Data Vulnerability | kev | markdown |  | CVE-2023-46604,cve-arsenal,cisa-kev,kev,in-the-wild,ransomware,Apache, |
+| 5877 | F5 BIG-IP Configuration Utility Authentication Bypass Vulnerability | kev | markdown |  | CVE-2023-46747,cve-arsenal,cisa-kev,kev,in-the-wild,ransomware,F5,BIG- |
+| 5878 | F5 BIG-IP Configuration Utility SQL Injection Vulnerability | kev | markdown |  | CVE-2023-46748,cve-arsenal,cisa-kev,kev,in-the-wild,F5,BIG-IP Configur |
+| 5879 | Ivanti Connect Secure and Policy Secure Authentication Bypass Vulnerability | kev | markdown |  | CVE-2023-46805,cve-arsenal,cisa-kev,kev,in-the-wild,ransomware,Ivanti, |
+| 5880 | SysAid Server Path Traversal Vulnerability | kev | markdown |  | CVE-2023-47246,cve-arsenal,cisa-kev,kev,in-the-wild,ransomware,SysAid, |
+| 5881 | QNAP VioStor NVR OS Command Injection Vulnerability | kev | markdown |  | CVE-2023-47565,cve-arsenal,cisa-kev,kev,in-the-wild,QNAP,VioStor NVR |
+| 5882 | Google Chromium V8 Type Confusion Vulnerability | kev | markdown |  | CVE-2023-4762,cve-arsenal,cisa-kev,kev,in-the-wild,Google,Chromium V8 |
+| 5883 | Qlik Sense HTTP Tunneling Vulnerability | kev | markdown |  | CVE-2023-48365,cve-arsenal,cisa-kev,kev,in-the-wild,ransomware,Qlik,Se |
+| 5884 | Google Chromium WebP Heap-Based Buffer Overflow Vulnerability | kev | markdown |  | CVE-2023-4863,cve-arsenal,cisa-kev,kev,in-the-wild,Google,Chromium Web |
+| 5885 | Fortinet FortiClient EMS SQL Injection Vulnerability | kev | markdown |  | CVE-2023-48788,cve-arsenal,cisa-kev,kev,in-the-wild,ransomware,Fortine |
+| 5886 | ownCloud graphapi Information Disclosure Vulnerability | kev | markdown |  | CVE-2023-49103,cve-arsenal,cisa-kev,kev,in-the-wild,ownCloud,ownCloud  |
+| 5887 | ownCloud Improper Authentication Vulnerability | kev | markdown |  | CVE-2023-49105,cve-arsenal,cisa-kev,kev,in-the-wild,ownCloud |
+| 5888 | GNU C Library Buffer Overflow Vulnerability | kev | markdown |  | CVE-2023-4911,cve-arsenal,cisa-kev,kev,in-the-wild,GNU,GNU C Library |
+| 5889 | Citrix NetScaler ADC and NetScaler Gateway Buffer Overflow Vulnerability | kev | markdown |  | CVE-2023-4966,cve-arsenal,cisa-kev,kev,in-the-wild,ransomware,Citrix,N |
+| 5890 | FXC AE1021, AE1021PE OS Command Injection Vulnerability | kev | markdown |  | CVE-2023-49897,cve-arsenal,cisa-kev,kev,in-the-wild,FXC,AE1021, AE1021 |
+| 5891 | TP-Link TL-WR841N Authentication Bypass by Spoofing Vulnerability | kev | markdown |  | CVE-2023-50224,cve-arsenal,cisa-kev,kev,in-the-wild,TP-Link,TL-WR841N |
+| 5892 | Digiever DS-2105 Pro Missing Authorization Vulnerability | kev | markdown |  | CVE-2023-52163,cve-arsenal,cisa-kev,kev,in-the-wild,Digiever,DS-2105 P |
+| 5893 | Google Chromium libvpx Heap Buffer Overflow Vulnerability | kev | markdown |  | CVE-2023-5217,cve-arsenal,cisa-kev,kev,in-the-wild,Google,Chromium lib |
+| 5894 | Roundcube Webmail Persistent Cross-Site Scripting (XSS) Vulnerability | kev | markdown |  | CVE-2023-5631,cve-arsenal,cisa-kev,kev,in-the-wild,Roundcube,Webmail |
+| 5895 | Google Skia Integer Overflow Vulnerability | kev | markdown |  | CVE-2023-6345,cve-arsenal,cisa-kev,kev,in-the-wild,Google,Chromium Ski |
+| 5896 | Unitronics Vision PLC and HMI Insecure Default Password Vulnerability | kev | markdown |  | CVE-2023-6448,cve-arsenal,cisa-kev,kev,in-the-wild,Unitronics,Vision P |
+| 5897 | Citrix NetScaler ADC and NetScaler Gateway Code Injection Vulnerability | kev | markdown |  | CVE-2023-6548,cve-arsenal,cisa-kev,kev,in-the-wild,Citrix,NetScaler AD |
+| 5898 | Citrix NetScaler ADC and NetScaler Gateway Buffer Overflow Vulnerability | kev | markdown |  | CVE-2023-6549,cve-arsenal,cisa-kev,kev,in-the-wild,Citrix,NetScaler AD |
+| 5899 | Google Chromium WebRTC Heap Buffer Overflow Vulnerability | kev | markdown |  | CVE-2023-7024,cve-arsenal,cisa-kev,kev,in-the-wild,Google,Chromium Web |
+| 5900 | GitLab Community and Enterprise Editions Improper Access Control Vulnerability | kev | markdown |  | CVE-2023-7028,cve-arsenal,cisa-kev,kev,in-the-wild,GitLab,GitLab CE/EE |
+| 5901 | Spreadsheet::ParseExcel Remote Code Execution Vulnerability | kev | markdown |  | CVE-2023-7101,cve-arsenal,cisa-kev,kev,in-the-wild,Spreadsheet::ParseE |
+| 5902 | Palo Alto Networks PAN-OS Management Interface Authentication Bypass Vulnerability | kev | markdown |  | CVE-2024-0012,cve-arsenal,cisa-kev,kev,in-the-wild,ransomware,Palo Alt |
+| 5903 | Google Chromium V8 Out-of-Bounds Memory Access Vulnerability | kev | markdown |  | CVE-2024-0519,cve-arsenal,cisa-kev,kev,in-the-wild,Google,Chromium V8 |
+| 5904 | D-Link DIR-859 Router Path Traversal Vulnerability | kev | markdown |  | CVE-2024-0769,cve-arsenal,cisa-kev,kev,in-the-wild,D-Link,DIR-859 Rout |
+| 5905 | Synology DiskStation Manager (DSM) Improper Encoding or Escaping of Output Vulnerability | kev | markdown |  | CVE-2024-10441,cve-arsenal,cisa-kev,kev,in-the-wild,ransomware,Synolog |
+| 5906 | Linux Kernel Use-After-Free Vulnerability | kev | markdown |  | CVE-2024-1086,cve-arsenal,cisa-kev,kev,in-the-wild,ransomware,Linux,Ke |
+| 5907 | GeoVision Devices OS Command Injection Vulnerability | kev | markdown |  | CVE-2024-11120,cve-arsenal,cisa-kev,kev,in-the-wild,GeoVision,Multiple |
+| 5908 | MDaemon Email Server Cross-Site Scripting (XSS) Vulnerability | kev | markdown |  | CVE-2024-11182,cve-arsenal,cisa-kev,kev,in-the-wild,MDaemon,Email Serv |
+| 5909 | Zyxel Multiple Firewalls Path Traversal Vulnerability | kev | markdown |  | CVE-2024-11667,cve-arsenal,cisa-kev,kev,in-the-wild,ransomware,Zyxel,M |
+| 5910 | ProjectSend Improper Authentication Vulnerability | kev | markdown |  | CVE-2024-11680,cve-arsenal,cisa-kev,kev,in-the-wild,ProjectSend |
+| 5911 | Progress Kemp LoadMaster OS Command Injection Vulnerability | kev | markdown |  | CVE-2024-1212,cve-arsenal,cisa-kev,kev,in-the-wild,Progress,Kemp LoadM |
+| 5912 | BeyondTrust Privileged Remote Access (PRA) and Remote Support (RS) Command Injection Vulnerability | kev | markdown |  | CVE-2024-12356,cve-arsenal,cisa-kev,kev,in-the-wild,BeyondTrust,Privil |
+| 5913 | BeyondTrust Privileged Remote Access (PRA) and Remote Support (RS) OS Command Injection Vulnerability | kev | markdown |  | CVE-2024-12686,cve-arsenal,cisa-kev,kev,in-the-wild,BeyondTrust,Privil |
+| 5914 | DrayTek Vigor Routers OS Command Injection Vulnerability | kev | markdown |  | CVE-2024-12987,cve-arsenal,cisa-kev,kev,in-the-wild,DrayTek,Vigor Rout |
+| 5915 | Ivanti Endpoint Manager (EPM) Absolute Path Traversal Vulnerability | kev | markdown |  | CVE-2024-13159,cve-arsenal,cisa-kev,kev,in-the-wild,Ivanti,Endpoint Ma |
+| 5916 | Ivanti Endpoint Manager (EPM) Absolute Path Traversal Vulnerability | kev | markdown |  | CVE-2024-13160,cve-arsenal,cisa-kev,kev,in-the-wild,Ivanti,Endpoint Ma |
+| 5917 | Ivanti Endpoint Manager (EPM) Absolute Path Traversal Vulnerability | kev | markdown |  | CVE-2024-13161,cve-arsenal,cisa-kev,kev,in-the-wild,Ivanti,Endpoint Ma |
+| 5918 | ConnectWise ScreenConnect Path Traversal Vulnerability | kev | markdown |  | CVE-2024-1708,cve-arsenal,cisa-kev,kev,in-the-wild,ransomware,ConnectW |
+| 5919 | ConnectWise ScreenConnect Authentication Bypass Vulnerability | kev | markdown |  | CVE-2024-1709,cve-arsenal,cisa-kev,kev,in-the-wild,ransomware,ConnectW |
+| 5920 | Cisco ASA and FTD Denial of Service Vulnerability | kev | markdown |  | CVE-2024-20353,cve-arsenal,cisa-kev,kev,in-the-wild,Cisco,Adaptive Sec |
+| 5921 | Cisco ASA and FTD Privilege Escalation Vulnerability | kev | markdown |  | CVE-2024-20359,cve-arsenal,cisa-kev,kev,in-the-wild,Cisco,Adaptive Sec |
+| 5922 | Cisco NX-OS Command Injection Vulnerability | kev | markdown |  | CVE-2024-20399,cve-arsenal,cisa-kev,kev,in-the-wild,Cisco,NX-OS |
+| 5923 | Cisco Smart Licensing Utility Static Credential Vulnerability | kev | markdown |  | CVE-2024-20439,cve-arsenal,cisa-kev,kev,in-the-wild,Cisco,Smart Licens |
+| 5924 | Cisco ASA and FTD Denial-of-Service Vulnerability | kev | markdown |  | CVE-2024-20481,cve-arsenal,cisa-kev,kev,in-the-wild,Cisco,Adaptive Sec |
+| 5925 | Adobe ColdFusion Improper Access Control Vulnerability | kev | markdown |  | CVE-2024-20767,cve-arsenal,cisa-kev,kev,in-the-wild,Adobe,ColdFusion |
+| 5926 | Oracle Agile Product Lifecycle Management (PLM) Deserialization Vulnerability | kev | markdown |  | CVE-2024-20953,cve-arsenal,cisa-kev,kev,in-the-wild,Oracle,Agile Produ |
+| 5927 | Oracle WebLogic Server Unspecified Vulnerability | kev | markdown |  | CVE-2024-21182,cve-arsenal,cisa-kev,kev,in-the-wild,Oracle,WebLogic Se |
+| 5928 | Oracle Agile Product Lifecycle Management (PLM) Incorrect Authorization Vulnerability | kev | markdown |  | CVE-2024-21287,cve-arsenal,cisa-kev,kev,in-the-wild,Oracle,Agile Produ |
+| 5929 | Microsoft Windows Kernel Exposed IOCTL with Insufficient Access Control Vulnerability | kev | markdown |  | CVE-2024-21338,cve-arsenal,cisa-kev,kev,in-the-wild,ransomware,Microso |
+| 5930 | Microsoft Windows SmartScreen Security Feature Bypass Vulnerability | kev | markdown |  | CVE-2024-21351,cve-arsenal,cisa-kev,kev,in-the-wild,Microsoft,Windows |
+| 5931 | Microsoft Exchange Server Privilege Escalation Vulnerability | kev | markdown |  | CVE-2024-21410,cve-arsenal,cisa-kev,kev,in-the-wild,Microsoft,Exchange |
+| 5932 | Microsoft Windows Internet Shortcut Files Security Feature Bypass Vulnerability | kev | markdown |  | CVE-2024-21412,cve-arsenal,cisa-kev,kev,in-the-wild,ransomware,Microso |
+| 5933 | Microsoft Outlook Improper Input Validation Vulnerability | kev | markdown |  | CVE-2024-21413,cve-arsenal,cisa-kev,kev,in-the-wild,Microsoft,Office O |
+| 5934 | Fortinet FortiOS Out-of-Bound Write Vulnerability | kev | markdown |  | CVE-2024-21762,cve-arsenal,cisa-kev,kev,in-the-wild,ransomware,Fortine |
+| 5935 | Ivanti Connect Secure and Policy Secure Command Injection Vulnerability | kev | markdown |  | CVE-2024-21887,cve-arsenal,cisa-kev,kev,in-the-wild,ransomware,Ivanti, |
+| 5936 | Ivanti Connect Secure, Policy Secure, and Neurons Server-Side Request Forgery (SSRF) Vulnerability | kev | markdown |  | CVE-2024-21893,cve-arsenal,cisa-kev,kev,in-the-wild,ransomware,Ivanti, |
+| 5937 | Fortinet Multiple Products Format String Vulnerability | kev | markdown |  | CVE-2024-23113,cve-arsenal,cisa-kev,kev,in-the-wild,Fortinet,Multiple  |
+| 5938 | Apple Multiple Products WebKit Type Confusion Vulnerability | kev | markdown |  | CVE-2024-23222,cve-arsenal,cisa-kev,kev,in-the-wild,Apple,Multiple Pro |
+| 5939 | Apple Multiple Products Memory Corruption Vulnerability | kev | markdown |  | CVE-2024-23225,cve-arsenal,cisa-kev,kev,in-the-wild,Apple,Multiple Pro |
+| 5940 | Apple Multiple Products Memory Corruption Vulnerability | kev | markdown |  | CVE-2024-23296,cve-arsenal,cisa-kev,kev,in-the-wild,Apple,Multiple Pro |
+| 5941 | Rejetto HTTP File Server Improper Neutralization of Special Elements Used in a Template Engine Vulnerability | kev | markdown |  | CVE-2024-23692,cve-arsenal,cisa-kev,kev,in-the-wild,ransomware,Rejetto |
+| 5942 | Jenkins Command Line Interface (CLI) Path Traversal Vulnerability | kev | markdown |  | CVE-2024-23897,cve-arsenal,cisa-kev,kev,in-the-wild,ransomware,Jenkins |
+| 5943 | Check Point Quantum Security Gateways Information Disclosure Vulnerability | kev | markdown |  | CVE-2024-24919,cve-arsenal,cisa-kev,kev,in-the-wild,ransomware,Check P |
+| 5944 | Microsoft Windows Error Reporting Service Improper Privilege Management Vulnerability | kev | markdown |  | CVE-2024-26169,cve-arsenal,cisa-kev,kev,in-the-wild,ransomware,Microso |
+| 5945 | JetBrains TeamCity Authentication Bypass Vulnerability | kev | markdown |  | CVE-2024-27198,cve-arsenal,cisa-kev,kev,in-the-wild,ransomware,JetBrai |
+| 5946 | JetBrains TeamCity Relative Path Traversal Vulnerability | kev | markdown |  | CVE-2024-27199,cve-arsenal,cisa-kev,kev,in-the-wild,ransomware,JetBrai |
+| 5947 | Apache HugeGraph-Server Improper Access Control Vulnerability | kev | markdown |  | CVE-2024-27348,cve-arsenal,cisa-kev,kev,in-the-wild,Apache,HugeGraph-S |
+| 5948 | Synacor Zimbra Collaboration Suite (ZCS) Cross-Site Scripting (XSS) Vulnerability | kev | markdown |  | CVE-2024-27443,cve-arsenal,cisa-kev,kev,in-the-wild,Synacor,Zimbra Col |
+| 5949 | Apple Multiple Products Improper Authentication Vulnerability | kev | markdown |  | CVE-2024-27834,cve-arsenal,cisa-kev,kev,in-the-wild,Apple,Multiple Pro |
+| 5950 | SolarWinds Web Help Desk Deserialization of Untrusted Data Vulnerability | kev | markdown |  | CVE-2024-28986,cve-arsenal,cisa-kev,kev,in-the-wild,SolarWinds,Web Hel |
+| 5951 | SolarWinds Web Help Desk Hardcoded Credential Vulnerability | kev | markdown |  | CVE-2024-28987,cve-arsenal,cisa-kev,kev,in-the-wild,SolarWinds,Web Hel |
+| 5952 | SolarWinds Serv-U Path Traversal Vulnerability | kev | markdown |  | CVE-2024-28995,cve-arsenal,cisa-kev,kev,in-the-wild,SolarWinds,Serv-U |
+| 5953 | Microsoft .NET Framework Information Disclosure Vulnerability | kev | markdown |  | CVE-2024-29059,cve-arsenal,cisa-kev,kev,in-the-wild,Microsoft,.NET Fra |
+| 5954 | Android Pixel Information Disclosure Vulnerability | kev | markdown |  | CVE-2024-29745,cve-arsenal,cisa-kev,kev,in-the-wild,Android,Pixel |
+| 5955 | Android Pixel Privilege Escalation Vulnerability | kev | markdown |  | CVE-2024-29748,cve-arsenal,cisa-kev,kev,in-the-wild,Android,Pixel |
+| 5956 | Ivanti Endpoint Manager (EPM) SQL Injection Vulnerability | kev | markdown |  | CVE-2024-29824,cve-arsenal,cisa-kev,kev,in-the-wild,Ivanti,Endpoint Ma |
+| 5957 | Microsoft SmartScreen Prompt Security Feature Bypass Vulnerability | kev | markdown |  | CVE-2024-29988,cve-arsenal,cisa-kev,kev,in-the-wild,Microsoft,SmartScr |
+| 5958 | Microsoft Windows MSHTML Platform Security Feature Bypass Vulnerability | kev | markdown |  | CVE-2024-30040,cve-arsenal,cisa-kev,kev,in-the-wild,Microsoft,Windows |
+| 5959 | Microsoft DWM Core Library Privilege Escalation Vulnerability | kev | markdown |  | CVE-2024-30051,cve-arsenal,cisa-kev,kev,in-the-wild,ransomware,Microso |
+| 5960 | Microsoft Windows Kernel TOCTOU Race Condition Vulnerability | kev | markdown |  | CVE-2024-30088,cve-arsenal,cisa-kev,kev,in-the-wild,ransomware,Microso |
+| 5961 | Apache OFBiz Path Traversal Vulnerability | kev | markdown |  | CVE-2024-32113,cve-arsenal,cisa-kev,kev,in-the-wild,Apache,OFBiz |
+| 5962 | D-Link Multiple NAS Devices Use of Hard-Coded Credentials Vulnerability | kev | markdown |  | CVE-2024-3272,cve-arsenal,cisa-kev,kev,in-the-wild,D-Link,Multiple NAS |
+| 5963 | D-Link Multiple NAS Devices Command Injection Vulnerability | kev | markdown |  | CVE-2024-3273,cve-arsenal,cisa-kev,kev,in-the-wild,D-Link,Multiple NAS |
+| 5964 | Android Pixel Privilege Escalation Vulnerability | kev | markdown |  | CVE-2024-32896,cve-arsenal,cisa-kev,kev,in-the-wild,Android,Pixel |
+| 5965 | Palo Alto Networks PAN-OS Malicious DNS Packet Vulnerability | kev | markdown |  | CVE-2024-3393,cve-arsenal,cisa-kev,kev,in-the-wild,Palo Alto Networks, |
+| 5966 | Palo Alto Networks PAN-OS Command Injection Vulnerability | kev | markdown |  | CVE-2024-3400,cve-arsenal,cisa-kev,kev,in-the-wild,ransomware,Palo Alt |
+| 5967 | Adobe Commerce and Magento Open Source Improper Restriction of XML External Entity Reference (XXE) Vulnerability | kev | markdown |  | CVE-2024-34102,cve-arsenal,cisa-kev,kev,in-the-wild,Adobe,Commerce and |
+| 5968 | Microsoft Windows Kernel-Mode Driver Untrusted Pointer Dereference Vulnerability | kev | markdown |  | CVE-2024-35250,cve-arsenal,cisa-kev,kev,in-the-wild,Microsoft,Windows |
+| 5969 | OSGeo GeoServer GeoTools Eval Injection Vulnerability | kev | markdown |  | CVE-2024-36401,cve-arsenal,cisa-kev,kev,in-the-wild,OSGeo,GeoServer |
+| 5970 | Android Kernel Remote Code Execution Vulnerability | kev | markdown |  | CVE-2024-36971,cve-arsenal,cisa-kev,kev,in-the-wild,Android,Kernel |
+| 5971 | Broadcom VMware vCenter Server Out-of-bounds Write Vulnerability | kev | markdown |  | CVE-2024-37079,cve-arsenal,cisa-kev,kev,in-the-wild,Broadcom,VMware vC |
+| 5972 | VMware ESXi Authentication Bypass Vulnerability | kev | markdown |  | CVE-2024-37085,cve-arsenal,cisa-kev,kev,in-the-wild,ransomware,VMware, |
+| 5973 | RoundCube Webmail Cross-Site Scripting (XSS) Vulnerability | kev | markdown |  | CVE-2024-37383,cve-arsenal,cisa-kev,kev,in-the-wild,Roundcube,Webmail |
+| 5974 | Microsoft Windows Installer Improper Privilege Management Vulnerability | kev | markdown |  | CVE-2024-38014,cve-arsenal,cisa-kev,kev,in-the-wild,Microsoft,Windows |
+| 5975 | Microsoft Windows Hyper-V Privilege Escalation Vulnerability | kev | markdown |  | CVE-2024-38080,cve-arsenal,cisa-kev,kev,in-the-wild,Microsoft,Windows |
+| 5976 | Microsoft SharePoint Deserialization Vulnerability | kev | markdown |  | CVE-2024-38094,cve-arsenal,cisa-kev,kev,in-the-wild,ransomware,Microso |
+| 5977 | Microsoft Windows Kernel Privilege Escalation Vulnerability | kev | markdown |  | CVE-2024-38106,cve-arsenal,cisa-kev,kev,in-the-wild,Microsoft,Windows |
+| 5978 | Microsoft Windows Power Dependency Coordinator Privilege Escalation Vulnerability | kev | markdown |  | CVE-2024-38107,cve-arsenal,cisa-kev,kev,in-the-wild,Microsoft,Windows |
+| 5979 | Microsoft Windows MSHTML Platform Spoofing Vulnerability | kev | markdown |  | CVE-2024-38112,cve-arsenal,cisa-kev,kev,in-the-wild,Microsoft,Windows |
+| 5980 | Microsoft Windows Scripting Engine Memory Corruption Vulnerability | kev | markdown |  | CVE-2024-38178,cve-arsenal,cisa-kev,kev,in-the-wild,Microsoft,Windows |
+| 5981 | Microsoft Project Remote Code Execution Vulnerability | kev | markdown |  | CVE-2024-38189,cve-arsenal,cisa-kev,kev,in-the-wild,Microsoft,Project |
+| 5982 | Microsoft Windows Ancillary Function Driver for WinSock Privilege Escalation Vulnerability | kev | markdown |  | CVE-2024-38193,cve-arsenal,cisa-kev,kev,in-the-wild,Microsoft,Windows |
+| 5983 | Microsoft Windows SmartScreen Security Feature Bypass Vulnerability | kev | markdown |  | CVE-2024-38213,cve-arsenal,cisa-kev,kev,in-the-wild,Microsoft,Windows |
+| 5984 | Microsoft Windows Mark of the Web (MOTW) Protection Mechanism Failure Vulnerability | kev | markdown |  | CVE-2024-38217,cve-arsenal,cisa-kev,kev,in-the-wild,Microsoft,Windows |
+| 5985 | Microsoft Publisher Protection Mechanism Failure Vulnerability | kev | markdown |  | CVE-2024-38226,cve-arsenal,cisa-kev,kev,in-the-wild,Microsoft,Publishe |
+| 5986 | Apache HTTP Server Improper Escaping of Output Vulnerability | kev | markdown |  | CVE-2024-38475,cve-arsenal,cisa-kev,kev,in-the-wild,Apache,HTTP Server |
+| 5987 | VMware vCenter Server Heap-Based Buffer Overflow Vulnerability | kev | markdown |  | CVE-2024-38812,cve-arsenal,cisa-kev,kev,in-the-wild,VMware,vCenter Ser |
+| 5988 | VMware vCenter Server Privilege Escalation Vulnerability | kev | markdown |  | CVE-2024-38813,cve-arsenal,cisa-kev,kev,in-the-wild,VMware,vCenter Ser |
+| 5989 | Apache OFBiz Incorrect Authorization Vulnerability | kev | markdown |  | CVE-2024-38856,cve-arsenal,cisa-kev,kev,in-the-wild,Apache,OFBiz |
+| 5990 | Versa Director Dangerous File Type Upload Vulnerability | kev | markdown |  | CVE-2024-39717,cve-arsenal,cisa-kev,kev,in-the-wild,Versa,Director |
+| 5991 | Twilio Authy Information Disclosure Vulnerability | kev | markdown |  | CVE-2024-39891,cve-arsenal,cisa-kev,kev,in-the-wild,Twilio,Authy |
+| 5992 | CrushFTP VFS Sandbox Escape Vulnerability | kev | markdown |  | CVE-2024-4040,cve-arsenal,cisa-kev,kev,in-the-wild,CrushFTP |
+| 5993 | Veeam Backup and Replication Deserialization Vulnerability | kev | markdown |  | CVE-2024-40711,cve-arsenal,cisa-kev,kev,in-the-wild,ransomware,Veeam,B |
+| 5994 | SonicWall SonicOS Improper Access Control Vulnerability | kev | markdown |  | CVE-2024-40766,cve-arsenal,cisa-kev,kev,in-the-wild,ransomware,SonicWa |
+| 5995 | Zyxel DSL CPE OS Command Injection Vulnerability | kev | markdown |  | CVE-2024-40890,cve-arsenal,cisa-kev,kev,in-the-wild,Zyxel,DSL CPE Devi |
+| 5996 | Zyxel DSL CPE OS Command Injection Vulnerability | kev | markdown |  | CVE-2024-40891,cve-arsenal,cisa-kev,kev,in-the-wild,Zyxel,DSL CPE Devi |
+| 5997 | Mitel SIP Phones Argument Injection Vulnerability | kev | markdown |  | CVE-2024-41710,cve-arsenal,cisa-kev,kev,in-the-wild,Mitel,SIP Phones |
+| 5998 | Mitel MiCollab Path Traversal Vulnerability | kev | markdown |  | CVE-2024-41713,cve-arsenal,cisa-kev,kev,in-the-wild,ransomware,Mitel,M |
+| 5999 | RoundCube Webmail Cross-Site Scripting Vulnerability | kev | markdown |  | CVE-2024-42009,cve-arsenal,cisa-kev,kev,in-the-wild,Roundcube,Webmail |
+| 6000 | Qualcomm Multiple Chipsets Use-After-Free Vulnerability | kev | markdown |  | CVE-2024-43047,cve-arsenal,cisa-kev,kev,in-the-wild,Qualcomm,Multiple  |
+| 6001 | Android Framework Privilege Escalation Vulnerability | kev | markdown |  | CVE-2024-43093,cve-arsenal,cisa-kev,kev,in-the-wild,Android,Framework |
+| 6002 | Microsoft Windows NTLMv2 Hash Disclosure Spoofing Vulnerability | kev | markdown |  | CVE-2024-43451,cve-arsenal,cisa-kev,kev,in-the-wild,Microsoft,Windows |
+| 6003 | Microsoft Windows MSHTML Platform Spoofing Vulnerability | kev | markdown |  | CVE-2024-43461,cve-arsenal,cisa-kev,kev,in-the-wild,Microsoft,Windows |
+| 6004 | Microsoft Configuration Manager SQL Injection Vulnerability | kev | markdown |  | CVE-2024-43468,cve-arsenal,cisa-kev,kev,in-the-wild,Microsoft,Configur |
+| 6005 | Microsoft Windows Management Console Remote Code Execution Vulnerability | kev | markdown |  | CVE-2024-43572,cve-arsenal,cisa-kev,kev,in-the-wild,Microsoft,Windows |
+| 6006 | Microsoft Windows MSHTML Platform Spoofing Vulnerability | kev | markdown |  | CVE-2024-43573,cve-arsenal,cisa-kev,kev,in-the-wild,Microsoft,Windows |
+| 6007 | Progress Telerik Report Server Authentication Bypass by Spoofing Vulnerability | kev | markdown |  | CVE-2024-4358,cve-arsenal,cisa-kev,kev,in-the-wild,Progress,Telerik Re |
+| 6008 | Apple Multiple Products Code Execution Vulnerability | kev | markdown |  | CVE-2024-44308,cve-arsenal,cisa-kev,kev,in-the-wild,Apple,Multiple Pro |
+| 6009 | Apple Multiple Products Cross-Site Scripting (XSS) Vulnerability | kev | markdown |  | CVE-2024-44309,cve-arsenal,cisa-kev,kev,in-the-wild,Apple,Multiple Pro |
+| 6010 | Apache OFBiz Forced Browsing Vulnerability | kev | markdown |  | CVE-2024-45195,cve-arsenal,cisa-kev,kev,in-the-wild,Apache,OFBiz |
+| 6011 | Synacor Zimbra Collaboration Suite (ZCS) Command Execution Vulnerability | kev | markdown |  | CVE-2024-45519,cve-arsenal,cisa-kev,kev,in-the-wild,Synacor,Zimbra Col |
+| 6012 | PHP-CGI OS Command Injection Vulnerability | kev | markdown |  | CVE-2024-4577,cve-arsenal,cisa-kev,kev,in-the-wild,ransomware,PHP Grou |
+| 6013 | Arm Mali GPU Kernel Driver Use-After-Free Vulnerability | kev | markdown |  | CVE-2024-4610,cve-arsenal,cisa-kev,kev,in-the-wild,Arm,Mali GPU Kernel |
+| 6014 | Google Chromium Visuals Use-After-Free Vulnerability | kev | markdown |  | CVE-2024-4671,cve-arsenal,cisa-kev,kev,in-the-wild,Google,Chromium |
+| 6015 | Fortinet FortiManager Missing Authentication Vulnerability | kev | markdown |  | CVE-2024-47575,cve-arsenal,cisa-kev,kev,in-the-wild,Fortinet,FortiMana |
+| 6016 | Google Chromium V8 Out-of-Bounds Memory Write Vulnerability | kev | markdown |  | CVE-2024-4761,cve-arsenal,cisa-kev,kev,in-the-wild,Google,Chromium V8 |
+| 6017 | NAKIVO Backup and Replication Absolute Path Traversal Vulnerability | kev | markdown |  | CVE-2024-48248,cve-arsenal,cisa-kev,kev,in-the-wild,NAKIVO,Backup and  |
+| 6018 | ServiceNow Improper Input Validation Vulnerability | kev | markdown |  | CVE-2024-4879,cve-arsenal,cisa-kev,kev,in-the-wild,ServiceNow,Utah, Va |
+| 6019 | Progress WhatsUp Gold Path Traversal Vulnerability | kev | markdown |  | CVE-2024-4885,cve-arsenal,cisa-kev,kev,in-the-wild,Progress,WhatsUp Go |
+| 6020 | Microsoft Partner Center Improper Access Control Vulnerability | kev | markdown |  | CVE-2024-49035,cve-arsenal,cisa-kev,kev,in-the-wild,Microsoft,Partner  |
+| 6021 | Microsoft Windows Task Scheduler Privilege Escalation Vulnerability | kev | markdown |  | CVE-2024-49039,cve-arsenal,cisa-kev,kev,in-the-wild,ransomware,Microso |
+| 6022 | Microsoft Windows Common Log File System (CLFS) Driver Heap-Based Buffer Overflow Vulnerability | kev | markdown |  | CVE-2024-49138,cve-arsenal,cisa-kev,kev,in-the-wild,Microsoft,Windows |
+| 6023 | Google Chromium V8 Type Confusion Vulnerability | kev | markdown |  | CVE-2024-4947,cve-arsenal,cisa-kev,kev,in-the-wild,Google,Chromium V8 |
+| 6024 | Justice AV Solutions (JAVS) Viewer Installer Embedded Malicious Code Vulnerability | kev | markdown |  | CVE-2024-4978,cve-arsenal,cisa-kev,kev,in-the-wild,Justice AV Solution |
+| 6025 | Linux Kernel Use of Uninitialized Resource Vulnerability | kev | markdown |  | CVE-2024-50302,cve-arsenal,cisa-kev,kev,in-the-wild,Linux,Kernel |
+| 6026 | Aviatrix Controllers OS Command Injection Vulnerability | kev | markdown |  | CVE-2024-50603,cve-arsenal,cisa-kev,kev,in-the-wild,Aviatrix,Controlle |
+| 6027 | Cleo Multiple Products Unrestricted File Upload Vulnerability | kev | markdown |  | CVE-2024-50623,cve-arsenal,cisa-kev,kev,in-the-wild,ransomware,Cleo,Mu |
+| 6028 | CyberPanel Incorrect Default Permissions Vulnerability | kev | markdown |  | CVE-2024-51378,cve-arsenal,cisa-kev,kev,in-the-wild,ransomware,CyberPe |
+| 6029 | CyberPanel Incorrect Default Permissions Vulnerability | kev | markdown |  | CVE-2024-51567,cve-arsenal,cisa-kev,kev,in-the-wild,ransomware,CyberPe |
+| 6030 | ServiceNow Incomplete List of Disallowed Inputs Vulnerability | kev | markdown |  | CVE-2024-5217,cve-arsenal,cisa-kev,kev,in-the-wild,ServiceNow,Utah, Va |
+| 6031 | Google Chromium V8 Type Confusion Vulnerability | kev | markdown |  | CVE-2024-5274,cve-arsenal,cisa-kev,kev,in-the-wild,Google,Chromium V8 |
+| 6032 | Linux Kernel Out-of-Bounds Write Vulnerability | kev | markdown |  | CVE-2024-53104,cve-arsenal,cisa-kev,kev,in-the-wild,Linux,Kernel |
+| 6033 | Linux Kernel Out-of-Bounds Read Vulnerability | kev | markdown |  | CVE-2024-53150,cve-arsenal,cisa-kev,kev,in-the-wild,Linux,Kernel |
+| 6034 | Linux Kernel Out-of-Bounds Access Vulnerability | kev | markdown |  | CVE-2024-53197,cve-arsenal,cisa-kev,kev,in-the-wild,Linux,Kernel |
+| 6035 | SonicWall SonicOS SSLVPN Improper Authentication Vulnerability | kev | markdown |  | CVE-2024-53704,cve-arsenal,cisa-kev,kev,in-the-wild,ransomware,SonicWa |
+| 6036 | AMI MegaRAC SPx Authentication Bypass by Spoofing Vulnerability | kev | markdown |  | CVE-2024-54085,cve-arsenal,cisa-kev,kev,in-the-wild,AMI,MegaRAC SPx |
+| 6037 | Mitel MiCollab Path Traversal Vulnerability | kev | markdown |  | CVE-2024-55550,cve-arsenal,cisa-kev,kev,in-the-wild,ransomware,Mitel,M |
+| 6038 | Fortinet FortiOS and FortiProxy Authentication Bypass Vulnerability | kev | markdown |  | CVE-2024-55591,cve-arsenal,cisa-kev,kev,in-the-wild,ransomware,Fortine |
+| 6039 | Cleo Multiple Products Unauthenticated File Upload Vulnerability | kev | markdown |  | CVE-2024-55956,cve-arsenal,cisa-kev,kev,in-the-wild,ransomware,Cleo,Mu |
+| 6040 | Craft CMS Code Injection Vulnerability | kev | markdown |  | CVE-2024-56145,cve-arsenal,cisa-kev,kev,in-the-wild,Craft CMS |
+| 6041 | SimpleHelp Missing Authorization Vulnerability | kev | markdown |  | CVE-2024-57726,cve-arsenal,cisa-kev,kev,in-the-wild,ransomware,SimpleH |
+| 6042 | SimpleHelp Path Traversal Vulnerability | kev | markdown |  | CVE-2024-57727,cve-arsenal,cisa-kev,kev,in-the-wild,ransomware,SimpleH |
+| 6043 | SimpleHelp Path Traversal Vulnerability | kev | markdown |  | CVE-2024-57728,cve-arsenal,cisa-kev,kev,in-the-wild,ransomware,SimpleH |
+| 6044 | Advantive VeraCore Unrestricted File Upload Vulnerability | kev | markdown |  | CVE-2024-57968,cve-arsenal,cisa-kev,kev,in-the-wild,Advantive,VeraCore |
+| 6045 | Yiiframework Yii Improper Protection of Alternate Path Vulnerability | kev | markdown |  | CVE-2024-58136,cve-arsenal,cisa-kev,kev,in-the-wild,Yiiframework,Yii |
+| 6046 | Palo Alto Networks Expedition Missing Authentication Vulnerability | kev | markdown |  | CVE-2024-5910,cve-arsenal,cisa-kev,kev,in-the-wild,Palo Alto Networks, |
+| 6047 | GeoVision Devices OS Command Injection Vulnerability | kev | markdown |  | CVE-2024-6047,cve-arsenal,cisa-kev,kev,in-the-wild,GeoVision,Multiple  |
+| 6048 | Progress WhatsUp Gold SQL Injection Vulnerability | kev | markdown |  | CVE-2024-6670,cve-arsenal,cisa-kev,kev,in-the-wild,ransomware,Progress |
+| 6049 | Kingsoft WPS Office Path Traversal Vulnerability | kev | markdown |  | CVE-2024-7262,cve-arsenal,cisa-kev,kev,in-the-wild,Kingsoft,WPS Office |
+| 6050 | Samsung MagicINFO 9 Server Path Traversal Vulnerability | kev | markdown |  | CVE-2024-7399,cve-arsenal,cisa-kev,kev,in-the-wild,Samsung,MagicINFO 9 |
+| 6051 | Ivanti Virtual Traffic Manager Authentication Bypass Vulnerability | kev | markdown |  | CVE-2024-7593,cve-arsenal,cisa-kev,kev,in-the-wild,Ivanti,Virtual Traf |
+| 6052 | TeamT5 ThreatSonar Anti-Ransomware Unrestricted Upload of File with Dangerous Type Vulnerability | kev | markdown |  | CVE-2024-7694,cve-arsenal,cisa-kev,kev,in-the-wild,TeamT5,ThreatSonar  |
+| 6053 | Google Chromium V8 Inappropriate Implementation Vulnerability | kev | markdown |  | CVE-2024-7965,cve-arsenal,cisa-kev,kev,in-the-wild,Google,Chromium V8 |
+| 6054 | Google Chromium V8 Type Confusion Vulnerability | kev | markdown |  | CVE-2024-7971,cve-arsenal,cisa-kev,kev,in-the-wild,Google,Chromium V8 |
+| 6055 | Citrix Session Recording Improper Privilege Management Vulnerability | kev | markdown |  | CVE-2024-8068,cve-arsenal,cisa-kev,kev,in-the-wild,Citrix,Session Reco |
+| 6056 | Citrix Session Recording Deserialization of Untrusted Data Vulnerability | kev | markdown |  | CVE-2024-8069,cve-arsenal,cisa-kev,kev,in-the-wild,Citrix,Session Reco |
+| 6057 | Ivanti Cloud Services Appliance OS Command Injection Vulnerability | kev | markdown |  | CVE-2024-8190,cve-arsenal,cisa-kev,kev,in-the-wild,Ivanti,Cloud Servic |
+| 6058 | PTZOptics PT30X-SDI/NDI Cameras Authentication Bypass Vulnerability | kev | markdown |  | CVE-2024-8956,cve-arsenal,cisa-kev,kev,in-the-wild,PTZOptics,PT30X-SDI |
+| 6059 | PTZOptics PT30X-SDI/NDI Cameras OS Command Injection Vulnerability | kev | markdown |  | CVE-2024-8957,cve-arsenal,cisa-kev,kev,in-the-wild,PTZOptics,PT30X-SDI |
+| 6060 | Ivanti Cloud Services Appliance (CSA) Path Traversal Vulnerability | kev | markdown |  | CVE-2024-8963,cve-arsenal,cisa-kev,kev,in-the-wild,Ivanti,Cloud Servic |
+| 6061 | Ivanti Cloud Services Appliance (CSA) SQL Injection Vulnerability | kev | markdown |  | CVE-2024-9379,cve-arsenal,cisa-kev,kev,in-the-wild,Ivanti,Cloud Servic |
+| 6062 | Ivanti Cloud Services Appliance (CSA) OS Command Injection Vulnerability | kev | markdown |  | CVE-2024-9380,cve-arsenal,cisa-kev,kev,in-the-wild,Ivanti,Cloud Servic |
+| 6063 | Palo Alto Networks Expedition OS Command Injection Vulnerability | kev | markdown |  | CVE-2024-9463,cve-arsenal,cisa-kev,kev,in-the-wild,Palo Alto Networks, |
+| 6064 | Palo Alto Networks Expedition SQL Injection Vulnerability | kev | markdown |  | CVE-2024-9465,cve-arsenal,cisa-kev,kev,in-the-wild,Palo Alto Networks, |
+| 6065 | Palo Alto Networks PAN-OS Management Interface OS Command Injection Vulnerability | kev | markdown |  | CVE-2024-9474,cve-arsenal,cisa-kev,kev,in-the-wild,ransomware,Palo Alt |
+| 6066 | ScienceLogic SL1 Unspecified Vulnerability | kev | markdown |  | CVE-2024-9537,cve-arsenal,cisa-kev,kev,in-the-wild,ScienceLogic,SL1 |
+| 6067 | Mozilla Firefox Use-After-Free Vulnerability | kev | markdown |  | CVE-2024-9680,cve-arsenal,cisa-kev,kev,in-the-wild,ransomware,Mozilla, |
+| 6068 | Palo Alto Networks PAN-OS Authentication Bypass Vulnerability | kev | markdown |  | CVE-2025-0108,cve-arsenal,cisa-kev,kev,in-the-wild,Palo Alto Networks, |
+| 6069 | Palo Alto Networks PAN-OS File Read Vulnerability | kev | markdown |  | CVE-2025-0111,cve-arsenal,cisa-kev,kev,in-the-wild,Palo Alto Networks, |
+| 6070 | Ivanti Connect Secure, Policy Secure, and ZTA Gateways Stack-Based Buffer Overflow Vulnerability | kev | markdown |  | CVE-2025-0282,cve-arsenal,cisa-kev,kev,in-the-wild,ransomware,Ivanti,C |
+| 6071 | 7-Zip Mark of the Web Bypass Vulnerability | kev | markdown |  | CVE-2025-0411,cve-arsenal,cisa-kev,kev,in-the-wild,7-Zip |
+| 6072 | Trimble Cityworks Deserialization Vulnerability | kev | markdown |  | CVE-2025-0994,cve-arsenal,cisa-kev,kev,in-the-wild,Trimble,Cityworks |
+| 6073 | Fortra GoAnywhere MFT Deserialization of Untrusted Data Vulnerability | kev | markdown |  | CVE-2025-10035,cve-arsenal,cisa-kev,kev,in-the-wild,ransomware,Fortra, |
+| 6074 | Google Chromium V8 Type Confusion Vulnerability | kev | markdown |  | CVE-2025-10585,cve-arsenal,cisa-kev,kev,in-the-wild,Google,Chromium V8 |
+| 6075 | Gladinet CentreStack and Triofox Files or Directories Accessible to External Parties Vulnerability | kev | markdown |  | CVE-2025-11371,cve-arsenal,cisa-kev,kev,in-the-wild,Gladinet,CentreSta |
+| 6076 | React Native Community CLI OS Command Injection Vulnerability | kev | markdown |  | CVE-2025-11953,cve-arsenal,cisa-kev,kev,in-the-wild,React Native Commu |
+| 6077 | Gladinet Triofox Improper Access Control Vulnerability | kev | markdown |  | CVE-2025-12480,cve-arsenal,cisa-kev,kev,in-the-wild,Gladinet,Triofox |
+| 6078 | Edimax IC-7100 IP Camera OS Command Injection Vulnerability | kev | markdown |  | CVE-2025-1316,cve-arsenal,cisa-kev,kev,in-the-wild,Edimax,IC-7100 IP C |
+| 6079 | Google Chromium V8 Type Confusion Vulnerability | kev | markdown |  | CVE-2025-13223,cve-arsenal,cisa-kev,kev,in-the-wild,Google,Chromium V8 |
+| 6080 | Google Chromium Out of Bounds Memory Access Vulnerability | kev | markdown |  | CVE-2025-14174,cve-arsenal,cisa-kev,kev,in-the-wild,Google,Chromium |
+| 6081 | Gladinet CentreStack and Triofox Hard Coded Cryptographic Vulnerability | kev | markdown |  | CVE-2025-14611,cve-arsenal,cisa-kev,kev,in-the-wild,Gladinet,CentreSta |
+| 6082 | WatchGuard Firebox Out of Bounds Write Vulnerability | kev | markdown |  | CVE-2025-14733,cve-arsenal,cisa-kev,kev,in-the-wild,ransomware,WatchGu |
+| 6083 | MongoDB and MongoDB Server Improper Handling of Length Parameter Inconsistency Vulnerability | kev | markdown |  | CVE-2025-14847,cve-arsenal,cisa-kev,kev,in-the-wild,MongoDB,MongoDB an |
+| 6084 | Notepad++ Download of Code Without Integrity Check Vulnerability | kev | markdown |  | CVE-2025-15556,cve-arsenal,cisa-kev,kev,in-the-wild,Notepad++ |
+| 6085 | Broadcom Brocade Fabric OS Code Injection Vulnerability | kev | markdown |  | CVE-2025-1976,cve-arsenal,cisa-kev,kev,in-the-wild,Broadcom,Brocade Fa |
+| 6086 | Cisco Identity Services Engine Injection Vulnerability | kev | markdown |  | CVE-2025-20281,cve-arsenal,cisa-kev,kev,in-the-wild,Cisco,Identity Ser |
+| 6087 | Cisco Secure Firewall Adaptive Security Appliance (ASA) and Secure Firewall Threat Defense (FTD) Buffer Overflow Vulnerability | kev | markdown |  | CVE-2025-20333,cve-arsenal,cisa-kev,kev,in-the-wild,Cisco,Secure Firew |
+| 6088 | Cisco Identity Services Engine Injection Vulnerability | kev | markdown |  | CVE-2025-20337,cve-arsenal,cisa-kev,kev,in-the-wild,Cisco,Identity Ser |
+| 6089 | Cisco IOS and IOS XE Software SNMP Denial of Service and Remote Code Execution Vulnerability | kev | markdown |  | CVE-2025-20352,cve-arsenal,cisa-kev,kev,in-the-wild,Cisco,IOS and IOS  |
+| 6090 | Cisco Secure Firewall Adaptive Security (ASA) Appliance and Secure Firewall Threat Defense (FTD) Missing Authorization Vulnerability | kev | markdown |  | CVE-2025-20362,cve-arsenal,cisa-kev,kev,in-the-wild,Cisco,Secure Firew |
+| 6091 | Cisco Multiple Products Improper Input Validation Vulnerability | kev | markdown |  | CVE-2025-20393,cve-arsenal,cisa-kev,kev,in-the-wild,Cisco,Multiple Pro |
+| 6092 | Samsung Mobile Devices Out-of-Bounds Write Vulnerability | kev | markdown |  | CVE-2025-21042,cve-arsenal,cisa-kev,kev,in-the-wild,Samsung,Mobile Dev |
+| 6093 | Samsung Mobile Devices Out-of-Bounds Write Vulnerability | kev | markdown |  | CVE-2025-21043,cve-arsenal,cisa-kev,kev,in-the-wild,Samsung,Mobile Dev |
+| 6094 | Microsoft Windows Hyper-V NT Kernel Integration VSP Heap-based Buffer Overflow Vulnerability | kev | markdown |  | CVE-2025-21333,cve-arsenal,cisa-kev,kev,in-the-wild,Microsoft,Windows |
+| 6095 | Microsoft Windows Hyper-V NT Kernel Integration VSP Use-After-Free Vulnerability | kev | markdown |  | CVE-2025-21334,cve-arsenal,cisa-kev,kev,in-the-wild,Microsoft,Windows |
+| 6096 | Microsoft Windows Hyper-V NT Kernel Integration VSP Use-After-Free Vulnerability | kev | markdown |  | CVE-2025-21335,cve-arsenal,cisa-kev,kev,in-the-wild,Microsoft,Windows |
+| 6097 | Microsoft Windows Storage Link Following Vulnerability | kev | markdown |  | CVE-2025-21391,cve-arsenal,cisa-kev,kev,in-the-wild,Microsoft,Windows |
+| 6098 | Microsoft Windows Ancillary Function Driver for WinSock Heap-Based Buffer Overflow Vulnerability | kev | markdown |  | CVE-2025-21418,cve-arsenal,cisa-kev,kev,in-the-wild,Microsoft,Windows |
+| 6099 | Qualcomm Multiple Chipsets Incorrect Authorization Vulnerability | kev | markdown |  | CVE-2025-21479,cve-arsenal,cisa-kev,kev,in-the-wild,Qualcomm,Multiple  |
+| 6100 | Qualcomm Multiple Chipsets Incorrect Authorization Vulnerability | kev | markdown |  | CVE-2025-21480,cve-arsenal,cisa-kev,kev,in-the-wild,Qualcomm,Multiple  |
+| 6101 | Juniper Junos OS Improper Isolation or Compartmentalization Vulnerability | kev | markdown |  | CVE-2025-21590,cve-arsenal,cisa-kev,kev,in-the-wild,Juniper,Junos OS |
+| 6102 | VMware ESXi and Workstation TOCTOU Race Condition Vulnerability | kev | markdown |  | CVE-2025-22224,cve-arsenal,cisa-kev,kev,in-the-wild,VMware,ESXi and Wo |
+| 6103 | VMware ESXi Arbitrary Write Vulnerability | kev | markdown |  | CVE-2025-22225,cve-arsenal,cisa-kev,kev,in-the-wild,ransomware,VMware, |
+| 6104 | VMware ESXi, Workstation, and Fusion Information Disclosure Vulnerability | kev | markdown |  | CVE-2025-22226,cve-arsenal,cisa-kev,kev,in-the-wild,VMware,ESXi, Works |
+| 6105 | Ivanti Connect Secure, Policy Secure, and ZTA Gateways Stack-Based Buffer Overflow Vulnerability | kev | markdown |  | CVE-2025-22457,cve-arsenal,cisa-kev,kev,in-the-wild,ransomware,Ivanti, |
+| 6106 | SonicWall SMA1000 Appliances Deserialization Vulnerability | kev | markdown |  | CVE-2025-23006,cve-arsenal,cisa-kev,kev,in-the-wild,ransomware,SonicWa |
+| 6107 | Craft CMS Code Injection Vulnerability | kev | markdown |  | CVE-2025-23209,cve-arsenal,cisa-kev,kev,in-the-wild,Craft CMS |
+| 6108 | Wazuh Server Deserialization of Untrusted Data Vulnerability | kev | markdown |  | CVE-2025-24016,cve-arsenal,cisa-kev,kev,in-the-wild,Wazuh,Wazuh Server |
+| 6109 | Microsoft Windows NTLM Hash Disclosure Spoofing Vulnerability | kev | markdown |  | CVE-2025-24054,cve-arsenal,cisa-kev,kev,in-the-wild,Microsoft,Windows |
+| 6110 | Apple Multiple Products Use-After-Free Vulnerability | kev | markdown |  | CVE-2025-24085,cve-arsenal,cisa-kev,kev,in-the-wild,Apple,Multiple Pro |
+| 6111 | Apple iOS and iPadOS Incorrect Authorization Vulnerability | kev | markdown |  | CVE-2025-24200,cve-arsenal,cisa-kev,kev,in-the-wild,Apple,iOS and iPad |
+| 6112 | Apple Multiple Products WebKit Out-of-Bounds Write Vulnerability | kev | markdown |  | CVE-2025-24201,cve-arsenal,cisa-kev,kev,in-the-wild,Apple,Multiple Pro |
+| 6113 | Fortinet FortiOS and FortiProxy Authentication Bypass Vulnerability | kev | markdown |  | CVE-2025-24472,cve-arsenal,cisa-kev,kev,in-the-wild,ransomware,Fortine |
+| 6114 | Apache Tomcat Path Equivalence Vulnerability | kev | markdown |  | CVE-2025-24813,cve-arsenal,cisa-kev,kev,in-the-wild,Apache,Tomcat |
+| 6115 | XWiki Platform Eval Injection Vulnerability | kev | markdown |  | CVE-2025-24893,cve-arsenal,cisa-kev,kev,in-the-wild,XWiki,Platform |
+| 6116 | Microsoft Windows Win32k Use-After-Free Vulnerability | kev | markdown |  | CVE-2025-24983,cve-arsenal,cisa-kev,kev,in-the-wild,Microsoft,Windows |
+| 6117 | Microsoft Windows NTFS Information Disclosure Vulnerability | kev | markdown |  | CVE-2025-24984,cve-arsenal,cisa-kev,kev,in-the-wild,Microsoft,Windows |
+| 6118 | Microsoft Windows Fast FAT File System Driver Integer Overflow Vulnerability | kev | markdown |  | CVE-2025-24985,cve-arsenal,cisa-kev,kev,in-the-wild,Microsoft,Windows |
+| 6119 | Microsoft Power Pages Improper Access Control Vulnerability | kev | markdown |  | CVE-2025-24989,cve-arsenal,cisa-kev,kev,in-the-wild,Microsoft,Power Pa |
+| 6120 | Microsoft Windows Untrusted Pointer Dereference Vulnerability | kev | markdown |  | CVE-2025-24990,cve-arsenal,cisa-kev,kev,in-the-wild,Microsoft,Windows |
+| 6121 | Microsoft Windows NTFS Out-Of-Bounds Read Vulnerability | kev | markdown |  | CVE-2025-24991,cve-arsenal,cisa-kev,kev,in-the-wild,Microsoft,Windows |
+| 6122 | Microsoft Windows NTFS Heap-Based Buffer Overflow Vulnerability | kev | markdown |  | CVE-2025-24993,cve-arsenal,cisa-kev,kev,in-the-wild,Microsoft,Windows |
+| 6123 | Advantive VeraCore SQL Injection Vulnerability | kev | markdown |  | CVE-2025-25181,cve-arsenal,cisa-kev,kev,in-the-wild,Advantive,VeraCore |
+| 6124 | Fortinet Multiple Products Heap-based Buffer Overflow Vulnerability | kev | markdown |  | CVE-2025-25249,cve-arsenal,cisa-kev,kev,in-the-wild,Fortinet,Multiple  |
+| 6125 | Fortinet FortiWeb SQL Injection Vulnerability | kev | markdown |  | CVE-2025-25257,cve-arsenal,cisa-kev,kev,in-the-wild,Fortinet,FortiWeb |
+| 6126 | SolarWinds Web Help Desk Deserialization of Untrusted Data Vulnerability | kev | markdown |  | CVE-2025-26399,cve-arsenal,cisa-kev,kev,in-the-wild,ransomware,SolarWi |
+| 6127 | Microsoft Windows Management Console (MMC) Improper Neutralization Vulnerability | kev | markdown |  | CVE-2025-26633,cve-arsenal,cisa-kev,kev,in-the-wild,ransomware,Microso |
+| 6128 | Qualcomm Multiple Chipsets Use-After-Free Vulnerability | kev | markdown |  | CVE-2025-27038,cve-arsenal,cisa-kev,kev,in-the-wild,Qualcomm,Multiple  |
+| 6129 | FreeType Out-of-Bounds Write Vulnerability | kev | markdown |  | CVE-2025-27363,cve-arsenal,cisa-kev,kev,in-the-wild,FreeType |
+| 6130 | Kentico Xperience CMS Authentication Bypass Using an Alternate Path or Channel Vulnerability | kev | markdown |  | CVE-2025-2746,cve-arsenal,cisa-kev,kev,in-the-wild,Kentico,Xperience C |
+| 6131 | Kentico Xperience CMS Authentication Bypass Using an Alternate Path or Channel Vulnerability | kev | markdown |  | CVE-2025-2747,cve-arsenal,cisa-kev,kev,in-the-wild,Kentico,Xperience C |
+| 6132 | Kentico Xperience Path Traversal Vulnerability | kev | markdown |  | CVE-2025-2749,cve-arsenal,cisa-kev,kev,in-the-wild,Kentico,Kentico Xpe |
+| 6133 | SysAid On-Prem Improper Restriction of XML External Entity Reference Vulnerability | kev | markdown |  | CVE-2025-2775,cve-arsenal,cisa-kev,kev,in-the-wild,SysAid,SysAid On-Pr |
+| 6134 | SysAid On-Prem Improper Restriction of XML External Entity Reference Vulnerability | kev | markdown |  | CVE-2025-2776,cve-arsenal,cisa-kev,kev,in-the-wild,SysAid,SysAid On-Pr |
+| 6135 | Google Chromium Mojo Sandbox Escape Vulnerability | kev | markdown |  | CVE-2025-2783,cve-arsenal,cisa-kev,kev,in-the-wild,Google,Chromium Moj |
+| 6136 | Synacor Zimbra Collaboration Suite (ZCS) Cross-site Scripting Vulnerability | kev | markdown |  | CVE-2025-27915,cve-arsenal,cisa-kev,kev,in-the-wild,Synacor,Zimbra Col |
+| 6137 | Srimax Output Messenger Directory Traversal Vulnerability | kev | markdown |  | CVE-2025-27920,cve-arsenal,cisa-kev,kev,in-the-wild,Srimax,Output Mess |
+| 6138 | D-Link DIR-823X Command Injection Vulnerability | kev | markdown |  | CVE-2025-29635,cve-arsenal,cisa-kev,kev,in-the-wild,D-Link,DIR-823X |
+| 6139 | Microsoft Windows Common Log File System (CLFS) Driver Use-After-Free Vulnerability | kev | markdown |  | CVE-2025-29824,cve-arsenal,cisa-kev,kev,in-the-wild,ransomware,Microso |
+| 6140 | tj-actions/changed-files GitHub Action Embedded Malicious Code Vulnerability | kev | markdown |  | CVE-2025-30066,cve-arsenal,cisa-kev,kev,in-the-wild,tj-actions,changed |
+| 6141 | reviewdog/action-setup GitHub Action Embedded Malicious Code Vulnerability | kev | markdown |  | CVE-2025-30154,cve-arsenal,cisa-kev,kev,in-the-wild,reviewdog,action-s |
+| 6142 | Microsoft Windows Scripting Engine Type Confusion Vulnerability | kev | markdown |  | CVE-2025-30397,cve-arsenal,cisa-kev,kev,in-the-wild,Microsoft,Windows |
+| 6143 | Microsoft Windows DWM Core Library Use-After-Free Vulnerability | kev | markdown |  | CVE-2025-30400,cve-arsenal,cisa-kev,kev,in-the-wild,Microsoft,Windows |
+| 6144 | Gladinet CentreStack and Triofox Use of Hard-coded Cryptographic Key Vulnerability | kev | markdown |  | CVE-2025-30406,cve-arsenal,cisa-kev,kev,in-the-wild,Gladinet,CentreSta |
+| 6145 | Vite Vitejs Improper Access Control Vulnerability | kev | markdown |  | CVE-2025-31125,cve-arsenal,cisa-kev,kev,in-the-wild,Vite,Vitejs |
+| 6146 | CrushFTP Authentication Bypass Vulnerability | kev | markdown |  | CVE-2025-31161,cve-arsenal,cisa-kev,kev,in-the-wild,ransomware,CrushFT |
+| 6147 | Apple Multiple Products Memory Corruption Vulnerability | kev | markdown |  | CVE-2025-31200,cve-arsenal,cisa-kev,kev,in-the-wild,Apple,Multiple Pro |
+| 6148 | Apple Multiple Products Arbitrary Read and Write Vulnerability | kev | markdown |  | CVE-2025-31201,cve-arsenal,cisa-kev,kev,in-the-wild,Apple,Multiple Pro |
+| 6149 | Apple Multiple Products Buffer Overflow Vulnerability | kev | markdown |  | CVE-2025-31277,cve-arsenal,cisa-kev,kev,in-the-wild,Apple,Multiple Pro |
+| 6150 | SAP NetWeaver Unrestricted File Upload Vulnerability | kev | markdown |  | CVE-2025-31324,cve-arsenal,cisa-kev,kev,in-the-wild,ransomware,SAP,Net |
+| 6151 | Craft CMS Code Injection Vulnerability | kev | markdown |  | CVE-2025-32432,cve-arsenal,cisa-kev,kev,in-the-wild,Craft CMS |
+| 6152 | Erlang Erlang/OTP SSH Server Missing Authentication for Critical Function Vulnerability | kev | markdown |  | CVE-2025-32433,cve-arsenal,cisa-kev,kev,in-the-wild,Erlang,Erlang/OTP |
+| 6153 | Sudo Inclusion of Functionality from Untrusted Control Sphere Vulnerability | kev | markdown |  | CVE-2025-32463,cve-arsenal,cisa-kev,kev,in-the-wild,Sudo |
+| 6154 | Langflow Missing Authentication Vulnerability | kev | markdown |  | CVE-2025-3248,cve-arsenal,cisa-kev,kev,in-the-wild,ransomware,Langflow |
+| 6155 | Microsoft Windows Common Log File System (CLFS) Driver Use-After-Free Vulnerability | kev | markdown |  | CVE-2025-32701,cve-arsenal,cisa-kev,kev,in-the-wild,Microsoft,Windows |
+| 6156 | Microsoft Windows Common Log File System (CLFS) Driver Heap-Based Buffer Overflow Vulnerability | kev | markdown |  | CVE-2025-32706,cve-arsenal,cisa-kev,kev,in-the-wild,Microsoft,Windows |
+| 6157 | Microsoft Windows Ancillary Function Driver for WinSock Use-After-Free Vulnerability | kev | markdown |  | CVE-2025-32709,cve-arsenal,cisa-kev,kev,in-the-wild,Microsoft,Windows |
+| 6158 | Fortinet Multiple Products Stack-Based Buffer Overflow Vulnerability | kev | markdown |  | CVE-2025-32756,cve-arsenal,cisa-kev,kev,in-the-wild,Fortinet,Multiple  |
+| 6159 | Quest KACE Systems Management Appliance (SMA) Improper Authentication Vulnerability | kev | markdown |  | CVE-2025-32975,cve-arsenal,cisa-kev,kev,in-the-wild,Quest,KACE Systems |
+| 6160 | Microsoft Windows External Control of File Name or Path Vulnerability | kev | markdown |  | CVE-2025-33053,cve-arsenal,cisa-kev,kev,in-the-wild,Microsoft,Windows |
+| 6161 | Microsoft Windows SMB Client Improper Access Control Vulnerability | kev | markdown |  | CVE-2025-33073,cve-arsenal,cisa-kev,kev,in-the-wild,Microsoft,Windows |
+| 6162 | Versa Concerto Improper Authentication Vulnerability | kev | markdown |  | CVE-2025-34026,cve-arsenal,cisa-kev,kev,in-the-wild,Versa,Concerto |
+| 6163 | Commvault Command Center Path Traversal Vulnerability | kev | markdown |  | CVE-2025-34028,cve-arsenal,cisa-kev,kev,in-the-wild,Commvault,Command  |
+| 6164 | Langflow Origin Validation Error Vulnerability | kev | markdown |  | CVE-2025-34291,cve-arsenal,cisa-kev,kev,in-the-wild,Langflow |
+| 6165 | Craft CMS External Control of Assumed-Immutable Web Parameter Vulnerability | kev | markdown |  | CVE-2025-35939,cve-arsenal,cisa-kev,kev,in-the-wild,Craft CMS |
+| 6166 | Hewlett Packard Enterprise (HPE) OneView Code Injection Vulnerability | kev | markdown |  | CVE-2025-37164,cve-arsenal,cisa-kev,kev,in-the-wild,Hewlett Packard En |
+| 6167 | Linux Kernel Time-of-Check Time-of-Use (TOCTOU) Race Condition Vulnerability | kev | markdown |  | CVE-2025-38352,cve-arsenal,cisa-kev,kev,in-the-wild,Linux,Kernel |
+| 6168 | Commvault Web Server Unspecified Vulnerability | kev | markdown |  | CVE-2025-3928,cve-arsenal,cisa-kev,kev,in-the-wild,Commvault,Web Serve |
+| 6169 | ConnectWise ScreenConnect Improper Authentication Vulnerability | kev | markdown |  | CVE-2025-3935,cve-arsenal,cisa-kev,kev,in-the-wild,ConnectWise,ScreenC |
+| 6170 | Linux Kernel Improper Check for Unusual or Exceptional Conditions Vulnerability | kev | markdown |  | CVE-2025-39682,cve-arsenal,cisa-kev,kev,in-the-wild,Linux,Kernel |
+| 6171 | Linux Kernel Race Condition Vulnerability | kev | markdown |  | CVE-2025-39964,cve-arsenal,cisa-kev,kev,in-the-wild,Linux,Kernel |
+| 6172 | Smartbedded Meteobridge Command Injection Vulnerability | kev | markdown |  | CVE-2025-4008,cve-arsenal,cisa-kev,kev,in-the-wild,Smartbedded,Meteobr |
+| 6173 | SolarWinds Web Help Desk Security Control Bypass Vulnerability | kev | markdown |  | CVE-2025-40536,cve-arsenal,cisa-kev,kev,in-the-wild,SolarWinds,Web Hel |
+| 6174 | SolarWinds Web Help Desk Deserialization of Untrusted Data Vulnerability | kev | markdown |  | CVE-2025-40551,cve-arsenal,cisa-kev,kev,in-the-wild,SolarWinds,Web Hel |
+| 6175 | SonicWall SMA1000 Missing Authorization Vulnerability | kev | markdown |  | CVE-2025-40602,cve-arsenal,cisa-kev,kev,in-the-wild,SonicWall,SMA1000  |
+| 6176 | Broadcom VMware Aria Operations and VMware Tools Privilege Defined with Unsafe Actions Vulnerability | kev | markdown |  | CVE-2025-41244,cve-arsenal,cisa-kev,kev,in-the-wild,Broadcom,VMware Ar |
+| 6177 | Danfoss AK-SM 800A Series Improper Authentication Vulnerability | kev | markdown |  | CVE-2025-41450,cve-arsenal,cisa-kev,kev,in-the-wild,Danfoss,AK-SM 800A |
+| 6178 | Qualitia Active! Mail Stack-Based Buffer Overflow Vulnerability | kev | markdown |  | CVE-2025-42599,cve-arsenal,cisa-kev,kev,in-the-wild,Qualitia,Active! M |
+| 6179 | SAP NetWeaver Improper Neutralization of Special Elements in Data Query Logic Vulnerability | kev | markdown |  | CVE-2025-42884,cve-arsenal,cisa-kev,kev,in-the-wild,SAP,NetWeaver |
+| 6180 | SAP NetWeaver Deserialization Vulnerability | kev | markdown |  | CVE-2025-42999,cve-arsenal,cisa-kev,kev,in-the-wild,ransomware,SAP,Net |
+| 6181 | Apple Multiple Products Unspecified Vulnerability | kev | markdown |  | CVE-2025-43200,cve-arsenal,cisa-kev,kev,in-the-wild,Apple,Multiple Pro |
+| 6182 | Apple iOS, iPadOS, and macOS Out-of-Bounds Write Vulnerability | kev | markdown |  | CVE-2025-43300,cve-arsenal,cisa-kev,kev,in-the-wild,Apple,iOS, iPadOS, |
+| 6183 | Apple Multiple Products Improper Locking Vulnerability | kev | markdown |  | CVE-2025-43510,cve-arsenal,cisa-kev,kev,in-the-wild,Apple,Multiple Pro |
+| 6184 | Apple Multiple Products Classic Buffer Overflow Vulnerability | kev | markdown |  | CVE-2025-43520,cve-arsenal,cisa-kev,kev,in-the-wild,Apple,Multiple Pro |
+| 6185 | Apple Multiple Products Use-After-Free WebKit Vulnerability | kev | markdown |  | CVE-2025-43529,cve-arsenal,cisa-kev,kev,in-the-wild,Apple,Multiple Pro |
+| 6186 | Ivanti Endpoint Manager Mobile (EPMM) Authentication Bypass Vulnerability | kev | markdown |  | CVE-2025-4427,cve-arsenal,cisa-kev,kev,in-the-wild,Ivanti,Endpoint Man |
+| 6187 | Ivanti Endpoint Manager Mobile (EPMM) Code Injection Vulnerability | kev | markdown |  | CVE-2025-4428,cve-arsenal,cisa-kev,kev,in-the-wild,Ivanti,Endpoint Man |
+| 6188 | Samsung MagicINFO 9 Server Path Traversal Vulnerability | kev | markdown |  | CVE-2025-4632,cve-arsenal,cisa-kev,kev,in-the-wild,Samsung,MagicINFO 9 |
+| 6189 | TeleMessage TM SGNL Hidden Functionality Vulnerability | kev | markdown |  | CVE-2025-47729,cve-arsenal,cisa-kev,kev,in-the-wild,TeleMessage,TM SGN |
+| 6190 | Wing FTP Server Improper Neutralization of Null Byte or NUL Character Vulnerability | kev | markdown |  | CVE-2025-47812,cve-arsenal,cisa-kev,kev,in-the-wild,Wing FTP Server |
+| 6191 | Wing FTP Server Information Disclosure Vulnerability | kev | markdown |  | CVE-2025-47813,cve-arsenal,cisa-kev,kev,in-the-wild,Wing FTP Server |
+| 6192 | IGEL OS Use of a Key Past its Expiration Date Vulnerability | kev | markdown |  | CVE-2025-47827,cve-arsenal,cisa-kev,kev,in-the-wild,IGEL,IGEL OS |
+| 6193 | Git Link Following Vulnerability | kev | markdown |  | CVE-2025-48384,cve-arsenal,cisa-kev,kev,in-the-wild,Git |
+| 6194 | Android Runtime Use-After-Free Vulnerability | kev | markdown |  | CVE-2025-48543,cve-arsenal,cisa-kev,kev,in-the-wild,Android,Runtime |
+| 6195 | Android Framework Privilege Escalation Vulnerability | kev | markdown |  | CVE-2025-48572,cve-arsenal,cisa-kev,kev,in-the-wild,Android,Framework |
+| 6196 | Android Framework Integer Overflow Vulnerability | kev | markdown |  | CVE-2025-48595,cve-arsenal,cisa-kev,kev,in-the-wild,Android,Framework |
+| 6197 | Android Framework Information Disclosure Vulnerability | kev | markdown |  | CVE-2025-48633,cve-arsenal,cisa-kev,kev,in-the-wild,Android,Framework |
+| 6198 | Synacor Zimbra Collaboration Suite (ZCS) Cross-site Scripting Vulnerability | kev | markdown |  | CVE-2025-48700,cve-arsenal,cisa-kev,kev,in-the-wild,Synacor,Zimbra Col |
+| 6199 | CWP Control Web Panel OS Command Injection Vulnerability | kev | markdown |  | CVE-2025-48703,cve-arsenal,cisa-kev,kev,in-the-wild,CWP,Control Web Pa |
+| 6200 | TeleMessage TM SGNL Initialization of a Resource with an Insecure Default Vulnerability | kev | markdown |  | CVE-2025-48927,cve-arsenal,cisa-kev,kev,in-the-wild,TeleMessage,TM SGN |
+| 6201 | TeleMessage TM SGNL Exposure of Core Dump File to an Unauthorized Control Sphere Vulnerability | kev | markdown |  | CVE-2025-48928,cve-arsenal,cisa-kev,kev,in-the-wild,TeleMessage,TM SGN |
+| 6202 | RoundCube Webmail Deserialization of Untrusted Data Vulnerability | kev | markdown |  | CVE-2025-49113,cve-arsenal,cisa-kev,kev,in-the-wild,Roundcube,Webmail |
+| 6203 | Microsoft SharePoint Code Injection Vulnerability | kev | markdown |  | CVE-2025-49704,cve-arsenal,cisa-kev,kev,in-the-wild,ransomware,Microso |
+| 6204 | Microsoft SharePoint Improper Authentication Vulnerability | kev | markdown |  | CVE-2025-49706,cve-arsenal,cisa-kev,kev,in-the-wild,ransomware,Microso |
+| 6205 | Dassault Systèmes DELMIA Apriso Deserialization of Untrusted Data Vulnerability | kev | markdown |  | CVE-2025-5086,cve-arsenal,cisa-kev,kev,in-the-wild,Dassault Systèmes,D |
+| 6206 | SmarterTools SmarterMail Unrestricted Upload of File with Dangerous Type Vulnerability | kev | markdown |  | CVE-2025-52691,cve-arsenal,cisa-kev,kev,in-the-wild,ransomware,Smarter |
+| 6207 | F5 BIG-IP Stack-Based Buffer Overflow Vulnerability | kev | markdown |  | CVE-2025-53521,cve-arsenal,cisa-kev,kev,in-the-wild,F5,BIG-IP |
+| 6208 | Sitecore Multiple Products Deserialization of Untrusted Data Vulnerability | kev | markdown |  | CVE-2025-53690,cve-arsenal,cisa-kev,kev,in-the-wild,Sitecore,Multiple  |
+| 6209 | Microsoft SharePoint Deserialization of Untrusted Data Vulnerability | kev | markdown |  | CVE-2025-53770,cve-arsenal,cisa-kev,kev,in-the-wild,ransomware,Microso |
+| 6210 | Laravel Livewire Code Injection Vulnerability | kev | markdown |  | CVE-2025-54068,cve-arsenal,cisa-kev,kev,in-the-wild,Laravel,Livewire |
+| 6211 | Google Chromium V8 Out-of-Bounds Read and Write Vulnerability | kev | markdown |  | CVE-2025-5419,cve-arsenal,cisa-kev,kev,in-the-wild,Google,Chromium V8 |
+| 6212 | Adobe Commerce and Magento Improper Input Validation Vulnerability | kev | markdown |  | CVE-2025-54236,cve-arsenal,cisa-kev,kev,in-the-wild,Adobe,Commerce and |
+| 6213 | Adobe Experience Manager Forms Code Execution Vulnerability | kev | markdown |  | CVE-2025-54253,cve-arsenal,cisa-kev,kev,in-the-wild,Adobe,Experience M |
+| 6214 | CrushFTP Unprotected Alternate Channel Vulnerability | kev | markdown |  | CVE-2025-54309,cve-arsenal,cisa-kev,kev,in-the-wild,CrushFTP |
+| 6215 | Prettier eslint-config-prettier Embedded Malicious Code Vulnerability | kev | markdown |  | CVE-2025-54313,cve-arsenal,cisa-kev,kev,in-the-wild,Prettier,eslint-co |
+| 6216 | Trend Micro Apex One OS Command Injection Vulnerability | kev | markdown |  | CVE-2025-54948,cve-arsenal,cisa-kev,kev,in-the-wild,Trend Micro,Apex O |
+| 6217 | Meta Platforms WhatsApp Incorrect Authorization Vulnerability | kev | markdown |  | CVE-2025-55177,cve-arsenal,cisa-kev,kev,in-the-wild,Meta Platforms,Wha |
+| 6218 | Meta React Server Components Remote Code Execution Vulnerability | kev | markdown |  | CVE-2025-55182,cve-arsenal,cisa-kev,kev,in-the-wild,ransomware,Meta,Re |
+| 6219 | Citrix NetScaler ADC and Gateway Out-of-Bounds Read Vulnerability | kev | markdown |  | CVE-2025-5777,cve-arsenal,cisa-kev,kev,in-the-wild,ransomware,Citrix,N |
+| 6220 | Sangoma FreePBX Authentication Bypass Vulnerability | kev | markdown |  | CVE-2025-57819,cve-arsenal,cisa-kev,kev,in-the-wild,Sangoma,FreePBX |
+| 6221 | Fortinet FortiWeb OS Command Injection Vulnerability | kev | markdown |  | CVE-2025-58034,cve-arsenal,cisa-kev,kev,in-the-wild,Fortinet,FortiWeb |
+| 6222 | OSGeo GeoServer Improper Restriction of XML External Entity Reference Vulnerability | kev | markdown |  | CVE-2025-58360,cve-arsenal,cisa-kev,kev,in-the-wild,OSGeo,GeoServer |
+| 6223 | Microsoft Windows Improper Access Control Vulnerability | kev | markdown |  | CVE-2025-59230,cve-arsenal,cisa-kev,kev,in-the-wild,Microsoft,Windows |
+| 6224 | Microsoft Windows Server Update Service (WSUS) Deserialization of Untrusted Data Vulnerability | kev | markdown |  | CVE-2025-59287,cve-arsenal,cisa-kev,kev,in-the-wild,Microsoft,Windows |
+| 6225 | ASUS Live Update Embedded Malicious Code Vulnerability | kev | markdown |  | CVE-2025-59374,cve-arsenal,cisa-kev,kev,in-the-wild,ASUS,Live Update |
+| 6226 | Libraesva Email Security Gateway Command Injection Vulnerability | kev | markdown |  | CVE-2025-59689,cve-arsenal,cisa-kev,kev,in-the-wild,Libraesva,Email Se |
+| 6227 | Fortinet Multiple Products Improper Verification of Cryptographic Signature Vulnerability | kev | markdown |  | CVE-2025-59718,cve-arsenal,cisa-kev,kev,in-the-wild,Fortinet,Multiple  |
+| 6228 | Microsoft Windows Link Following Vulnerability | kev | markdown |  | CVE-2025-60710,cve-arsenal,cisa-kev,kev,in-the-wild,ransomware,Microso |
+| 6229 | Fortinet Multiple Products Path Traversal Vulnerability | kev | markdown |  | CVE-2025-61624,cve-arsenal,cisa-kev,kev,in-the-wild,Fortinet,Multiple  |
+| 6230 | Oracle Fusion Middleware Missing Authentication for Critical Function Vulnerability | kev | markdown |  | CVE-2025-61757,cve-arsenal,cisa-kev,kev,in-the-wild,Oracle,Fusion Midd |
+| 6231 | Oracle E-Business Suite Unspecified Vulnerability | kev | markdown |  | CVE-2025-61882,cve-arsenal,cisa-kev,kev,in-the-wild,ransomware,Oracle, |
+| 6232 | Oracle E-Business Suite Server-Side Request Forgery (SSRF) Vulnerability | kev | markdown |  | CVE-2025-61884,cve-arsenal,cisa-kev,kev,in-the-wild,ransomware,Oracle, |
+| 6233 | Motex LANSCOPE Endpoint Manager Improper Verification of Source of a Communication Channel Vulnerability | kev | markdown |  | CVE-2025-61932,cve-arsenal,cisa-kev,kev,in-the-wild,Motex,LANSCOPE End |
+| 6234 | Dassault Systèmes DELMIA Apriso Code Injection Vulnerability | kev | markdown |  | CVE-2025-6204,cve-arsenal,cisa-kev,kev,in-the-wild,Dassault Systèmes,D |
+| 6235 | Dassault Systèmes DELMIA Apriso Missing Authorization Vulnerability | kev | markdown |  | CVE-2025-6205,cve-arsenal,cisa-kev,kev,in-the-wild,Dassault Systèmes,D |
+| 6236 | RARLAB WinRAR Path Traversal Vulnerability | kev | markdown |  | CVE-2025-6218,cve-arsenal,cisa-kev,kev,in-the-wild,RARLAB,WinRAR |
+| 6237 | Microsoft Windows Race Condition Vulnerability | kev | markdown |  | CVE-2025-62215,cve-arsenal,cisa-kev,kev,in-the-wild,Microsoft,Windows |
+| 6238 | Microsoft Windows Use After Free Vulnerability | kev | markdown |  | CVE-2025-62221,cve-arsenal,cisa-kev,kev,in-the-wild,Microsoft,Windows |
+| 6239 | Ray-Project Ray Code Injection Vulnerability | kev | markdown |  | CVE-2025-62593,cve-arsenal,cisa-kev,kev,in-the-wild,Ray-Project,Ray |
+| 6240 | Sangoma FreePBX OS Command Injection Vulnerability | kev | markdown |  | CVE-2025-64328,cve-arsenal,cisa-kev,kev,in-the-wild,Sangoma,FreePBX |
+| 6241 | Fortinet FortiWeb Path Traversal Vulnerability | kev | markdown |  | CVE-2025-64446,cve-arsenal,cisa-kev,kev,in-the-wild,Fortinet,FortiWeb |
+| 6242 | Citrix NetScaler ADC and Gateway Buffer Overflow Vulnerability | kev | markdown |  | CVE-2025-6543,cve-arsenal,cisa-kev,kev,in-the-wild,Citrix,NetScaler AD |
+| 6243 | Google Chromium V8 Type Confusion Vulnerability | kev | markdown |  | CVE-2025-6554,cve-arsenal,cisa-kev,kev,in-the-wild,Google,Chromium V8 |
+| 6244 | Google Chromium ANGLE and GPU Improper Input Validation Vulnerability | kev | markdown |  | CVE-2025-6558,cve-arsenal,cisa-kev,kev,in-the-wild,Google,Chromium |
+| 6245 | Synacor Zimbra Collaboration Suite (ZCS) Cross-Site Scripting Vulnerability | kev | markdown |  | CVE-2025-66376,cve-arsenal,cisa-kev,kev,in-the-wild,Synacor,Zimbra Col |
+| 6246 | Array Networks ArrayOS AG OS Command Injection Vulnerability | kev | markdown |  | CVE-2025-66644,cve-arsenal,cisa-kev,kev,in-the-wild,Array Networks,Arr |
+| 6247 | Lantronix EDS5000 Code Injection Vulnerability | kev | markdown |  | CVE-2025-67038,cve-arsenal,cisa-kev,kev,in-the-wild,Lantronix,EDS5000 |
+| 6248 | RoundCube Webmail Cross-site Scripting Vulnerability | kev | markdown |  | CVE-2025-68461,cve-arsenal,cisa-kev,kev,in-the-wild,Roundcube,Webmail |
+| 6249 | n8n Improper Control of Dynamically-Managed Code Resources Vulnerability | kev | markdown |  | CVE-2025-68613,cve-arsenal,cisa-kev,kev,in-the-wild,n8n |
+| 6250 | Synacor Zimbra Collaboration Suite (ZCS) PHP Remote File Inclusion Vulnerability | kev | markdown |  | CVE-2025-68645,cve-arsenal,cisa-kev,kev,in-the-wild,Synacor,Zimbra Col |
+| 6251 | Fortinet FortiOS Exposure of Sensitive Information to an Unauthorized Actor Vulnerability | kev | markdown |  | CVE-2025-68686,cve-arsenal,cisa-kev,kev,in-the-wild,Fortinet,FortiOS |
+| 6252 | Citrix NetScaler Memory Overflow Vulnerability | kev | markdown |  | CVE-2025-7775,cve-arsenal,cisa-kev,kev,in-the-wild,Citrix,NetScaler |
+| 6253 | RARLAB WinRAR Path Traversal Vulnerability | kev | markdown |  | CVE-2025-8088,cve-arsenal,cisa-kev,kev,in-the-wild,ransomware,RARLAB,W |
+| 6254 | Gogs Path Traversal Vulnerability | kev | markdown |  | CVE-2025-8110,cve-arsenal,cisa-kev,kev,in-the-wild,Gogs |
+| 6255 | N-able N-Central Insecure Deserialization Vulnerability | kev | markdown |  | CVE-2025-8875,cve-arsenal,cisa-kev,kev,in-the-wild,N-able,N-Central |
+| 6256 | N-able N-Central Command Injection Vulnerability | kev | markdown |  | CVE-2025-8876,cve-arsenal,cisa-kev,kev,in-the-wild,N-able,N-Central |
+| 6257 | WatchGuard Firebox Out-of-Bounds Write Vulnerability | kev | markdown |  | CVE-2025-9242,cve-arsenal,cisa-kev,kev,in-the-wild,WatchGuard,Firebox |
+| 6258 | TP-Link Archer C7(EU) and TL-WR841N/ND(MS) OS Command Injection Vulnerability | kev | markdown |  | CVE-2025-9377,cve-arsenal,cisa-kev,kev,in-the-wild,TP-Link,Multiple Ro |
+| 6259 | Palo Alto Networks PAN-OS Authentication Bypass Vulnerability | kev | markdown |  | CVE-2026-0257,cve-arsenal,cisa-kev,kev,in-the-wild,ransomware,Palo Alt |
+| 6260 | Palo Alto Networks PAN-OS Out-of-bounds Write Vulnerability | kev | markdown |  | CVE-2026-0300,cve-arsenal,cisa-kev,kev,in-the-wild,Palo Alto Networks, |
+| 6261 | Palo Alto Networks PAN-OS Code Injection Vulnerability | kev | markdown |  | CVE-2026-0322,cve-arsenal,cisa-kev,kev,in-the-wild,Palo Alto Networks, |
+| 6262 | Langflow Inclusion of Functionality from Untrusted Control Sphere Vulnerability | kev | markdown |  | CVE-2026-0770,cve-arsenal,cisa-kev,kev,in-the-wild,Langflow |
+| 6263 | Zammad GmbH Zammad Session Fixation Vulnerability | kev | markdown |  | CVE-2026-102489,cve-arsenal,cisa-kev,kev,in-the-wild,Zammad GmbH,Zamma |
+| 6264 | Zammad GmbH Zammad Improper Privilege Management Vulnerability | kev | markdown |  | CVE-2026-102490,cve-arsenal,cisa-kev,kev,in-the-wild,Zammad GmbH,Zamma |
+| 6265 | BeyondTrust Remote Support Authentication Bypass by Spoofing Vulnerability | kev | markdown |  | CVE-2026-102764,cve-arsenal,cisa-kev,kev,in-the-wild,BeyondTrust,Remot |
+| 6266 | GPUStack Improper Authentication Vulnerability | kev | markdown |  | CVE-2026-102895,cve-arsenal,cisa-kev,kev,in-the-wild,GPUStack |
+| 6267 | Hewlett Packard Enterprise (HPE) Juniper Session Smart Conductor and Session Smart Router OS Command Injection Vulnerability | kev | markdown |  | CVE-2026-103406,cve-arsenal,cisa-kev,kev,in-the-wild,Hewlett Packard E |
+| 6268 | Fortinet FortiMail Path Traversal Vulnerability | kev | markdown |  | CVE-2026-104286,cve-arsenal,cisa-kev,kev,in-the-wild,Fortinet,FortiMai |
+| 6269 | Ivanti Connect Secure Authentication Bypass by Spoofing Vulnerability | kev | markdown |  | CVE-2026-104935,cve-arsenal,cisa-kev,kev,in-the-wild,Ivanti,Connect Se |
+| 6270 | Ahsay AhsayCBS Improper Authentication Vulnerability | kev | markdown |  | CVE-2026-105133,cve-arsenal,cisa-kev,kev,in-the-wild,Ahsay,AhsayCBS |
+| 6271 | Ahsay AhsayCBS Command Injection Vulnerability | kev | markdown |  | CVE-2026-105134,cve-arsenal,cisa-kev,kev,in-the-wild,Ahsay,AhsayCBS |
+| 6272 | Ivanti Sentry OS Command Injection Vulnerability | kev | markdown |  | CVE-2026-10520,cve-arsenal,cisa-kev,kev,in-the-wild,Ivanti,Sentry |
+| 6273 | EG Secure Solutions SiteGuard Server Edition OS Command Injection Vulnerability | kev | markdown |  | CVE-2026-106931,cve-arsenal,cisa-kev,kev,in-the-wild,EG Secure Solutio |
+| 6274 | PHP Memory Corruption Vulnerability | kev | markdown |  | CVE-2026-109618,cve-arsenal,cisa-kev,kev,in-the-wild,PHP Group,PHP |
+| 6275 | PHP Stale Internal Request-State Vulnerability | kev | markdown |  | CVE-2026-109619,cve-arsenal,cisa-kev,kev,in-the-wild,PHP Group,PHP |
+| 6276 | Collabora Online – Built-in CODE Server OS Command Injection Vulnerability | kev | markdown |  | CVE-2026-110447,cve-arsenal,cisa-kev,kev,in-the-wild,Collabora,Collabo |
+| 6277 | Siemens Software Center Uncontrolled Search Path Element Vulnerability | kev | markdown |  | CVE-2026-110936,cve-arsenal,cisa-kev,kev,in-the-wild,Siemens,Software  |
+| 6278 | Ivanti Connect Secure Missing Authentication for Critical Function Vulnerability | kev | markdown |  | CVE-2026-111357,cve-arsenal,cisa-kev,kev,in-the-wild,Ivanti,Connect Se |
+| 6279 | Google Brotli Unchecked Return Value Vulnerability | kev | markdown |  | CVE-2026-111497,cve-arsenal,cisa-kev,kev,in-the-wild,Google,Brotli |
+| 6280 | Barracuda Networks Multiple Products OS Command Injection Vulnerability | kev | markdown |  | CVE-2026-111560,cve-arsenal,cisa-kev,kev,in-the-wild,Barracuda Network |
+| 6281 | Openwave Messaging Limited Webtop Media Transcoder Incorrect Resource Transfer Between Spheres Vulnerability | kev | markdown |  | CVE-2026-111793,cve-arsenal,cisa-kev,kev,in-the-wild,Openwave Messagin |
+| 6282 | Arista VeloCloud Orchestrator SQL Injection Vulnerability | kev | markdown |  | CVE-2026-114625,cve-arsenal,cisa-kev,kev,in-the-wild,Arista,VeloCloud  |
+| 6283 | UnrealIRCd Improper Neutralization of Delimiters Vulnerability | kev | markdown |  | CVE-2026-114713,cve-arsenal,cisa-kev,kev,in-the-wild,UnrealIRCd |
+| 6284 | Perforce Puppet Enterprise Deserialization of Untrusted Data Vulnerability | kev | markdown |  | CVE-2026-115731,cve-arsenal,cisa-kev,kev,in-the-wild,Perforce,Puppet E |
+| 6285 | Google Chromium V8 Out-of-Bounds Read and Write Vulnerability | kev | markdown |  | CVE-2026-11645,cve-arsenal,cisa-kev,kev,in-the-wild,Google,Chromium V8 |
+| 6286 | Barracuda Networks Email Security Gateway (ESG) Authentication Bypass Using an Alternate Path or Channel Vulnerability | kev | markdown |  | CVE-2026-116606,cve-arsenal,cisa-kev,kev,in-the-wild,Barracuda Network |
+| 6287 | SignalWire FreeSwitch Code Injection Vulnerability | kev | markdown |  | CVE-2026-116779,cve-arsenal,cisa-kev,kev,in-the-wild,SignalWire,FreeSw |
+| 6288 | Ivanti Connect Secure Generation of Predictable Numbers or Identifiers Vulnerability | kev | markdown |  | CVE-2026-118527,cve-arsenal,cisa-kev,kev,in-the-wild,Ivanti,Connect Se |
+| 6289 | WordPress WordPress Core Time-of-check Time-of-use (TOCTOU) Race Condition Vulnerability | kev | markdown |  | CVE-2026-119977,cve-arsenal,cisa-kev,kev,in-the-wild,WordPress,WordPre |
+| 6290 | Check Point Multiple Products Incorrect Permission Assignment for Critical Resource Vulnerability | kev | markdown |  | CVE-2026-123039,cve-arsenal,cisa-kev,kev,in-the-wild,Check Point,Multi |
+| 6291 | OpenBSD OpenSSH Unexpected Status Code or Return Value Vulnerability | kev | markdown |  | CVE-2026-123158,cve-arsenal,cisa-kev,kev,in-the-wild,OpenBSD,OpenSSH |
+| 6292 | IBM Aspera Faspex Incorrect Authorization Vulnerability | kev | markdown |  | CVE-2026-123218,cve-arsenal,cisa-kev,kev,in-the-wild,IBM,Aspera Faspex |
+| 6293 | VMWare vCenter Authentication Bypass Using an Alternate Path or Channel Vulnerability | kev | markdown |  | CVE-2026-123890,cve-arsenal,cisa-kev,kev,in-the-wild,Broadcom,VMware v |
+| 6294 | Microsoft Office Outlook Missing User Interaction for Potentially Unsafe Action Vulnerability | kev | markdown |  | CVE-2026-124194,cve-arsenal,cisa-kev,kev,in-the-wild,Microsoft,Office |
+| 6295 | Google Chromium Use-After-Free Vulnerability | kev | markdown |  | CVE-2026-125350,cve-arsenal,cisa-kev,kev,in-the-wild,Google,Chromium |
+| 6296 | PTC Windchill and FlexPLM Improper Input Validation Vulnerability | kev | markdown |  | CVE-2026-12569,cve-arsenal,cisa-kev,kev,in-the-wild,ransomware,PTC,Win |
+| 6297 | Ivanti Endpoint Manager Mobile (EPMM) Code Injection Vulnerability | kev | markdown |  | CVE-2026-1281,cve-arsenal,cisa-kev,kev,in-the-wild,Ivanti,Endpoint Man |
+| 6298 | Apache Roller Deserialization of Untrusted Data Vulnerability | kev | markdown |  | CVE-2026-129448,cve-arsenal,cisa-kev,kev,in-the-wild,Apache,Roller |
+| 6299 | Idunno AntiCsrf Deserialization of Untrusted Data Vulnerability | kev | markdown |  | CVE-2026-131914,cve-arsenal,cisa-kev,kev,in-the-wild,Idunno,AntiCsrf |
+| 6300 | Drupal Core Remote Code Execution Vulnerability | kev | markdown |  | CVE-2026-132165,cve-arsenal,cisa-kev,kev,in-the-wild,Drupal,Core |
+| 6301 | Optimizely Web Experimentation External Control of Critical State Data Vulnerability | kev | markdown |  | CVE-2026-132224,cve-arsenal,cisa-kev,kev,in-the-wild,Optimizely,Web Ex |
+| 6302 | Mitel MiCollab Unrestricted Upload of File with Dangerous Type Vulnerability | kev | markdown |  | CVE-2026-133275,cve-arsenal,cisa-kev,kev,in-the-wild,Mitel,MiCollab |
+| 6303 | Mitel MiCollab XML Injection Vulnerability | kev | markdown |  | CVE-2026-133303,cve-arsenal,cisa-kev,kev,in-the-wild,Mitel,MiCollab |
+| 6304 | Mitel MiCollab Weak Authentication Vulnerability | kev | markdown |  | CVE-2026-133311,cve-arsenal,cisa-kev,kev,in-the-wild,Mitel,MiCollab |
+| 6305 | Mitel MiCollab OS Command Injection Vulnerability | kev | markdown |  | CVE-2026-133323,cve-arsenal,cisa-kev,kev,in-the-wild,Mitel,MiCollab |
+| 6306 | Mitel MiCollab Not Failing Securely Vulnerability | kev | markdown |  | CVE-2026-133324,cve-arsenal,cisa-kev,kev,in-the-wild,Mitel,MiCollab |
+| 6307 | Vates Xen Orchestra Improper Validation of Specified Type of Input Vulnerability | kev | markdown |  | CVE-2026-133469,cve-arsenal,cisa-kev,kev,in-the-wild,Vates,Xen Orchest |
+| 6308 | Project MONAI MONAI Label Path Traversal Vulnerability | kev | markdown |  | CVE-2026-133968,cve-arsenal,cisa-kev,kev,in-the-wild,Project MONAI,MON |
+| 6309 | Ivanti Endpoint Manager Mobile (EPMM) Code Injection Vulnerability | kev | markdown |  | CVE-2026-1340,cve-arsenal,cisa-kev,kev,in-the-wild,Ivanti,Endpoint Man |
+| 6310 | N-able MailAssure (SpamExperts) Server-Side Request Forgery (SSRF) Vulnerability | kev | markdown |  | CVE-2026-134624,cve-arsenal,cisa-kev,kev,in-the-wild,N-able,MailAssure |
+| 6311 | SonicWall SMA1000 Appliances Server-Side Request Forgery Vulnerability | kev | markdown |  | CVE-2026-15409,cve-arsenal,cisa-kev,kev,in-the-wild,ransomware,SonicWa |
+| 6312 | SonicWall SMA1000 Appliances Code Injection Vulnerability | kev | markdown |  | CVE-2026-15410,cve-arsenal,cisa-kev,kev,in-the-wild,ransomware,SonicWa |
+| 6313 | Ivanti Endpoint Manager (EPM) Authentication Bypass Vulnerability | kev | markdown |  | CVE-2026-1603,cve-arsenal,cisa-kev,kev,in-the-wild,Ivanti,Endpoint Man |
+| 6314 | Check Point SmartConsole Improper Authentication Vulnerability | kev | markdown |  | CVE-2026-16232,cve-arsenal,cisa-kev,kev,in-the-wild,Check Point,SmartC |
+| 6315 | Arista VeloCloud Orchestrator On-Prem OS Command Injection Vulnerability | kev | markdown |  | CVE-2026-16812,cve-arsenal,cisa-kev,kev,in-the-wild,Arista,VeloCloud O |
+| 6316 | BeyondTrust Remote Support (RS) and Privileged Remote Access (PRA) OS Command Injection Vulnerability | kev | markdown |  | CVE-2026-1731,cve-arsenal,cisa-kev,kev,in-the-wild,ransomware,BeyondTr |
+| 6317 | N-able N-central Authentication Bypass Using an Alternate Path or Channel Vulnerability | kev | markdown |  | CVE-2026-18556,cve-arsenal,cisa-kev,kev,in-the-wild,N-able,N-central |
+| 6318 | N-able N-central Authentication Bypass Using an Alternate Path or Channel Vulnerability | kev | markdown |  | CVE-2026-18577,cve-arsenal,cisa-kev,kev,in-the-wild,N-able,N-central |
+| 6319 | Citrix NetScaler Authentication Bypass Using an Alternate Path or Channel Vulnerability | kev | markdown |  | CVE-2026-19490,cve-arsenal,cisa-kev,kev,in-the-wild,Citrix,NetScaler |
+| 6320 | SonicWall SonicOS SSLVPN Use of Single-factor Authentication Vulnerability | kev | markdown |  | CVE-2026-19868,cve-arsenal,cisa-kev,kev,in-the-wild,SonicWall,SonicOS  |
+| 6321 | Cisco Unified Communications Products Code Injection Vulnerability | kev | markdown |  | CVE-2026-20045,cve-arsenal,cisa-kev,kev,in-the-wild,Cisco,Unified Comm |
+| 6322 | Cisco Firewall Management Center Authentication Bypass Using an Alternate Path or Channel Vulnerability | kev | markdown |  | CVE-2026-20079,cve-arsenal,cisa-kev,kev,in-the-wild,Cisco,Secure Firew |
+| 6323 | Cisco Catalyst SD-WAN Manager Incorrect Use of Privileged APIs Vulnerability | kev | markdown |  | CVE-2026-20122,cve-arsenal,cisa-kev,kev,in-the-wild,Cisco,Catalyst SD- |
+| 6324 | Cisco Catalyst SD-WAN Controller and Manager Authentication Bypass Vulnerability | kev | markdown |  | CVE-2026-20127,cve-arsenal,cisa-kev,kev,in-the-wild,Cisco,Catalyst SD- |
+| 6325 | Cisco Catalyst SD-WAN Manager Storing Passwords in a Recoverable Format Vulnerability | kev | markdown |  | CVE-2026-20128,cve-arsenal,cisa-kev,kev,in-the-wild,Cisco,Catalyst SD- |
+| 6326 | Cisco Secure Firewall Management Center (FMC) Software and Cisco Security Cloud Control (SCC) Firewall Management Deserialization of Untrusted Data Vulnerability | kev | markdown |  | CVE-2026-20131,cve-arsenal,cisa-kev,kev,in-the-wild,ransomware,Cisco,S |
+| 6327 | Cisco Catalyst SD-WAN Manager Exposure of Sensitive Information to an Unauthorized Actor Vulnerability | kev | markdown |  | CVE-2026-20133,cve-arsenal,cisa-kev,kev,in-the-wild,Cisco,Catalyst SD- |
+| 6328 | Cisco Catalyst SD-WAN Controller Authentication Bypass Vulnerability | kev | markdown |  | CVE-2026-20182,cve-arsenal,cisa-kev,kev,in-the-wild,Cisco,Catalyst SD- |
+| 6329 | Cisco Unified Communications Manager Server-Side Request Forgery (SSRF) Vulnerability | kev | markdown |  | CVE-2026-20230,cve-arsenal,cisa-kev,kev,in-the-wild,Cisco,Unified Comm |
+| 6330 | Cisco Catalyst SD-WAN Manager Improper Encoding or Escaping of Output Vulnerability | kev | markdown |  | CVE-2026-20245,cve-arsenal,cisa-kev,kev,in-the-wild,Cisco,Catalyst SD- |
+| 6331 | Splunk Enterprise Missing Authentication for Critical Function Vulnerability | kev | markdown |  | CVE-2026-20253,cve-arsenal,cisa-kev,kev,in-the-wild,Splunk,Enterprise |
+| 6332 | Cisco Catalyst SD-WAN Manager Directory or Path Traversal Vulnerability | kev | markdown |  | CVE-2026-20262,cve-arsenal,cisa-kev,kev,in-the-wild,Cisco,Catalyst SD- |
+| 6333 | Cisco Secure Firewall Management Center Use of Hard-coded Password Vulnerability | kev | markdown |  | CVE-2026-20316,cve-arsenal,cisa-kev,kev,in-the-wild,ransomware,Cisco,S |
+| 6334 | Cisco BroadWorks Improper Restriction of XML External Entity Reference Vulnerability | kev | markdown |  | CVE-2026-20320,cve-arsenal,cisa-kev,kev,in-the-wild,Cisco,BroadWorks |
+| 6335 | Cisco Secure Firewall Adaptive Security Appliance (ASA) and Secure Firewall Threat Defense (FTD) Heap Inspection Vulnerability | kev | markdown |  | CVE-2026-20349,cve-arsenal,cisa-kev,kev,in-the-wild,Cisco,Secure Firew |
+| 6336 | Apple Multiple Buffer Overflow Vulnerability | kev | markdown |  | CVE-2026-20700,cve-arsenal,cisa-kev,kev,in-the-wild,Apple,Multiple Pro |
+| 6337 | Microsoft Windows Information Disclosure Vulnerability | kev | markdown |  | CVE-2026-20805,cve-arsenal,cisa-kev,kev,in-the-wild,Microsoft,Windows |
+| 6338 | Microsoft SharePoint Deserialization of Untrusted Data Vulnerability | kev | markdown |  | CVE-2026-20963,cve-arsenal,cisa-kev,kev,in-the-wild,Microsoft,SharePoi |
+| 6339 | Qualcomm Multiple Chipsets Memory Corruption Vulnerability | kev | markdown |  | CVE-2026-21385,cve-arsenal,cisa-kev,kev,in-the-wild,Qualcomm,Multiple  |
+| 6340 | Microsoft Office Security Feature Bypass Vulnerability | kev | markdown |  | CVE-2026-21509,cve-arsenal,cisa-kev,kev,in-the-wild,Microsoft,Office |
+| 6341 | Microsoft Windows Shell Protection Mechanism Failure Vulnerability | kev | markdown |  | CVE-2026-21510,cve-arsenal,cisa-kev,kev,in-the-wild,Microsoft,Windows |
+| 6342 | Microsoft MSHTML Framework Protection Mechanism Failure Vulnerability | kev | markdown |  | CVE-2026-21513,cve-arsenal,cisa-kev,kev,in-the-wild,Microsoft,Windows |
+| 6343 | Microsoft Office Word Reliance on Untrusted Inputs in a Security Decision Vulnerability | kev | markdown |  | CVE-2026-21514,cve-arsenal,cisa-kev,kev,in-the-wild,Microsoft,Office |
+| 6344 | Microsoft Windows Type Confusion Vulnerability | kev | markdown |  | CVE-2026-21519,cve-arsenal,cisa-kev,kev,in-the-wild,Microsoft,Windows |
+| 6345 | Microsoft Windows NULL Pointer Dereference Vulnerability | kev | markdown |  | CVE-2026-21525,cve-arsenal,cisa-kev,kev,in-the-wild,Microsoft,Windows |
+| 6346 | Microsoft Windows Improper Privilege Management Vulnerability | kev | markdown |  | CVE-2026-21533,cve-arsenal,cisa-kev,kev,in-the-wild,Microsoft,Windows |
+| 6347 | Atlassian Multiple Products Files or Directories Accessible to External Parties Vulnerability | kev | markdown |  | CVE-2026-21589,cve-arsenal,cisa-kev,kev,in-the-wild,Atlassian,Multiple |
+| 6348 | Fortinet FortiClient EMS SQL Injection Vulnerability | kev | markdown |  | CVE-2026-21643,cve-arsenal,cisa-kev,kev,in-the-wild,Fortinet,FortiClie |
+| 6349 | Oracle HTTP Server and Oracle Weblogic Server Proxy Plug-in Improper Access Control Vulnerability | kev | markdown |  | CVE-2026-21962,cve-arsenal,cisa-kev,kev,in-the-wild,Oracle,HTTP Server |
+| 6350 | Broadcom VMware Aria Operations Command Injection Vulnerability | kev | markdown |  | CVE-2026-22719,cve-arsenal,cisa-kev,kev,in-the-wild,Broadcom,VMware Ar |
+| 6351 | Dell RecoverPoint for Virtual Machines (RP4VMs) Use of Hard-coded Credentials Vulnerability | kev | markdown |  | CVE-2026-22769,cve-arsenal,cisa-kev,kev,in-the-wild,Dell,RecoverPoint  |
+| 6352 | SmarterTools SmarterMail Authentication Bypass Using an Alternate Path or Channel Vulnerability | kev | markdown |  | CVE-2026-23760,cve-arsenal,cisa-kev,kev,in-the-wild,ransomware,Smarter |
+| 6353 | GNU InetUtils Argument Injection Vulnerability | kev | markdown |  | CVE-2026-24061,cve-arsenal,cisa-kev,kev,in-the-wild,GNU,InetUtils |
+| 6354 | Google Chromium CSS Use-After-Free Vulnerability | kev | markdown |  | CVE-2026-2441,cve-arsenal,cisa-kev,kev,in-the-wild,Google,Chromium |
+| 6355 | SmarterTools SmarterMail Missing Authentication for Critical Function Vulnerability | kev | markdown |  | CVE-2026-24423,cve-arsenal,cisa-kev,kev,in-the-wild,ransomware,Smarter |
+| 6356 | Fortinet Multiple Products Authentication Bypass Using an Alternate Path or Channel Vulnerability | kev | markdown |  | CVE-2026-24858,cve-arsenal,cisa-kev,kev,in-the-wild,Fortinet,Multiple  |
+| 6357 | Fortinet FortiSandbox OS Command Injection Vulnerability | kev | markdown |  | CVE-2026-25089,cve-arsenal,cisa-kev,kev,in-the-wild,Fortinet,FortiSand |
+| 6358 | Soliton Systems K.K FileZen OS Command Injection Vulnerability | kev | markdown |  | CVE-2026-25108,cve-arsenal,cisa-kev,kev,in-the-wild,Soliton Systems K. |
+| 6359 | SolarWinds Serv-U Uncontrolled Resource Consumption Vulnerability | kev | markdown |  | CVE-2026-28318,cve-arsenal,cisa-kev,kev,in-the-wild,SolarWinds,Serv-U |
+| 6360 | Citrix NetScaler Out-of-Bounds Read Vulnerability | kev | markdown |  | CVE-2026-3055,cve-arsenal,cisa-kev,kev,in-the-wild,Citrix,NetScaler |
+| 6361 | Linux Kernel Incorrect Resource Transfer Between Spheres Vulnerability | kev | markdown |  | CVE-2026-31431,cve-arsenal,cisa-kev,kev,in-the-wild,Linux,Kernel |
+| 6362 | Microsoft SharePoint Server Improper Input Validation Vulnerability | kev | markdown |  | CVE-2026-32201,cve-arsenal,cisa-kev,kev,in-the-wild,Microsoft,SharePoi |
+| 6363 | Microsoft Windows Protection Mechanism Failure Vulnerability | kev | markdown |  | CVE-2026-32202,cve-arsenal,cisa-kev,kev,in-the-wild,Microsoft,Windows |
+| 6364 | Langflow Code Injection Vulnerability | kev | markdown |  | CVE-2026-33017,cve-arsenal,cisa-kev,kev,in-the-wild,Langflow |
+| 6365 | Aquasecurity Trivy Embedded Malicious Code Vulnerability | kev | markdown |  | CVE-2026-33634,cve-arsenal,cisa-kev,kev,in-the-wild,Aquasecurity,Trivy |
+| 6366 | Microsoft Internet Key Exchange (IKE) Service Extensions Double Free Vulnerability | kev | markdown |  | CVE-2026-33824,cve-arsenal,cisa-kev,kev,in-the-wild,Microsoft,Internet |
+| 6367 | Microsoft Defender Insufficient Granularity of Access Control Vulnerability | kev | markdown |  | CVE-2026-33825,cve-arsenal,cisa-kev,kev,in-the-wild,ransomware,Microso |
+| 6368 | Apache ActiveMQ Improper Input Validation Vulnerability | kev | markdown |  | CVE-2026-34197,cve-arsenal,cisa-kev,kev,in-the-wild,Apache,ActiveMQ |
+| 6369 | Apache Tomcat Missing Encryption of Sensitive Data Vulnerability | kev | markdown |  | CVE-2026-34486,cve-arsenal,cisa-kev,kev,in-the-wild,Apache,Tomcat |
+| 6370 | Adobe Acrobat and Reader Prototype Pollution Vulnerability | kev | markdown |  | CVE-2026-34621,cve-arsenal,cisa-kev,kev,in-the-wild,Adobe,Acrobat and  |
+| 6371 | Ubiquiti UniFi OS Improper Access Control Vulnerability | kev | markdown |  | CVE-2026-34908,cve-arsenal,cisa-kev,kev,in-the-wild,Ubiquiti,UniFi OS |
+| 6372 | Ubiquiti UniFi OS Path Traversal Vulnerability | kev | markdown |  | CVE-2026-34909,cve-arsenal,cisa-kev,kev,in-the-wild,Ubiquiti,UniFi OS |
+| 6373 | Ubiquiti UniFi OS Improper Input Validation Vulnerability | kev | markdown |  | CVE-2026-34910,cve-arsenal,cisa-kev,kev,in-the-wild,Ubiquiti,UniFi OS |
+| 6374 | Trend Micro Apex One (On-Premise) Directory Traversal Vulnerability | kev | markdown |  | CVE-2026-34926,cve-arsenal,cisa-kev,kev,in-the-wild,Trend Micro,Apex O |
+| 6375 | TrueConf Client Download of Code Without Integrity Check Vulnerability | kev | markdown |  | CVE-2026-3502,cve-arsenal,cisa-kev,kev,in-the-wild,TrueConf,Client |
+| 6376 | Oracle PeopleSoft Enterprise PeopleTools Missing Authentication for Critical Function Vulnerability | kev | markdown |  | CVE-2026-35273,cve-arsenal,cisa-kev,kev,in-the-wild,ransomware,Oracle, |
+| 6377 | Fortinet FortiClient EMS Improper Access Control Vulnerability | kev | markdown |  | CVE-2026-35616,cve-arsenal,cisa-kev,kev,in-the-wild,Fortinet,FortiClie |
+| 6378 | Google Skia Out-of-Bounds Write Vulnerability | kev | markdown |  | CVE-2026-3909,cve-arsenal,cisa-kev,kev,in-the-wild,Google,Skia |
+| 6379 | Google Chromium V8 Improper Restriction of Operations Within the Bounds of a Memory Buffer Vulnerability | kev | markdown |  | CVE-2026-3910,cve-arsenal,cisa-kev,kev,in-the-wild,Google,Chromium V8 |
+| 6380 | Fortinet FortiSandbox OS Command Injection Vulnerability | kev | markdown |  | CVE-2026-39808,cve-arsenal,cisa-kev,kev,in-the-wild,Fortinet,FortiSand |
+| 6381 | Marimo Remote Code Execution Vulnerability | kev | markdown |  | CVE-2026-39987,cve-arsenal,cisa-kev,kev,in-the-wild,Marimo |
+| 6382 | BerriAI LiteLLM Unprotected Alternate Channel Vulnerability | kev | markdown |  | CVE-2026-40217,cve-arsenal,cisa-kev,kev,in-the-wild,BerriAI,LiteLLM |
+| 6383 | Microsoft Defender Link Following Vulnerability | kev | markdown |  | CVE-2026-41091,cve-arsenal,cisa-kev,kev,in-the-wild,Microsoft,Defender |
+| 6384 | Broadcom VMWare ESX Insufficient Logging Vulnerability | kev | markdown |  | CVE-2026-41709,cve-arsenal,cisa-kev,kev,in-the-wild,Broadcom,VMware ES |
+| 6385 | WebPros cPanel & WHM and WP2 (WordPress Squared) Missing Authentication for Critical Function Vulnerability | kev | markdown |  | CVE-2026-41940,cve-arsenal,cisa-kev,kev,in-the-wild,ransomware,WebPros |
+| 6386 | JFrog Artifactory Incorrect Authorization Vulnerability | kev | markdown |  | CVE-2026-42016,cve-arsenal,cisa-kev,kev,in-the-wild,JFrog,Artifactory |
+| 6387 | JFrog Artifactory Improper Authentication Vulnerability | kev | markdown |  | CVE-2026-42018,cve-arsenal,cisa-kev,kev,in-the-wild,JFrog,Artifactory |
+| 6388 | BerriAI LiteLLM SQL Injection Vulnerability | kev | markdown |  | CVE-2026-42208,cve-arsenal,cisa-kev,kev,in-the-wild,BerriAI,LiteLLM |
+| 6389 | BerriAI LiteLLM Command Injection Vulnerability | kev | markdown |  | CVE-2026-42271,cve-arsenal,cisa-kev,kev,in-the-wild,BerriAI,LiteLLM |
+| 6390 | Microsoft Exchange Server Cross-Site Scripting Vulnerability | kev | markdown |  | CVE-2026-42897,cve-arsenal,cisa-kev,kev,in-the-wild,Microsoft |
+| 6391 | Mirasvit Full Page Cache Warmer Deserialization of Untrusted Data Vulnerability | kev | markdown |  | CVE-2026-45247,cve-arsenal,cisa-kev,kev,in-the-wild,Mirasvit,Mirasvit  |
+| 6392 | TanStack Unspecified Vulnerability | kev | markdown |  | CVE-2026-45321,cve-arsenal,cisa-kev,kev,in-the-wild,ransomware,TanStac |
+| 6393 | Microsoft Defender Denial of Service Vulnerability | kev | markdown |  | CVE-2026-45498,cve-arsenal,cisa-kev,kev,in-the-wild,Microsoft,Defender |
+| 6394 | Microsoft SharePoint Server Deserialization of Untrusted Data Vulnerability | kev | markdown |  | CVE-2026-45659,cve-arsenal,cisa-kev,kev,in-the-wild,ransomware,Microso |
+| 6395 | Linux Kernel Missing Initialization of a Variable Vulnerability | kev | markdown |  | CVE-2026-46300,cve-arsenal,cisa-kev,kev,in-the-wild,Linux,Kernel |
+| 6396 | Oracle E-Business Suite Improper Privilege Management Vulnerability | kev | markdown |  | CVE-2026-46817,cve-arsenal,cisa-kev,kev,in-the-wild,Oracle,E-Business  |
+| 6397 | Nx Console Embedded Malicious Code Vulnerability | kev | markdown |  | CVE-2026-48027,cve-arsenal,cisa-kev,kev,in-the-wild,ransomware,Nx,Nx C |
+| 6398 | LiteSpeed cPanel Plugin Privilege Escalation Vulnerability | kev | markdown |  | CVE-2026-48172,cve-arsenal,cisa-kev,kev,in-the-wild,LiteSpeed,cPanel P |
+| 6399 | Adobe ColdFusion Path Traversal Vulnerability | kev | markdown |  | CVE-2026-48282,cve-arsenal,cisa-kev,kev,in-the-wild,Adobe,ColdFusion |
+| 6400 | Adobe Commerce and Magento Unrestricted Upload of File with Dangerous Type Vulnerability | kev | markdown |  | CVE-2026-48356,cve-arsenal,cisa-kev,kev,in-the-wild,Adobe,Commerce and |
+| 6401 | SimpleHelp Authentication Bypass Vulnerability | kev | markdown |  | CVE-2026-48558,cve-arsenal,cisa-kev,kev,in-the-wild,SimpleHelp |
+| 6402 | Kludex Starlette HTTP Request/Response Smuggling Vulnerability | kev | markdown |  | CVE-2026-48710,cve-arsenal,cisa-kev,kev,in-the-wild,Kludex,Starlette |
+| 6403 | Widget Factory Joomla Content Editor Improper Access Control Vulnerability | kev | markdown |  | CVE-2026-48907,cve-arsenal,cisa-kev,kev,in-the-wild,Widget Factory,Joo |
+| 6404 | JoomShaper SP Page Builder Unrestricted Upload of File with Dangerous Type Vulnerability | kev | markdown |  | CVE-2026-48908,cve-arsenal,cisa-kev,kev,in-the-wild,JoomShaper,SP Page |
+| 6405 | iCagenda Unrestricted Upload of File with Dangerous Type Vulnerability | kev | markdown |  | CVE-2026-48939,cve-arsenal,cisa-kev,kev,in-the-wild,iCagenda |
+| 6406 | Kestra OSS OS Command Injection Vulnerability | kev | markdown |  | CVE-2026-49869,cve-arsenal,cisa-kev,kev,in-the-wild,Kestra,Kestra OSS |
+| 6407 | Microsoft SharePoint Deserialization of Untrusted Data Vulnerability | kev | markdown |  | CVE-2026-50522,cve-arsenal,cisa-kev,kev,in-the-wild,Microsoft,SharePoi |
+| 6408 | Check Point Security Gateway Improper Authentication Vulnerability | kev | markdown |  | CVE-2026-50751,cve-arsenal,cisa-kev,kev,in-the-wild,ransomware,Check P |
+| 6409 | Google Dawn Use-After-Free Vulnerability | kev | markdown |  | CVE-2026-5281,cve-arsenal,cisa-kev,kev,in-the-wild,Google,Dawn |
+| 6410 | Linux Kernel Out-of-Bounds Write Vulnerability | kev | markdown |  | CVE-2026-53266,cve-arsenal,cisa-kev,kev,in-the-wild,Linux,Kernel |
+| 6411 | Linux Kernel Unspecified Vulnerability | kev | markdown |  | CVE-2026-53362,cve-arsenal,cisa-kev,kev,in-the-wild,Linux,Kernel |
+| 6412 | WSO2 Multiple Products Path Traversal Vulnerability | kev | markdown |  | CVE-2026-5430,cve-arsenal,cisa-kev,kev,in-the-wild,WSO2,Multiple Produ |
+| 6413 | LiteSpeed cPanel Plugin UNIX Symbolic Link (Symlink) Following Vulnerability | kev | markdown |  | CVE-2026-54420,cve-arsenal,cisa-kev,kev,in-the-wild,LiteSpeed,cPanel P |
+| 6414 | Microsoft SharePoint Weak Authentication Vulnerability | kev | markdown |  | CVE-2026-55040,cve-arsenal,cisa-kev,kev,in-the-wild,Microsoft,SharePoi |
+| 6415 | Langflow Authorization Bypass Through User-Controlled Key Vulnerability | kev | markdown |  | CVE-2026-55255,cve-arsenal,cisa-kev,kev,in-the-wild,Langflow |
+| 6416 | Microsoft Active Directory Federation Services Insufficient Granularity of Access Control Vulnerability | kev | markdown |  | CVE-2026-56155,cve-arsenal,cisa-kev,kev,in-the-wild,Microsoft,Active D |
+| 6417 | Microsoft SharePoint Server Missing Authentication for Critical Function Vulnerability | kev | markdown |  | CVE-2026-56164,cve-arsenal,cisa-kev,kev,in-the-wild,Microsoft,SharePoi |
+| 6418 | Joomlack Page Builder Improper Access Control Vulnerability | kev | markdown |  | CVE-2026-56290,cve-arsenal,cisa-kev,kev,in-the-wild,Joomlack,Page Buil |
+| 6419 | Balbooa Forms Unrestricted Upload of File with Dangerous Type Vulnerability | kev | markdown |  | CVE-2026-56291,cve-arsenal,cisa-kev,kev,in-the-wild,Balbooa,Forms |
+| 6420 | Microsoft SharePoint Deserialization of Untrusted Data Vulnerability | kev | markdown |  | CVE-2026-58644,cve-arsenal,cisa-kev,kev,in-the-wild,Microsoft,SharePoi |
+| 6421 | Google Pixel Improper Authorization Vulnerability | kev | markdown |  | CVE-2026-58704,cve-arsenal,cisa-kev,kev,in-the-wild,Google,Pixel |
+| 6422 | Broadcom VMware vCenter Path Traversal Vulnerability | kev | markdown |  | CVE-2026-59310,cve-arsenal,cisa-kev,kev,in-the-wild,ransomware,Broadco |
+| 6423 | BerriAI LiteLLM Improper Authentication Vulnerability | kev | markdown |  | CVE-2026-59822,cve-arsenal,cisa-kev,kev,in-the-wild,BerriAI,LiteLLM |
+| 6424 | Gitea Code Injection Vulnerability | kev | markdown |  | CVE-2026-60004,cve-arsenal,cisa-kev,kev,in-the-wild,Gitea |
+| 6425 | WordPress Core SQL Injection Vulnerability | kev | markdown |  | CVE-2026-60137,cve-arsenal,cisa-kev,kev,in-the-wild,WordPress,Core |
+| 6426 | WordPress Core Interpretation Conflict Vulnerability | kev | markdown |  | CVE-2026-63030,cve-arsenal,cisa-kev,kev,in-the-wild,WordPress,Core |
+| 6427 | JetBrains TeamCity Deserialization of Untrusted Data Vulnerability | kev | markdown |  | CVE-2026-63077,cve-arsenal,cisa-kev,kev,in-the-wild,ransomware,JetBrai |
+| 6428 | MLflow Server-Side Request Forgery Vulnerability | kev | markdown |  | CVE-2026-64849,cve-arsenal,cisa-kev,kev,in-the-wild,MLflow |
+| 6429 | Apple macOS Improper Authentication Vulnerability | kev | markdown |  | CVE-2026-65400,cve-arsenal,cisa-kev,kev,in-the-wild,Apple,macOS |
+| 6430 | Microsoft SharePoint Code Injection Vulnerability | kev | markdown |  | CVE-2026-65660,cve-arsenal,cisa-kev,kev,in-the-wild,Microsoft,SharePoi |
+| 6431 | JFrog Artifactory Improper Limitation of a Pathname to a Restricted Directory Vulnerability | kev | markdown |  | CVE-2026-66384,cve-arsenal,cisa-kev,kev,in-the-wild,JFrog,Artifactory |
+| 6432 | MikroTik RouterOS Missing Authentication for Critical Function Vulnerability | kev | markdown |  | CVE-2026-67277,cve-arsenal,cisa-kev,kev,in-the-wild,MikroTik,RouterOS |
+| 6433 | Mikrotik RouterOS Improper Enforcement of Behavioral Workflow Vulnerability | kev | markdown |  | CVE-2026-67279,cve-arsenal,cisa-kev,kev,in-the-wild,MikroTik,RouterOS |
+| 6434 | Microsoft Windows Ancillary Function Driver for WinSock Use-After-Free Vulnerability | kev | markdown |  | CVE-2026-68820,cve-arsenal,cisa-kev,kev,in-the-wild,Microsoft,Windows  |
+| 6435 | Ivanti Endpoint Manager Mobile (EPMM) Improper Input Validation Vulnerability | kev | markdown |  | CVE-2026-6973,cve-arsenal,cisa-kev,kev,in-the-wild,Ivanti,Endpoint Man |
+| 6436 | Adobe Commerce and Magento Incorrect Authorization Vulnerability | kev | markdown |  | CVE-2026-71362,cve-arsenal,cisa-kev,kev,in-the-wild,Adobe,Commerce and |
+| 6437 | TrueConf Server Missing Authentication for Critical Function Vulnerability | kev | markdown |  | CVE-2026-72529,cve-arsenal,cisa-kev,kev,in-the-wild,TrueConf,Server |
+| 6438 | TrueConf Server Code Injection Vulnerability | kev | markdown |  | CVE-2026-72530,cve-arsenal,cisa-kev,kev,in-the-wild,TrueConf,Server |
+| 6439 | Zyxel GS1900 Series Switches Stack-Based Buffer Overflow Vulnerability | kev | markdown |  | CVE-2026-7273,cve-arsenal,cisa-kev,kev,in-the-wild,Zyxel,GS1900 Series |
+| 6440 | Metabase SQL Injection Vulnerability | kev | markdown |  | CVE-2026-72898,cve-arsenal,cisa-kev,kev,in-the-wild,Metabase |
+| 6441 | Zimbra Collaboration Suite (ZCS) OS Command Injection Vulnerability | kev | markdown |  | CVE-2026-73570,cve-arsenal,cisa-kev,kev,in-the-wild,Synacor,Zimbra Col |
+| 6442 | Arista Extensible Operating System Incomplete Comparison with Missing Factors Vulnerability | kev | markdown |  | CVE-2026-7473,cve-arsenal,cisa-kev,kev,in-the-wild,Arista,Extensible O |
+| 6443 | Adobe Commerce and Magento Improper Neutralization of Special Elements Used in a Template Engine Vulnerability | kev | markdown |  | CVE-2026-75650,cve-arsenal,cisa-kev,kev,in-the-wild,Adobe,Commerce and |
+| 6444 | Cisco Secure Firewall ASA Software and Cisco Secure FTD Software Unchecked Return Value to NULL Pointer Dereference Vulnerability | kev | markdown |  | CVE-2026-76418,cve-arsenal,cisa-kev,kev,in-the-wild,Cisco,Secure Firew |
+| 6445 | Cisco Identity Services Engine Incorrect Use of Privileged APIs Vulnerability | kev | markdown |  | CVE-2026-76460,cve-arsenal,cisa-kev,kev,in-the-wild,Cisco,Identity Ser |
+| 6446 | Cisco Secure Email Gateway SQL Injection Vulnerability | kev | markdown |  | CVE-2026-76461,cve-arsenal,cisa-kev,kev,in-the-wild,Cisco,Secure Email |
+| 6447 | Cisco Expressway Series Use of Hard-coded Credentials Vulnerability | kev | markdown |  | CVE-2026-76466,cve-arsenal,cisa-kev,kev,in-the-wild,Cisco,Expressway S |
+| 6448 | Cisco Catalyst SD-WAN Manager Hex Encoding Vulnerability | kev | markdown |  | CVE-2026-76504,cve-arsenal,cisa-kev,kev,in-the-wild,Cisco,Catalyst SD- |
+| 6449 | Cisco Secure Email Gateway Relative Path Traversal Vulnerability | kev | markdown |  | CVE-2026-76519,cve-arsenal,cisa-kev,kev,in-the-wild,Cisco,Secure Email |
+| 6450 | Progress LoadMaster Command Injection Vulnerability | kev | markdown |  | CVE-2026-8037,cve-arsenal,cisa-kev,kev,in-the-wild,Progress,LoadMaster |
+| 6451 | PaperCut NG/MF Missing Authentication for Critical Function Vulnerability | kev | markdown |  | CVE-2026-81578,cve-arsenal,cisa-kev,kev,in-the-wild,PaperCut,NG/MF |
+| 6452 | Microsoft Windows Link Following Vulnerability | kev | markdown |  | CVE-2026-81963,cve-arsenal,cisa-kev,kev,in-the-wild,Microsoft,Windows |
+| 6453 | PaperCut NG/MF Unsafe Reflection Vulnerability | kev | markdown |  | CVE-2026-82078,cve-arsenal,cisa-kev,kev,in-the-wild,PaperCut,NG/MF |
+| 6454 | JFrog Artifactory Improper Authentication Vulnerability | kev | markdown |  | CVE-2026-82329,cve-arsenal,cisa-kev,kev,in-the-wild,JFrog,Artifactory |
+| 6455 | SonicWall SMA1000 Appliances Server-Side Request Forgery Vulnerability | kev | markdown |  | CVE-2026-83548,cve-arsenal,cisa-kev,kev,in-the-wild,SonicWall,SMA1000  |
+| 6456 | SonicWall SMA1000 Appliances OS Command Injection Vulnerability | kev | markdown |  | CVE-2026-83549,cve-arsenal,cisa-kev,kev,in-the-wild,SonicWall,SMA1000  |
+| 6457 | Daemon Tools Lite Embedded Malicious Code Vulnerability | kev | markdown |  | CVE-2026-8398,cve-arsenal,cisa-kev,kev,in-the-wild,Daemon,Daemon Tools |
+| 6458 | Citrix NetScaler ADC and NetScaler Gateway Improper Restriction of Operations within the Bounds of a Memory Buffer Vulnerability | kev | markdown |  | CVE-2026-8452,cve-arsenal,cisa-kev,kev,in-the-wild,Citrix,NetScaler AD |
+| 6459 | ConnectWise ScreenConnect Improper Privilege Management and Missing Authorization Vulnerability | kev | markdown |  | CVE-2026-84869,cve-arsenal,cisa-kev,kev,in-the-wild,ConnectWise,Screen |
+| 6460 | Google Chromium V8 Type Confusion Vulnerability | kev | markdown |  | CVE-2026-85046,cve-arsenal,cisa-kev,kev,in-the-wild,Google,Chromium V8 |
+| 6461 | Check Point Multiple Products Improper Certificate Validation Vulnerability | kev | markdown |  | CVE-2026-85102,cve-arsenal,cisa-kev,kev,in-the-wild,Check Point,Multip |
+| 6462 | GitLab Community Edition and Enterprise Edition Path Traversal Vulnerability | kev | markdown |  | CVE-2026-85706,cve-arsenal,cisa-kev,kev,in-the-wild,GitLab,Community E |
+| 6463 | Microsoft Windows Heap-Based Buffer Overflow Vulnerability | kev | markdown |  | CVE-2026-85880,cve-arsenal,cisa-kev,kev,in-the-wild,Microsoft,Windows |
+| 6464 | MikroTik RouterOS Improper Neutralization of Argument Delimiters in a Command Vulnerability | kev | markdown |  | CVE-2026-86060,cve-arsenal,cisa-kev,kev,in-the-wild,MikroTik,RouterOS |
+| 6465 | N-able N-central Static Code Injection Vulnerability | kev | markdown |  | CVE-2026-86218,cve-arsenal,cisa-kev,kev,in-the-wild,N-able,N-central |
+| 6466 | Apple Multiple Products Out-of-Bounds Write Vulnerability | kev | markdown |  | CVE-2026-86950,cve-arsenal,cisa-kev,kev,in-the-wild,Apple,Multiple Pro |
+| 6467 | Google Chromium V8 Out of Bounds Write Vulnerability | kev | markdown |  | CVE-2026-87491,cve-arsenal,cisa-kev,kev,in-the-wild,Google,Chromium V8 |
+| 6468 | Acronis Backup Incorrect Default Permissions Vulnerability | kev | markdown |  | CVE-2026-87886,cve-arsenal,cisa-kev,kev,in-the-wild,Acronis,Backup |
+| 6469 | WordPress Core Remote File Inclusion Vulnerability | kev | markdown |  | CVE-2026-87902,cve-arsenal,cisa-kev,kev,in-the-wild,WordPress,Core |
+| 6470 | Citrix NetScaler Improper Input Validation Vulnerability | kev | markdown |  | CVE-2026-88771,cve-arsenal,cisa-kev,kev,in-the-wild,Citrix,NetScaler |
+| 6471 | Citrix NetScaler Improper Restriction of Operations within the Bounds of a Memory Buffer Vulnerability | kev | markdown |  | CVE-2026-88772,cve-arsenal,cisa-kev,kev,in-the-wild,Citrix,NetScaler |
+| 6472 | Citrix NetScaler Improper Restriction of Operations within the Bounds of a Memory Buffer Vulnerability | kev | markdown |  | CVE-2026-88779,cve-arsenal,cisa-kev,kev,in-the-wild,Citrix,NetScaler |
+| 6473 | Apache Axis Unsafe Reflection Vulnerability | kev | markdown |  | CVE-2026-90436,cve-arsenal,cisa-kev,kev,in-the-wild,Apache,Axis |
+| 6474 | Vanderbilt University Research Electronic Data Capture (REDCap) Code Injection Vulnerability | kev | markdown |  | CVE-2026-90817,cve-arsenal,cisa-kev,kev,in-the-wild,Vanderbilt Univers |
+| 6475 | Drupal Core SQL Injection Vulnerability | kev | markdown |  | CVE-2026-9082,cve-arsenal,cisa-kev,kev,in-the-wild,Drupal,Core |
+| 6476 | IBM Langflow Code Injection Vulnerability | kev | markdown |  | CVE-2026-9198,cve-arsenal,cisa-kev,kev,in-the-wild,IBM,Langflow |
+| 6477 | Check Point Multiple Products Path Traversal Vulnerability | kev | markdown |  | CVE-2026-93616,cve-arsenal,cisa-kev,kev,in-the-wild,Check Point,Multip |
+| 6478 | Arista VeloCloud Orchestrator Improper Input Validation Vulnerability | kev | markdown |  | CVE-2026-93952,cve-arsenal,cisa-kev,kev,in-the-wild,Arista,VeloCloud O |
+| 6479 | F5 BIG-IP APM Heap-based Buffer Overflow Vulnerability | kev | markdown |  | CVE-2026-94127,cve-arsenal,cisa-kev,kev,in-the-wild,F5,BIG-IP APM |
+| 6480 | Sangoma Switchvox SQL Injection Vulnerability | kev | markdown |  | CVE-2026-9586,cve-arsenal,cisa-kev,kev,in-the-wild,Sangoma,Switchvox |
+| 6481 | Plex Media Server Server-Side Request Forgery (SSRF) Vulnerability | kev | markdown |  | CVE-2026-96652,cve-arsenal,cisa-kev,kev,in-the-wild,Plex,Media Server |
+| 6482 | Plex Media Server Improper Neutralization of Encoded URI Schemes in a Web Page Vulnerability | kev | markdown |  | CVE-2026-96654,cve-arsenal,cisa-kev,kev,in-the-wild,Plex,Media Server |
+| 6483 | Plex Media Server Server-Side Request Forgery (SSRF) Vulnerability | kev | markdown |  | CVE-2026-96655,cve-arsenal,cisa-kev,kev,in-the-wild,Plex,Media Server |
+| 6484 | Plex Media Server External Control of File Name or Path Vulnerability | kev | markdown |  | CVE-2026-96656,cve-arsenal,cisa-kev,kev,in-the-wild,Plex,Media Server |
+| 6485 | Microsoft Windows Command Injection Vulnerability | kev | markdown |  | CVE-2026-96951,cve-arsenal,cisa-kev,kev,in-the-wild,Microsoft,Windows |
+| 6486 | GitLab Community Edition and Enterprise Edition Integer Overflow or Wraparound Vulnerability | kev | markdown |  | CVE-2026-97229,cve-arsenal,cisa-kev,kev,in-the-wild,GitLab,Community E |
+| 6487 | AdBlock before 2.21 allows remote attackers to block arbitrary resources on arbitrary websites and to disable arbitrary blocking filters | nvd | markdown |  | CVE-2015-2692,cve-arsenal,nvd,cvss-critical |
+| 6488 | The Data Protection component in the VMware vSphere GUI in IBM Tivoli Storage Manager for Virtual Environments: Data Protection for VMware (aka Spectrum Protect | nvd | markdown |  | CVE-2015-7425,cve-arsenal,nvd,cvss-critical |
+| 6489 | The Data Protection extension in the VMware GUI in IBM Tivoli Storage Manager for Virtual Environments: Data Protection for VMware (aka Spectrum Protect for Vir | nvd | markdown |  | CVE-2015-7426,cve-arsenal,nvd,cvss-critical |
+| 6490 | The initialize method in the Histogram class in lib/colorscore/histogram.rb in the colorscore gem before 0.0.5 for Ruby allows context-dependent attackers to ex | nvd | markdown |  | CVE-2015-7541,cve-arsenal,nvd,cvss-critical |
+| 6491 | SearchBlox 8.3 before 8.3.1 allows remote attackers to write to the config file, and consequently cause a denial of service (application crash), via unspecified | nvd | markdown |  | CVE-2015-7919,cve-arsenal,nvd,cvss-critical |
+| 6492 | Adcon Telemetry A840 Telemetry Gateway Base Station has hardcoded credentials, which allows remote attackers to obtain administrative access via unspecified vec | nvd | markdown |  | CVE-2015-7930,cve-arsenal,nvd,cvss-critical |
+| 6493 | The PasswordReset.Controllers.ResetController.ChangePasswordIndex method in PasswordReset.dll in Dovestones AD Self Password Reset before 3.0.4 allows remote  | nvd | markdown |  | CVE-2015-8267,cve-arsenal,nvd,cvss-critical |
+| 6494 | Integer overflow in the ImageRegionReader::ReadIntoBuffer function in MediaStorageAndFileFormat/gdcmImageRegionReader.cxx in Grassroots DICOM (aka GDCM) before  | nvd | markdown |  | CVE-2015-8396,cve-arsenal,nvd,cvss-critical |
+| 6495 | Adobe Flash Player before 18.0.0 and 19.x and 20.x before 20.0.0 on Windows and OS X and before 11.2.202 on Linux, Adobe AIR before 20.0.0, Adob | nvd | markdown |  | CVE-2015-8459,cve-arsenal,nvd,cvss-critical |
+| 6496 | Local privilege escalation vulnerability in the Gentoo QEMU package before 2.5.0-r1 | nvd | markdown |  | CVE-2015-8556,cve-arsenal,nvd,cvss-critical |
+| 6497 | The idle stream handling in nghttp2 before 1.6.0 allows attackers to have unspecified impact via unknown vectors, aka a heap-use-after-free bug | nvd | markdown |  | CVE-2015-8659,cve-arsenal,nvd,cvss-critical |
+| 6498 | The multifilesystem storage backend in Radicale before 1.1 allows remote attackers to read or write to arbitrary files via a crafted component name | nvd | markdown |  | CVE-2015-8747,cve-arsenal,nvd,cvss-critical |
+| 6499 | SQL injection vulnerability in the Group Promotions module in the admin control panel in MyBB (aka MyBulletinBoard) before 1.6.18 and 1.8.x before 1.8.6 and MyB | nvd | markdown |  | CVE-2015-8974,cve-arsenal,nvd,cvss-critical |
+| 6500 | MailEnable before 8.60 allows XXE via an XML document in the request.aspx Options parameter | nvd | markdown |  | CVE-2015-9280,cve-arsenal,nvd,cvss-critical |
+| 6501 | MySQL for PCF tiles 1.7.x before 1.7.10 were discovered to log the AWS access key in plaintext. These credentials were logged to the Service Backup component lo | nvd | markdown |  | CVE-2016-0898,cve-arsenal,nvd,cvss-critical |
+| 6502 | An issue was discovered in Radisys MRF Web Panel (SWMS) 9.0.1. The MSM_MACRO_NAME POST parameter in /swms/ms.cgi was discovered to be vulnerable to OS command i | nvd | markdown |  | CVE-2016-10043,cve-arsenal,nvd,cvss-critical |
+| 6503 | Adobe Reader and Acrobat before 11.0.16, Acrobat and Acrobat Reader DC Classic before 15.006.30172, and Acrobat and Acrobat Reader DC Continuous before 15.016.2 | nvd | markdown |  | CVE-2016-1038,cve-arsenal,nvd,cvss-critical |
+| 6504 | Adobe Reader and Acrobat before 11.0.16, Acrobat and Acrobat Reader DC Classic before 15.006.30172, and Acrobat and Acrobat Reader DC Continuous before 15.016.2 | nvd | markdown |  | CVE-2016-1041,cve-arsenal,nvd,cvss-critical |
+| 6505 | Adobe Reader and Acrobat before 11.0.16, Acrobat and Acrobat Reader DC Classic before 15.006.30172, and Acrobat and Acrobat Reader DC Continuous before 15.016.2 | nvd | markdown |  | CVE-2016-1044,cve-arsenal,nvd,cvss-critical |
+| 6506 | The XML parser in Cisco Information Server (CIS) 6.2 allows remote attackers to read arbitrary files or cause a denial of service (CPU and memory consumption) v | nvd | markdown |  | CVE-2016-1343,cve-arsenal,nvd,cvss-critical |
+| 6507 | The filesystem storage backend in Radicale before 1.1 on Windows allows remote attackers to read or write to arbitrary files via a crafted path, as demonstrated | nvd | markdown |  | CVE-2016-1505,cve-arsenal,nvd,cvss-critical |
+| 6508 | Multiple unspecified vulnerabilities in the browser engine in Mozilla Firefox before 44.0 allow remote attackers to cause a denial of service (memory corruption | nvd | markdown |  | CVE-2016-1931,cve-arsenal,nvd,cvss-critical |
+| 6509 | HPE Operations Manager 8.x and 9.0 on Windows allows remote attackers to execute arbitrary commands via a crafted serialized Java object, related to the Apache  | nvd | markdown |  | CVE-2016-1985,cve-arsenal,nvd,cvss-critical |
+| 6510 | Pulse Connect Secure (PCS) 8.2 before 8.2r1, 8.1 before 8.1r2, 8.0 before 8.0r10, and 7.4 before 7.4r13.4 allow remote attackers to read sensitive system authen | nvd | markdown |  | CVE-2016-4787,cve-arsenal,nvd,cvss-critical |
+| 6511 | General Electric (GE) Bently Nevada 3500/22M USB with firmware before 5.0 and Bently Nevada 3500/22M Serial have open ports, which makes it easier for remote at | nvd | markdown |  | CVE-2016-5788,cve-arsenal,nvd,cvss-critical |
+| 6512 | IBM BigFix Platform could allow a remote attacker to execute arbitrary code on the system, caused by a use-after-free race condition. An attacker could exploit  | nvd | markdown |  | CVE-2016-6082,cve-arsenal,nvd,cvss-critical |
+| 6513 | VMware vRealize Operations (aka vROps) 6.x before 6.4.0 allows remote authenticated users to gain privileges, or halt and remove virtual machines, via unspecifi | nvd | markdown |  | CVE-2016-7457,cve-arsenal,nvd,cvss-critical |
+| 6514 | SQL injection vulnerability in core services in Intel Security McAfee ePolicy Orchestrator (ePO) 5.3.2 and earlier and 5.1.3 and earlier allows attackers to alt | nvd | markdown |  | CVE-2016-8027,cve-arsenal,nvd,cvss-critical |
+| 6515 | An issue was discovered in Schneider Electric ConneXium firewalls TCSEFEC23F3F20 all versions, TCSEFEC23F3F21 all versions, TCSEFEC23FCF20 all versions, TCSEFEC | nvd | markdown |  | CVE-2016-8352,cve-arsenal,nvd,cvss-critical |
+| 6516 | An issue was discovered in Moxa OnCell OnCellG3470A-LTE, AWK-1131A/3131A/4131A Series, AWK-3191 Series, AWK-5232/6232 Series, AWK-1121/1127 Series, WAC-1001 V2  | nvd | markdown |  | CVE-2016-8363,cve-arsenal,nvd,cvss-critical |
+| 6517 | IBM UrbanCode Deploy could allow a user to execute code using a specially crafted file upload that would replace code on the server. This code could be executed | nvd | markdown |  | CVE-2016-8938,cve-arsenal,nvd,cvss-critical |
+| 6518 | A hard-coded cryptographic key vulnerability was identified in Red Lion Controls Sixnet-Managed Industrial Switches running firmware Version 5.0.196 and Stride- | nvd | markdown |  | CVE-2016-9335,cve-arsenal,nvd,cvss-critical |
+| 6519 | An issue was discovered in Rockwell Automation Logix5000 Programmable Automation Controller FRN 16.00 through 21.00 (excluding all firmware versions prior to FR | nvd | markdown |  | CVE-2016-9343,cve-arsenal,nvd,cvss-critical |
+| 6520 | Vulnerability in the Oracle WebLogic Server component of Oracle Fusion Middleware (subcomponent: JNDI). Supported versions that are affected are 10.3.6.0 and 12 | nvd | markdown |  | CVE-2017-10137,cve-arsenal,nvd,cvss-critical |
+| 6521 | Vulnerability in the Oracle Identity Manager component of Oracle Fusion Middleware (subcomponent: Default Account). Supported versions that are affected are 11 | nvd | markdown |  | CVE-2017-10151,cve-arsenal,nvd,cvss-critical |
+| 6522 | Vulnerability in the Oracle Tuxedo component of Oracle Fusion Middleware (subcomponent: Core). Supported versions that are affected are 11.1.1, 12.1.1, 12.1.3 a | nvd | markdown |  | CVE-2017-10269,cve-arsenal,nvd,cvss-critical |
+| 6523 | Vulnerability in the Oracle Hospitality Reporting and Analytics component of Oracle Hospitality Applications (subcomponent: Report). Supported versions that are | nvd | markdown |  | CVE-2017-10402,cve-arsenal,nvd,cvss-critical |
+| 6524 | Vulnerability in the Oracle Hospitality Reporting and Analytics component of Oracle Hospitality Applications (subcomponent: Report). Supported versions that are | nvd | markdown |  | CVE-2017-10405,cve-arsenal,nvd,cvss-critical |
+| 6525 | Xen through 4.8.x mishandles page transfer, which allows guest OS users to obtain privileged host OS access, aka XSA-217 | nvd | markdown |  | CVE-2017-10912,cve-arsenal,nvd,cvss-critical |
+| 6526 | Xen through 4.8.x does not validate memory allocations during certain P2M operations, which allows guest OS users to obtain privileged host OS access, aka XSA-2 | nvd | markdown |  | CVE-2017-10918,cve-arsenal,nvd,cvss-critical |
+| 6527 | The grant-table feature in Xen through 4.8.x mishandles a GNTMAP_device_map and GNTMAP_host_map mapping, when followed by only a GNTMAP_host_map unmapping, whic | nvd | markdown |  | CVE-2017-10920,cve-arsenal,nvd,cvss-critical |
+| 6528 | The grant-table feature in Xen through 4.8.x does not ensure sufficient type counts for a GNTMAP_device_map and GNTMAP_host_map mapping, which allows guest OS u | nvd | markdown |  | CVE-2017-10921,cve-arsenal,nvd,cvss-critical |
+| 6529 | An issue was discovered in Adobe Connect 9.6.2 and earlier versions. A Server-Side Request Forgery (SSRF) vulnerability exists that could be abused to bypass ne | nvd | markdown |  | CVE-2017-11291,cve-arsenal,nvd,cvss-critical |
+| 6530 | An exploitable heap overflow vulnerability exists in the tinysvcmdns library version 2016-07-18. A specially crafted packet can make the library overwrite an ar | nvd | markdown |  | CVE-2017-12087,cve-arsenal,nvd,cvss-critical |
+| 6531 | A authentication bypass and execution of code vulnerability in HPE Integrated Lights-out 4 (iLO 4) version prior to 2.53 was found | nvd | markdown |  | CVE-2017-12542,cve-arsenal,nvd,cvss-critical |
+| 6532 | Analysis of the Bomgar Remote Support Portal JavaStart.jar Applet 52790 and earlier revealed that it is vulnerable to a path traversal vulnerability. The archiv | nvd | markdown |  | CVE-2017-12815,cve-arsenal,nvd,cvss-critical |
+| 6533 | Server Side Request Forgery vulnerability in Vebto Pixie Image Editor 1.4 and 1.7 allows remote attackers to disclose information or execute arbitrary code via  | nvd | markdown |  | CVE-2017-12905,cve-arsenal,nvd,cvss-critical |
+| 6534 | An Improper Authentication issue was discovered in iniNet Solutions iniNet Webserver, all versions prior to V2.02.0100. The webserver does not properly authenti | nvd | markdown |  | CVE-2017-13995,cve-arsenal,nvd,cvss-critical |
+| 6535 | EMC RSA Authentication Agent API 8.5 for C and RSA Authentication Agent SDK 8.6 for C allow attackers to bypass authentication, aka an "Error Handling Vulnerabi | nvd | markdown |  | CVE-2017-14378,cve-arsenal,nvd,cvss-critical |
+| 6536 | An exploitable OS Command Injection vulnerability exists in the Telnet, SSH, and console login functionality of Moxa AWK-3131A Industrial IEEE 802.11a/b/g/n wir | nvd | markdown |  | CVE-2017-14459,cve-arsenal,nvd,cvss-critical |
+| 6537 | An exploitable access control vulnerability exists in the data, program, and function file permissions functionality of Allen Bradley Micrologix 1400 Series B F | nvd | markdown |  | CVE-2017-14469,cve-arsenal,nvd,cvss-critical |
+| 6538 | An exploitable access control vulnerability exists in the data, program, and function file permissions functionality of Allen Bradley Micrologix 1400 Series B F | nvd | markdown |  | CVE-2017-14470,cve-arsenal,nvd,cvss-critical |
+| 6539 | An exploitable access control vulnerability exists in the data, program, and function file permissions functionality of Allen Bradley Micrologix 1400 Series B F | nvd | markdown |  | CVE-2017-14471,cve-arsenal,nvd,cvss-critical |
+| 6540 | An exploitable access control vulnerability exists in the data, program, and function file permissions functionality of Allen Bradley Micrologix 1400 Series B F | nvd | markdown |  | CVE-2017-14472,cve-arsenal,nvd,cvss-critical |
+| 6541 | An exploitable access control vulnerability exists in the data, program, and function file permissions functionality of Allen Bradley Micrologix 1400 Series B F | nvd | markdown |  | CVE-2017-14473,cve-arsenal,nvd,cvss-critical |
+| 6542 | The safe-eval module describes itself as a safer version of eval. By accessing the object constructors, un-sanitized user input can access the entire standard l | nvd | markdown |  | CVE-2017-16088,cve-arsenal,nvd,cvss-critical |
+| 6543 | A Buffer Overflow issue was discovered in Rockwell Automation Allen-Bradley MicroLogix 1400 Controllers, Series B and C Versions 21.002 and earlier. The stack-b | nvd | markdown |  | CVE-2017-16740,cve-arsenal,nvd,cvss-critical |
+| 6544 | hw/input/ps2.c in Qemu does not validate 'rptr' and 'count' values during guest migration, leading to out-of-bounds access | nvd | markdown |  | CVE-2017-16845,cve-arsenal,nvd,cvss-critical |
+| 6545 | A vulnerability in Juniper Networks NorthStar Controller Application prior to version 2.1.0 Service Pack 1 may allow an unauthenticated, unprivileged, network-b | nvd | markdown |  | CVE-2017-2320,cve-arsenal,nvd,cvss-critical |
+| 6546 | The Integrated User Firewall (UserFW) feature was introduced in Junos OS version 12.1X47-D10 on the Juniper SRX Series devices to provide simple integration of  | nvd | markdown |  | CVE-2017-2343,cve-arsenal,nvd,cvss-critical |
+| 6547 | An exploitable buffer overflow exists in the psnotifyd application of the Pharos PopUp printer client version 9.0. A specially crafted packet can be sent to the | nvd | markdown |  | CVE-2017-2785,cve-arsenal,nvd,cvss-critical |
+| 6548 | A buffer overflows exists in the psnotifyd application of the Pharos PopUp printer client version 9.0. A specially crafted packet can be sent to the victim's co | nvd | markdown |  | CVE-2017-2788,cve-arsenal,nvd,cvss-critical |
+| 6549 | Adobe Digital Editions versions 4.5.4 and earlier have an exploitable memory corruption vulnerability in the PDF runtime engine. Successful exploitation could l | nvd | markdown |  | CVE-2017-3088,cve-arsenal,nvd,cvss-critical |
+| 6550 | Vulnerability in the Primavera P6 Enterprise Project Portfolio Management component of Oracle Primavera Products Suite (subcomponent: Web Access). Supported ver | nvd | markdown |  | CVE-2017-3324,cve-arsenal,nvd,cvss-critical |
+| 6551 | Vulnerability in the Solaris component of Oracle Sun Systems Products Suite (subcomponent: Kernel RPC). For supported versions that are affected see note. Easil | nvd | markdown |  | CVE-2017-3623,cve-arsenal,nvd,cvss-critical |
+| 6552 | A vulnerability in the web-based GUI of Cisco Prime Home could allow an unauthenticated, remote attacker to bypass authentication and execute actions with admin | nvd | markdown |  | CVE-2017-3791,cve-arsenal,nvd,cvss-critical |
+| 6553 | An issue was discovered in Carlo Gavazzi VMU-C EM prior to firmware Version A11_U05, and VMU-C PV prior to firmware Version A17. Successful exploitation of this | nvd | markdown |  | CVE-2017-5145,cve-arsenal,nvd,cvss-critical |
+| 6554 | When executing a program via the bubblewrap sandbox, the nonpriv session can escape to the parent session by using the TIOCSTI ioctl to push characters into the | nvd | markdown |  | CVE-2017-5226,cve-arsenal,nvd,cvss-critical |
+| 6555 | The Symantec Messaging Gateway can encounter an issue of remote code execution, which describes a situation whereby an individual may obtain the ability to exec | nvd | markdown |  | CVE-2017-6326,cve-arsenal,nvd,cvss-critical |
+| 6556 | Zoho ManageEngine Desktop Central before build 100082 allows remote attackers to obtain control over all connected active desktops via unspecified vectors | nvd | markdown |  | CVE-2017-7213,cve-arsenal,nvd,cvss-critical |
+| 6557 | Uploaded XML documents were not correctly validated in Apache OpenMeetings 3.1.0 | nvd | markdown |  | CVE-2017-7664,cve-arsenal,nvd,cvss-critical |
+| 6558 | In SolarWinds Log & Event Manager (LEM) before 6.3.1 Hotfix 4, a menu system is encountered when the SSH service is accessed with "cmc" and "password" (the defa | nvd | markdown |  | CVE-2017-7722,cve-arsenal,nvd,cvss-critical |
+| 6559 | An Improper Access Control issue was discovered in Schweitzer Engineering Laboratories (SEL) SEL-3620 and SEL-3622 Security Gateway Versions R202 and, R203, R20 | nvd | markdown |  | CVE-2017-7928,cve-arsenal,nvd,cvss-critical |
+| 6560 | Zyxel WRE6505 devices have a default TELNET password of 1234 for the root and admin accounts, which makes it easier for remote attackers to conduct DNS hijackin | nvd | markdown |  | CVE-2017-7964,cve-arsenal,nvd,cvss-critical |
+| 6561 | www.modified-shop.org modified eCommerce Shopsoftware 2.0.2 rev 10690 has XXE in api/it-recht-kanzlei/api-it-recht-kanzlei.php | nvd | markdown |  | CVE-2017-8110,cve-arsenal,nvd,cvss-critical |
+| 6562 | An issue was discovered on Accellion FTA devices before FTA_9_12_180. Because a regular expression (intended to match local https URLs) lacks an initial ^ chara | nvd | markdown |  | CVE-2017-8794,cve-arsenal,nvd,cvss-critical |
+| 6563 | A vulnerability in the Secure Sockets Layer (SSL) VPN functionality of the Cisco Adaptive Security Appliance (ASA) Software could allow an unauthenticated, remo | nvd | markdown |  | CVE-2018-0101,cve-arsenal,nvd,cvss-critical |
+| 6564 | A vulnerability in Cisco Digital Network Architecture (DNA) Center could allow an unauthenticated, remote attacker to log in to an affected system by using an a | nvd | markdown |  | CVE-2018-0222,cve-arsenal,nvd,cvss-critical |
+| 6565 | A vulnerability in the container management subsystem of Cisco Digital Network Architecture (DNA) Center could allow an unauthenticated, remote attacker to bypa | nvd | markdown |  | CVE-2018-0268,cve-arsenal,nvd,cvss-critical |
+| 6566 | I Librarian I-librarian version 4.8 and earlier contains a XML External Entity (XXE) vulnerability in line 154 of importmetadata.php(simplexml_load_string) that | nvd | markdown |  | CVE-2018-1000124,cve-arsenal,nvd,cvss-critical |
+| 6567 | Eclipse RDF4j version < 2.4.0 Milestone 2 contains a XML External Entity (XXE) vulnerability in RDF4j XML parser parsing RDF files that can result in the disclo | nvd | markdown |  | CVE-2018-1000644,cve-arsenal,nvd,cvss-critical |
+| 6568 | Stroom version <5.4.5 contains a XML External Entity (XXE) vulnerability in XML Parser that can result in disclosure of confidential data, denial of service, se | nvd | markdown |  | CVE-2018-1000651,cve-arsenal,nvd,cvss-critical |
+| 6569 | JabRef version <=4.3.1 contains a XML External Entity (XXE) vulnerability in MsBibImporter XML Parser that can result in disclosure of confidential data, denial | nvd | markdown |  | CVE-2018-1000652,cve-arsenal,nvd,cvss-critical |
+| 6570 | neo4j-contrib neo4j-apoc-procedures version before commit 45bc09c contains a XML External Entity (XXE) vulnerability in XML Parser that can result in Disclosure | nvd | markdown |  | CVE-2018-1000820,cve-arsenal,nvd,cvss-critical |
+| 6571 | MicroMathematics version before commit 5c05ac8 contains a XML External Entity (XXE) vulnerability in SMathStudio files that can result in Disclosure of confiden | nvd | markdown |  | CVE-2018-1000821,cve-arsenal,nvd,cvss-critical |
+| 6572 | codelibs fess version before commit faa265b contains a XML External Entity (XXE) vulnerability in GSA XML file parser that can result in Disclosure of confident | nvd | markdown |  | CVE-2018-1000822,cve-arsenal,nvd,cvss-critical |
+| 6573 | exist version <= 5.0.0-RC4 contains a XML External Entity (XXE) vulnerability in XML Parser for REST Server that can result in Disclosure of confidential data,  | nvd | markdown |  | CVE-2018-1000823,cve-arsenal,nvd,cvss-critical |
+| 6574 | FreeCol version <= nightly-2018-08-22 contains a XML External Entity (XXE) vulnerability in FreeColXMLReader parser that can result in Disclosure of confidentia | nvd | markdown |  | CVE-2018-1000825,cve-arsenal,nvd,cvss-critical |
+| 6575 | XR3Player version <= V3.124 contains a XML External Entity (XXE) vulnerability in Playlist parser that can result in Disclosure of confidential data, denial of  | nvd | markdown |  | CVE-2018-1000830,cve-arsenal,nvd,cvss-critical |
+| 6576 | K9Mail version <= v5.600 contains a XML External Entity (XXE) vulnerability in WebDAV response parser that can result in Disclosure of confidential data, denial | nvd | markdown |  | CVE-2018-1000831,cve-arsenal,nvd,cvss-critical |
+| 6577 | KeePassDX version <= 2.5.0.0beta17 contains a XML External Entity (XXE) vulnerability in kdbx file parser that can result in Disclosure of confidential data, de | nvd | markdown |  | CVE-2018-1000835,cve-arsenal,nvd,cvss-critical |
+| 6578 | UML Designer version <= 8.0.0 contains a XML External Entity (XXE) vulnerability in XML parser for plugins that can result in Disclosure of confidential data, d | nvd | markdown |  | CVE-2018-1000837,cve-arsenal,nvd,cvss-critical |
+| 6579 | autopsy version <= 4.9.0 contains a XML External Entity (XXE) vulnerability in CaseMetadata XML Parser that can result in Disclosure of confidential data, denia | nvd | markdown |  | CVE-2018-1000838,cve-arsenal,nvd,cvss-critical |
+| 6580 | A vulnerability in Trend Micro Control Manager (versions 6.0 and 7.0) could allow an attacker to conduct a server-side request forgery (SSRF) attack on vulnerab | nvd | markdown |  | CVE-2018-10511,cve-arsenal,nvd,cvss-critical |
+| 6581 | Stack-based buffer overflow in Activision Infinity Ward Call of Duty Modern Warfare 2 before 2018-04-26 allows remote attackers to execute arbitrary code via cr | nvd | markdown |  | CVE-2018-10718,cve-arsenal,nvd,cvss-critical |
+| 6582 | A SQL injection vulnerability in the web administration and quarantine components of Micro Focus Secure Messaging Gateway allows an unauthenticated remote attac | nvd | markdown |  | CVE-2018-12464,cve-arsenal,nvd,cvss-critical |
+| 6583 | A vulnerability has been identified in TIM 1531 IRC (All version < V2.0). The devices was missing proper authentication on port 102/tcp, although configured. Su | nvd | markdown |  | CVE-2018-13816,cve-arsenal,nvd,cvss-critical |
+| 6584 | FasterXML jackson-databind 2.x before 2.9.7 might allow remote attackers to conduct server-side request forgery (SSRF) attacks by leveraging failure to block th | nvd | markdown |  | CVE-2018-14721,cve-arsenal,nvd,cvss-critical |
+| 6585 | A command injection vulnerability in the apex-publish-static-files npm module version <2.0.1 which allows arbitrary shell command execution through a maliciousl | nvd | markdown |  | CVE-2018-16462,cve-arsenal,nvd,cvss-critical |
+| 6586 | In FreeBSD before 11.2-STABLE(r341486) and 11.2-RELEASE-p6, insufficient bounds checking in one of the device models provided by bhyve can permit a guest operat | nvd | markdown |  | CVE-2018-17160,cve-arsenal,nvd,cvss-critical |
+| 6587 | IBM Security Access Manager Appliance 9.0.4 and 9.0.5 could allow remote code execution when Advanced Access Control or Federation services are running. IBM | nvd | markdown |  | CVE-2018-1722,cve-arsenal,nvd,cvss-critical |
+| 6588 | An earlier fix for an Inter-process Communication (IPC) vulnerability, CVE-2011-3079, added authentication to communication between IPC endpoints and server par | nvd | markdown |  | CVE-2018-18505,cve-arsenal,nvd,cvss-critical |
+| 6589 | Sandboxie 5.26 allows a Sandbox Escape via an "import os" statement, followed by os.system("cmd") or os.system("powershell"), within a .py file. NOTE: the vendo | nvd | markdown |  | CVE-2018-18748,cve-arsenal,nvd,cvss-critical |
+| 6590 | The Kubernetes integration in GitLab Enterprise Edition 11.x before 11.2.8, 11.3.x before 11.3.9, and 11.4.x before 11.4.4 has SSRF | nvd | markdown |  | CVE-2018-18843,cve-arsenal,nvd,cvss-critical |
+| 6591 | mPDF through 7.1.6, if deployed as a web application that accepts arbitrary HTML, allows SSRF, as demonstrated by a '<img src="http://192.168' substring that tr | nvd | markdown |  | CVE-2018-19047,cve-arsenal,nvd,cvss-critical |
+| 6592 | An issue was discovered in the MQTT server in Contiki-NG before 4.2. The function parse_publish_vhdr() that parses MQTT PUBLISH messages with a variable length  | nvd | markdown |  | CVE-2018-19417,cve-arsenal,nvd,cvss-critical |
+| 6593 | Vulnerability in the Sun ZFS Storage Appliance Kit (AK) component of Oracle Sun Systems Products Suite (subcomponent: Core Services). The supported version that | nvd | markdown |  | CVE-2018-2611,cve-arsenal,nvd,cvss-critical |
+| 6594 | Vulnerability in the Oracle GoldenGate component of Oracle GoldenGate (subcomponent: Monitoring Manager). Supported versions that are affected are 12.1.2, 1 | nvd | markdown |  | CVE-2018-2913,cve-arsenal,nvd,cvss-critical |
+| 6595 | Incorrect parsing in url-parse <1.4.3 returns wrong hostname which leads to multiple vulnerabilities such as SSRF, Open Redirect, Bypass Authentication Protocol | nvd | markdown |  | CVE-2018-3774,cve-arsenal,nvd,cvss-critical |
+| 6596 | An exploitable vulnerability exists in the REST parser of video-core's HTTP server of the Samsung SmartThings Hub STH-ETH-250 - Firmware version 0.20.17. The vi | nvd | markdown |  | CVE-2018-3907,cve-arsenal,nvd,cvss-critical |
+| 6597 | An exploitable heap overflow vulnerability exists in the WkbProgramLow function of WibuKey Network server management, version 6.40.2402.500. A specially crafted | nvd | markdown |  | CVE-2018-3991,cve-arsenal,nvd,cvss-critical |
+| 6598 | An issue was discovered in certain Apple products. macOS before 10.13.3 is affected. The issue involves the "Sandbox" component. It allows bypass of a sandbox p | nvd | markdown |  | CVE-2018-4091,cve-arsenal,nvd,cvss-critical |
+| 6599 | An issue was discovered in certain Apple products. macOS before 10.13.5 is affected. The issue involves the "Grand Central Dispatch" component. It allows attack | nvd | markdown |  | CVE-2018-4229,cve-arsenal,nvd,cvss-critical |
+| 6600 | An issue was discovered in Adobe Acrobat Reader 2018.009.20050 and earlier versions, 2017.011.30070 and earlier versions, 2015.006.30394 and earlier versions. T | nvd | markdown |  | CVE-2018-4872,cve-arsenal,nvd,cvss-critical |
+| 6601 | Authentication Bypass vulnerability in the administrative user interface in McAfee Web Gateway 7.8.1 through 7.8.1 allows remote attackers to execute arbitr | nvd | markdown |  | CVE-2018-6667,cve-arsenal,nvd,cvss-critical |
+| 6602 | Stack-based Buffer Overflow vulnerability in libUPnPHndlr.so in Belkin Wemo Insight Smart Plug allows remote attackers to bypass local security protection via a | nvd | markdown |  | CVE-2018-6692,cve-arsenal,nvd,cvss-critical |
+| 6603 | The VMware AirWatch Agent for Android prior to 8.2 and AirWatch Agent for Windows Mobile prior to 6.5.2 contain a remote code execution vulnerability in real ti | nvd | markdown |  | CVE-2018-6968,cve-arsenal,nvd,cvss-critical |
+| 6604 | Juniper ATP ships with hard coded credentials in the Web Collector instance which gives an attacker the ability to take full control of any installation of the  | nvd | markdown |  | CVE-2019-0020,cve-arsenal,nvd,cvss-critical |
+| 6605 | Juniper ATP ships with hard coded credentials in the Cyphort Core instance which gives an attacker the ability to take full control of any installation of the s | nvd | markdown |  | CVE-2019-0022,cve-arsenal,nvd,cvss-critical |
+| 6606 | Zoho ManageEngine ADSelfService Plus 5.x before build 5703 has SSRF | nvd | markdown |  | CVE-2019-3905,cve-arsenal,nvd,cvss-critical |
+| 6607 | Multiple use-after-free vulnerabilities in vnc.c in the VNC server in QEMU 0.10.6 and earlier might allow guest OS users to execute arbitrary code on the host O | nvd | markdown |  | CVE-2009-3616,cve-arsenal,nvd,cvss-critical |
+| 6608 | The VMX process in VMware ESXi 3.5 through 4.1 and ESX 3.5 through 4.1 does not properly handle RPC commands, which allows guest OS users to cause a denial of s | nvd | markdown |  | CVE-2012-1516,cve-arsenal,nvd,cvss-critical |
+| 6609 | The portal client in IBM Tivoli Monitoring (ITM) 6.2.2 through FP9, 6.2.3 through FP5, and 6.3.0 through FP6 allows remote authenticated users to gain privilege | nvd | markdown |  | CVE-2015-7411,cve-arsenal,nvd,cvss-critical |
+| 6610 | eWON devices with firmware before 10.1s0 omit RBAC for I/O server information and status requests, which allows remote attackers to obtain sensitive information | nvd | markdown |  | CVE-2015-7926,cve-arsenal,nvd,cvss-critical |
+| 6611 | The GMS ViewPoint (GMSVP) web application in Dell SonicWALL GMS, Analyzer, and UMA EM5000 7.2, 8.0, and 8.1 before Hotfix 168056 allows remote authenticated use | nvd | markdown |  | CVE-2016-2396,cve-arsenal,nvd,cvss-critical |
+| 6612 | lshell 0.9.16 allows remote authenticated users to break out of a limited shell and execute arbitrary commands | nvd | markdown |  | CVE-2016-6902,cve-arsenal,nvd,cvss-critical |
+| 6613 | lshell 0.9.16 allows remote authenticated users to break out of a limited shell and execute arbitrary commands | nvd | markdown |  | CVE-2016-6903,cve-arsenal,nvd,cvss-critical |
+| 6614 | An issue was discovered in Smiths-Medical CADD-Solis Medication Safety Software, Version 1.0; 2.0; 3.0; and 3.1. CADD-Solis Medication Safety Software grants an | nvd | markdown |  | CVE-2016-8355,cve-arsenal,nvd,cvss-critical |
+| 6615 | Remote Command Execution in com.trend.iwss.gui.servlet.ManagePatches in Trend Micro Interscan Web Security Virtual Appliance (IWSVA) version 6.5-SP2_Build_Linux | nvd | markdown |  | CVE-2016-9269,cve-arsenal,nvd,cvss-critical |
+| 6616 | PricewaterhouseCoopers (PwC) ACE-ABAP 8.10.304 for SAP Security allows remote authenticated users to conduct ABAP injection attacks and execute arbitrary code v | nvd | markdown |  | CVE-2016-9832,cve-arsenal,nvd,cvss-critical |
+| 6617 | Vulnerability in the OJVM component of Oracle Database Server. Supported versions that are affected are 11.2.0, 12.1.0 and 12.2.0. Easily exploitable vuln | nvd | markdown |  | CVE-2017-10202,cve-arsenal,nvd,cvss-critical |
+| 6618 | Vulnerability in the Oracle Tuxedo component of Oracle Fusion Middleware (subcomponent: Core). Supported versions that are affected are 11.1.1, 12.1.1, 12.1.3 a | nvd | markdown |  | CVE-2017-10272,cve-arsenal,nvd,cvss-critical |
+| 6619 | Vulnerability in the Oracle WebLogic Server component of Oracle Fusion Middleware (subcomponent: WLS - Web Services). The supported version that is affected are | nvd | markdown |  | CVE-2017-10352,cve-arsenal,nvd,cvss-critical |
+| 6620 | Vulnerability in the Oracle Hospitality Cruise AffairWhere component of Oracle Hospitality Applications (subcomponent: AffairWhere). Supported versions that are | nvd | markdown |  | CVE-2017-10396,cve-arsenal,nvd,cvss-critical |
+| 6621 | Vulnerability in the Oracle Hospitality Reporting and Analytics component of Oracle Hospitality Applications (subcomponent: iQuery). Supported versions that are | nvd | markdown |  | CVE-2017-10404,cve-arsenal,nvd,cvss-critical |
+| 6622 | A vulnerability in the web console of the Cisco Cloud Services Platform (CSP) 2100 could allow an authenticated, remote attacker to interact maliciously with th | nvd | markdown |  | CVE-2017-12251,cve-arsenal,nvd,cvss-critical |
+| 6623 | IBM Security Guardium 10.0 could allow a remote authenticated attacker to execute arbitrary commands on the system. By sending a specially-crafted request, an a | nvd | markdown |  | CVE-2017-1253,cve-arsenal,nvd,cvss-critical |
+| 6624 | Remote enabling and disabling admin interface in Gemalto's HASP SRM, Sentinel HASP and Sentinel LDK products prior to Sentinel LDK RTE version 7.55 leads to new | nvd | markdown |  | CVE-2017-12822,cve-arsenal,nvd,cvss-critical |
+| 6625 | XML external entity (XXE) vulnerability in the import package functionality of the deployment module in Lansweeper before 6.0.100 allows remote authenticated | nvd | markdown |  | CVE-2017-13706,cve-arsenal,nvd,cvss-critical |
+| 6626 | An exploitable buffer overflow vulnerability exists in Insteon Hub running firmware version 1012. The HTTP server implementation incorrectly handles the URL par | nvd | markdown |  | CVE-2017-14444,cve-arsenal,nvd,cvss-critical |
+| 6627 | An exploitable buffer overflow vulnerability exists in Insteon Hub running firmware version 1012. The HTTP server implementation incorrectly handles the host pa | nvd | markdown |  | CVE-2017-14445,cve-arsenal,nvd,cvss-critical |
+| 6628 | An exploitable stack-based buffer overflow vulnerability exists in Insteon Hub running firmware version 1012. The HTTP server implementation unsafely extracts p | nvd | markdown |  | CVE-2017-14446,cve-arsenal,nvd,cvss-critical |
+| 6629 | An attacker could send an authenticated HTTP request to trigger this vulnerability in Insteon Hub running firmware version 1012. At 0x9d01bad0 the value for the | nvd | markdown |  | CVE-2017-16338,cve-arsenal,nvd,cvss-critical |
+| 6630 | An attacker could send an authenticated HTTP request to trigger this vulnerability in Insteon Hub running firmware version 1012. At 0x9d01bb1c the value for the | nvd | markdown |  | CVE-2017-16339,cve-arsenal,nvd,cvss-critical |
+| 6631 | An attacker could send an authenticated HTTP request to trigger this vulnerability in Insteon Hub running firmware version 1012. At 0x9d01c0e8 the value for the | nvd | markdown |  | CVE-2017-16340,cve-arsenal,nvd,cvss-critical |
+| 6632 | An attacker could send an authenticated HTTP request to trigger this vulnerability in Insteon Hub running firmware version 1012. At 0x9d01c224 the value for the | nvd | markdown |  | CVE-2017-16341,cve-arsenal,nvd,cvss-critical |
+| 6633 | An attacker could send an authenticated HTTP request to trigger this vulnerability in Insteon Hub running firmware version 1012. At 0x9d01c254 the value for the | nvd | markdown |  | CVE-2017-16342,cve-arsenal,nvd,cvss-critical |
+| 6634 | An attacker could send an authenticated HTTP request to trigger this vulnerability in Insteon Hub running firmware version 1012. At 0x9d01c284 the value for the | nvd | markdown |  | CVE-2017-16343,cve-arsenal,nvd,cvss-critical |
+| 6635 | An attacker could send an authenticated HTTP request to trigger this vulnerability in Insteon Hub running firmware version 1012. At 0x9d01c2c8 the value for the | nvd | markdown |  | CVE-2017-16344,cve-arsenal,nvd,cvss-critical |
+| 6636 | An attacker could send an authenticated HTTP request to trigger this vulnerability in Insteon Hub running firmware version 1012. At 0x9d01c318 the value for the | nvd | markdown |  | CVE-2017-16345,cve-arsenal,nvd,cvss-critical |
+| 6637 | An attacker could send an authenticated HTTP request to trigger this vulnerability in Insteon Hub running firmware version 1012. At 0x9d01c368 the value for the | nvd | markdown |  | CVE-2017-16346,cve-arsenal,nvd,cvss-critical |
+| 6638 | An attacker could send an authenticated HTTP request to trigger this vulnerability in Insteon Hub running firmware version 1012. At 0x9d01e7d4 the value for the | nvd | markdown |  | CVE-2017-16347,cve-arsenal,nvd,cvss-critical |
+| 6639 | A design flaw issue was found in the Red Hat OpenStack Platform director use of TripleO to enable libvirtd based live-migration. Libvirtd is deployed by default | nvd | markdown |  | CVE-2017-2637,cve-arsenal,nvd,cvss-critical |
+| 6640 | Vulnerability in the Primavera P6 Enterprise Project Portfolio Management component of Oracle Primavera Products Suite (subcomponent: Web Access (Apache Commons | nvd | markdown |  | CVE-2017-3503,cve-arsenal,nvd,cvss-critical |
+| 6641 | Vulnerability in the Oracle Identity Manager component of Oracle Fusion Middleware (subcomponent: Rules Engine). The supported version that is affected is 11.1 | nvd | markdown |  | CVE-2017-3553,cve-arsenal,nvd,cvss-critical |
+| 6642 | The drag-and-drop (DnD) function in VMware Workstation 12.x before version 12.5.4 and Fusion 8.x before version 8.5.5 has an out-of-bounds memory access vulnera | nvd | markdown |  | CVE-2017-4901,cve-arsenal,nvd,cvss-critical |
+| 6643 | The WHMCS Reseller Module V2 2.0.2 in Softaculous Virtualizor before 2.9.1 does not verify the user correctly, which allows remote authenticated users to cont | nvd | markdown |  | CVE-2017-6513,cve-arsenal,nvd,cvss-critical |
+| 6644 | NfSen before 1.3.8 allows remote attackers to execute arbitrary OS commands via shell metacharacters in the customfmt parameter (aka the "Custom output format"  | nvd | markdown |  | CVE-2017-7175,cve-arsenal,nvd,cvss-critical |
+| 6645 | TP-Link C2 and C20i devices through firmware 0.9.1 4.2 v0032.0 Build 160706 Rel.37961n allow remote code execution with a single HTTP request by placing shell c | nvd | markdown |  | CVE-2017-8220,cve-arsenal,nvd,cvss-critical |
+| 6646 | A vulnerability in the role-based resource checking functionality of the Cisco Unified Computing System (UCS) Director could allow an authenticated, remote atta | nvd | markdown |  | CVE-2018-0238,cve-arsenal,nvd,cvss-critical |
+| 6647 | An issue was discovered in MyBiz MyProcureNet 5.0.0. A malicious file can be uploaded to the webserver by an attacker. It is possible for an attacker to upload  | nvd | markdown |  | CVE-2018-11091,cve-arsenal,nvd,cvss-critical |
+| 6648 | An issue was discovered in Xen 4.7 through 4.10.x. libxl fails to pass the readonly flag to qemu when setting up a SCSI disk, due to what was probably an errone | nvd | markdown |  | CVE-2018-12892,cve-arsenal,nvd,cvss-critical |
+| 6649 | In OnlineJudge 2.0, the sandbox has an incorrect access control vulnerability that can write a file anywhere. A user can write a directory listing to /tmp, and  | nvd | markdown |  | CVE-2018-16367,cve-arsenal,nvd,cvss-critical |
+| 6650 | A sandbox escape issue was discovered in VyOS 1.1.8. It provides a restricted management shell for operator users to administer the device. By issuing various s | nvd | markdown |  | CVE-2018-18555,cve-arsenal,nvd,cvss-critical |
+| 6651 | A privilege escalation issue was discovered in VyOS 1.1.8. The default configuration also allows operator users to execute the pppd binary with elevated (sudo)  | nvd | markdown |  | CVE-2018-18556,cve-arsenal,nvd,cvss-critical |
+| 6652 | A vulnerability was discovered in the Java VM component of Oracle Database Server. Supported versions that are affected are 11.2.0, 12.1.0, 12.2.0 and 18 | nvd | markdown |  | CVE-2018-3110,cve-arsenal,nvd,cvss-critical |
+| 6653 | An exploitable vulnerability exists in the smart cameras RTSP configuration of the Samsung SmartThings Hub STH-ETH-250 - Firmware version 0.20.17. The device in | nvd | markdown |  | CVE-2018-3856,cve-arsenal,nvd,cvss-critical |
+| 6654 | On Samsung SmartThings Hub STH-ETH-250 devices with firmware version 0.20.17, the video-core process incorrectly extracts fields from a user-controlled JSON pay | nvd | markdown |  | CVE-2018-3863,cve-arsenal,nvd,cvss-critical |
+| 6655 | An exploitable buffer overflow vulnerability exists in the samsungWifiScan handler of video-core's HTTP server of Samsung SmartThings Hub STH-ETH-250 - Firmware | nvd | markdown |  | CVE-2018-3866,cve-arsenal,nvd,cvss-critical |
+| 6656 | An exploitable stack-based buffer overflow vulnerability exists in the samsungWifiScan callback notification of video-core's HTTP server of Samsung SmartThings  | nvd | markdown |  | CVE-2018-3867,cve-arsenal,nvd,cvss-critical |
+| 6657 | An exploitable buffer overflow vulnerability exists in the credentials handler of video-core's HTTP server of Samsung SmartThings Hub STH-ETH-250 - Firmware ver | nvd | markdown |  | CVE-2018-3872,cve-arsenal,nvd,cvss-critical |
+| 6658 | An exploitable buffer overflow vulnerability exists in the credentials handler of video-core's HTTP server of Samsung SmartThings Hub STH-ETH-250-Firmware versi | nvd | markdown |  | CVE-2018-3873,cve-arsenal,nvd,cvss-critical |
+| 6659 | An exploitable buffer overflow vulnerability exists in the credentials handler of video-core's HTTP server of Samsung SmartThings Hub STH-ETH-250-Firmware versi | nvd | markdown |  | CVE-2018-3874,cve-arsenal,nvd,cvss-critical |
+| 6660 | An exploitable buffer overflow vulnerability exists in the credentials handler of video-core's HTTP server of Samsung SmartThings Hub STH-ETH-250-Firmware versi | nvd | markdown |  | CVE-2018-3875,cve-arsenal,nvd,cvss-critical |
+| 6661 | An exploitable buffer overflow vulnerability exists in the credentials handler of video-core's HTTP server of Samsung SmartThings Hub STH-ETH-250-Firmware versi | nvd | markdown |  | CVE-2018-3877,cve-arsenal,nvd,cvss-critical |
+| 6662 | Multiple exploitable buffer overflow vulnerabilities exist in the credentials handler of video-core's HTTP server of Samsung SmartThings Hub STH-ETH-250 devices | nvd | markdown |  | CVE-2018-3878,cve-arsenal,nvd,cvss-critical |
+| 6663 | An exploitable stack-based buffer overflow vulnerability exists in the database 'find-by-cameraId' functionality of video-core's HTTP server of Samsung SmartThi | nvd | markdown |  | CVE-2018-3880,cve-arsenal,nvd,cvss-critical |
+| 6664 | An exploitable buffer overflow vulnerability exists in the camera "replace" feature of video-core's HTTP server of Samsung SmartThings Hub STH-ETH-250 devices w | nvd | markdown |  | CVE-2018-3902,cve-arsenal,nvd,cvss-critical |
+| 6665 | On Samsung SmartThings Hub STH-ETH-250 devices with firmware version 0.20.17, the video-core process incorrectly extracts fields from a user-controlled JSON pay | nvd | markdown |  | CVE-2018-3903,cve-arsenal,nvd,cvss-critical |
+| 6666 | An exploitable buffer overflow vulnerability exists in the camera 'update' feature of video-core's HTTP server of Samsung SmartThings Hub STH-ETH-250 - Firmware | nvd | markdown |  | CVE-2018-3904,cve-arsenal,nvd,cvss-critical |
+| 6667 | An exploitable buffer overflow vulnerability exists in the camera "create" feature of video-core's HTTP server of Samsung SmartThings Hub STH-ETH-250 devices wi | nvd | markdown |  | CVE-2018-3905,cve-arsenal,nvd,cvss-critical |
+| 6668 | On Samsung SmartThings Hub STH-ETH-250 devices with firmware version 0.20.17, the video-core process insecurely extracts the fields from the "shard" table of it | nvd | markdown |  | CVE-2018-3917,cve-arsenal,nvd,cvss-critical |
+| 6669 | An exploitable stack-based buffer overflow vulnerability exists in the retrieval of database fields in video-core's HTTP server of Samsung SmartThings Hub STH-E | nvd | markdown |  | CVE-2018-3919,cve-arsenal,nvd,cvss-critical |
+| 6670 | In browser editing in Atlassian Bitbucket Server from version 4.13.0 before 5.4.8 (the fixed version for 4.13.0 through 5.4.7), 5.5.0 before 5.5.8 (the fixed ve | nvd | markdown |  | CVE-2018-5225,cve-arsenal,nvd,cvss-critical |
+| 6671 | The default permissions of /dev/kmem in Linux versions before 2.0.36 allows IP spoofing | nvd | markdown |  | CVE-1999-0426,cve-arsenal,nvd,cvss-critical |
+| 6672 | VAXstations running Open VMS 5.3 through 5.5-2 with VMS DECwindows or MOTIF do not properly disable access to user accounts that exceed the break-in limit thres | nvd | markdown |  | CVE-1999-1324,cve-arsenal,nvd,cvss-critical |
+| 6673 | CGI Script Center News Update 1.1 does not properly validate the original news administration password during a password change operation, which allows remote a | nvd | markdown |  | CVE-2000-0944,cve-arsenal,nvd,cvss-critical |
+| 6674 | The default configuration for the domain name resolver for Microsoft Windows 98, NT 4.0, 2000, and XP sets the QueryIpMatching parameter to 0, which causes Wind | nvd | markdown |  | CVE-2000-1218,cve-arsenal,nvd,cvss-critical |
+| 6675 | Buffer overflow in FTP server in HPUX 11 allows remote attackers to execute arbitrary commands by creating a long pathname and calling the STAT command, which u | nvd | markdown |  | CVE-2001-0248,cve-arsenal,nvd,cvss-critical |
+| 6676 | Heap overflow in FTP daemon in Solaris 8 allows remote attackers to execute arbitrary commands by creating a long pathname and calling the LIST command, which u | nvd | markdown |  | CVE-2001-0249,cve-arsenal,nvd,cvss-critical |
+| 6677 | Lightwave ConsoleServer 3200 does not disconnect users after unsuccessful login attempts, which could allow remote attackers to conduct brute force password gue | nvd | markdown |  | CVE-2001-0395,cve-arsenal,nvd,cvss-critical |
+| 6678 | Format string vulnerability in Infodrom cfingerd 1.4.3 and earlier allows a remote attacker to gain additional privileges via a malformed ident reply that is pa | nvd | markdown |  | CVE-2001-0609,cve-arsenal,nvd,cvss-critical |
+| 6679 | Apache on MacOS X Client 10.0.3 with the HFS+ file system allows remote attackers to bypass access restrictions via a URL that contains some characters whose ca | nvd | markdown |  | CVE-2001-0766,cve-arsenal,nvd,cvss-critical |
+| 6680 | Knox Arkeia server 4.2, and possibly other versions, uses a constant salt when encrypting passwords using the crypt() function, which makes it easier for an att | nvd | markdown |  | CVE-2001-0967,cve-arsenal,nvd,cvss-critical |
+| 6681 | Symantec LiveUpdate before 1.6 does not use cryptography to ensure the integrity of download files, which allows remote attackers to execute arbitrary code via  | nvd | markdown |  | CVE-2001-1125,cve-arsenal,nvd,cvss-critical |

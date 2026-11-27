@@ -2,9 +2,9 @@
 
 | 项 | 数量 |
 |---|---|
-| `knowledge.db` 条目 | **672** |
-| `pocs/` 原文目录 | **593** |
-| 已配对 | **592** |
+| `knowledge.db` 条目 | **2672** |
+| `pocs/` 原文目录 | **2593** |
+| 已配对 | **2592** |
 | 仅有台账（正文在 db 的 `content`） | **80** |
 | 仅有目录（db 无条目） | **1** |
 
@@ -693,3 +693,2003 @@
 | 679 | VIP/等级接口参数篡改（免费拿高等级权益） | gray-market | `fujiang-gray-market-f76beb82` | code | 1.0 |
 | 680 | 提现审核接口越权（读他人银行卡 / 改审核状态） | gray-market | `fujiang-gray-market-0c77ad6f` | code | 1.0 |
 | 681 | 提现银行卡越权替换（把别人提现收进自己卡） | gray-market | `fujiang-gray-market-25410c01` | code | 1.0 |
+| 4682 | SAP NetWeaver Remote Code Execution Vulnerability | kev | `cve-2010-5326` | code | 1.0 |
+| 4683 | HP OpenView Network Node Manager Remote Code Execution Vulnerability | kev | `cve-2005-2773` | code | 1.0 |
+| 4684 | Alcatel OmniPCX Enterprise Remote Code Execution Vulnerability | kev | `cve-2007-3010` | code | 1.0 |
+| 4685 | phpMyAdmin Remote Code Execution Vulnerability | kev | `cve-2009-1151` | code | 1.0 |
+| 4686 | Oracle JRE Unspecified Vulnerability | kev | `cve-2010-0840` | code | 1.0 |
+| 4687 | Adobe ColdFusion Directory Traversal Vulnerability | kev | `cve-2010-2861` | code | 1.0 |
+| 4688 | Exim Heap-Based Buffer Overflow Vulnerability | kev | `cve-2010-4344` | code | 1.0 |
+| 4689 | Microsoft Forefront TMG Remote Code Execution Vulnerability | kev | `cve-2011-1889` | code | 1.0 |
+| 4690 | Adobe Reader and Acrobat Universal 3D Memory Corruption Vulnerability | kev | `cve-2011-2462` | code | 1.0 |
+| 4691 | Oracle Java SE Runtime Environment (JRE) Arbitrary Code Execution Vulnerability | kev | `cve-2011-3544` | code | 1.0 |
+| 4692 | Apache Struts 2 Improper Input Validation Vulnerability | kev | `cve-2012-0391` | code | 1.0 |
+| 4693 | Oracle Fusion Middleware Unspecified Vulnerability | kev | `cve-2012-1710` | code | 1.0 |
+| 4694 | Oracle Java SE Runtime Environment (JRE) Arbitrary Code Execution Vulnerability | kev | `cve-2012-4681` | code | 1.0 |
+| 4695 | Adobe ColdFusion Authentication Bypass Vulnerability | kev | `cve-2013-0625` | code | 1.0 |
+| 4696 | Adobe ColdFusion Authentication Bypass Vulnerability | kev | `cve-2013-0632` | code | 1.0 |
+| 4697 | Apache Struts Improper Input Validation Vulnerability | kev | `cve-2013-2251` | code | 1.0 |
+| 4698 | Adobe Reader and Acrobat Arbitrary Integer Overflow Vulnerability | kev | `cve-2013-2729` | code | 1.0 |
+| 4699 | Adobe Reader and Acrobat Memory Corruption Vulnerability | kev | `cve-2013-3346` | code | 1.0 |
+| 4700 | HP Multiple Products Remote Code Execution Vulnerability | kev | `cve-2013-4810` | code | 1.0 |
+| 4701 | Adobe Flash Player Integer Underflow Vulnerablity | kev | `cve-2014-0497` | code | 1.0 |
+| 4702 | Adobe Reader and Acrobat Sandbox Bypass Vulnerability | kev | `cve-2014-0546` | code | 1.0 |
+| 4703 | InduSoft Web Studio NTWebServer Directory Traversal Vulnerability | kev | `cve-2014-0780` | code | 1.0 |
+| 4704 | Multi-Router Looking Glass (MRLG) Buffer Overflow Vulnerability | kev | `cve-2014-3931` | code | 1.0 |
+| 4705 | GNU Bourne-Again Shell (Bash) Arbitrary Code Execution Vulnerability | kev | `cve-2014-6271` | code | 1.0 |
+| 4706 | Rejetto HTTP File Server (HFS) Remote Code Execution Vulnerability | kev | `cve-2014-6287` | code | 1.0 |
+| 4707 | GNU Bourne-Again Shell (Bash) Arbitrary Code Execution Vulnerability | kev | `cve-2014-7169` | code | 1.0 |
+| 4708 | Realtek SDK Improper Input Validation Vulnerability | kev | `cve-2014-8361` | code | 1.0 |
+| 4709 | Adobe Flash Player Remote Code Execution Vulnerability | kev | `cve-2015-0311` | code | 1.0 |
+| 4710 | Adobe Flash Player Use-After-Free Vulnerability | kev | `cve-2015-0313` | code | 1.0 |
+| 4711 | D-Link and TRENDnet Multiple Devices Remote Code Execution Vulnerability | kev | `cve-2015-1187` | code | 1.0 |
+| 4712 | Elasticsearch Groovy Scripting Engine Remote Code Execution Vulnerability | kev | `cve-2015-1427` | code | 1.0 |
+| 4713 | Oracle Java SE and Java SE Embedded Remote Code Execution Vulnerability | kev | `cve-2015-2590` | code | 1.0 |
+| 4714 | Adobe Flash Player Memory Corruption Vulnerability | kev | `cve-2015-3043` | code | 1.0 |
+| 4715 | Adobe Flash Player Heap-Based Buffer Overflow Vulnerability | kev | `cve-2015-3113` | code | 1.0 |
+| 4716 | Oracle WebLogic Server Deserialization of Untrusted Data Vulnerability | kev | `cve-2015-4852` | code | 1.0 |
+| 4717 | Adobe Flash Player Use-After-Free Vulnerability | kev | `cve-2015-5119` | code | 1.0 |
+| 4718 | Adobe Flash Player Use-After-Free Vulnerability | kev | `cve-2015-5122` | code | 1.0 |
+| 4719 | Adobe Flash Player Use-After-Free Vulnerability | kev | `cve-2015-5123` | code | 1.0 |
+| 4720 | IBM WebSphere Application Server and Server Hypervisor Edition Code Injection. | kev | `cve-2015-7450` | code | 1.0 |
+| 4721 | Juniper ScreenOS Improper Authentication Vulnerability | kev | `cve-2015-7755` | code | 1.0 |
+| 4722 | PHPMailer Command Injection Vulnerability | kev | `cve-2016-10033` | code | 1.0 |
+| 4723 | NETGEAR WNR2000v5 Router Buffer Overflow Vulnerability | kev | `cve-2016-10174` | code | 1.0 |
+| 4724 | Adobe Flash Player Arbitrary Code Execution Vulnerability | kev | `cve-2016-1019` | code | 1.0 |
+| 4725 | NETGEAR Multiple WAP Devices Command Injection Vulnerability | kev | `cve-2016-1555` | code | 1.0 |
+| 4726 | SAP NetWeaver SQL Injection Vulnerability | kev | `cve-2016-2386` | code | 1.0 |
+| 4727 | Apache ActiveMQ Improper Input Validation Vulnerability | kev | `cve-2016-3088` | code | 1.0 |
+| 4728 | Oracle Java SE and JRockit Unspecified Vulnerability | kev | `cve-2016-3427` | code | 1.0 |
+| 4729 | Adobe Flash Player Arbitrary Code Execution Vulnerability | kev | `cve-2016-4117` | code | 1.0 |
+| 4730 | Adobe Flash Player Remote Code Execution Vulnerability | kev | `cve-2016-4171` | code | 1.0 |
+| 4731 | Apache Shiro Code Execution Vulnerability | kev | `cve-2016-4437` | code | 1.0 |
+| 4732 | SKYSEA Client View Improper Authentication Vulnerability | kev | `cve-2016-7836` | code | 1.0 |
+| 4733 | Apache Tomcat Remote Code Execution Vulnerability | kev | `cve-2016-8735` | code | 1.0 |
+| 4734 | Jenkins Remote Code Execution Vulnerability | kev | `cve-2017-1000353` | code | 1.0 |
+| 4735 | Primetek Primefaces Remote Code Execution Vulnerability | kev | `cve-2017-1000486` | code | 1.0 |
+| 4736 | Telerik UI for ASP.NET AJAX Unrestricted File Upload Vulnerability | kev | `cve-2017-11317` | code | 1.0 |
+| 4737 | Telerik UI for ASP.NET AJAX Insecure Direct Object Reference Vulnerability | kev | `cve-2017-11357` | code | 1.0 |
+| 4738 | Red Hat JBoss Application Server Remote Code Execution Vulnerability | kev | `cve-2017-12149` | code | 1.0 |
+| 4739 | Cisco IOS and IOS XE Software DHCP Remote Code Execution Vulnerability | kev | `cve-2017-12240` | code | 1.0 |
+| 4740 | Palo Alto Networks PAN-OS Remote Code Execution Vulnerability | kev | `cve-2017-15944` | code | 1.0 |
+| 4741 | Kaseya VSA SQL Injection Vulnerability | kev | `cve-2017-18362` | code | 1.0 |
+| 4742 | Adobe ColdFusion Deserialization Vulnerability | kev | `cve-2017-3066` | code | 1.0 |
+| 4743 | Cisco IOS and IOS XE Remote Code Execution Vulnerability | kev | `cve-2017-3881` | code | 1.0 |
+| 4744 | Apache Struts Remote Code Execution Vulnerability | kev | `cve-2017-5638` | code | 1.0 |
+| 4745 | Intel Active Management Technology (AMT), Small Business Technology (SBT), and Standard Manageability Privilege Escalation Vulnerability | kev | `cve-2017-5689` | code | 1.0 |
+| 4746 | NETGEAR DGN2200 Remote Code Execution Vulnerability | kev | `cve-2017-6077` | code | 1.0 |
+| 4747 | Citrix Multiple Products Remote Code Execution Vulnerability | kev | `cve-2017-6316` | code | 1.0 |
+| 4748 | NETGEAR Multiple Devices Buffer Overflow Vulnerability | kev | `cve-2017-6862` | code | 1.0 |
+| 4749 | Microsoft Windows Server Buffer Overflow Vulnerability | kev | `cve-2017-7269` | code | 1.0 |
+| 4750 | Samba Remote Code Execution Vulnerability | kev | `cve-2017-7494` | code | 1.0 |
+| 4751 | Hikvision Multiple Products Improper Authentication Vulnerability | kev | `cve-2017-7921` | code | 1.0 |
+| 4752 | Microsoft Windows Search Remote Code Execution Vulnerability | kev | `cve-2017-8543` | code | 1.0 |
+| 4753 | Progress Telerik UI for ASP.NET AJAX and Sitefinity Cryptographic Weakness Vulnerability | kev | `cve-2017-9248` | code | 1.0 |
+| 4754 | Apache Struts 1 Improper Input Validation Vulnerability | kev | `cve-2017-9791` | code | 1.0 |
+| 4755 | PHPUnit Command Injection Vulnerability | kev | `cve-2017-9841` | code | 1.0 |
+| 4756 | Cisco VPN Routers Remote Code Execution Vulnerability | kev | `cve-2018-0125` | code | 1.0 |
+| 4757 | Cisco Secure Access Control System Java Deserialization Vulnerability | kev | `cve-2018-0147` | code | 1.0 |
+| 4758 | Cisco IOS Software and Cisco IOS XE Software Quality of Service Remote Code Execution Vulnerability | kev | `cve-2018-0151` | code | 1.0 |
+| 4759 | Cisco IOS and IOS XE Software Smart Install Remote Code Execution Vulnerability | kev | `cve-2018-0171` | code | 1.0 |
+| 4760 | Jenkins Stapler Web Framework Deserialization of Untrusted Data Vulnerability | kev | `cve-2018-1000861` | code | 1.0 |
+| 4761 | Dasan GPON Routers Authentication Bypass Vulnerability | kev | `cve-2018-10561` | code | 1.0 |
+| 4762 | Dasan GPON Routers Command Injection Vulnerability | kev | `cve-2018-10562` | code | 1.0 |
+| 4763 | Quest KACE System Management Appliance Remote Command Execution Vulnerability | kev | `cve-2018-11138` | code | 1.0 |
+| 4764 | VMware Tanzu Spring Data Commons Property Binder Vulnerability | kev | `cve-2018-1273` | code | 1.0 |
+| 4765 | Tenda AC7, AC9, and AC10 Routers Command Injection Vulnerability | kev | `cve-2018-14558` | code | 1.0 |
+| 4766 | Red Hat JBoss RichFaces Framework Expression Language Injection Vulnerability | kev | `cve-2018-14667` | code | 1.0 |
+| 4767 | NUUO NVRmini Devices OS Command Injection Vulnerability | kev | `cve-2018-14933` | code | 1.0 |
+| 4768 | Adobe ColdFusion Unrestricted File Upload Vulnerability | kev | `cve-2018-15961` | code | 1.0 |
+| 4769 | GIGABYTE Multiple Products Privilege Escalation Vulnerability | kev | `cve-2018-19323` | code | 1.0 |
+| 4770 | Paessler PRTG Network Monitor Local File Inclusion Vulnerability | kev | `cve-2018-19410` | code | 1.0 |
+| 4771 | ThinkPHP "noneCms" Remote Code Execution Vulnerability | kev | `cve-2018-20062` | code | 1.0 |
+| 4772 | Kaseya VSA Remote Code Execution Vulnerability | kev | `cve-2018-20753` | code | 1.0 |
+| 4773 | Oracle WebLogic Server Unspecified Vulnerability | kev | `cve-2018-2628` | code | 1.0 |
+| 4774 | Adobe ColdFusion Deserialization of Untrusted Data Vulnerability | kev | `cve-2018-4939` | code | 1.0 |
+| 4775 | D-Link Multiple Routers OS Command Injection Vulnerability | kev | `cve-2018-6530` | code | 1.0 |
+| 4776 | Exim Buffer Overflow Vulnerability | kev | `cve-2018-6789` | code | 1.0 |
+| 4777 | MikroTik RouterOS Stack-Based Buffer Overflow Vulnerability | kev | `cve-2018-7445` | code | 1.0 |
+| 4778 | Drupal Core Remote Code Execution Vulnerability | kev | `cve-2018-7600` | code | 1.0 |
+| 4779 | Drupal Core Remote Code Execution Vulnerability | kev | `cve-2018-7602` | code | 1.0 |
+| 4780 | Oracle Fusion Middleware Unspecified Vulnerability | kev | `cve-2012-3152` | code | 1.0 |
+| 4781 | Arcserve Unified Data Protection (UDP) Directory Traversal Vulnerability | kev | `cve-2015-4068` | code | 1.0 |
+| 4782 | MikroTik Router OS Directory Traversal Vulnerability | kev | `cve-2018-14847` | code | 1.0 |
+| 4783 | Microsoft Windows Privilege Escalation Vulnerability | kev | `cve-2002-0367` | code | 1.0 |
+| 4784 | Microsoft Windows Privilege Escalation Vulnerability | kev | `cve-2004-0210` | code | 1.0 |
+| 4785 | Cisco IOS Denial-of-Service Vulnerability | kev | `cve-2004-1464` | code | 1.0 |
+| 4786 | Apache Struts 1 ActionForm Denial-of-Service Vulnerability | kev | `cve-2006-1547` | code | 1.0 |
+| 4787 | Microsoft Word Malformed Object Pointer Vulnerability | kev | `cve-2006-2492` | code | 1.0 |
+| 4788 | Microsoft Office Excel Remote Code Execution Vulnerability | kev | `cve-2007-0671` | code | 1.0 |
+| 4789 | Adobe Acrobat and Reader Buffer Overflow Vulnerability | kev | `cve-2007-5659` | code | 1.0 |
+| 4790 | Microsoft Windows Video ActiveX Control Remote Code Execution Vulnerability | kev | `cve-2008-0015` | code | 1.0 |
+| 4791 | Adobe Acrobat and Reader Unspecified Vulnerability | kev | `cve-2008-0655` | code | 1.0 |
+| 4792 | Adobe Reader and Acrobat Input Validation Vulnerability | kev | `cve-2008-2992` | code | 1.0 |
+| 4793 | Oracle VirtualBox Insufficient Input Validation Vulnerability | kev | `cve-2008-3431` | code | 1.0 |
+| 4794 | Cisco IOS Cross-Site Request Forgery Vulnerability | kev | `cve-2008-4128` | code | 1.0 |
+| 4795 | Microsoft Windows Buffer Overflow Vulnerability | kev | `cve-2008-4250` | code | 1.0 |
+| 4796 | Microsoft Office Remote Code Execution | kev | `cve-2009-0238` | code | 1.0 |
+| 4797 | Microsoft Office PowerPoint Code Injection Vulnerability | kev | `cve-2009-0556` | code | 1.0 |
+| 4798 | Microsoft Office Object Record Corruption Vulnerability | kev | `cve-2009-0557` | code | 1.0 |
+| 4799 | Microsoft Office Buffer Overflow Vulnerability | kev | `cve-2009-0563` | code | 1.0 |
+| 4800 | Adobe Reader and Adobe Acrobat Stack-Based Buffer Overflow Vulnerability | kev | `cve-2009-0927` | code | 1.0 |
+| 4801 | Microsoft Windows Improper Input Validation Vulnerability | kev | `cve-2009-1123` | code | 1.0 |
+| 4802 | Microsoft DirectX NULL Byte Overwrite Vulnerability | kev | `cve-2009-1537` | code | 1.0 |
+| 4803 | Adobe Acrobat and Reader, Flash Player Unspecified Vulnerability | kev | `cve-2009-1862` | code | 1.0 |
+| 4804 | Cisco IOS XR Border Gateway Protocol (BGP) Denial-of-Service Vulnerability | kev | `cve-2009-2055` | code | 1.0 |
+| 4805 | Microsoft Excel Featheader Record Memory Corruption Vulnerability | kev | `cve-2009-3129` | code | 1.0 |
+| 4806 | Adobe Acrobat and Reader Heap-Based Buffer Overflow Vulnerability | kev | `cve-2009-3459` | code | 1.0 |
+| 4807 | Adobe Acrobat and Reader Universal 3D Remote Code Execution Vulnerability | kev | `cve-2009-3953` | code | 1.0 |
+| 4808 | Adobe BlazeDS Information Disclosure Vulnerability | kev | `cve-2009-3960` | code | 1.0 |
+| 4809 | Adobe Acrobat and Reader Use-After-Free Vulnerability | kev | `cve-2009-4324` | code | 1.0 |
+| 4810 | Adobe Reader and Acrobat Arbitrary Code Execution Vulnerability | kev | `cve-2010-0188` | code | 1.0 |
+| 4811 | Microsoft Windows Kernel Exception Handler Vulnerability | kev | `cve-2010-0232` | code | 1.0 |
+| 4812 | Microsoft Internet Explorer Use-After-Free Vulnerability | kev | `cve-2010-0249` | code | 1.0 |
+| 4813 | Red Hat JBoss Authentication Bypass Vulnerability | kev | `cve-2010-0738` | code | 1.0 |
+| 4814 | Microsoft Internet Explorer Use-After-Free Vulnerability | kev | `cve-2010-0806` | code | 1.0 |
+| 4815 | Adobe Flash Player Memory Corruption Vulnerability | kev | `cve-2010-1297` | code | 1.0 |
+| 4816 | Red Hat JBoss Information Disclosure Vulnerability | kev | `cve-2010-1428` | code | 1.0 |
+| 4817 | Red Hat Linux JBoss Seam 2 Remote Code Execution Vulnerability | kev | `cve-2010-1871` | code | 1.0 |
+| 4818 | Microsoft Windows Remote Code Execution Vulnerability | kev | `cve-2010-2568` | code | 1.0 |
+| 4819 | Microsoft PowerPoint Buffer Overflow Vulnerability | kev | `cve-2010-2572` | code | 1.0 |
+| 4820 | Adobe Acrobat and Reader Stack-Based Buffer Overflow Vulnerability | kev | `cve-2010-2883` | code | 1.0 |
+| 4821 | Cisco IOS XR Border Gateway Protocol (BGP) Denial-of-Service Vulnerability | kev | `cve-2010-3035` | code | 1.0 |
+| 4822 | Microsoft Office Stack-based Buffer Overflow Vulnerability | kev | `cve-2010-3333` | code | 1.0 |
+| 4823 | Mozilla Multiple Products Remote Code Execution Vulnerability | kev | `cve-2010-3765` | code | 1.0 |
+| 4824 | Linux Kernel Improper Input Validation Vulnerability | kev | `cve-2010-3904` | code | 1.0 |
+| 4825 | Microsoft Internet Explorer Uninitialized Memory Corruption Vulnerability | kev | `cve-2010-3962` | code | 1.0 |
+| 4826 | Exim Privilege Escalation Vulnerability | kev | `cve-2010-4345` | code | 1.0 |
+| 4827 | Microsoft Windows Kernel Stack-Based Buffer Overflow Vulnerability | kev | `cve-2010-4398` | code | 1.0 |
+| 4828 | Ubiquiti AirOS Command Injection Vulnerability | kev | `cve-2010-5330` | code | 1.0 |
+| 4829 | Adobe Flash Player Unspecified Vulnerability | kev | `cve-2011-0609` | code | 1.0 |
+| 4830 | Adobe Flash Player Remote Code Execution Vulnerability | kev | `cve-2011-0611` | code | 1.0 |
+| 4831 | Android OS Privilege Escalation Vulnerability | kev | `cve-2011-1823` | code | 1.0 |
+| 4832 | Microsoft Ancillary Function Driver (afd.sys) Improper Input Validation Vulnerability | kev | `cve-2011-2005` | code | 1.0 |
+| 4833 | Microsoft Windows Remote Code Execution Vulnerability | kev | `cve-2011-3402` | code | 1.0 |
+| 4834 | D-Link DIR-300 Router Cleartext Storage of a Password Vulnerability | kev | `cve-2011-4723` | code | 1.0 |
+| 4835 | Microsoft Windows Authenticode Signature Verification Remote Code Execution Vulnerability | kev | `cve-2012-0151` | code | 1.0 |
+| 4836 | Microsoft MSCOMCTL.OCX Remote Code Execution Vulnerability | kev | `cve-2012-0158` | code | 1.0 |
+| 4837 | Oracle Java SE Runtime Environment (JRE) Arbitrary Code Execution Vulnerability | kev | `cve-2012-0507` | code | 1.0 |
+| 4838 | Oracle Fusion Middleware Unspecified Vulnerability | kev | `cve-2012-0518` | code | 1.0 |
+| 4839 | Adobe Flash Player Memory Corruption Vulnerability | kev | `cve-2012-0754` | code | 1.0 |
+| 4840 | Adobe Flash Player Cross-Site Scripting (XSS) Vulnerability | kev | `cve-2012-0767` | code | 1.0 |
+| 4841 | Adobe Flash Player Arbitrary Code Execution Vulnerability | kev | `cve-2012-1535` | code | 1.0 |
+| 4842 | Oracle Java SE Runtime Environment (JRE) Arbitrary Code Execution Vulnerability | kev | `cve-2012-1723` | code | 1.0 |
+| 4843 | PHP-CGI Query String Parameter Vulnerability | kev | `cve-2012-1823` | code | 1.0 |
+| 4844 | Microsoft Visual Basic for Applications Insecure Library Loading Vulnerability | kev | `cve-2012-1854` | code | 1.0 |
+| 4845 | Microsoft Office MSCOMCTL.OCX Remote Code Execution Vulnerability | kev | `cve-2012-1856` | code | 1.0 |
+| 4846 | Microsoft XML Core Services Memory Corruption Vulnerability | kev | `cve-2012-1889` | code | 1.0 |
+| 4847 | Adobe Flash Player Memory Corruption Vulnerability | kev | `cve-2012-2034` | code | 1.0 |
+| 4848 | Microsoft Word Remote Code Execution Vulnerability | kev | `cve-2012-2539` | code | 1.0 |
+| 4849 | Microsoft Internet Explorer Use-After-Free Vulnerability | kev | `cve-2012-4792` | code | 1.0 |
+| 4850 | Microsoft Internet Explorer Use-After-Free Vulnerability | kev | `cve-2012-4969` | code | 1.0 |
+| 4851 | Adobe Flash Player Integer Overflow Vulnerability | kev | `cve-2012-5054` | code | 1.0 |
+| 4852 | Oracle Java SE Sandbox Bypass Vulnerability | kev | `cve-2012-5076` | code | 1.0 |
+| 4853 | Microsoft Silverlight Double Dereference Vulnerability | kev | `cve-2013-0074` | code | 1.0 |
+| 4854 | Oracle JRE Remote Code Execution Vulnerability | kev | `cve-2013-0422` | code | 1.0 |
+| 4855 | Oracle JRE Sandbox Bypass Vulnerability | kev | `cve-2013-0431` | code | 1.0 |
+| 4856 | Adobe ColdFusion Directory Traversal Vulnerability | kev | `cve-2013-0629` | code | 1.0 |
+| 4857 | Adobe ColdFusion Information Disclosure Vulnerability | kev | `cve-2013-0631` | code | 1.0 |
+| 4858 | Adobe Reader and Acrobat Memory Corruption Vulnerability | kev | `cve-2013-0640` | code | 1.0 |
+| 4859 | Adobe Reader Buffer Overflow Vulnerability | kev | `cve-2013-0641` | code | 1.0 |
+| 4860 | Adobe Flash Player Incorrect Default Permissions Vulnerability | kev | `cve-2013-0643` | code | 1.0 |
+| 4861 | Adobe Flash Player Code Execution Vulnerability | kev | `cve-2013-0648` | code | 1.0 |
+| 4862 | Microsoft Office Buffer Overflow Vulnerability | kev | `cve-2013-1331` | code | 1.0 |
+| 4863 | Microsoft Internet Explorer Remote Code Execution Vulnerability | kev | `cve-2013-1347` | code | 1.0 |
+| 4864 | Mozilla Firefox Information Disclosure Vulnerability | kev | `cve-2013-1675` | code | 1.0 |
+| 4865 | Mozilla Firefox and Thunderbird Denial-of-Service Vulnerability | kev | `cve-2013-1690` | code | 1.0 |
+| 4866 | Linux Kernel Privilege Escalation Vulnerability | kev | `cve-2013-2094` | code | 1.0 |
+| 4867 | Oracle JRE Unspecified Vulnerability | kev | `cve-2013-2423` | code | 1.0 |
+| 4868 | Oracle Java SE Unspecified Vulnerability | kev | `cve-2013-2465` | code | 1.0 |
+| 4869 | Microsoft Internet Explorer Use-After-Free Vulnerability | kev | `cve-2013-2551` | code | 1.0 |
+| 4870 | Linux Kernel Integer Overflow Vulnerability | kev | `cve-2013-2596` | code | 1.0 |
+| 4871 | Code Aurora ACDB Audio Driver Stack-based Buffer Overflow Vulnerability | kev | `cve-2013-2597` | code | 1.0 |
+| 4872 | Microsoft Internet Explorer Memory Corruption Vulnerability | kev | `cve-2013-3163` | code | 1.0 |
+| 4873 | Microsoft Win32k Privilege Escalation Vulnerability | kev | `cve-2013-3660` | code | 1.0 |
+| 4874 | Microsoft Internet Explorer Resource Management Errors Vulnerability | kev | `cve-2013-3893` | code | 1.0 |
+| 4875 | Microsoft Silverlight Information Disclosure Vulnerability | kev | `cve-2013-3896` | code | 1.0 |
+| 4876 | Microsoft Internet Explorer Use-After-Free Vulnerability | kev | `cve-2013-3897` | code | 1.0 |
+| 4877 | Microsoft WinVerifyTrust function Remote Code Execution | kev | `cve-2013-3900` | code | 1.0 |
+| 4878 | Microsoft Graphics Component Memory Corruption Vulnerability | kev | `cve-2013-3906` | code | 1.0 |
+| 4879 | Microsoft Windows Out-of-Bounds Write Vulnerability | kev | `cve-2013-3918` | code | 1.0 |
+| 4880 | IBM InfoSphere BigInsights Invalid Input Vulnerability | kev | `cve-2013-3993` | code | 1.0 |
+| 4881 | Microsoft Windows Kernel Privilege Escalation Vulnerability | kev | `cve-2013-5065` | code | 1.0 |
+| 4882 | D-Link DSL-2760U Gateway Cross-Site Scripting Vulnerability | kev | `cve-2013-5223` | code | 1.0 |
+| 4883 | Linux Kernel Improper Input Validation Vulnerability | kev | `cve-2013-6282` | code | 1.0 |
+| 4884 | Microsoft Internet Explorer Information Disclosure Vulnerability | kev | `cve-2013-7331` | code | 1.0 |
+| 4885 | Ruby on Rails Directory Traversal Vulnerability | kev | `cve-2014-0130` | code | 1.0 |
+| 4886 | OpenSSL Information Disclosure Vulnerability | kev | `cve-2014-0160` | code | 1.0 |
+| 4887 | Linux Kernel Race Condition Vulnerability | kev | `cve-2014-0196` | code | 1.0 |
+| 4888 | Microsoft Internet Explorer Use-After-Free Vulnerability | kev | `cve-2014-0322` | code | 1.0 |
+| 4889 | Adobe Reader and Acrobat Use-After-Free Vulnerability | kev | `cve-2014-0496` | code | 1.0 |
+| 4890 | Adobe Flash Player Double Free Vulnerablity | kev | `cve-2014-0502` | code | 1.0 |
+| 4891 | D-Link DIR-600 Router Cross-Site Request Forgery (CSRF) Vulnerability | kev | `cve-2014-100005` | code | 1.0 |
+| 4892 | Microsoft Word Memory Corruption Vulnerability | kev | `cve-2014-1761` | code | 1.0 |
+| 4893 | Microsoft Internet Explorer Memory Corruption Vulnerability | kev | `cve-2014-1776` | code | 1.0 |
+| 4894 | Microsoft Windows Group Policy Preferences Password Privilege Escalation Vulnerability | kev | `cve-2014-1812` | code | 1.0 |
+| 4895 | Cisco Adaptive Security Appliance (ASA) Cross-Site Scripting (XSS) Vulnerability | kev | `cve-2014-2120` | code | 1.0 |
+| 4896 | Microsoft Internet Explorer Privilege Escalation Vulnerability | kev | `cve-2014-2817` | code | 1.0 |
+| 4897 | Elasticsearch Remote Code Execution Vulnerability | kev | `cve-2014-3120` | code | 1.0 |
+| 4898 | Linux Kernel Privilege Escalation Vulnerability | kev | `cve-2014-3153` | code | 1.0 |
+| 4899 | Microsoft IME Japanese Privilege Escalation Vulnerability | kev | `cve-2014-4077` | code | 1.0 |
+| 4900 | Microsoft Win32k Privilege Escalation Vulnerability | kev | `cve-2014-4113` | code | 1.0 |
+| 4901 | Microsoft Windows Object Linking & Embedding (OLE) Remote Code Execution Vulnerability | kev | `cve-2014-4114` | code | 1.0 |
+| 4902 | Microsoft Internet Explorer Privilege Escalation Vulnerability | kev | `cve-2014-4123` | code | 1.0 |
+| 4903 | Microsoft Windows Remote Code Execution Vulnerability | kev | `cve-2014-4148` | code | 1.0 |
+| 4904 | Apple OS X Heap-Based Buffer Overflow Vulnerability | kev | `cve-2014-4404` | code | 1.0 |
+| 4905 | GNU Bash OS Command Injection Vulnerability | kev | `cve-2014-6278` | code | 1.0 |
+| 4906 | Microsoft Kerberos Key Distribution Center (KDC) Privilege Escalation Vulnerability | kev | `cve-2014-6324` | code | 1.0 |
+| 4907 | Microsoft Windows Object Linking & Embedding (OLE) Automation Array Remote Code Execution Vulnerability | kev | `cve-2014-6332` | code | 1.0 |
+| 4908 | Microsoft Windows Code Injection Vulnerability | kev | `cve-2014-6352` | code | 1.0 |
+| 4909 | Adobe Flash Player Dereferenced Pointer Vulnerability | kev | `cve-2014-8439` | code | 1.0 |
+| 4910 | Adobe Flash Player Stack-Based Buffer Overflow Vulnerability | kev | `cve-2014-9163` | code | 1.0 |
+| 4911 | Microsoft Windows TS WebProxy Directory Traversal Vulnerability | kev | `cve-2015-0016` | code | 1.0 |
+| 4912 | Microsoft Internet Explorer ASLR Bypass Vulnerability | kev | `cve-2015-0071` | code | 1.0 |
+| 4913 | Adobe Flash Player ASLR Bypass Vulnerability | kev | `cve-2015-0310` | code | 1.0 |
+| 4914 | Cisco Prime Data Center Network Manager (DCNM) Directory Traversal Vulnerability | kev | `cve-2015-0666` | code | 1.0 |
+| 4915 | Apple OS X Authentication Bypass Vulnerability | kev | `cve-2015-1130` | code | 1.0 |
+| 4916 | Microsoft HTTP.sys Remote Code Execution Vulnerability | kev | `cve-2015-1635` | code | 1.0 |
+| 4917 | Microsoft Office Memory Corruption Vulnerability | kev | `cve-2015-1641` | code | 1.0 |
+| 4918 | Microsoft Office Memory Corruption Vulnerability | kev | `cve-2015-1642` | code | 1.0 |
+| 4919 | Microsoft Windows Remote Code Execution Vulnerability | kev | `cve-2015-1671` | code | 1.0 |
+| 4920 | Microsoft Win32k Privilege Escalation Vulnerability | kev | `cve-2015-1701` | code | 1.0 |
+| 4921 | Microsoft Windows Mount Manager Privilege Escalation Vulnerability | kev | `cve-2015-1769` | code | 1.0 |
+| 4922 | Microsoft Office Uninitialized Memory Use Vulnerability | kev | `cve-2015-1770` | code | 1.0 |
+| 4923 | D-Link DIR-645 Router Remote Code Execution Vulnerability | kev | `cve-2015-2051` | code | 1.0 |
+| 4924 | Intel Ethernet Diagnostics Driver for Windows Denial-of-Service Vulnerability | kev | `cve-2015-2291` | code | 1.0 |
+| 4925 | Microsoft Win32k Privilege Escalation Vulnerability | kev | `cve-2015-2360` | code | 1.0 |
+| 4926 | Microsoft ATM Font Driver Privilege Escalation Vulnerability | kev | `cve-2015-2387` | code | 1.0 |
+| 4927 | Microsoft Internet Explorer Memory Corruption Vulnerability | kev | `cve-2015-2419` | code | 1.0 |
+| 4928 | Microsoft PowerPoint Memory Corruption Vulnerability | kev | `cve-2015-2424` | code | 1.0 |
+| 4929 | Microsoft Internet Explorer Memory Corruption Vulnerability | kev | `cve-2015-2425` | code | 1.0 |
+| 4930 | Microsoft Windows Adobe Type Manager Library Remote Code Execution Vulnerability | kev | `cve-2015-2426` | code | 1.0 |
+| 4931 | Microsoft Internet Explorer Memory Corruption Vulnerability | kev | `cve-2015-2502` | code | 1.0 |
+| 4932 | Microsoft Office Malformed EPS File Vulnerability | kev | `cve-2015-2545` | code | 1.0 |
+| 4933 | Microsoft Win32k Memory Corruption Vulnerability | kev | `cve-2015-2546` | code | 1.0 |
+| 4934 | TP-Link Multiple Archer Devices Directory Traversal Vulnerability | kev | `cve-2015-3035` | code | 1.0 |
+| 4935 | Red Hat Libuser Race Condition Vulnerability | kev | `cve-2015-3246` | code | 1.0 |
+| 4936 | ProFTPD Improper Access Control Vulnerability | kev | `cve-2015-3306` | code | 1.0 |
+| 4937 | Mozilla Firefox Security Feature Bypass Vulnerability | kev | `cve-2015-4495` | code | 1.0 |
+| 4938 | Oracle Java SE Integrity Check Vulnerability | kev | `cve-2015-4902` | code | 1.0 |
+| 4939 | Red Hat Automatic Bug Reporting Tool Privilege Escalation Vulnerability | kev | `cve-2015-5287` | code | 1.0 |
+| 4940 | Jenkins User Interface (UI) Information Disclosure Vulnerability | kev | `cve-2015-5317` | code | 1.0 |
+| 4941 | ISC BIND Data Processing Errors Vulnerability | kev | `cve-2015-5477` | code | 1.0 |
+| 4942 | Microsoft Windows Kernel Privilege Escalation Vulnerability | kev | `cve-2015-6175` | code | 1.0 |
+| 4943 | Adobe Flash Player Arbitrary Code Execution Vulnerability | kev | `cve-2015-7645` | code | 1.0 |
+| 4944 | Adobe Flash Player Integer Overflow Vulnerability | kev | `cve-2015-8651` | code | 1.0 |
+| 4945 | Microsoft Silverlight Runtime Remote Code Execution Vulnerability | kev | `cve-2016-0034` | code | 1.0 |
+| 4946 | Microsoft Windows Kernel Privilege Escalation Vulnerability | kev | `cve-2016-0040` | code | 1.0 |
+| 4947 | Microsoft Windows Secondary Logon Service Privilege Escalation Vulnerability | kev | `cve-2016-0099` | code | 1.0 |
+| 4948 | Microsoft Windows CSRSS Security Feature Bypass Vulnerability | kev | `cve-2016-0151` | code | 1.0 |
+| 4949 | Microsoft Internet Explorer Information Disclosure Vulnerability | kev | `cve-2016-0162` | code | 1.0 |
+| 4950 | Microsoft Win32k Privilege Escalation Vulnerability | kev | `cve-2016-0165` | code | 1.0 |
+| 4951 | Microsoft Win32k Privilege Escalation Vulnerability | kev | `cve-2016-0167` | code | 1.0 |
+| 4952 | Microsoft Windows Media Center Remote Code Execution Vulnerability | kev | `cve-2016-0185` | code | 1.0 |
+| 4953 | Microsoft Internet Explorer Memory Corruption Vulnerability | kev | `cve-2016-0189` | code | 1.0 |
+| 4954 | Ruby on Rails Directory Traversal Vulnerability | kev | `cve-2016-0752` | code | 1.0 |
+| 4955 | Adobe Flash Player and AIR Use-After-Free Vulnerability | kev | `cve-2016-0984` | code | 1.0 |
+| 4956 | Adobe Flash Player and AIR Integer Overflow Vulnerability | kev | `cve-2016-1010` | code | 1.0 |
+| 4957 | D-Link DCS-930L Devices OS Command Injection Vulnerability | kev | `cve-2016-11021` | code | 1.0 |
+| 4958 | Google Chromium V8 Out-of-Bounds Read Vulnerability | kev | `cve-2016-1646` | code | 1.0 |
+| 4959 | D-Link DSL-2750B Devices Command Injection Vulnerability | kev | `cve-2016-20017` | code | 1.0 |
+| 4960 | SAP NetWeaver Information Disclosure Vulnerability | kev | `cve-2016-2388` | code | 1.0 |
+| 4961 | Apache Struts Command Injection Vulnerability | kev | `cve-2016-3081` | code | 1.0 |
+| 4962 | Microsoft Office OLE DLL Side Loading Vulnerability | kev | `cve-2016-3235` | code | 1.0 |
+| 4963 | Microsoft Internet Explorer Messaging API Information Disclosure Vulnerability | kev | `cve-2016-3298` | code | 1.0 |
+| 4964 | Microsoft Windows Kernel Privilege Escalation Vulnerability | kev | `cve-2016-3309` | code | 1.0 |
+| 4965 | Microsoft Internet Explorer and Edge Information Disclosure Vulnerability | kev | `cve-2016-3351` | code | 1.0 |
+| 4966 | Microsoft Windows Graphics Device Interface (GDI) Remote Code Execution Vulnerability | kev | `cve-2016-3393` | code | 1.0 |
+| 4967 | SolarWinds Virtualization Manager Privilege Escalation Vulnerability | kev | `cve-2016-3643` | code | 1.0 |
+| 4968 | ImageMagick Improper Input Validation Vulnerability | kev | `cve-2016-3714` | code | 1.0 |
+| 4969 | ImageMagick Arbitrary File Deletion Vulnerability | kev | `cve-2016-3715` | code | 1.0 |
+| 4970 | ImageMagick Server-Side Request Forgery (SSRF) Vulnerability | kev | `cve-2016-3718` | code | 1.0 |
+| 4971 | SAP NetWeaver Directory Traversal Vulnerability | kev | `cve-2016-3976` | code | 1.0 |
+| 4972 | Trihedral VTScada (formerly VTS) Denial-of-Service Vulnerability | kev | `cve-2016-4523` | code | 1.0 |
+| 4973 | Apple iOS Information Disclosure Vulnerability | kev | `cve-2016-4655` | code | 1.0 |
+| 4974 | Apple iOS Memory Corruption Vulnerability | kev | `cve-2016-4656` | code | 1.0 |
+| 4975 | Apple iOS Webkit Memory Corruption Vulnerability | kev | `cve-2016-4657` | code | 1.0 |
+| 4976 | Linux Kernel Race Condition Vulnerability | kev | `cve-2016-5195` | code | 1.0 |
+| 4977 | Google Chromium V8 Out-of-Bounds Memory Vulnerability | kev | `cve-2016-5198` | code | 1.0 |
+| 4978 | NETGEAR Multiple Routers Remote Code Execution Vulnerability | kev | `cve-2016-6277` | code | 1.0 |
+| 4979 | Cisco Adaptive Security Appliance (ASA) SNMP Buffer Overflow Vulnerability | kev | `cve-2016-6366` | code | 1.0 |
+| 4980 | Cisco Adaptive Security Appliance (ASA) CLI Remote Code Execution Vulnerability | kev | `cve-2016-6367` | code | 1.0 |
+| 4981 | Cisco IOS, IOS XR, and IOS XE IKEv1 Information Disclosure Vulnerability | kev | `cve-2016-6415` | code | 1.0 |
+| 4982 | Microsoft Office Memory Corruption Vulnerability | kev | `cve-2016-7193` | code | 1.0 |
+| 4983 | Microsoft Edge Memory Corruption Vulnerability | kev | `cve-2016-7200` | code | 1.0 |
+| 4984 | Microsoft Edge Memory Corruption Vulnerability | kev | `cve-2016-7201` | code | 1.0 |
+| 4985 | Microsoft Win32k Privilege Escalation Vulnerability | kev | `cve-2016-7255` | code | 1.0 |
+| 4986 | Microsoft Windows Open Type Font Remote Code Execution Vulnerability | kev | `cve-2016-7256` | code | 1.0 |
+| 4987 | Microsoft Office Security Feature Bypass Vulnerability | kev | `cve-2016-7262` | code | 1.0 |
+| 4988 | Adobe Flash Player Use-After-Free Vulnerability | kev | `cve-2016-7855` | code | 1.0 |
+| 4989 | Adobe Flash Player Use-After-Free Vulnerability | kev | `cve-2016-7892` | code | 1.0 |
+| 4990 | Siemens SIMATIC CP 1543-1 Improper Privilege Management Vulnerability | kev | `cve-2016-8562` | code | 1.0 |
+| 4991 | Mozilla Firefox, Firefox ESR, and Thunderbird Use-After-Free Vulnerability | kev | `cve-2016-9079` | code | 1.0 |
+| 4992 | SAP NetWeaver XML External Entity (XXE) Vulnerability | kev | `cve-2016-9563` | code | 1.0 |
+| 4993 | Microsoft Graphics Device Interface (GDI) Privilege Escalation Vulnerability | kev | `cve-2017-0001` | code | 1.0 |
+| 4994 | Microsoft Windows Graphics Device Interface (GDI) Privilege Escalation Vulnerability | kev | `cve-2017-0005` | code | 1.0 |
+| 4995 | Microsoft XML Core Services Information Disclosure Vulnerability | kev | `cve-2017-0022` | code | 1.0 |
+| 4996 | Microsoft Edge and Internet Explorer Type Confusion Vulnerability | kev | `cve-2017-0037` | code | 1.0 |
+| 4997 | Microsoft Internet Explorer Information Disclosure Vulnerability | kev | `cve-2017-0059` | code | 1.0 |
+| 4998 | Microsoft Windows Transaction Manager Privilege Escalation Vulnerability | kev | `cve-2017-0101` | code | 1.0 |
+| 4999 | Microsoft Windows Server Message Block (SMBv1) Remote Code Execution Vulnerability | kev | `cve-2017-0143` | code | 1.0 |
+| 5000 | Microsoft SMBv1 Remote Code Execution Vulnerability | kev | `cve-2017-0144` | code | 1.0 |
+| 5001 | Microsoft SMBv1 Remote Code Execution Vulnerability | kev | `cve-2017-0145` | code | 1.0 |
+| 5002 | Microsoft Windows SMB Remote Code Execution Vulnerability | kev | `cve-2017-0146` | code | 1.0 |
+| 5003 | Microsoft Windows SMBv1 Information Disclosure Vulnerability | kev | `cve-2017-0147` | code | 1.0 |
+| 5004 | Microsoft SMBv1 Server Remote Code Execution Vulnerability | kev | `cve-2017-0148` | code | 1.0 |
+| 5005 | Microsoft Internet Explorer Memory Corruption Vulnerability | kev | `cve-2017-0149` | code | 1.0 |
+| 5006 | Microsoft Office and WordPad Remote Code Execution Vulnerability | kev | `cve-2017-0199` | code | 1.0 |
+| 5007 | Microsoft Internet Explorer Privilege Escalation Vulnerability | kev | `cve-2017-0210` | code | 1.0 |
+| 5008 | Microsoft Windows Privilege Escalation Vulnerability | kev | `cve-2017-0213` | code | 1.0 |
+| 5009 | Microsoft Internet Explorer Remote Code Execution Vulnerability | kev | `cve-2017-0222` | code | 1.0 |
+| 5010 | Microsoft Office Use-After-Free Vulnerability | kev | `cve-2017-0261` | code | 1.0 |
+| 5011 | Microsoft Office Remote Code Execution Vulnerability | kev | `cve-2017-0262` | code | 1.0 |
+| 5012 | Microsoft Win32k Privilege Escalation Vulnerability | kev | `cve-2017-0263` | code | 1.0 |
+| 5013 | Linux Kernel PIE Stack Buffer Corruption Vulnerability | kev | `cve-2017-1000253` | code | 1.0 |
+| 5014 | Oracle Corporation WebLogic Server Remote Code Execution Vulnerability | kev | `cve-2017-10271` | code | 1.0 |
+| 5015 | Adobe Flash Player Type Confusion Vulnerability | kev | `cve-2017-11292` | code | 1.0 |
+| 5016 | Microsoft Office Outlook Security Feature Bypass Vulnerability | kev | `cve-2017-11774` | code | 1.0 |
+| 5017 | Microsoft Office Remote Code Execution Vulnerability | kev | `cve-2017-11826` | code | 1.0 |
+| 5018 | Microsoft Office Memory Corruption Vulnerability | kev | `cve-2017-11882` | code | 1.0 |
+| 5019 | Cisco IOS Software Network Address Translation Denial-of-Service Vulnerability | kev | `cve-2017-12231` | code | 1.0 |
+| 5020 | Cisco IOS Software for Cisco Integrated Services Routers Denial-of-Service Vulnerability | kev | `cve-2017-12232` | code | 1.0 |
+| 5021 | Cisco IOS Software Common Industrial Protocol Request Denial-of-Service Vulnerability | kev | `cve-2017-12233` | code | 1.0 |
+| 5022 | Cisco IOS Software Common Industrial Protocol Request Denial-of-Service Vulnerability | kev | `cve-2017-12234` | code | 1.0 |
+| 5023 | Cisco IOS Software for Cisco Industrial Ethernet Switches PROFINET Denial-of-Service Vulnerability | kev | `cve-2017-12235` | code | 1.0 |
+| 5024 | Cisco IOS and IOS XE Software Internet Key Exchange Denial-of-Service Vulnerability | kev | `cve-2017-12237` | code | 1.0 |
+| 5025 | Cisco Catalyst 6800 Series Switches VPLS Denial-of-Service Vulnerability | kev | `cve-2017-12238` | code | 1.0 |
+| 5026 | Cisco IOS XE Software Ethernet Virtual Private Network Border Gateway Protocol Denial-of-Service Vulnerability | kev | `cve-2017-12319` | code | 1.0 |
+| 5027 | Apache Tomcat on Windows Remote Code Execution Vulnerability | kev | `cve-2017-12615` | code | 1.0 |
+| 5028 | Apache Tomcat Remote Code Execution Vulnerability | kev | `cve-2017-12617` | code | 1.0 |
+| 5029 | SAP NetWeaver Directory Traversal Vulnerability | kev | `cve-2017-12637` | code | 1.0 |
+| 5030 | Roundcube Webmail File Disclosure Vulnerability | kev | `cve-2017-16651` | code | 1.0 |
+| 5031 | Embedthis GoAhead Remote Code Execution Vulnerability | kev | `cve-2017-17562` | code | 1.0 |
+| 5032 | Zyxel P660HN-T1A Routers Command Injection Vulnerability | kev | `cve-2017-18368` | code | 1.0 |
+| 5033 | Oracle WebLogic Server OS Command Injection Vulnerability | kev | `cve-2017-3506` | code | 1.0 |
+| 5034 | Google Chromium V8 Memory Corruption Vulnerability | kev | `cve-2017-5030` | code | 1.0 |
+| 5035 | Google Chromium V8 Type Confusion Vulnerability | kev | `cve-2017-5070` | code | 1.0 |
+| 5036 | NETGEAR Multiple Devices Exposure of Sensitive Information Vulnerability | kev | `cve-2017-5521` | code | 1.0 |
+| 5037 | Symantec Messaging Gateway Remote Code Execution Vulnerability | kev | `cve-2017-6327` | code | 1.0 |
+| 5038 | NETGEAR DGN2200 Devices OS Command Injection Vulnerability | kev | `cve-2017-6334` | code | 1.0 |
+| 5039 | Cisco IOS Software and Cisco IOS XE Software UDP Packet Processing Denial-of-Service Vulnerability | kev | `cve-2017-6627` | code | 1.0 |
+| 5040 | Cisco IOS Software and Cisco IOS XE Software Denial-of-Service Vulnerability | kev | `cve-2017-6663` | code | 1.0 |
+| 5041 | Cisco IOS and IOS XE Software SNMP Remote Code Execution Vulnerability | kev | `cve-2017-6736` | code | 1.0 |
+| 5042 | Cisco IOS and IOS XE Software SNMP Remote Code Execution Vulnerability | kev | `cve-2017-6737` | code | 1.0 |
+| 5043 | Cisco IOS and IOS XE Software SNMP Remote Code Execution Vulnerability | kev | `cve-2017-6738` | code | 1.0 |
+| 5044 | Cisco IOS and IOS XE Software SNMP Remote Code Execution Vulnerability | kev | `cve-2017-6739` | code | 1.0 |
+| 5045 | Cisco IOS and IOS XE Software SNMP Remote Code Execution Vulnerability | kev | `cve-2017-6740` | code | 1.0 |
+| 5046 | Cisco IOS and IOS XE Software SNMP Remote Code Execution Vulnerability | kev | `cve-2017-6742` | code | 1.0 |
+| 5047 | Cisco IOS and IOS XE Software SNMP Remote Code Execution Vulnerability | kev | `cve-2017-6743` | code | 1.0 |
+| 5048 | Cisco IOS Software SNMP Remote Code Execution Vulnerability | kev | `cve-2017-6744` | code | 1.0 |
+| 5049 | Zyxel EMG2926 Routers Command Injection Vulnerability | kev | `cve-2017-6884` | code | 1.0 |
+| 5050 | Artifex Ghostscript Type Confusion Vulnerability | kev | `cve-2017-8291` | code | 1.0 |
+| 5051 | Microsoft Windows Shell (.lnk) Remote Code Execution Vulnerability | kev | `cve-2017-8464` | code | 1.0 |
+| 5052 | Microsoft Malware Protection Engine Improper Restriction of Operations Vulnerability | kev | `cve-2017-8540` | code | 1.0 |
+| 5053 | Microsoft Office Remote Code Execution Vulnerability | kev | `cve-2017-8570` | code | 1.0 |
+| 5054 | Microsoft .NET Framework Remote Code Execution Vulnerability | kev | `cve-2017-8759` | code | 1.0 |
+| 5055 | Apache Struts Deserialization of Untrusted Data Vulnerability | kev | `cve-2017-9805` | code | 1.0 |
+| 5056 | DotNetNuke (DNN) Remote Code Execution Vulnerability | kev | `cve-2017-9822` | code | 1.0 |
+| 5057 | Cisco IOS Software Integrated Services Module for VPN Denial-of-Service Vulnerability | kev | `cve-2018-0154` | code | 1.0 |
+| 5058 | Cisco Catalyst Bidirectional Forwarding Detection Denial-of-Service Vulnerability | kev | `cve-2018-0155` | code | 1.0 |
+| 5059 | Cisco IOS Software and Cisco IOS XE Software Smart Install Denial-of-Service Vulnerability | kev | `cve-2018-0156` | code | 1.0 |
+| 5060 | Cisco IOS and XE Software Internet Key Exchange Memory Leak Vulnerability | kev | `cve-2018-0158` | code | 1.0 |
+| 5061 | Cisco IOS and XE Software Internet Key Exchange Version 1 Denial-of-Service Vulnerability | kev | `cve-2018-0159` | code | 1.0 |
+| 5062 | Cisco IOS Software Resource Management Errors Vulnerability | kev | `cve-2018-0161` | code | 1.0 |
+| 5063 | Cisco IOS, XR, and XE Software Buffer Overflow Vulnerability | kev | `cve-2018-0167` | code | 1.0 |
+| 5064 | Cisco IOS and IOS XE Software Improper Input Validation Vulnerability | kev | `cve-2018-0172` | code | 1.0 |
+| 5065 | Cisco IOS and IOS XE Software Improper Input Validation Vulnerability | kev | `cve-2018-0173` | code | 1.0 |
+| 5066 | Cisco IOS Software and Cisco IOS XE Software Improper Input Validation Vulnerability | kev | `cve-2018-0174` | code | 1.0 |
+| 5067 | Cisco IOS, XR, and XE Software Buffer Overflow Vulnerability | kev | `cve-2018-0175` | code | 1.0 |
+| 5068 | Cisco IOS Software Denial-of-Service Vulnerability | kev | `cve-2018-0179` | code | 1.0 |
+| 5069 | Cisco IOS Software Denial-of-Service Vulnerability | kev | `cve-2018-0180` | code | 1.0 |
+| 5070 | Cisco Adaptive Security Appliance (ASA) Denial-of-Service Vulnerability | kev | `cve-2018-0296` | code | 1.0 |
+| 5071 | Microsoft Office Memory Corruption Vulnerability | kev | `cve-2018-0798` | code | 1.0 |
+| 5072 | Microsoft Office Memory Corruption Vulnerability | kev | `cve-2018-0802` | code | 1.0 |
+| 5073 | Microsoft COM for Windows Deserialization of Untrusted Data Vulnerability | kev | `cve-2018-0824` | code | 1.0 |
+| 5074 | Apache Struts Remote Code Execution Vulnerability | kev | `cve-2018-11776` | code | 1.0 |
+| 5075 | Fortinet FortiOS and FortiADC Improper Access Control Vulnerability | kev | `cve-2018-13374` | code | 1.0 |
+| 5076 | Fortinet FortiOS SSL VPN Path Traversal Vulnerability | kev | `cve-2018-13379` | code | 1.0 |
+| 5077 | Fortinet FortiOS and FortiProxy Improper Authorization | kev | `cve-2018-13382` | code | 1.0 |
+| 5078 | Fortinet FortiOS and FortiProxy Out-of-bounds Write | kev | `cve-2018-13383` | code | 1.0 |
+| 5079 | Linux Kernel Integer Overflow Vulnerability | kev | `cve-2018-14634` | code | 1.0 |
+| 5080 | LG N1A1 NAS Remote Command Execution Vulnerability | kev | `cve-2018-14839` | code | 1.0 |
+| 5081 | Laravel Deserialization of Untrusted Data Vulnerability | kev | `cve-2018-15133` | code | 1.0 |
+| 5082 | DotNetNuke (DNN) Inadequate Encryption Strength Vulnerability | kev | `cve-2018-15811` | code | 1.0 |
+| 5083 | Adobe Flash Player Use-After-Free Vulnerability | kev | `cve-2018-15982` | code | 1.0 |
+| 5084 | Google Chromium V8 Remote Code Execution Vulnerability | kev | `cve-2018-17463` | code | 1.0 |
+| 5085 | Google Chromium V8 Out-of-Bounds Write Vulnerability | kev | `cve-2018-17480` | code | 1.0 |
+| 5086 | DotNetNuke (DNN) Inadequate Encryption Strength Vulnerability | kev | `cve-2018-18325` | code | 1.0 |
+| 5087 | TIBCO JasperReports Library Directory Traversal Vulnerability | kev | `cve-2018-18809` | code | 1.0 |
+| 5088 | GIGABYTE Multiple Products Unspecified Vulnerability | kev | `cve-2018-19320` | code | 1.0 |
+| 5089 | GIGABYTE Multiple Products Privilege Escalation Vulnerability | kev | `cve-2018-19321` | code | 1.0 |
+| 5090 | GIGABYTE Multiple Products Code Execution Vulnerability | kev | `cve-2018-19322` | code | 1.0 |
+| 5091 | QNAP NAS File Station Cross-Site Scripting Vulnerability | kev | `cve-2018-19943` | code | 1.0 |
+| 5092 | QNAP NAS File Station Command Injection Vulnerability | kev | `cve-2018-19949` | code | 1.0 |
+| 5093 | QNAP NAS File Station Cross-Site Scripting Vulnerability | kev | `cve-2018-19953` | code | 1.0 |
+| 5094 | WinRAR Absolute Path Traversal Vulnerability | kev | `cve-2018-20250` | code | 1.0 |
+| 5095 | SAP Customer Relationship Management (CRM) Path Traversal Vulnerability | kev | `cve-2018-2380` | code | 1.0 |
+| 5096 | Sierra Wireless AirLink ALEOS Unrestricted Upload of File with Dangerous Type Vulnerability | kev | `cve-2018-4063` | code | 1.0 |
+| 5097 | Apple Multiple Products Memory Corruption Vulnerability | kev | `cve-2018-4344` | code | 1.0 |
+| 5098 | Adobe Flash Player Use-After-Free Vulnerability | kev | `cve-2018-4878` | code | 1.0 |
+| 5099 | Adobe Acrobat and Reader Double Free Vulnerability | kev | `cve-2018-4990` | code | 1.0 |
+| 5100 | Adobe Flash Player Stack-based Buffer Overflow Vulnerability | kev | `cve-2018-5002` | code | 1.0 |
+| 5101 | TIBCO JasperReports Server Information Disclosure Vulnerability | kev | `cve-2018-5430` | code | 1.0 |
+| 5102 | Google Chromium V8 Integer Overflow Vulnerability | kev | `cve-2018-6065` | code | 1.0 |
+| 5103 | Synacor Zimbra Collaboration Suite (ZCS) Cross-Site Scripting (XSS) Vulnerability | kev | `cve-2018-6882` | code | 1.0 |
+| 5104 | VMware SD-WAN Edge by VeloCloud Command Injection Vulnerability | kev | `cve-2018-6961` | code | 1.0 |
+| 5105 | Schneider Electric U.motion Builder SQL Injection Vulnerability | kev | `cve-2018-7841` | code | 1.0 |
+| 5106 | Microsoft Win32k Privilege Escalation Vulnerability | kev | `cve-2018-8120` | code | 1.0 |
+| 5107 | Microsoft Windows VBScript Engine Out-of-Bounds Write Vulnerability | kev | `cve-2018-8174` | code | 1.0 |
+| 5108 | ChakraCore Scripting Engine Type Confusion Vulnerability | kev | `cve-2018-8298` | code | 1.0 |
+| 5109 | Microsoft Scripting Engine Memory Corruption Vulnerability | kev | `cve-2018-8373` | code | 1.0 |
+| 5110 | Microsoft DirectX Graphics Kernel Privilege Escalation Vulnerability | kev | `cve-2018-8405` | code | 1.0 |
+| 5111 | Microsoft DirectX Graphics Kernel Privilege Escalation Vulnerability | kev | `cve-2018-8406` | code | 1.0 |
+| 5112 | Microsoft Windows Shell Remote Code Execution Vulnerability | kev | `cve-2018-8414` | code | 1.0 |
+| 5113 | Microsoft Windows Privilege Escalation Vulnerability | kev | `cve-2018-8440` | code | 1.0 |
+| 5114 | Microsoft Win32k Privilege Escalation Vulnerability | kev | `cve-2018-8453` | code | 1.0 |
+| 5115 | Microsoft Exchange Server Privilege Escalation Vulnerability | kev | `cve-2018-8581` | code | 1.0 |
+| 5116 | Microsoft Win32k Privilege Escalation Vulnerability | kev | `cve-2018-8589` | code | 1.0 |
+| 5117 | Microsoft Windows Kernel Privilege Escalation Vulnerability | kev | `cve-2018-8611` | code | 1.0 |
+| 5118 | Microsoft Windows Win32k Improper Resource Shutdown or Release Vulnerability | kev | `cve-2018-8639` | code | 1.0 |
+| 5119 | Microsoft Internet Explorer Scripting Engine Memory Corruption Vulnerability | kev | `cve-2018-8653` | code | 1.0 |
+| 5120 | Paessler PRTG Network Monitor OS Command Injection Vulnerability | kev | `cve-2018-9276` | code | 1.0 |
+| 5121 | Apache Solr DataImportHandler Code Injection Vulnerability | kev | `cve-2019-0193` | code | 1.0 |
+| 5122 | Apache HTTP Server Privilege Escalation Vulnerability | kev | `cve-2019-0211` | code | 1.0 |
+| 5123 | SAP Commerce Cloud Deserialization of Untrusted Data Vulnerability | kev | `cve-2019-0344` | code | 1.0 |
+| 5124 | Microsoft MSHTML Remote Code Execution Vulnerability | kev | `cve-2019-0541` | code | 1.0 |
+| 5125 | Microsoft Windows Privilege Escalation Vulnerability | kev | `cve-2019-0543` | code | 1.0 |
+| 5126 | Microsoft SharePoint Remote Code Execution Vulnerability | kev | `cve-2019-0604` | code | 1.0 |
+| 5127 | Microsoft Internet Explorer Information Disclosure Vulnerability | kev | `cve-2019-0676` | code | 1.0 |
+| 5128 | Microsoft Windows SMB Information Disclosure Vulnerability | kev | `cve-2019-0703` | code | 1.0 |
+| 5129 | Microsoft Remote Desktop Services Remote Code Execution Vulnerability | kev | `cve-2019-0708` | code | 1.0 |
+| 5130 | Microsoft Internet Explorer Type Confusion Vulnerability | kev | `cve-2019-0752` | code | 1.0 |
+| 5131 | Microsoft Win32k Privilege Escalation Vulnerability | kev | `cve-2019-0797` | code | 1.0 |
+| 5132 | Microsoft Win32k Privilege Escalation Vulnerability | kev | `cve-2019-0803` | code | 1.0 |
+| 5133 | Microsoft Win32k Privilege Escalation Vulnerability | kev | `cve-2019-0808` | code | 1.0 |
+| 5134 | Microsoft Windows AppX Deployment Service (AppXSVC) Privilege Escalation Vulnerability | kev | `cve-2019-0841` | code | 1.0 |
+| 5135 | Microsoft Win32k Privilege Escalation Vulnerability | kev | `cve-2019-0859` | code | 1.0 |
+| 5136 | Microsoft Windows Error Reporting (WER) Privilege Escalation Vulnerability | kev | `cve-2019-0863` | code | 1.0 |
+| 5137 | Microsoft Windows Privilege Escalation Vulnerability | kev | `cve-2019-0880` | code | 1.0 |
+| 5138 | Microsoft GDI Remote Code Execution Vulnerability | kev | `cve-2019-0903` | code | 1.0 |
+| 5139 | Jenkins Script Security Plugin Sandbox Bypass Vulnerability | kev | `cve-2019-1003029` | code | 1.0 |
+| 5140 | Jenkins Matrix Project Plugin Remote Code Execution Vulnerability | kev | `cve-2019-1003030` | code | 1.0 |
+| 5141 | Kentico Xperience Deserialization of Untrusted Data Vulnerability | kev | `cve-2019-10068` | code | 1.0 |
+| 5142 | Exim Mail Transfer Agent (MTA) Improper Input Validation | kev | `cve-2019-10149` | code | 1.0 |
+| 5143 | Microsoft Windows AppX Deployment Service (AppXSVC) Privilege Escalation Vulnerability | kev | `cve-2019-1064` | code | 1.0 |
+| 5144 | Microsoft SQL Server Remote Code Execution Vulnerability | kev | `cve-2019-1068` | code | 1.0 |
+| 5145 | Microsoft Task Scheduler Privilege Escalation Vulnerability | kev | `cve-2019-1069` | code | 1.0 |
+| 5146 | MongoDB mongo-express Remote Code Execution Vulnerability | kev | `cve-2019-10758` | code | 1.0 |
+| 5147 | Reolink Multiple IP Cameras OS Command Injection Vulnerability | kev | `cve-2019-11001` | code | 1.0 |
+| 5148 | PHP FastCGI Process Manager (FPM) Buffer Overflow Vulnerability | kev | `cve-2019-11043` | code | 1.0 |
+| 5149 | Microsoft Windows AppX Deployment Service (AppXSVC) Privilege Escalation Vulnerability | kev | `cve-2019-1129` | code | 1.0 |
+| 5150 | Microsoft Windows AppX Deployment Service Privilege Escalation Vulnerability | kev | `cve-2019-1130` | code | 1.0 |
+| 5151 | Microsoft Win32k Privilege Escalation Vulnerability | kev | `cve-2019-1132` | code | 1.0 |
+| 5152 | Ivanti Pulse Connect Secure Arbitrary File Read Vulnerability | kev | `cve-2019-11510` | code | 1.0 |
+| 5153 | Ivanti Pulse Connect Secure and Policy Secure Command Injection Vulnerability | kev | `cve-2019-11539` | code | 1.0 |
+| 5154 | Atlassian Crowd and Crowd Data Center Remote Code Execution Vulnerability | kev | `cve-2019-11580` | code | 1.0 |
+| 5155 | Atlassian Jira Server and Data Center Server-Side Template Injection Vulnerability | kev | `cve-2019-11581` | code | 1.0 |
+| 5156 | Citrix Workspace Application and Receiver for Windows Remote Code Execution Vulnerability | kev | `cve-2019-11634` | code | 1.0 |
+| 5157 | Mozilla Firefox and Thunderbird Type Confusion Vulnerability | kev | `cve-2019-11707` | code | 1.0 |
+| 5158 | Mozilla Firefox and Thunderbird Sandbox Escape Vulnerability | kev | `cve-2019-11708` | code | 1.0 |
+| 5159 | Microsoft Windows Privilege Common Log File System (CLFS) Escalation Vulnerability | kev | `cve-2019-1214` | code | 1.0 |
+| 5160 | Microsoft Windows Privilege Escalation Vulnerability | kev | `cve-2019-1215` | code | 1.0 |
+| 5161 | Microsoft Windows AppX Deployment Server Privilege Escalation Vulnerability | kev | `cve-2019-1253` | code | 1.0 |
+| 5162 | Microsoft Excel Remote Code Execution Vulnerability | kev | `cve-2019-1297` | code | 1.0 |
+| 5163 | Citrix SD-WAN and NetScaler SQL Injection Vulnerability | kev | `cve-2019-12989` | code | 1.0 |
+| 5164 | Citrix SD-WAN and NetScaler Command Injection Vulnerability | kev | `cve-2019-12991` | code | 1.0 |
+| 5165 | Microsoft Windows Error Reporting Manager Privilege Escalation Vulnerability | kev | `cve-2019-1315` | code | 1.0 |
+| 5166 | Microsoft Windows Privilege Escalation Vulnerability | kev | `cve-2019-1322` | code | 1.0 |
+| 5167 | Linux Kernel Improper Privilege Management Vulnerability | kev | `cve-2019-13272` | code | 1.0 |
+| 5168 | Citrix StoreFront Server XML External Entity (XXE) Processing Vulnerability | kev | `cve-2019-13608` | code | 1.0 |
+| 5169 | Microsoft Internet Explorer Scripting Engine Memory Corruption Vulnerability | kev | `cve-2019-1367` | code | 1.0 |
+| 5170 | Google Chrome WebAudio Use-After-Free Vulnerability | kev | `cve-2019-13720` | code | 1.0 |
+| 5171 | Microsoft Windows AppX Deployment Extensions Privilege Escalation Vulnerability | kev | `cve-2019-1385` | code | 1.0 |
+| 5172 | Microsoft Windows Certificate Dialog Privilege Escalation Vulnerability | kev | `cve-2019-1388` | code | 1.0 |
+| 5173 | Microsoft Windows Universal Plug and Play (UPnP) Service Privilege Escalation Vulnerability | kev | `cve-2019-1405` | code | 1.0 |
+| 5174 | Microsoft Internet Explorer Scripting Engine Memory Corruption Vulnerability | kev | `cve-2019-1429` | code | 1.0 |
+| 5175 | Microsoft Win32k Privilege Escalation Vulnerability | kev | `cve-2019-1458` | code | 1.0 |
+| 5176 | Webmin Command Injection Vulnerability | kev | `cve-2019-15107` | code | 1.0 |
+| 5177 | Cisco RV Series Routers Deserialization of Untrusted Data Vulnerability | kev | `cve-2019-15271` | code | 1.0 |
+| 5178 | Docker Desktop Community Edition Privilege Escalation Vulnerability | kev | `cve-2019-15752` | code | 1.0 |
+| 5179 | Palo Alto Networks PAN-OS Remote Code Execution Vulnerability | kev | `cve-2019-1579` | code | 1.0 |
+| 5180 | Nagios XI Remote Code Execution Vulnerability | kev | `cve-2019-15949` | code | 1.0 |
+| 5181 | D-Link DNS-320 Remote Code Execution Vulnerability | kev | `cve-2019-16057` | code | 1.0 |
+| 5182 | SIMalliance Toolbox Browser Command Injection Vulnerability | kev | `cve-2019-16256` | code | 1.0 |
+| 5183 | Nostromo nhttpd Directory Traversal Vulnerability | kev | `cve-2019-16278` | code | 1.0 |
+| 5184 | Cisco Small Business Routers Improper Input Validation Vulnerability | kev | `cve-2019-1652` | code | 1.0 |
+| 5185 | Cisco Small Business RV320 and RV325 Routers Information Disclosure Vulnerability | kev | `cve-2019-1653` | code | 1.0 |
+| 5186 | vBulletin PHP Module Remote Code Execution Vulnerability | kev | `cve-2019-16759` | code | 1.0 |
+| 5187 | D-Link Multiple Routers Command Injection Vulnerability | kev | `cve-2019-16920` | code | 1.0 |
+| 5188 | Exim Out-of-bounds Write Vulnerability | kev | `cve-2019-16928` | code | 1.0 |
+| 5189 | Mozilla Firefox And Thunderbird Type Confusion Vulnerability | kev | `cve-2019-17026` | code | 1.0 |
+| 5190 | Apache Solr VelocityResponseWriter Plug-In Remote Code Execution Vulnerability | kev | `cve-2019-17558` | code | 1.0 |
+| 5191 | D-Link DIR-859 Router Command Execution Vulnerability | kev | `cve-2019-17621` | code | 1.0 |
+| 5192 | Trend Micro OfficeScan Directory Traversal Vulnerability | kev | `cve-2019-18187` | code | 1.0 |
+| 5193 | WhatsApp Cross-Site Scripting Vulnerability | kev | `cve-2019-18426` | code | 1.0 |
+| 5194 | Progress Telerik UI for ASP.NET AJAX Deserialization of Untrusted Data Vulnerability | kev | `cve-2019-18935` | code | 1.0 |
+| 5195 | TeamViewer Desktop Bypass Remote Login Vulnerability | kev | `cve-2019-18988` | code | 1.0 |
+| 5196 | Sangoma FreePBX Improper Authentication Vulnerability | kev | `cve-2019-19006` | code | 1.0 |
+| 5197 | Netis WF2419 Devices Remote Code Execution Vulnerability | kev | `cve-2019-19356` | code | 1.0 |
+| 5198 | Citrix ADC, Gateway, and SD-WAN WANOP Appliance Code Execution Vulnerability | kev | `cve-2019-19781` | code | 1.0 |
+| 5199 | TVT NVMS-1000 Directory Traversal Vulnerability | kev | `cve-2019-20085` | code | 1.0 |
+| 5200 | D-Link DWL-2600AP Access Point Command Injection Vulnerability | kev | `cve-2019-20500` | code | 1.0 |
+| 5201 | Android Kernel Use-After-Free Vulnerability | kev | `cve-2019-2215` | code | 1.0 |
+| 5202 | Oracle BI Publisher Unauthorized Access Vulnerability | kev | `cve-2019-2616` | code | 1.0 |
+| 5203 | Oracle WebLogic Server, Injection | kev | `cve-2019-2725` | code | 1.0 |
+| 5204 | Oracle Solaris Privilege Escalation Vulnerability | kev | `cve-2019-3010` | code | 1.0 |
+| 5205 | Atlassian Confluence Server and Data Center Server-Side Template Injection Vulnerability | kev | `cve-2019-3396` | code | 1.0 |
+| 5206 | Atlassian Confluence Server and Data Center Path Traversal Vulnerability | kev | `cve-2019-3398` | code | 1.0 |
+| 5207 | WhatsApp VOIP Stack Buffer Overflow Vulnerability | kev | `cve-2019-3568` | code | 1.0 |
+| 5208 | Crestron Multiple Products Command Injection Vulnerability | kev | `cve-2019-3929` | code | 1.0 |
+| 5209 | IBM Planning Analytics Remote Code Execution Vulnerability | kev | `cve-2019-4716` | code | 1.0 |
+| 5210 | Rails Ruby on Rails Path Traversal Vulnerability | kev | `cve-2019-5418` | code | 1.0 |
+| 5211 | VMware ESXi and Horizon DaaS OpenSLP Heap-Based Buffer Overflow Vulnerability | kev | `cve-2019-5544` | code | 1.0 |
+| 5212 | Fortinet FortiOS Default Configuration Vulnerability | kev | `cve-2019-5591` | code | 1.0 |
+| 5213 | Google Chrome Blink Use-After-Free Vulnerability | kev | `cve-2019-5786` | code | 1.0 |
+| 5214 | Google Chromium V8 Out-of-Bounds Write Vulnerability | kev | `cve-2019-5825` | code | 1.0 |
+| 5215 | Apple iOS and macOS Group Facetime Vulnerability | kev | `cve-2019-6223` | code | 1.0 |
+| 5216 | Drupal Core Remote Code Execution Vulnerability | kev | `cve-2019-6340` | code | 1.0 |
+| 5217 | Fortinet FortiOS Use of Hard-Coded Credentials Vulnerability | kev | `cve-2019-6693` | code | 1.0 |
+| 5218 | QNAP Photo Station Improper Access Control Vulnerability | kev | `cve-2019-7192` | code | 1.0 |
+| 5219 | QNAP QTS Improper Input Validation Vulnerability | kev | `cve-2019-7193` | code | 1.0 |
+| 5220 | QNAP Photo Station Path Traversal Vulnerability | kev | `cve-2019-7194` | code | 1.0 |
+| 5221 | QNAP Photo Station Path Traversal Vulnerability | kev | `cve-2019-7195` | code | 1.0 |
+| 5222 | Sonatype Nexus Repository Manager Incorrect Access Control Vulnerability | kev | `cve-2019-7238` | code | 1.0 |
+| 5223 | Nice Linear eMerge E3-Series OS Command Injection Vulnerability | kev | `cve-2019-7256` | code | 1.0 |
+| 5224 | Apple Multiple Products Memory Corruption Vulnerability | kev | `cve-2019-7286` | code | 1.0 |
+| 5225 | Apple iOS Memory Corruption Vulnerability | kev | `cve-2019-7287` | code | 1.0 |
+| 5226 | SonicWall SMA100 SQL Injection Vulnerability | kev | `cve-2019-7481` | code | 1.0 |
+| 5227 | SonicWall SMA100 Directory Traversal Vulnerability | kev | `cve-2019-7483` | code | 1.0 |
+| 5228 | Kibana Arbitrary Code Execution | kev | `cve-2019-7609` | code | 1.0 |
+| 5229 | Zoho ManageEngine ServiceDesk Plus (SDP) File Upload Vulnerability | kev | `cve-2019-8394` | code | 1.0 |
+| 5230 | Apple Multiple Products Type Confusion Vulnerability | kev | `cve-2019-8506` | code | 1.0 |
+| 5231 | Apple macOS Use-After-Free Vulnerability | kev | `cve-2019-8526` | code | 1.0 |
+| 5232 | Apple Multiple Products Use-After-Free Vulnerability | kev | `cve-2019-8605` | code | 1.0 |
+| 5233 | WebKitGTK Memory Corruption Vulnerability | kev | `cve-2019-8720` | code | 1.0 |
+| 5234 | ThinkPHP Remote Code Execution Vulnerability | kev | `cve-2019-9082` | code | 1.0 |
+| 5235 | Synacor Zimbra Collaboration Suite (ZCS) Server-Side Request Forgery (SSRF) Vulnerability | kev | `cve-2019-9621` | code | 1.0 |
+| 5236 | Synacor Zimbra Collaboration Suite (ZCS) Improper Restriction of XML External Entity Reference | kev | `cve-2019-9670` | code | 1.0 |
+| 5237 | Sitecore CMS and Experience Platform (XP) Deserialization Vulnerability | kev | `cve-2019-9874` | code | 1.0 |
+| 5238 | Sitecore CMS and Experience Platform (XP) Deserialization Vulnerability | kev | `cve-2019-9875` | code | 1.0 |
+| 5239 | WordPress Social Warfare Plugin Cross-Site Scripting (XSS) Vulnerability | kev | `cve-2019-9978` | code | 1.0 |
+| 5240 | Android Kernel Out-of-Bounds Write Vulnerability | kev | `cve-2020-0041` | code | 1.0 |
+| 5241 | Mediatek Multiple Chipsets Insufficient Input Validation Vulnerability | kev | `cve-2020-0069` | code | 1.0 |
+| 5242 | Microsoft Windows CryptoAPI Spoofing Vulnerability | kev | `cve-2020-0601` | code | 1.0 |
+| 5243 | Microsoft SQL Server Reporting Services Remote Code Execution Vulnerability | kev | `cve-2020-0618` | code | 1.0 |
+| 5244 | Microsoft Update Notification Manager Privilege Escalation Vulnerability | kev | `cve-2020-0638` | code | 1.0 |
+| 5245 | Microsoft .NET Framework Remote Code Execution Vulnerability | kev | `cve-2020-0646` | code | 1.0 |
+| 5246 | Microsoft Internet Explorer Scripting Engine Memory Corruption Vulnerability | kev | `cve-2020-0674` | code | 1.0 |
+| 5247 | Microsoft Windows Installer Privilege Escalation Vulnerability | kev | `cve-2020-0683` | code | 1.0 |
+| 5248 | Microsoft Exchange Server Validation Key Remote Code Execution Vulnerability | kev | `cve-2020-0688` | code | 1.0 |
+| 5249 | Microsoft Windows Background Intelligent Transfer Service (BITS) Improper Privilege Management Vulnerability | kev | `cve-2020-0787` | code | 1.0 |
+| 5250 | Microsoft SMBv3 Remote Code Execution Vulnerability | kev | `cve-2020-0796` | code | 1.0 |
+| 5251 | Microsoft Edge and Internet Explorer Memory Corruption Vulnerability | kev | `cve-2020-0878` | code | 1.0 |
+| 5252 | Microsoft Windows Adobe Font Manager Library Remote Code Execution Vulnerability | kev | `cve-2020-0938` | code | 1.0 |
+| 5253 | Microsoft Internet Explorer Scripting Engine Memory Corruption Vulnerability | kev | `cve-2020-0968` | code | 1.0 |
+| 5254 | Microsoft Windows Kernel Privilege Escalation Vulnerability | kev | `cve-2020-0986` | code | 1.0 |
+| 5255 | SolarWinds Orion Authentication Bypass Vulnerability | kev | `cve-2020-10148` | code | 1.0 |
+| 5256 | Sumavision EMR Cross-Site Request Forgery (CSRF) Vulnerability | kev | `cve-2020-10181` | code | 1.0 |
+| 5257 | Zoho ManageEngine Desktop Central File Upload Vulnerability | kev | `cve-2020-10189` | code | 1.0 |
+| 5258 | Sonatype Nexus Repository Remote Code Execution Vulnerability | kev | `cve-2020-10199` | code | 1.0 |
+| 5259 | Microsoft Windows Adobe Font Manager Library Remote Code Execution Vulnerability | kev | `cve-2020-1020` | code | 1.0 |
+| 5260 | rConfig OS Command Injection Vulnerability | kev | `cve-2020-10221` | code | 1.0 |
+| 5261 | Microsoft Windows Kernel Privilege Escalation Vulnerability | kev | `cve-2020-1027` | code | 1.0 |
+| 5262 | Microsoft Hyper-V RemoteFX vGPU Remote Code Execution Vulnerability | kev | `cve-2020-1040` | code | 1.0 |
+| 5263 | Microsoft Win32k Privilege Escalation Vulnerability | kev | `cve-2020-1054` | code | 1.0 |
+| 5264 | Tenda AC1900 Router AC15 Model Remote Code Execution Vulnerability | kev | `cve-2020-10987` | code | 1.0 |
+| 5265 | JQuery Cross-Site Scripting (XSS) Vulnerability | kev | `cve-2020-11023` | code | 1.0 |
+| 5266 | Qualcomm Multiple Chipsets Improper Input Validation Vulnerability | kev | `cve-2020-11261` | code | 1.0 |
+| 5267 | Microsoft .NET Framework, SharePoint, and Visual Studio Remote Code Execution Vulnerability | kev | `cve-2020-1147` | code | 1.0 |
+| 5268 | SaltStack Salt Authentication Bypass Vulnerability | kev | `cve-2020-11651` | code | 1.0 |
+| 5269 | SaltStack Salt Path Traversal Vulnerability | kev | `cve-2020-11652` | code | 1.0 |
+| 5270 | WordPress Snap Creek Duplicator Plugin File Download Vulnerability | kev | `cve-2020-11738` | code | 1.0 |
+| 5271 | Treck TCP/IP stack Out-of-Bounds Read Vulnerability | kev | `cve-2020-11899` | code | 1.0 |
+| 5272 | Apache Airflow Command Injection | kev | `cve-2020-11978` | code | 1.0 |
+| 5273 | Sophos SFOS SQL Injection Vulnerability | kev | `cve-2020-12271` | code | 1.0 |
+| 5274 | Roundcube Webmail Remote Code Execution Vulnerability | kev | `cve-2020-12641` | code | 1.0 |
+| 5275 | Fortinet FortiOS SSL VPN Improper Authentication Vulnerability | kev | `cve-2020-12812` | code | 1.0 |
+| 5276 | Microsoft Windows DNS Server Remote Code Execution Vulnerability | kev | `cve-2020-1350` | code | 1.0 |
+| 5277 | Drupal core Un-restricted Upload of File | kev | `cve-2020-13671` | code | 1.0 |
+| 5278 | Microsoft Internet Explorer Scripting Engine Memory Corruption Vulnerability | kev | `cve-2020-1380` | code | 1.0 |
+| 5279 | Apache Airflow's Experimental API Authentication Bypass | kev | `cve-2020-13927` | code | 1.0 |
+| 5280 | Roundcube Webmail Cross-Site Scripting (XSS) Vulnerability | kev | `cve-2020-13965` | code | 1.0 |
+| 5281 | Microsoft Windows Spoofing Vulnerability | kev | `cve-2020-1464` | code | 1.0 |
+| 5282 | Oracle WebLogic Server Remote Code Execution Vulnerability | kev | `cve-2020-14644` | code | 1.0 |
+| 5283 | Microsoft Netlogon Privilege Escalation Vulnerability | kev | `cve-2020-1472` | code | 1.0 |
+| 5284 | Oracle WebLogic Server Remote Code Execution Vulnerability | kev | `cve-2020-14750` | code | 1.0 |
+| 5285 | Oracle Business Intelligence Enterprise Edition Path Transversal | kev | `cve-2020-14864` | code | 1.0 |
+| 5286 | Oracle Solaris and Zettabyte File System (ZFS) Unspecified Vulnerability | kev | `cve-2020-14871` | code | 1.0 |
+| 5287 | Oracle WebLogic Server Remote Code Execution Vulnerability | kev | `cve-2020-14882` | code | 1.0 |
+| 5288 | Oracle WebLogic Server Unspecified Vulnerability | kev | `cve-2020-14883` | code | 1.0 |
+| 5289 | Sophos XG Firewall Buffer Overflow Vulnerability | kev | `cve-2020-15069` | code | 1.0 |
+| 5290 | DrayTek Multiple Vigor Routers OS Command Injection Vulnerability | kev | `cve-2020-15415` | code | 1.0 |
+| 5291 | Ivanti MobileIron Multiple Products Remote Code Execution Vulnerability | kev | `cve-2020-15505` | code | 1.0 |
+| 5292 | Google Chrome FreeType Heap Buffer Overflow Vulnerability | kev | `cve-2020-15999` | code | 1.0 |
+| 5293 | Google Chromium V8 Type Confusion Vulnerability | kev | `cve-2020-16009` | code | 1.0 |
+| 5294 | Google Chrome for Android UI Heap Buffer Overflow Vulnerability | kev | `cve-2020-16010` | code | 1.0 |
+| 5295 | Google Chromium V8 Incorrect Implementation Vulnerabililty | kev | `cve-2020-16013` | code | 1.0 |
+| 5296 | Google Chrome Use-After-Free Vulnerability | kev | `cve-2020-16017` | code | 1.0 |
+| 5297 | Juniper Junos OS Path Traversal Vulnerability | kev | `cve-2020-1631` | code | 1.0 |
+| 5298 | SaltStack Salt Shell Injection Vulnerability | kev | `cve-2020-16846` | code | 1.0 |
+| 5299 | Microsoft Windows Kernel Privilege Escalation Vulnerability | kev | `cve-2020-17087` | code | 1.0 |
+| 5300 | Microsoft Exchange Server Remote Code Execution Vulnerability | kev | `cve-2020-17144` | code | 1.0 |
+| 5301 | Fuel CMS SQL Injection Vulnerability | kev | `cve-2020-17463` | code | 1.0 |
+| 5302 | vBulletin PHP Module Remote Code Execution Vulnerability | kev | `cve-2020-17496` | code | 1.0 |
+| 5303 | Apache Flink Improper Access Control Vulnerability | kev | `cve-2020-17519` | code | 1.0 |
+| 5304 | Apache Struts Remote Code Execution Vulnerability | kev | `cve-2020-17530` | code | 1.0 |
+| 5305 | Apache Tomcat Improper Privilege Management Vulnerability | kev | `cve-2020-1938` | code | 1.0 |
+| 5306 | Apache Kylin OS Command Injection Vulnerability | kev | `cve-2020-1956` | code | 1.0 |
+| 5307 | Palo Alto Networks PAN-OS Authentication Bypass Vulnerability | kev | `cve-2020-2021` | code | 1.0 |
+| 5308 | TP-link TL-WA855RE Missing Authentication for Critical Function Vulnerability | kev | `cve-2020-24363` | code | 1.0 |
+| 5309 | Trend Micro Multiple Products Improper Access Control Vulnerability | kev | `cve-2020-24557` | code | 1.0 |
+| 5310 | QNAP Helpdesk Improper Access Control Vulnerability | kev | `cve-2020-2506` | code | 1.0 |
+| 5311 | D-Link DCS-2530L and DCS-2670L Devices Unspecified Vulnerability | kev | `cve-2020-25078` | code | 1.0 |
+| 5312 | D-Link DCS-2530L and DCS-2670L Command Injection Vulnerability | kev | `cve-2020-25079` | code | 1.0 |
+| 5313 | QNAP Network-Attached Storage (NAS) Command Injection Vulnerability | kev | `cve-2020-2509` | code | 1.0 |
+| 5314 | WordPress File Manager Plugin Remote Code Execution Vulnerability | kev | `cve-2020-25213` | code | 1.0 |
+| 5315 | Sophos SG UTM Remote Code Execution Vulnerability | kev | `cve-2020-25223` | code | 1.0 |
+| 5316 | D-Link DNS-320 Device Command Injection Vulnerability | kev | `cve-2020-25506` | code | 1.0 |
+| 5317 | Oracle Fusion Middleware Unspecified Vulnerability | kev | `cve-2020-2551` | code | 1.0 |
+| 5318 | Oracle Multiple Products Remote Code Execution Vulnerability | kev | `cve-2020-2555` | code | 1.0 |
+| 5319 | Netgear JGS516PE Devices Missing Function Level Access Control Vulnerability | kev | `cve-2020-26919` | code | 1.0 |
+| 5320 | Apple Multiple Products Memory Corruption Vulnerability | kev | `cve-2020-27930` | code | 1.0 |
+| 5321 | Apple Multiple Products Type Confusion Vulnerability | kev | `cve-2020-27932` | code | 1.0 |
+| 5322 | Apple Multiple Products Memory Initialization Vulnerability | kev | `cve-2020-27950` | code | 1.0 |
+| 5323 | Oracle WebLogic Server Unspecified Vulnerability | kev | `cve-2020-2883` | code | 1.0 |
+| 5324 | PEAR Archive_Tar Deserialization of Untrusted Data Vulnerability | kev | `cve-2020-28949` | code | 1.0 |
+| 5325 | D-Link DIR-825 R1 Devices Buffer Overflow Vulnerability | kev | `cve-2020-29557` | code | 1.0 |
+| 5326 | CyberoamOS (CROS) SQL Injection Vulnerability | kev | `cve-2020-29574` | code | 1.0 |
+| 5327 | Zyxel Multiple Products Use of Hard-Coded Credentials Vulnerability | kev | `cve-2020-29583` | code | 1.0 |
+| 5328 | Cisco IOS XR Software Discovery Protocol Format String Vulnerability | kev | `cve-2020-3118` | code | 1.0 |
+| 5329 | Cisco AnyConnect Secure Mobility Client for Windows Uncontrolled Search Path Vulnerability | kev | `cve-2020-3153` | code | 1.0 |
+| 5330 | Cisco IP Phones Web Server Remote Code Execution and Denial-of-Service Vulnerability | kev | `cve-2020-3161` | code | 1.0 |
+| 5331 | Cisco ASA and FTD Information Disclosure Vulnerability | kev | `cve-2020-3259` | code | 1.0 |
+| 5332 | Cisco AnyConnect Secure Mobility Client for Windows DLL Hijacking Vulnerability | kev | `cve-2020-3433` | code | 1.0 |
+| 5333 | Cisco ASA and FTD Read-Only Path Traversal Vulnerability | kev | `cve-2020-3452` | code | 1.0 |
+| 5334 | Cisco IOS XR Software DVMRP Memory Exhaustion Vulnerability | kev | `cve-2020-3566` | code | 1.0 |
+| 5335 | Cisco IOS XR Software DVMRP Memory Exhaustion Vulnerability | kev | `cve-2020-3569` | code | 1.0 |
+| 5336 | Roundcube Webmail Cross-Site Scripting (XSS) Vulnerability | kev | `cve-2020-35730` | code | 1.0 |
+| 5337 | Cisco ASA and FTD Cross-Site Scripting (XSS) Vulnerability | kev | `cve-2020-3580` | code | 1.0 |
+| 5338 | PEAR Archive_Tar Improper Link Resolution Vulnerability | kev | `cve-2020-36193` | code | 1.0 |
+| 5339 | Apple Multiple Products Memory Corruption Vulnerability | kev | `cve-2020-3837` | code | 1.0 |
+| 5340 | VMware Multiple Products Privilege Escalation Vulnerability | kev | `cve-2020-3950` | code | 1.0 |
+| 5341 | VMware vCenter Server Information Disclosure Vulnerability | kev | `cve-2020-3952` | code | 1.0 |
+| 5342 | VMware ESXi OpenSLP Use-After-Free Vulnerability | kev | `cve-2020-3992` | code | 1.0 |
+| 5343 | Multiple VMware Products Command Injection Vulnerability | kev | `cve-2020-4006` | code | 1.0 |
+| 5344 | IBM Data Risk Manager Security Bypass Vulnerability | kev | `cve-2020-4427` | code | 1.0 |
+| 5345 | IBM Data Risk Manager Remote Code Execution Vulnerability | kev | `cve-2020-4428` | code | 1.0 |
+| 5346 | IBM Data Risk Manager Directory Traversal Vulnerability | kev | `cve-2020-4430` | code | 1.0 |
+| 5347 | SonicWall SonicOS Buffer Overflow Vulnerability | kev | `cve-2020-5135` | code | 1.0 |
+| 5348 | VMware Tanzu Spring Cloud Config Directory Traversal Vulnerability | kev | `cve-2020-5410` | code | 1.0 |
+| 5349 | Grandstream Networks UCM6200 Series SQL Injection Vulnerability | kev | `cve-2020-5722` | code | 1.0 |
+| 5350 | Amcrest Cameras and NVR Stack-based Buffer Overflow Vulnerability | kev | `cve-2020-5735` | code | 1.0 |
+| 5351 | Plex Media Server Remote Code Execution Vulnerability | kev | `cve-2020-5741` | code | 1.0 |
+| 5352 | Unraid Remote Code Execution Vulnerability | kev | `cve-2020-5847` | code | 1.0 |
+| 5353 | Unraid Authentication Bypass Vulnerability | kev | `cve-2020-5849` | code | 1.0 |
+| 5354 | F5 BIG-IP Traffic Management User Interface (TMUI) Remote Code Execution Vulnerability | kev | `cve-2020-5902` | code | 1.0 |
+| 5355 | SAP Solution Manager Missing Authentication for Critical Function Vulnerability | kev | `cve-2020-6207` | code | 1.0 |
+| 5356 | SAP NetWeaver Missing Authentication for Critical Function Vulnerability | kev | `cve-2020-6287` | code | 1.0 |
+| 5357 | Google Chromium V8 Type Confusion Vulnerability | kev | `cve-2020-6418` | code | 1.0 |
+| 5358 | Google Chrome Media Use-After-Free Vulnerability | kev | `cve-2020-6572` | code | 1.0 |
+| 5359 | Mozilla Firefox And Thunderbird Use-After-Free Vulnerability | kev | `cve-2020-6819` | code | 1.0 |
+| 5360 | Mozilla Firefox And Thunderbird Use-After-Free Vulnerability | kev | `cve-2020-6820` | code | 1.0 |
+| 5361 | OpenSMTPD Remote Code Execution Vulnerability | kev | `cve-2020-7247` | code | 1.0 |
+| 5362 | Synacor Zimbra Collaboration Suite (ZCS) Server-Side Request Forgery Vulnerability | kev | `cve-2020-7796` | code | 1.0 |
+| 5363 | Liferay Portal Deserialization of Untrusted Data Vulnerability | kev | `cve-2020-7961` | code | 1.0 |
+| 5364 | Citrix ADC, Gateway, and SD-WAN WANOP Appliance Authorization Bypass Vulnerability | kev | `cve-2020-8193` | code | 1.0 |
+| 5365 | Citrix ADC, Gateway, and SD-WAN WANOP Appliance Information Disclosure Vulnerability | kev | `cve-2020-8195` | code | 1.0 |
+| 5366 | Citrix ADC, Gateway, and SD-WAN WANOP Appliance Information Disclosure Vulnerability | kev | `cve-2020-8196` | code | 1.0 |
+| 5367 | Pulse Connect Secure Code Injection Vulnerability | kev | `cve-2020-8218` | code | 1.0 |
+| 5368 | Ivanti Pulse Connect Secure Code Execution Vulnerability | kev | `cve-2020-8243` | code | 1.0 |
+| 5369 | Ivanti Pulse Connect Secure Code Execution Vulnerability | kev | `cve-2020-8260` | code | 1.0 |
+| 5370 | Trend Micro Apex One and OfficeScan Remote Code Execution Vulnerability | kev | `cve-2020-8467` | code | 1.0 |
+| 5371 | Trend Micro Multiple Products Content Validation Escape Vulnerability | kev | `cve-2020-8468` | code | 1.0 |
+| 5372 | Multiple DrayTek Vigor Routers Web Management Page Vulnerability | kev | `cve-2020-8515` | code | 1.0 |
+| 5373 | Trend Micro Apex One and OfficeScan Authentication Bypass Vulnerability | kev | `cve-2020-8599` | code | 1.0 |
+| 5374 | PlaySMS Server-Side Template Injection Vulnerability | kev | `cve-2020-8644` | code | 1.0 |
+| 5375 | EyesOfNetwork Improper Privilege Management Vulnerability | kev | `cve-2020-8655` | code | 1.0 |
+| 5376 | EyesOfNetwork Use of Hard-Coded Credentials Vulnerability | kev | `cve-2020-8657` | code | 1.0 |
+| 5377 | Pi-Hole AdminLTE Remote Code Execution Vulnerability | kev | `cve-2020-8816` | code | 1.0 |
+| 5378 | Zyxel Multiple NAS Devices OS Command Injection Vulnerability | kev | `cve-2020-9054` | code | 1.0 |
+| 5379 | D-Link DIR-610 Devices Remote Command Execution | kev | `cve-2020-9377` | code | 1.0 |
+| 5380 | Adobe Acrobat Use-After-Free Vulnerability | kev | `cve-2020-9715` | code | 1.0 |
+| 5381 | Apple iOS, iPadOS, and watchOS Out-of-Bounds Write Vulnerability | kev | `cve-2020-9818` | code | 1.0 |
+| 5382 | Apple iOS, iPadOS, and watchOS Memory Corruption Vulnerability | kev | `cve-2020-9819` | code | 1.0 |
+| 5383 | Apple Multiple Products Code Execution Vulnerability | kev | `cve-2020-9859` | code | 1.0 |
+| 5384 | Apple Multiple Products Memory Corruption Vulnerability | kev | `cve-2020-9907` | code | 1.0 |
+| 5385 | Apple iOS, iPadOS, and macOS Input Validation Vulnerability | kev | `cve-2020-9934` | code | 1.0 |
+| 5386 | Android Kernel Race Condition Vulnerability | kev | `cve-2021-0920` | code | 1.0 |
+| 5387 | Android Kernel Use-After-Free Vulnerability | kev | `cve-2021-1048` | code | 1.0 |
+| 5388 | Cisco HyperFlex HX Installer Virtual Machine Command Injection Vulnerability | kev | `cve-2021-1497` | code | 1.0 |
+| 5389 | Cisco HyperFlex HX Data Platform Command Injection Vulnerability | kev | `cve-2021-1498` | code | 1.0 |
+| 5390 | Microsoft Defender Remote Code Execution Vulnerability | kev | `cve-2021-1647` | code | 1.0 |
+| 5391 | Microsoft Windows Print Spooler Remote Code Execution Vulnerability | kev | `cve-2021-1675` | code | 1.0 |
+| 5392 | Microsoft Win32k Privilege Escalation Vulnerability | kev | `cve-2021-1732` | code | 1.0 |
+| 5393 | Apple Multiple Products Race Condition Vulnerability | kev | `cve-2021-1782` | code | 1.0 |
+| 5394 | Apple Multiple Products Type Confusion Vulnerability | kev | `cve-2021-1789` | code | 1.0 |
+| 5395 | Apple iOS, iPadOS, and macOS WebKit Remote Code Execution Vulnerability | kev | `cve-2021-1870` | code | 1.0 |
+| 5396 | Apple iOS, iPadOS, and macOS WebKit Remote Code Execution Vulnerability | kev | `cve-2021-1871` | code | 1.0 |
+| 5397 | Apple iOS, iPadOS, and watchOS WebKit Cross-Site Scripting (XSS) Vulnerability | kev | `cve-2021-1879` | code | 1.0 |
+| 5398 | Qualcomm Multiple Chipsets Use-After-Free Vulnerability | kev | `cve-2021-1905` | code | 1.0 |
+| 5399 | Qualcomm Multiple Chipsets Detection of Error Condition Without Action Vulnerability | kev | `cve-2021-1906` | code | 1.0 |
+| 5400 | SonicWall SSLVPN SMA100 SQL Injection Vulnerability | kev | `cve-2021-20016` | code | 1.0 |
+| 5401 | SonicWall Email Security Improper Privilege Management Vulnerability | kev | `cve-2021-20021` | code | 1.0 |
+| 5402 | SonicWall Email Security Unrestricted Upload of File Vulnerability | kev | `cve-2021-20022` | code | 1.0 |
+| 5403 | SonicWall Email Security Path Traversal Vulnerability | kev | `cve-2021-20023` | code | 1.0 |
+| 5404 | SonicWall Secure Remote Access (SRA) SQL Injection Vulnerability | kev | `cve-2021-20028` | code | 1.0 |
+| 5405 | SonicWall SMA100 Appliances OS Command Injection Vulnerability | kev | `cve-2021-20035` | code | 1.0 |
+| 5406 | SonicWall SMA 100 Appliances Stack-Based Buffer Overflow Vulnerability | kev | `cve-2021-20038` | code | 1.0 |
+| 5407 | Arcadyan Buffalo Firmware Path Traversal Vulnerability | kev | `cve-2021-20090` | code | 1.0 |
+| 5408 | Draytek VigorConnect Path Traversal Vulnerability | kev | `cve-2021-20123` | code | 1.0 |
+| 5409 | Draytek VigorConnect Path Traversal Vulnerability | kev | `cve-2021-20124` | code | 1.0 |
+| 5410 | Adobe Acrobat and Reader Heap-based Buffer Overflow Vulnerability | kev | `cve-2021-21017` | code | 1.0 |
+| 5411 | Google Chromium V8 Heap Buffer Overflow Vulnerability | kev | `cve-2021-21148` | code | 1.0 |
+| 5412 | Google Chromium Race Condition Vulnerability | kev | `cve-2021-21166` | code | 1.0 |
+| 5413 | Google Chromium Blink Use-After-Free Vulnerability | kev | `cve-2021-21193` | code | 1.0 |
+| 5414 | Google Chromium Blink Use-After-Free Vulnerability | kev | `cve-2021-21206` | code | 1.0 |
+| 5415 | Google Chromium V8 Improper Input Validation Vulnerability | kev | `cve-2021-21220` | code | 1.0 |
+| 5416 | Google Chromium V8 Type Confusion Vulnerability | kev | `cve-2021-21224` | code | 1.0 |
+| 5417 | Adminer Server-Side Request Forgery Vulnerability | kev | `cve-2021-21311` | code | 1.0 |
+| 5418 | System Information Library for Node.JS Command Injection | kev | `cve-2021-21315` | code | 1.0 |
+| 5419 | Dell dbutil Driver Insufficient Access Control Vulnerability | kev | `cve-2021-21551` | code | 1.0 |
+| 5420 | VMware vCenter Server Remote Code Execution Vulnerability | kev | `cve-2021-21972` | code | 1.0 |
+| 5421 | VMware vCenter Server and Cloud Foundation Server Side Request Forgery (SSRF) Vulnerability | kev | `cve-2021-21973` | code | 1.0 |
+| 5422 | VMware Server Side Request Forgery in vRealize Operations Manager API | kev | `cve-2021-21975` | code | 1.0 |
+| 5423 | VMware vCenter Server Improper Input Validation Vulnerability | kev | `cve-2021-21985` | code | 1.0 |
+| 5424 | VMware vCenter Server File Upload Vulnerability | kev | `cve-2021-22005` | code | 1.0 |
+| 5425 | VMware vCenter Server Improper Access Control | kev | `cve-2021-22017` | code | 1.0 |
+| 5426 | Omnissa Workspace ONE Server-Side Request Forgery | kev | `cve-2021-22054` | code | 1.0 |
+| 5427 | GitLab Server-Side Request Forgery (SSRF) Vulnerability | kev | `cve-2021-22175` | code | 1.0 |
+| 5428 | ExifTool Remote Code Execution Vulnerability | kev | `cve-2021-22204` | code | 1.0 |
+| 5429 | GitLab Community and Enterprise Editions Remote Code Execution Vulnerability | kev | `cve-2021-22205` | code | 1.0 |
+| 5430 | Micro Focus Operation Bridge Report (OBR) Remote Code Execution Vulnerability | kev | `cve-2021-22502` | code | 1.0 |
+| 5431 | Micro Focus Access Manager Information Leakage Vulnerability | kev | `cve-2021-22506` | code | 1.0 |
+| 5432 | Linux Kernel Heap Out-of-Bounds Write Vulnerability | kev | `cve-2021-22555` | code | 1.0 |
+| 5433 | Linux Kernel Privilege Escalation Vulnerability | kev | `cve-2021-22600` | code | 1.0 |
+| 5434 | Rockwell Multiple Products Insufficient Protected Credentials Vulnerability | kev | `cve-2021-22681` | code | 1.0 |
+| 5435 | Ivanti Pulse Connect Secure Use-After-Free Vulnerability | kev | `cve-2021-22893` | code | 1.0 |
+| 5436 | Ivanti Pulse Connect Secure Collaboration Suite Buffer Overflow Vulnerability | kev | `cve-2021-22894` | code | 1.0 |
+| 5437 | Ivanti Pulse Connect Secure Command Injection Vulnerability | kev | `cve-2021-22899` | code | 1.0 |
+| 5438 | Ivanti Pulse Connect Secure Unrestricted File Upload Vulnerability | kev | `cve-2021-22900` | code | 1.0 |
+| 5439 | Citrix ShareFile Improper Access Control Vulnerability | kev | `cve-2021-22941` | code | 1.0 |
+| 5440 | F5 BIG-IP and BIG-IQ Centralized Management iControl REST Remote Code Execution Vulnerability | kev | `cve-2021-22986` | code | 1.0 |
+| 5441 | F5 BIG-IP Traffic Management Microkernel Buffer Overflow | kev | `cve-2021-22991` | code | 1.0 |
+| 5442 | Ajax.NET Professional Deserialization of Untrusted Data Vulnerability | kev | `cve-2021-23758` | code | 1.0 |
+| 5443 | McAfee Total Protection (MTP) Improper Privilege Management Vulnerability | kev | `cve-2021-23874` | code | 1.0 |
+| 5444 | Nagios XI OS Command Injection | kev | `cve-2021-25296` | code | 1.0 |
+| 5445 | Nagios XI OS Command Injection | kev | `cve-2021-25297` | code | 1.0 |
+| 5446 | Nagios XI OS Command Injection | kev | `cve-2021-25298` | code | 1.0 |
+| 5447 | Samsung Mobile Devices Improper Access Control Vulnerability | kev | `cve-2021-25337` | code | 1.0 |
+| 5448 | Samsung Mobile Devices Improper Access Control Vulnerability | kev | `cve-2021-25369` | code | 1.0 |
+| 5449 | Samsung Mobile Devices Memory Corruption Vulnerability | kev | `cve-2021-25370` | code | 1.0 |
+| 5450 | Samsung Mobile Devices Unspecified Vulnerability | kev | `cve-2021-25371` | code | 1.0 |
+| 5451 | Samsung Mobile Devices Improper Boundary Check Vulnerability | kev | `cve-2021-25372` | code | 1.0 |
+| 5452 | Samsung Mobile Devices Race Condition Vulnerability | kev | `cve-2021-25394` | code | 1.0 |
+| 5453 | Samsung Mobile Devices Race Condition Vulnerability | kev | `cve-2021-25395` | code | 1.0 |
+| 5454 | Samsung Mobile Devices Out-of-Bounds Read Vulnerability | kev | `cve-2021-25487` | code | 1.0 |
+| 5455 | Samsung Mobile Devices Improper Input Validation Vulnerability | kev | `cve-2021-25489` | code | 1.0 |
+| 5456 | Atlassian Confluence Server and Data Center Object-Graph Navigation Language (OGNL) Injection Vulnerability | kev | `cve-2021-26084` | code | 1.0 |
+| 5457 | Atlassian Confluence Server Pre-Authorization Arbitrary File Read Vulnerability | kev | `cve-2021-26085` | code | 1.0 |
+| 5458 | Atlassian Jira Server and Data Center Path Traversal Vulnerability | kev | `cve-2021-26086` | code | 1.0 |
+| 5459 | Microsoft Internet Explorer Memory Corruption Vulnerability | kev | `cve-2021-26411` | code | 1.0 |
+| 5460 | OpenPLC ScadaBR Unrestricted Upload of File with Dangerous Type Vulnerability | kev | `cve-2021-26828` | code | 1.0 |
+| 5461 | OpenPLC ScadaBR Cross-site Scripting Vulnerability | kev | `cve-2021-26829` | code | 1.0 |
+| 5462 | Microsoft Exchange Server Remote Code Execution Vulnerability | kev | `cve-2021-26855` | code | 1.0 |
+| 5463 | Microsoft Exchange Server Remote Code Execution Vulnerability | kev | `cve-2021-26857` | code | 1.0 |
+| 5464 | Microsoft Exchange Server Remote Code Execution Vulnerability | kev | `cve-2021-26858` | code | 1.0 |
+| 5465 | Microsoft Office Remote Code Execution Vulnerability | kev | `cve-2021-27059` | code | 1.0 |
+| 5466 | Microsoft Exchange Server Remote Code Execution Vulnerability | kev | `cve-2021-27065` | code | 1.0 |
+| 5467 | Microsoft Internet Explorer Remote Code Execution Vulnerability | kev | `cve-2021-27085` | code | 1.0 |
+| 5468 | Accellion FTA SQL Injection Vulnerability | kev | `cve-2021-27101` | code | 1.0 |
+| 5469 | Accellion FTA OS Command Injection Vulnerability | kev | `cve-2021-27102` | code | 1.0 |
+| 5470 | Accellion FTA Server-Side Request Forgery (SSRF) Vulnerability | kev | `cve-2021-27103` | code | 1.0 |
+| 5471 | Accellion FTA OS Command Injection Vulnerability | kev | `cve-2021-27104` | code | 1.0 |
+| 5472 | DD-WRT Stack-Based Buffer Overflow Vulnerability | kev | `cve-2021-27137` | code | 1.0 |
+| 5473 | Yealink Device Management Server-Side Request Forgery (SSRF) Vulnerability | kev | `cve-2021-27561` | code | 1.0 |
+| 5474 | Arm Trusted Firmware Out-of-Bounds Write Vulnerability | kev | `cve-2021-27562` | code | 1.0 |
+| 5475 | Checkbox Survey Deserialization of Untrusted Data Vulnerability | kev | `cve-2021-27852` | code | 1.0 |
+| 5476 | FatPipe WARP, IPVPN, and MPVPN Configuration Upload exploit | kev | `cve-2021-27860` | code | 1.0 |
+| 5477 | Veritas Backup Exec Agent File Access Vulnerability | kev | `cve-2021-27876` | code | 1.0 |
+| 5478 | Veritas Backup Exec Agent Improper Authentication Vulnerability | kev | `cve-2021-27877` | code | 1.0 |
+| 5479 | Veritas Backup Exec Agent Command Execution Vulnerability | kev | `cve-2021-27878` | code | 1.0 |
+| 5480 | Microsoft Win32k Privilege Escalation Vulnerability | kev | `cve-2021-28310` | code | 1.0 |
+| 5481 | Adobe Acrobat and Reader Use-After-Free Vulnerability | kev | `cve-2021-28550` | code | 1.0 |
+| 5482 | Arm Mali Graphics Processing Unit (GPU) Use-After-Free Vulnerability | kev | `cve-2021-28663` | code | 1.0 |
+| 5483 | Arm Mali Graphics Processing Unit (GPU) Unspecified Vulnerability | kev | `cve-2021-28664` | code | 1.0 |
+| 5484 | QNAP NAS Improper Authorization Vulnerability | kev | `cve-2021-28799` | code | 1.0 |
+| 5485 | Arm Mali GPU Kernel Driver Use-After-Free Vulnerability | kev | `cve-2021-29256` | code | 1.0 |
+| 5486 | Kaseya Virtual System/Server Administrator (VSA) Information Disclosure Vulnerability | kev | `cve-2021-30116` | code | 1.0 |
+| 5487 | Google Chromium PopupBlocker Security Bypass Vulnerability | kev | `cve-2021-30533` | code | 1.0 |
+| 5488 | Google Chromium V8 Type Confusion Vulnerability | kev | `cve-2021-30551` | code | 1.0 |
+| 5489 | Google Chromium WebGL Use-After-Free Vulnerability | kev | `cve-2021-30554` | code | 1.0 |
+| 5490 | Google Chromium V8 Type Confusion Vulnerability | kev | `cve-2021-30563` | code | 1.0 |
+| 5491 | Google Chromium V8 Out-of-Bounds Write Vulnerability | kev | `cve-2021-30632` | code | 1.0 |
+| 5492 | Google Chromium Indexed DB API Use-After-Free Vulnerability | kev | `cve-2021-30633` | code | 1.0 |
+| 5493 | Apple macOS Unspecified Vulnerability | kev | `cve-2021-30657` | code | 1.0 |
+| 5494 | Apple Multiple Products WebKit Storage Use-After-Free Vulnerability | kev | `cve-2021-30661` | code | 1.0 |
+| 5495 | Apple Multiple Products WebKit Integer Overflow Vulnerability | kev | `cve-2021-30663` | code | 1.0 |
+| 5496 | Apple Multiple Products WebKit Memory Corruption Vulnerability | kev | `cve-2021-30665` | code | 1.0 |
+| 5497 | Apple iOS WebKit Buffer Overflow Vulnerability | kev | `cve-2021-30666` | code | 1.0 |
+| 5498 | Apple macOS Unspecified Vulnerability | kev | `cve-2021-30713` | code | 1.0 |
+| 5499 | Apple iOS WebKit Memory Corruption Vulnerability | kev | `cve-2021-30761` | code | 1.0 |
+| 5500 | Apple iOS WebKit Use-After-Free Vulnerability | kev | `cve-2021-30762` | code | 1.0 |
+| 5501 | Apple Multiple Products Memory Corruption Vulnerability | kev | `cve-2021-30807` | code | 1.0 |
+| 5502 | Apple iOS, iPadOS, macOS Use-After-Free Vulnerability | kev | `cve-2021-30858` | code | 1.0 |
+| 5503 | Apple Multiple Products Integer Overflow Vulnerability | kev | `cve-2021-30860` | code | 1.0 |
+| 5504 | Apple iOS, iPadOS, and macOS Type Confusion Vulnerability | kev | `cve-2021-30869` | code | 1.0 |
+| 5505 | Apple Multiple Products Memory Corruption Vulnerability | kev | `cve-2021-30883` | code | 1.0 |
+| 5506 | Apple iOS, iPadOS, and macOS Out-of-Bounds Write Vulnerability | kev | `cve-2021-30900` | code | 1.0 |
+| 5507 | Apple Multiple Products Integer Overflow or Wraparound Vulnerability | kev | `cve-2021-30952` | code | 1.0 |
+| 5508 | Apple iOS and iPadOS Buffer Overflow Vulnerability | kev | `cve-2021-30983` | code | 1.0 |
+| 5509 | Apple iOS, macOS, watchOS Sandbox Bypass Vulnerability | kev | `cve-2021-31010` | code | 1.0 |
+| 5510 | Microsoft HTTP Protocol Stack Remote Code Execution Vulnerability | kev | `cve-2021-31166` | code | 1.0 |
+| 5511 | Microsoft Exchange Server Information Disclosure Vulnerability | kev | `cve-2021-31196` | code | 1.0 |
+| 5512 | Microsoft Enhanced Cryptographic Provider Privilege Escalation Vulnerability | kev | `cve-2021-31199` | code | 1.0 |
+| 5513 | Microsoft Enhanced Cryptographic Provider Privilege Escalation Vulnerability | kev | `cve-2021-31201` | code | 1.0 |
+| 5514 | Microsoft Exchange Server Security Feature Bypass Vulnerability | kev | `cve-2021-31207` | code | 1.0 |
+| 5515 | Laravel Ignition File Upload Vulnerability | kev | `cve-2021-3129` | code | 1.0 |
+| 5516 | Sudo Heap-Based Buffer Overflow Vulnerability | kev | `cve-2021-3156` | code | 1.0 |
+| 5517 | Tenda AC11 Router Stack Buffer Overflow Vulnerability | kev | `cve-2021-31755` | code | 1.0 |
+| 5518 | Microsoft Windows Kernel Information Disclosure Vulnerability | kev | `cve-2021-31955` | code | 1.0 |
+| 5519 | Microsoft Windows NTFS Privilege Escalation Vulnerability | kev | `cve-2021-31956` | code | 1.0 |
+| 5520 | Microsoft Windows Kernel Privilege Escalation Vulnerability | kev | `cve-2021-31979` | code | 1.0 |
+| 5521 | ONLYOFFICE Docs Server Path Traversal Vulnerability | kev | `cve-2021-3199` | code | 1.0 |
+| 5522 | ASUS Routers Improper Authentication Vulnerability | kev | `cve-2021-32030` | code | 1.0 |
+| 5523 | October CMS Improper Authentication | kev | `cve-2021-32648` | code | 1.0 |
+| 5524 | Dahua IP Camera Authentication Bypass Vulnerability | kev | `cve-2021-33044` | code | 1.0 |
+| 5525 | Dahua IP Camera Authentication Bypass Vulnerability | kev | `cve-2021-33045` | code | 1.0 |
+| 5526 | Microsoft Desktop Window Manager (DWM) Core Library Privilege Escalation Vulnerability | kev | `cve-2021-33739` | code | 1.0 |
+| 5527 | Microsoft Windows MSHTML Platform Remote Code Execution Vulnerability | kev | `cve-2021-33742` | code | 1.0 |
+| 5528 | Microsoft Exchange Server Information Disclosure | kev | `cve-2021-33766` | code | 1.0 |
+| 5529 | Microsoft Windows Kernel Privilege Escalation Vulnerability | kev | `cve-2021-33771` | code | 1.0 |
+| 5530 | Microsoft Windows Scripting Engine Memory Corruption Vulnerability | kev | `cve-2021-34448` | code | 1.0 |
+| 5531 | Microsoft Exchange Server Remote Code Execution Vulnerability | kev | `cve-2021-34473` | code | 1.0 |
+| 5532 | Microsoft Windows User Profile Service Privilege Escalation Vulnerability | kev | `cve-2021-34484` | code | 1.0 |
+| 5533 | Microsoft Windows Event Tracing Privilege Escalation Vulnerability | kev | `cve-2021-34486` | code | 1.0 |
+| 5534 | Microsoft Exchange Server Privilege Escalation Vulnerability | kev | `cve-2021-34523` | code | 1.0 |
+| 5535 | Microsoft Windows Print Spooler Remote Code Execution Vulnerability | kev | `cve-2021-34527` | code | 1.0 |
+| 5536 | Linux Kernel Privilege Escalation Vulnerability | kev | `cve-2021-3493` | code | 1.0 |
+| 5537 | SolarWinds Serv-U Remote Code Execution Vulnerability | kev | `cve-2021-35211` | code | 1.0 |
+| 5538 | SolarWinds Serv-U Improper Input Validation Vulnerability | kev | `cve-2021-35247` | code | 1.0 |
+| 5539 | Realtek Jungle SDK Remote Code Execution Vulnerability | kev | `cve-2021-35394` | code | 1.0 |
+| 5540 | Realtek AP-Router SDK Buffer Overflow Vulnerability | kev | `cve-2021-35395` | code | 1.0 |
+| 5541 | ForgeRock Access Management (AM) Core Server Remote Code Execution Vulnerability | kev | `cve-2021-35464` | code | 1.0 |
+| 5542 | Oracle Fusion Middleware Unspecified Vulnerability | kev | `cve-2021-35587` | code | 1.0 |
+| 5543 | Red Hat Polkit Incorrect Authorization Vulnerability | kev | `cve-2021-3560` | code | 1.0 |
+| 5544 | Hikvision Improper Input Validation | kev | `cve-2021-36260` | code | 1.0 |
+| 5545 | Sunhillo SureLine OS Command Injection Vulnerablity | kev | `cve-2021-36380` | code | 1.0 |
+| 5546 | Trend Micro Multiple Products Improper Input Validation Vulnerability | kev | `cve-2021-36741` | code | 1.0 |
+| 5547 | Trend Micro Multiple Products Improper Input Validation Vulnerability | kev | `cve-2021-36742` | code | 1.0 |
+| 5548 | Microsoft Windows SAM Local Privilege Escalation Vulnerability | kev | `cve-2021-36934` | code | 1.0 |
+| 5549 | Microsoft Windows Local Security Authority (LSA) Spoofing Vulnerability | kev | `cve-2021-36942` | code | 1.0 |
+| 5550 | Microsoft Windows Update Medic Service Privilege Escalation Vulnerability | kev | `cve-2021-36948` | code | 1.0 |
+| 5551 | Microsoft Windows Common Log File System (CLFS) Driver Privilege Escalation Vulnerability | kev | `cve-2021-36955` | code | 1.0 |
+| 5552 | Zoho ManageEngine ServiceDesk Authentication Bypass Vulnerability | kev | `cve-2021-37415` | code | 1.0 |
+| 5553 | Google Chromium Portals Use-After-Free Vulnerability | kev | `cve-2021-37973` | code | 1.0 |
+| 5554 | Google Chromium V8 Use-After-Free Vulnerability | kev | `cve-2021-37975` | code | 1.0 |
+| 5555 | Google Chromium Information Disclosure Vulnerability | kev | `cve-2021-37976` | code | 1.0 |
+| 5556 | Google Chromium Intents Improper Input Validation Vulnerability | kev | `cve-2021-38000` | code | 1.0 |
+| 5557 | Google Chromium V8 Memory Corruption Vulnerability | kev | `cve-2021-38003` | code | 1.0 |
+| 5558 | SAP NetWeaver Unrestricted File Upload Vulnerability | kev | `cve-2021-38163` | code | 1.0 |
+| 5559 | Delta Electronics DOPSoft 2 Improper Input Validation Vulnerability | kev | `cve-2021-38406` | code | 1.0 |
+| 5560 | Microsoft Open Management Infrastructure (OMI) Privilege Escalation Vulnerability | kev | `cve-2021-38645` | code | 1.0 |
+| 5561 | Microsoft Office Access Connectivity Engine Remote Code Execution Vulnerability | kev | `cve-2021-38646` | code | 1.0 |
+| 5562 | Microsoft Open Management Infrastructure (OMI) Remote Code Execution Vulnerability | kev | `cve-2021-38647` | code | 1.0 |
+| 5563 | Microsoft Open Management Infrastructure (OMI) Privilege Escalation Vulnerability | kev | `cve-2021-38648` | code | 1.0 |
+| 5564 | Microsoft Open Management Infrastructure (OMI) Privilege Escalation Vulnerability | kev | `cve-2021-38649` | code | 1.0 |
+| 5565 | XStream Remote Code Execution Vulnerability | kev | `cve-2021-39144` | code | 1.0 |
+| 5566 | Grafana Authentication Bypass Vulnerability | kev | `cve-2021-39226` | code | 1.0 |
+| 5567 | Google Pixel Out-of-Bounds Write Vulnerability | kev | `cve-2021-39793` | code | 1.0 |
+| 5568 | GitLab Community and Enterprise Editions Server-Side Request Forgery (SSRF) Vulnerability | kev | `cve-2021-39935` | code | 1.0 |
+| 5569 | Red Hat Polkit Out-of-Bounds Read and Write Vulnerability | kev | `cve-2021-4034` | code | 1.0 |
+| 5570 | Reolink RLC-410W IP Camera OS Command Injection Vulnerability | kev | `cve-2021-40407` | code | 1.0 |
+| 5571 | Apache HTTP Server-Side Request Forgery (SSRF) | kev | `cve-2021-40438` | code | 1.0 |
+| 5572 | Microsoft MSHTML Remote Code Execution Vulnerability | kev | `cve-2021-40444` | code | 1.0 |
+| 5573 | Microsoft Windows Win32k Privilege Escalation Vulnerability | kev | `cve-2021-40449` | code | 1.0 |
+| 5574 | Microsoft Win32k Privilege Escalation Vulnerability | kev | `cve-2021-40450` | code | 1.0 |
+| 5575 | Zoho ManageEngine ADSelfService Plus Authentication Bypass Vulnerability | kev | `cve-2021-40539` | code | 1.0 |
+| 5576 | D-Link DIR-605 Router Information Disclosure Vulnerability | kev | `cve-2021-40655` | code | 1.0 |
+| 5577 | Aviatrix Controller Unrestricted Upload of File | kev | `cve-2021-40870` | code | 1.0 |
+| 5578 | Google Chromium V8 Use-After-Free Vulnerability | kev | `cve-2021-4102` | code | 1.0 |
+| 5579 | Metabase GeoJSON API Local File Inclusion Vulnerability | kev | `cve-2021-41277` | code | 1.0 |
+| 5580 | Microsoft Win32k Privilege Escalation Vulnerability | kev | `cve-2021-41357` | code | 1.0 |
+| 5581 | Microsoft Windows Installer Privilege Escalation Vulnerability | kev | `cve-2021-41379` | code | 1.0 |
+| 5582 | Apache HTTP Server Path Traversal Vulnerability | kev | `cve-2021-41773` | code | 1.0 |
+| 5583 | Apache HTTP Server Path Traversal Vulnerability | kev | `cve-2021-42013` | code | 1.0 |
+| 5584 | Sitecore XP Remote Command Execution Vulnerability | kev | `cve-2021-42237` | code | 1.0 |
+| 5585 | BQE BillQuick Web Suite SQL Injection Vulnerability | kev | `cve-2021-42258` | code | 1.0 |
+| 5586 | Microsoft Active Directory Domain Services Privilege Escalation Vulnerability | kev | `cve-2021-42278` | code | 1.0 |
+| 5587 | Microsoft Active Directory Domain Services Privilege Escalation Vulnerability | kev | `cve-2021-42287` | code | 1.0 |
+| 5588 | Microsoft Excel Security Feature Bypass | kev | `cve-2021-42292` | code | 1.0 |
+| 5589 | Microsoft Exchange Server Remote Code Execution Vulnerability | kev | `cve-2021-42321` | code | 1.0 |
+| 5590 | Microsoft Windows Privilege Escalation Vulnerability | kev | `cve-2021-43226` | code | 1.0 |
+| 5591 | Grafana Path Traversal Vulnerability | kev | `cve-2021-43798` | code | 1.0 |
+| 5592 | Microsoft Windows AppX Installer Spoofing Vulnerability | kev | `cve-2021-43890` | code | 1.0 |
+| 5593 | Roundcube Webmail SQL Injection Vulnerability | kev | `cve-2021-44026` | code | 1.0 |
+| 5594 | Zoho ManageEngine ServiceDesk Plus Remote Code Execution Vulnerability | kev | `cve-2021-44077` | code | 1.0 |
+| 5595 | Fortinet FortiOS Arbitrary File Download | kev | `cve-2021-44168` | code | 1.0 |
+| 5596 | Acclaim Systems USAHERDS Use of Hard-Coded Credentials Vulnerability | kev | `cve-2021-44207` | code | 1.0 |
+| 5597 | Apache Log4j2 Remote Code Execution Vulnerability | kev | `cve-2021-44228` | code | 1.0 |
+| 5598 | Zoho Desktop Central Authentication Bypass Vulnerability | kev | `cve-2021-44515` | code | 1.0 |
+| 5599 | Ivanti Endpoint Manager Cloud Service Appliance (EPM CSA) Code Injection Vulnerability | kev | `cve-2021-44529` | code | 1.0 |
+| 5600 | Apache Log4j2 Deserialization of Untrusted Data Vulnerability | kev | `cve-2021-45046` | code | 1.0 |
+| 5601 | D-Link Multiple Routers Remote Code Execution Vulnerability | kev | `cve-2021-45382` | code | 1.0 |
+| 5602 | Palo Alto Networks PAN-OS Reflected Amplification Denial-of-Service Vulnerability | kev | `cve-2022-0028` | code | 1.0 |
+| 5603 | Linux Kernel Heap-Based Buffer Overflow Vulnerability | kev | `cve-2022-0185` | code | 1.0 |
+| 5604 | Linux Kernel Improper Authentication Vulnerability | kev | `cve-2022-0492` | code | 1.0 |
+| 5605 | Debian-specific Redis Server Lua Sandbox Escape Vulnerability | kev | `cve-2022-0543` | code | 1.0 |
+| 5606 | Google Chromium Animation Use-After-Free Vulnerability | kev | `cve-2022-0609` | code | 1.0 |
+| 5607 | Linux Kernel Privilege Escalation Vulnerability | kev | `cve-2022-0847` | code | 1.0 |
+| 5608 | Linux Kernel Out-of-Bounds Write Vulnerability | kev | `cve-2022-0995` | code | 1.0 |
+| 5609 | Sophos Firewall Authentication Bypass Vulnerability | kev | `cve-2022-1040` | code | 1.0 |
+| 5610 | Google Chromium V8 Type Confusion Vulnerability | kev | `cve-2022-1096` | code | 1.0 |
+| 5611 | Google Chromium V8 Type Confusion Vulnerability | kev | `cve-2022-1364` | code | 1.0 |
+| 5612 | F5 BIG-IP Missing Authentication Vulnerability | kev | `cve-2022-1388` | code | 1.0 |
+| 5613 | Cisco Small Business RV Series Routers Stack-based Buffer Overflow Vulnerability | kev | `cve-2022-20699` | code | 1.0 |
+| 5614 | Cisco Small Business RV Series Routers Stack-based Buffer Overflow Vulnerability | kev | `cve-2022-20700` | code | 1.0 |
+| 5615 | Cisco Small Business RV Series Routers Stack-based Buffer Overflow Vulnerability | kev | `cve-2022-20701` | code | 1.0 |
+| 5616 | Cisco Small Business RV Series Routers Stack-based Buffer Overflow Vulnerability | kev | `cve-2022-20703` | code | 1.0 |
+| 5617 | Cisco Small Business RV Series Routers Stack-based Buffer Overflow Vulnerability | kev | `cve-2022-20708` | code | 1.0 |
+| 5618 | Cisco SD-WAN Path Traversal Vulnerability | kev | `cve-2022-20775` | code | 1.0 |
+| 5619 | Cisco IOS XR Open Port Vulnerability | kev | `cve-2022-20821` | code | 1.0 |
+| 5620 | Oracle ADF Faces Deserialization of Untrusted Data Vulnerability | kev | `cve-2022-21445` | code | 1.0 |
+| 5621 | Oracle E-Business Suite Unspecified Vulnerability | kev | `cve-2022-21587` | code | 1.0 |
+| 5622 | Microsoft Win32k Privilege Escalation Vulnerability | kev | `cve-2022-21882` | code | 1.0 |
+| 5623 | Microsoft Windows User Profile Service Privilege Escalation Vulnerability | kev | `cve-2022-21919` | code | 1.0 |
+| 5624 | Microsoft Windows Runtime Remote Code Execution Vulnerability | kev | `cve-2022-21971` | code | 1.0 |
+| 5625 | Microsoft Windows Print Spooler Privilege Escalation Vulnerability | kev | `cve-2022-21999` | code | 1.0 |
+| 5626 | Microsoft Windows Client Server Runtime Subsystem (CSRSS) Privilege Escalation Vulnerability | kev | `cve-2022-22047` | code | 1.0 |
+| 5627 | Qualcomm Multiple Chipsets Use-After-Free Vulnerability | kev | `cve-2022-22071` | code | 1.0 |
+| 5628 | Samsung Mobile Devices Use-After-Free Vulnerability | kev | `cve-2022-22265` | code | 1.0 |
+| 5629 | SAP Multiple Products HTTP Request Smuggling Vulnerability | kev | `cve-2022-22536` | code | 1.0 |
+| 5630 | Apple Memory Corruption Vulnerability | kev | `cve-2022-22587` | code | 1.0 |
+| 5631 | Apple iOS, iPadOS, and macOS Webkit Use-After-Free Vulnerability | kev | `cve-2022-22620` | code | 1.0 |
+| 5632 | Apple macOS Out-of-Bounds Read Vulnerability | kev | `cve-2022-22674` | code | 1.0 |
+| 5633 | Apple macOS Out-of-Bounds Write Vulnerability | kev | `cve-2022-22675` | code | 1.0 |
+| 5634 | Arm Mali GPU Kernel Driver Unspecified Vulnerability | kev | `cve-2022-22706` | code | 1.0 |
+| 5635 | Microsoft Windows Print Spooler Privilege Escalation Vulnerability | kev | `cve-2022-22718` | code | 1.0 |
+| 5636 | WebRTC Heap Buffer Overflow Vulnerability | kev | `cve-2022-2294` | code | 1.0 |
+| 5637 | VMware Spring Cloud Gateway Code Injection Vulnerability | kev | `cve-2022-22947` | code | 1.0 |
+| 5638 | VMware vCenter Server Incorrect Default File Permissions Vulnerability | kev | `cve-2022-22948` | code | 1.0 |
+| 5639 | VMware Workspace ONE Access and Identity Manager Server-Side Template Injection Vulnerability | kev | `cve-2022-22954` | code | 1.0 |
+| 5640 | VMware Multiple Products Privilege Escalation Vulnerability | kev | `cve-2022-22960` | code | 1.0 |
+| 5641 | VMware Tanzu Spring Cloud Function Remote Code Execution Vulnerability | kev | `cve-2022-22963` | code | 1.0 |
+| 5642 | Spring Framework JDK 9+ Remote Code Execution Vulnerability | kev | `cve-2022-22965` | code | 1.0 |
+| 5643 | Zabbix Frontend Authentication Bypass Vulnerability | kev | `cve-2022-23131` | code | 1.0 |
+| 5644 | Zabbix Frontend Improper Access Control Vulnerability | kev | `cve-2022-23134` | code | 1.0 |
+| 5645 | WatchGuard Firebox and XTM Privilege Escalation Vulnerability | kev | `cve-2022-23176` | code | 1.0 |
+| 5646 | NUUO NVRmini2 Devices Missing Authentication Vulnerability | kev | `cve-2022-23227` | code | 1.0 |
+| 5647 | Dante Discovery Process Control Vulnerability | kev | `cve-2022-23748` | code | 1.0 |
+| 5648 | Adobe Commerce and Magento Open Source Improper Input Validation Vulnerability | kev | `cve-2022-24086` | code | 1.0 |
+| 5649 | Apache APISIX Authentication Bypass Vulnerability | kev | `cve-2022-24112` | code | 1.0 |
+| 5650 | Microsoft Windows CLFS Driver Privilege Escalation Vulnerability | kev | `cve-2022-24521` | code | 1.0 |
+| 5651 | Synacor Zimbra Collaborate Suite (ZCS) Cross-Site Scripting Vulnerability | kev | `cve-2022-24682` | code | 1.0 |
+| 5652 | Apache CouchDB Insecure Default Initialization of Resource Vulnerability | kev | `cve-2022-24706` | code | 1.0 |
+| 5653 | OSGeo GeoServer JAI-EXT Code Injection Vulnerability | kev | `cve-2022-24816` | code | 1.0 |
+| 5654 | TerraMaster OS Remote Command Execution Vulnerability | kev | `cve-2022-24990` | code | 1.0 |
+| 5655 | Linux Kernel Use-After-Free Vulnerability | kev | `cve-2022-2586` | code | 1.0 |
+| 5656 | Atlassian Confluence Server and Data Center Remote Code Execution Vulnerability | kev | `cve-2022-26134` | code | 1.0 |
+| 5657 | Atlassian Questions For Confluence App Hard-coded Credentials Vulnerability | kev | `cve-2022-26138` | code | 1.0 |
+| 5658 | MiCollab, MiVoice Business Express Access Control Vulnerability | kev | `cve-2022-26143` | code | 1.0 |
+| 5659 | D-Link DIR-820L Remote Code Execution Vulnerability | kev | `cve-2022-26258` | code | 1.0 |
+| 5660 | WatchGuard Firebox and XTM Appliances Arbitrary Code Execution | kev | `cve-2022-26318` | code | 1.0 |
+| 5661 | dotCMS Unrestricted Upload of File Vulnerability | kev | `cve-2022-26352` | code | 1.0 |
+| 5662 | Mozilla Firefox Use-After-Free Vulnerability | kev | `cve-2022-26485` | code | 1.0 |
+| 5663 | Mozilla Firefox Use-After-Free Vulnerability | kev | `cve-2022-26486` | code | 1.0 |
+| 5664 | Veeam Backup & Replication Remote Code Execution Vulnerability | kev | `cve-2022-26500` | code | 1.0 |
+| 5665 | Veeam Backup & Replication Remote Code Execution Vulnerability | kev | `cve-2022-26501` | code | 1.0 |
+| 5666 | Trend Micro Apex Central Arbitrary File Upload Vulnerability | kev | `cve-2022-26871` | code | 1.0 |
+| 5667 | Microsoft Windows User Profile Service Privilege Escalation Vulnerability | kev | `cve-2022-26904` | code | 1.0 |
+| 5668 | Microsoft Active Directory Domain Services Privilege Escalation Vulnerability | kev | `cve-2022-26923` | code | 1.0 |
+| 5669 | Microsoft Windows LSA Spoofing Vulnerability | kev | `cve-2022-26925` | code | 1.0 |
+| 5670 | Citrix Application Delivery Controller (ADC) and Gateway Authentication Bypass Vulnerability | kev | `cve-2022-27518` | code | 1.0 |
+| 5671 | QNAP Photo Station Externally Controlled Reference Vulnerability | kev | `cve-2022-27593` | code | 1.0 |
+| 5672 | Synacor Zimbra Collaboration Suite (ZCS) Command Injection Vulnerability | kev | `cve-2022-27924` | code | 1.0 |
+| 5673 | Synacor Zimbra Collaboration Suite (ZCS) Arbitrary File Upload Vulnerability | kev | `cve-2022-27925` | code | 1.0 |
+| 5674 | Synacor Zimbra Collaboration Suite (ZCS) Cross-Site Scripting (XSS) Vulnerability | kev | `cve-2022-27926` | code | 1.0 |
+| 5675 | Google Chromium Intents Insufficient Input Validation Vulnerability | kev | `cve-2022-2856` | code | 1.0 |
+| 5676 | Zoho ManageEngine ADSelfService Plus Remote Code Execution Vulnerability | kev | `cve-2022-28810` | code | 1.0 |
+| 5677 | SolarView Compact Command Injection Vulnerability | kev | `cve-2022-29303` | code | 1.0 |
+| 5678 | WSO2 Multiple Products Unrestrictive Upload of File Vulnerability | kev | `cve-2022-29464` | code | 1.0 |
+| 5679 | Mitel MiVoice Connect Data Validation Vulnerability | kev | `cve-2022-29499` | code | 1.0 |
+| 5680 | Microsoft Windows Support Diagnostic Tool (MSDT) Remote Code Execution Vulnerability | kev | `cve-2022-30190` | code | 1.0 |
+| 5681 | RARLAB UnRAR Directory Traversal Vulnerability | kev | `cve-2022-30333` | code | 1.0 |
+| 5682 | Google Chromium Network Service Use-After-Free Vulnerability | kev | `cve-2022-3038` | code | 1.0 |
+| 5683 | Zyxel Multiple Firewalls OS Command Injection Vulnerability | kev | `cve-2022-30525` | code | 1.0 |
+| 5684 | Google Chromium Mojo Insufficient Data Validation Vulnerability | kev | `cve-2022-3075` | code | 1.0 |
+| 5685 | Netwrix Auditor Insecure Object Deserialization Vulnerability | kev | `cve-2022-31199` | code | 1.0 |
+| 5686 | Sophos Firewall Code Injection Vulnerability | kev | `cve-2022-3236` | code | 1.0 |
+| 5687 | Apple iOS and macOS Out-of-Bounds Write Vulnerability | kev | `cve-2022-32893` | code | 1.0 |
+| 5688 | Apple iOS and macOS Out-of-Bounds Write Vulnerability | kev | `cve-2022-32894` | code | 1.0 |
+| 5689 | Apple iOS, iPadOS, and macOS Remote Code Execution Vulnerability | kev | `cve-2022-32917` | code | 1.0 |
+| 5690 | Apache Spark Command Injection Vulnerability | kev | `cve-2022-33891` | code | 1.0 |
+| 5691 | Microsoft Windows Support Diagnostic Tool (MSDT) Remote Code Execution Vulnerability | kev | `cve-2022-34713` | code | 1.0 |
+| 5692 | Zoho ManageEngine Multiple Products Remote Code Execution Vulnerability | kev | `cve-2022-35405` | code | 1.0 |
+| 5693 | Teclib GLPI Remote Code Execution Vulnerability | kev | `cve-2022-35914` | code | 1.0 |
+| 5694 | ZK Framework AuUploader Unspecified Vulnerability | kev | `cve-2022-36537` | code | 1.0 |
+| 5695 | Atlassian Bitbucket Server and Data Center Command Injection Vulnerability | kev | `cve-2022-36804` | code | 1.0 |
+| 5696 | Synacor Zimbra Collaboration Suite (ZCS) Authentication Bypass Vulnerability | kev | `cve-2022-37042` | code | 1.0 |
+| 5697 | D-Link Routers Buffer Overflow Vulnerability | kev | `cve-2022-37055` | code | 1.0 |
+| 5698 | Google Chromium V8 Type Confusion Vulnerability | kev | `cve-2022-3723` | code | 1.0 |
+| 5699 | Microsoft Windows Common Log File System (CLFS) Driver Privilege Escalation Vulnerability | kev | `cve-2022-37969` | code | 1.0 |
+| 5700 | Microsoft Windows Print Spooler Privilege Escalation Vulnerability | kev | `cve-2022-38028` | code | 1.0 |
+| 5701 | Arm Mali GPU Kernel Driver Use-After-Free Vulnerability | kev | `cve-2022-38181` | code | 1.0 |
+| 5702 | Fortra Cobalt Strike Teamserver Cross-Site Scripting (XSS) Vulnerability | kev | `cve-2022-39197` | code | 1.0 |
+| 5703 | Trend Micro Apex One and Apex One as a Service Improper Validation Vulnerability | kev | `cve-2022-40139` | code | 1.0 |
+| 5704 | Fortinet Multiple Products Authentication Bypass Vulnerability | kev | `cve-2022-40684` | code | 1.0 |
+| 5705 | Mitel MiVoice Connect Command Injection Vulnerability | kev | `cve-2022-40765` | code | 1.0 |
+| 5706 | D-Link DNR-322L Download of Code Without Integrity Check Vulnerability | kev | `cve-2022-40799` | code | 1.0 |
+| 5707 | Microsoft Windows COM+ Event System Service Privilege Escalation Vulnerability | kev | `cve-2022-41033` | code | 1.0 |
+| 5708 | Microsoft Exchange Server Server-Side Request Forgery Vulnerability | kev | `cve-2022-41040` | code | 1.0 |
+| 5709 | Microsoft Windows Mark of the Web (MOTW) Security Feature Bypass Vulnerability | kev | `cve-2022-41049` | code | 1.0 |
+| 5710 | Microsoft Windows Print Spooler Privilege Escalation Vulnerability | kev | `cve-2022-41073` | code | 1.0 |
+| 5711 | Microsoft Exchange Server Privilege Escalation Vulnerability | kev | `cve-2022-41080` | code | 1.0 |
+| 5712 | Microsoft Exchange Server Remote Code Execution Vulnerability | kev | `cve-2022-41082` | code | 1.0 |
+| 5713 | Microsoft Windows Mark of the Web (MOTW) Security Feature Bypass Vulnerability | kev | `cve-2022-41091` | code | 1.0 |
+| 5714 | Microsoft Windows CNG Key Isolation Service Privilege Escalation Vulnerability | kev | `cve-2022-41125` | code | 1.0 |
+| 5715 | Microsoft Windows Scripting Languages Remote Code Execution Vulnerability | kev | `cve-2022-41128` | code | 1.0 |
+| 5716 | Mitel MiVoice Connect Code Injection Vulnerability | kev | `cve-2022-41223` | code | 1.0 |
+| 5717 | Fortinet FortiOS Path Traversal Vulnerability | kev | `cve-2022-41328` | code | 1.0 |
+| 5718 | Google Chromium GPU Heap Buffer Overflow Vulnerability | kev | `cve-2022-4135` | code | 1.0 |
+| 5719 | Synacor Zimbra Collaboration Suite (ZCS) Arbitrary File Upload Vulnerability | kev | `cve-2022-41352` | code | 1.0 |
+| 5720 | Fortinet FortiOS Heap-Based Buffer Overflow Vulnerability | kev | `cve-2022-42475` | code | 1.0 |
+| 5721 | Google Chromium V8 Type Confusion Vulnerability | kev | `cve-2022-4262` | code | 1.0 |
+| 5722 | Apple iOS and iPadOS Out-of-Bounds Write Vulnerability | kev | `cve-2022-42827` | code | 1.0 |
+| 5723 | Apple iOS Type Confusion Vulnerability | kev | `cve-2022-42856` | code | 1.0 |
+| 5724 | Fortra Cobalt Strike User Interface Remote Code Execution Vulnerability | kev | `cve-2022-42948` | code | 1.0 |
+| 5725 | Hitachi Vantara Pentaho BA Server Special Element Injection Vulnerability | kev | `cve-2022-43769` | code | 1.0 |
+| 5726 | Hitachi Vantara Pentaho BA Server Authorization Bypass Vulnerability | kev | `cve-2022-43939` | code | 1.0 |
+| 5727 | Microsoft Defender SmartScreen Security Feature Bypass Vulnerability | kev | `cve-2022-44698` | code | 1.0 |
+| 5728 | CWP Control Web Panel OS Command Injection Vulnerability | kev | `cve-2022-44877` | code | 1.0 |
+| 5729 | Cacti Command Injection Vulnerability | kev | `cve-2022-46169` | code | 1.0 |
+| 5730 | Zoho ManageEngine Multiple Products Remote Code Execution Vulnerability | kev | `cve-2022-47966` | code | 1.0 |
+| 5731 | IBM Aspera Faspex Code Execution Vulnerability | kev | `cve-2022-47986` | code | 1.0 |
+| 5732 | Apple Multiple Products Unspecified Vulnerability | kev | `cve-2022-48503` | code | 1.0 |
+| 5733 | Apple Multiple Products Memory Corruption Vulnerability | kev | `cve-2022-48618` | code | 1.0 |
+| 5734 | Linux Kernel Use-After-Free Vulnerability | kev | `cve-2023-0266` | code | 1.0 |
+| 5735 | Linux Kernel Improper Ownership Management Vulnerability | kev | `cve-2023-0386` | code | 1.0 |
+| 5736 | Fortra GoAnywhere MFT Remote Code Execution Vulnerability | kev | `cve-2023-0669` | code | 1.0 |
+| 5737 | TP-Link Archer AX-21 Command Injection Vulnerability | kev | `cve-2023-1389` | code | 1.0 |
+| 5738 | Sophos Web Appliance Command Injection Vulnerability | kev | `cve-2023-1671` | code | 1.0 |
+| 5739 | Cisco IOS and IOS XE Group Encrypted Transport VPN Out-of-Bounds Write Vulnerability | kev | `cve-2023-20109` | code | 1.0 |
+| 5740 | Cisco Small Business RV Series Routers Command Injection Vulnerability | kev | `cve-2023-20118` | code | 1.0 |
+| 5741 | Cisco IOS XE Web UI Privilege Escalation Vulnerability | kev | `cve-2023-20198` | code | 1.0 |
+| 5742 | Cisco Adaptive Security Appliance and Firepower Threat Defense Unauthorized Access Vulnerability | kev | `cve-2023-20269` | code | 1.0 |
+| 5743 | Cisco IOS XE Web UI Command Injection Vulnerability | kev | `cve-2023-20273` | code | 1.0 |
+| 5744 | Google Chromium V8 Type Confusion Vulnerability | kev | `cve-2023-2033` | code | 1.0 |
+| 5745 | VMware Tools Authentication Bypass Vulnerability | kev | `cve-2023-20867` | code | 1.0 |
+| 5746 | Vmware Aria Operations for Networks Command Injection Vulnerability | kev | `cve-2023-20887` | code | 1.0 |
+| 5747 | Android Framework Privilege Escalation Vulnerability | kev | `cve-2023-20963` | code | 1.0 |
+| 5748 | Android Pixel Information Disclosure Vulnerability | kev | `cve-2023-21237` | code | 1.0 |
+| 5749 | Google Chrome Skia Integer Overflow Vulnerability | kev | `cve-2023-2136` | code | 1.0 |
+| 5750 | Samsung Mobile Devices Insertion of Sensitive Information Into Log File Vulnerability | kev | `cve-2023-21492` | code | 1.0 |
+| 5751 | Microsoft Exchange Server Deserialization of Untrusted Data Vulnerability | kev | `cve-2023-21529` | code | 1.0 |
+| 5752 | Adobe Acrobat and Reader Use-After-Free Vulnerability | kev | `cve-2023-21608` | code | 1.0 |
+| 5753 | Microsoft Windows Advanced Local Procedure Call (ALPC) Privilege Escalation Vulnerability | kev | `cve-2023-21674` | code | 1.0 |
+| 5754 | Microsoft Office Publisher Security Feature Bypass Vulnerability | kev | `cve-2023-21715` | code | 1.0 |
+| 5755 | Microsoft Windows Graphic Component Privilege Escalation Vulnerability | kev | `cve-2023-21823` | code | 1.0 |
+| 5756 | Oracle WebLogic Server Unspecified Vulnerability | kev | `cve-2023-21839` | code | 1.0 |
+| 5757 | Atlassian Confluence Data Center and Server Broken Access Control Vulnerability | kev | `cve-2023-22515` | code | 1.0 |
+| 5758 | Atlassian Confluence Data Center and Server Improper Authorization Vulnerability | kev | `cve-2023-22518` | code | 1.0 |
+| 5759 | Atlassian Confluence Data Center and Server Template Injection Vulnerability | kev | `cve-2023-22527` | code | 1.0 |
+| 5760 | Strapi Cleartext Storage of Sensitive Information Vulnerability | kev | `cve-2023-22894` | code | 1.0 |
+| 5761 | Multiple SugarCRM Products Remote Code Execution Vulnerability | kev | `cve-2023-22952` | code | 1.0 |
+| 5762 | Microsoft Windows Common Log File System (CLFS) Driver Privilege Escalation Vulnerability | kev | `cve-2023-23376` | code | 1.0 |
+| 5763 | Microsoft Office Outlook Privilege Escalation Vulnerability | kev | `cve-2023-23397` | code | 1.0 |
+| 5764 | Apple Multiple Products WebKit Type Confusion Vulnerability | kev | `cve-2023-23529` | code | 1.0 |
+| 5765 | Joomla! Improper Access Control Vulnerability | kev | `cve-2023-23752` | code | 1.0 |
+| 5766 | Citrix Content Collaboration ShareFile Improper Access Control Vulnerability | kev | `cve-2023-24489` | code | 1.0 |
+| 5767 | Microsoft Windows SmartScreen Security Feature Bypass Vulnerability | kev | `cve-2023-24880` | code | 1.0 |
+| 5768 | Microsoft SharePoint Server Code Injection Vulnerability | kev | `cve-2023-24955` | code | 1.0 |
+| 5769 | D-Link DIR-820 Router OS Command Injection Vulnerability | kev | `cve-2023-25280` | code | 1.0 |
+| 5770 | PaperCut NG/MF Cross-Site Request Forgery (CSRF) Vulnerability | kev | `cve-2023-2533` | code | 1.0 |
+| 5771 | Multiple Ruckus Wireless Products CSRF and RCE Vulnerability | kev | `cve-2023-25717` | code | 1.0 |
+| 5772 | Danfoss AK-SM 800A Series Path Traversal Vulnerability | kev | `cve-2023-25914` | code | 1.0 |
+| 5773 | Danfoss AK-SM 800A Series Improper Input Validation Vulnerability | kev | `cve-2023-25915` | code | 1.0 |
+| 5774 | Arm Mali GPU Kernel Driver Information Disclosure Vulnerability | kev | `cve-2023-26083` | code | 1.0 |
+| 5775 | Adobe ColdFusion Deserialization of Untrusted Data Vulnerability | kev | `cve-2023-26359` | code | 1.0 |
+| 5776 | Adobe ColdFusion Deserialization of Untrusted Data Vulnerability | kev | `cve-2023-26360` | code | 1.0 |
+| 5777 | Adobe Acrobat and Reader Out-of-Bounds Write Vulnerability | kev | `cve-2023-26369` | code | 1.0 |
+| 5778 | PaperCut MF/NG Improper Access Control Vulnerability | kev | `cve-2023-27350` | code | 1.0 |
+| 5779 | PaperCut NG/MF Improper Authentication Vulnerability | kev | `cve-2023-27351` | code | 1.0 |
+| 5780 | Apache Superset Insecure Default Initialization of Resource Vulnerability | kev | `cve-2023-27524` | code | 1.0 |
+| 5781 | Veeam Backup & Replication Cloud Connect Missing Authentication for Critical Function Vulnerability | kev | `cve-2023-27532` | code | 1.0 |
+| 5782 | Zyxel Multiple NAS Devices Command Injection Vulnerability | kev | `cve-2023-27992` | code | 1.0 |
+| 5783 | Fortinet FortiOS and FortiProxy SSL-VPN Heap-Based Buffer Overflow Vulnerability | kev | `cve-2023-27997` | code | 1.0 |
+| 5784 | Apple Multiple Products WebKit Out-of-Bounds Read Vulnerability | kev | `cve-2023-28204` | code | 1.0 |
+| 5785 | Apple Multiple Products WebKit Use-After-Free Vulnerability | kev | `cve-2023-28205` | code | 1.0 |
+| 5786 | Apple iOS, iPadOS, and macOS IOSurfaceAccelerator Out-of-Bounds Write Vulnerability | kev | `cve-2023-28206` | code | 1.0 |
+| 5787 | Microsoft Windows CNG Key Isolation Service Privilege Escalation Vulnerability | kev | `cve-2023-28229` | code | 1.0 |
+| 5788 | Microsoft Windows Common Log File System (CLFS) Driver Privilege Escalation Vulnerability | kev | `cve-2023-28252` | code | 1.0 |
+| 5789 | MinIO Information Disclosure Vulnerability | kev | `cve-2023-28432` | code | 1.0 |
+| 5790 | MinIO Security Feature Bypass Vulnerability | kev | `cve-2023-28434` | code | 1.0 |
+| 5791 | Array Networks AG and vxAG ArrayOS Missing Authentication for Critical Function Vulnerability | kev | `cve-2023-28461` | code | 1.0 |
+| 5792 | Barracuda Networks ESG Appliance Improper Input Validation Vulnerability | kev | `cve-2023-2868` | code | 1.0 |
+| 5793 | Zyxel Multiple Firewalls OS Command Injection Vulnerability | kev | `cve-2023-28771` | code | 1.0 |
+| 5794 | Adobe ColdFusion Improper Access Control Vulnerability | kev | `cve-2023-29298` | code | 1.0 |
+| 5795 | Adobe ColdFusion Deserialization of Untrusted Data Vulnerability | kev | `cve-2023-29300` | code | 1.0 |
+| 5796 | Microsoft Win32K Privilege Escalation Vulnerability | kev | `cve-2023-29336` | code | 1.0 |
+| 5797 | Microsoft SharePoint Server Privilege Escalation Vulnerability | kev | `cve-2023-29357` | code | 1.0 |
+| 5798 | Microsoft Streaming Service Untrusted Pointer Dereference Vulnerability | kev | `cve-2023-29360` | code | 1.0 |
+| 5799 | Novi Survey Insecure Deserialization Vulnerability | kev | `cve-2023-29492` | code | 1.0 |
+| 5800 | Service Location Protocol (SLP) Denial-of-Service Vulnerability | kev | `cve-2023-29552` | code | 1.0 |
+| 5801 | Google Chromium V8 Type Confusion Vulnerability | kev | `cve-2023-3079` | code | 1.0 |
+| 5802 | Microsoft Windows MSHTML Platform Privilege Escalation Vulnerability | kev | `cve-2023-32046` | code | 1.0 |
+| 5803 | Microsoft Windows Defender SmartScreen Security Feature Bypass Vulnerability | kev | `cve-2023-32049` | code | 1.0 |
+| 5804 | Ignite Realtime Openfire Path Traversal Vulnerability | kev | `cve-2023-32315` | code | 1.0 |
+| 5805 | Apple Multiple Products WebKit Use-After-Free Vulnerability | kev | `cve-2023-32373` | code | 1.0 |
+| 5806 | Apple Multiple Products WebKit Sandbox Escape Vulnerability | kev | `cve-2023-32409` | code | 1.0 |
+| 5807 | Apple Multiple Products Integer Overflow Vulnerability | kev | `cve-2023-32434` | code | 1.0 |
+| 5808 | Apple Multiple Products WebKit Memory Corruption Vulnerability | kev | `cve-2023-32435` | code | 1.0 |
+| 5809 | Apple Multiple Products WebKit Type Confusion Vulnerability | kev | `cve-2023-32439` | code | 1.0 |
+| 5810 | Zyxel Multiple Firewalls Buffer Overflow Vulnerability | kev | `cve-2023-33009` | code | 1.0 |
+| 5811 | Zyxel Multiple Firewalls Buffer Overflow Vulnerability | kev | `cve-2023-33010` | code | 1.0 |
+| 5812 | Qualcomm Multiple Chipsets Use-After-Free Vulnerability | kev | `cve-2023-33063` | code | 1.0 |
+| 5813 | Qualcomm Multiple Chipsets Use of Out-of-Range Pointer Offset Vulnerability | kev | `cve-2023-33106` | code | 1.0 |
+| 5814 | Qualcomm Multiple Chipsets Integer Overflow Vulnerability | kev | `cve-2023-33107` | code | 1.0 |
+| 5815 | Apache RocketMQ Command Execution Vulnerability | kev | `cve-2023-33246` | code | 1.0 |
+| 5816 | TP-Link Multiple Routers Command Injection Vulnerability | kev | `cve-2023-33538` | code | 1.0 |
+| 5817 | VMware vCenter Server Out-of-Bounds Write Vulnerability | kev | `cve-2023-34048` | code | 1.0 |
+| 5818 | Synacor Zimbra Collaboration Suite (ZCS) Cross-Site Scripting (XSS) Vulnerability | kev | `cve-2023-34192` | code | 1.0 |
+| 5819 | Progress MOVEit Transfer SQL Injection Vulnerability | kev | `cve-2023-34362` | code | 1.0 |
+| 5820 | Ivanti Endpoint Manager Mobile Authentication Bypass Vulnerability | kev | `cve-2023-35078` | code | 1.0 |
+| 5821 | Ivanti Endpoint Manager Mobile (EPMM) Path Traversal Vulnerability | kev | `cve-2023-35081` | code | 1.0 |
+| 5822 | Ivanti Endpoint Manager Mobile (EPMM) and MobileIron Core Authentication Bypass Vulnerability | kev | `cve-2023-35082` | code | 1.0 |
+| 5823 | Citrix NetScaler ADC and NetScaler Gateway Code Injection Vulnerability | kev | `cve-2023-3519` | code | 1.0 |
+| 5824 | Microsoft Outlook Security Feature Bypass Vulnerability | kev | `cve-2023-35311` | code | 1.0 |
+| 5825 | Android Framework Privilege Escalation Vulnerability | kev | `cve-2023-35674` | code | 1.0 |
+| 5826 | Microsoft Windows SmartScreen Security Feature Bypass Vulnerability | kev | `cve-2023-36025` | code | 1.0 |
+| 5827 | Microsoft Windows Desktop Window Manager (DWM) Core Library Privilege Escalation Vulnerability | kev | `cve-2023-36033` | code | 1.0 |
+| 5828 | Microsoft Windows Cloud Files Mini Filter Driver Privilege Escalation Vulnerability | kev | `cve-2023-36036` | code | 1.0 |
+| 5829 | Microsoft Windows Out-of-Bounds Read Vulnerability | kev | `cve-2023-36424` | code | 1.0 |
+| 5830 | Microsoft WordPad Information Disclosure Vulnerability | kev | `cve-2023-36563` | code | 1.0 |
+| 5831 | Microsoft Windows Mark of the Web (MOTW) Security Feature Bypass Vulnerability | kev | `cve-2023-36584` | code | 1.0 |
+| 5832 | Microsoft Word Information Disclosure Vulnerability | kev | `cve-2023-36761` | code | 1.0 |
+| 5833 | Microsoft Streaming Service Proxy Privilege Escalation Vulnerability | kev | `cve-2023-36802` | code | 1.0 |
+| 5834 | Juniper Junos OS EX Series PHP External Variable Modification Vulnerability | kev | `cve-2023-36844` | code | 1.0 |
+| 5835 | Juniper Junos OS EX Series and SRX Series PHP External Variable Modification Vulnerability | kev | `cve-2023-36845` | code | 1.0 |
+| 5836 | Juniper Junos OS SRX Series Missing Authentication for Critical Function Vulnerability | kev | `cve-2023-36846` | code | 1.0 |
+| 5837 | Juniper Junos OS EX Series Missing Authentication for Critical Function Vulnerability | kev | `cve-2023-36847` | code | 1.0 |
+| 5838 | Juniper Junos OS SRX Series Missing Authentication for Critical Function Vulnerability | kev | `cve-2023-36851` | code | 1.0 |
+| 5839 | Microsoft Windows Error Reporting Service Privilege Escalation Vulnerability | kev | `cve-2023-36874` | code | 1.0 |
+| 5840 | Microsoft Windows Search Remote Code Execution Vulnerability | kev | `cve-2023-36884` | code | 1.0 |
+| 5841 | Apple Multiple Products WebKit Code Execution Vulnerability | kev | `cve-2023-37450` | code | 1.0 |
+| 5842 | Synacor Zimbra Collaboration Suite (ZCS) Cross-Site Scripting (XSS) Vulnerability | kev | `cve-2023-37580` | code | 1.0 |
+| 5843 | Ivanti Sentry Authentication Bypass Vulnerability | kev | `cve-2023-38035` | code | 1.0 |
+| 5844 | Microsoft .NET Core and Visual Studio Denial-of-Service Vulnerability | kev | `cve-2023-38180` | code | 1.0 |
+| 5845 | Adobe ColdFusion Deserialization of Untrusted Data Vulnerability | kev | `cve-2023-38203` | code | 1.0 |
+| 5846 | Adobe ColdFusion Improper Access Control Vulnerability | kev | `cve-2023-38205` | code | 1.0 |
+| 5847 | Apple Multiple Products Kernel Unspecified Vulnerability | kev | `cve-2023-38606` | code | 1.0 |
+| 5848 | RARLAB WinRAR Code Execution Vulnerability | kev | `cve-2023-38831` | code | 1.0 |
+| 5849 | ZKTeco BioTime Path Traversal Vulnerability | kev | `cve-2023-38950` | code | 1.0 |
+| 5850 | ASUS RT-AX55 Routers OS Command Injection Vulnerability | kev | `cve-2023-39780` | code | 1.0 |
+| 5851 | Progress WS_FTP Server Deserialization of Untrusted Data Vulnerability | kev | `cve-2023-40044` | code | 1.0 |
+| 5852 | Apple iOS, iPadOS, and watchOS Wallet Code Execution Vulnerability | kev | `cve-2023-41061` | code | 1.0 |
+| 5853 | Apple iOS, iPadOS, and macOS ImageIO Buffer Overflow Vulnerability | kev | `cve-2023-41064` | code | 1.0 |
+| 5854 | Trend Micro Apex One and Worry-Free Business Security Remote Code Execution Vulnerability | kev | `cve-2023-41179` | code | 1.0 |
+| 5855 | Qlik Sense HTTP Tunneling Vulnerability | kev | `cve-2023-41265` | code | 1.0 |
+| 5856 | Qlik Sense Path Traversal Vulnerability | kev | `cve-2023-41266` | code | 1.0 |
+| 5857 | Microsoft Skype for Business Privilege Escalation Vulnerability | kev | `cve-2023-41763` | code | 1.0 |
+| 5858 | Apple iOS and iPadOS Use-After-Free Vulnerability | kev | `cve-2023-41974` | code | 1.0 |
+| 5859 | Apple Multiple Products Code Execution Vulnerability | kev | `cve-2023-41990` | code | 1.0 |
+| 5860 | Apple Multiple Products Improper Certificate Validation Vulnerability | kev | `cve-2023-41991` | code | 1.0 |
+| 5861 | Apple Multiple Products Kernel Privilege Escalation Vulnerability | kev | `cve-2023-41992` | code | 1.0 |
+| 5862 | Apple Multiple Products WebKit Code Execution Vulnerability | kev | `cve-2023-41993` | code | 1.0 |
+| 5863 | Arm Mali GPU Kernel Driver Use-After-Free Vulnerability | kev | `cve-2023-4211` | code | 1.0 |
+| 5864 | JetBrains TeamCity Authentication Bypass Vulnerability | kev | `cve-2023-42793` | code | 1.0 |
+| 5865 | Apple iOS and iPadOS Kernel Privilege Escalation Vulnerability | kev | `cve-2023-42824` | code | 1.0 |
+| 5866 | Apple Multiple Products WebKit Out-of-Bounds Read Vulnerability | kev | `cve-2023-42916` | code | 1.0 |
+| 5867 | Apple Multiple Products WebKit Memory Corruption Vulnerability | kev | `cve-2023-42917` | code | 1.0 |
+| 5868 | Apple Multiple products Use-After-Free Vulnerability | kev | `cve-2023-43000` | code | 1.0 |
+| 5869 | NextGen Healthcare Mirth Connect Deserialization of Untrusted Data Vulnerability | kev | `cve-2023-43208` | code | 1.0 |
+| 5870 | KNX Association KNX Protocol Connection Authorization Option 1 Overly Restrictive Account Lockout Mechanism Vulnerability | kev | `cve-2023-4346` | code | 1.0 |
+| 5871 | Roundcube Webmail Persistent Cross-Site Scripting (XSS) Vulnerability | kev | `cve-2023-43770` | code | 1.0 |
+| 5872 | SonicWall SMA100 Appliances OS Command Injection Vulnerability | kev | `cve-2023-44221` | code | 1.0 |
+| 5873 | HTTP/2 Rapid Reset Attack Vulnerability | kev | `cve-2023-44487` | code | 1.0 |
+| 5874 | Acronis Cyber Infrastructure (ACI) Insecure Default Password Vulnerability | kev | `cve-2023-45249` | code | 1.0 |
+| 5875 | North Grid Proself Improper Restriction of XML External Entity (XXE) Reference Vulnerability | kev | `cve-2023-45727` | code | 1.0 |
+| 5876 | Apache ActiveMQ Deserialization of Untrusted Data Vulnerability | kev | `cve-2023-46604` | code | 1.0 |
+| 5877 | F5 BIG-IP Configuration Utility Authentication Bypass Vulnerability | kev | `cve-2023-46747` | code | 1.0 |
+| 5878 | F5 BIG-IP Configuration Utility SQL Injection Vulnerability | kev | `cve-2023-46748` | code | 1.0 |
+| 5879 | Ivanti Connect Secure and Policy Secure Authentication Bypass Vulnerability | kev | `cve-2023-46805` | code | 1.0 |
+| 5880 | SysAid Server Path Traversal Vulnerability | kev | `cve-2023-47246` | code | 1.0 |
+| 5881 | QNAP VioStor NVR OS Command Injection Vulnerability | kev | `cve-2023-47565` | code | 1.0 |
+| 5882 | Google Chromium V8 Type Confusion Vulnerability | kev | `cve-2023-4762` | code | 1.0 |
+| 5883 | Qlik Sense HTTP Tunneling Vulnerability | kev | `cve-2023-48365` | code | 1.0 |
+| 5884 | Google Chromium WebP Heap-Based Buffer Overflow Vulnerability | kev | `cve-2023-4863` | code | 1.0 |
+| 5885 | Fortinet FortiClient EMS SQL Injection Vulnerability | kev | `cve-2023-48788` | code | 1.0 |
+| 5886 | ownCloud graphapi Information Disclosure Vulnerability | kev | `cve-2023-49103` | code | 1.0 |
+| 5887 | ownCloud Improper Authentication Vulnerability | kev | `cve-2023-49105` | code | 1.0 |
+| 5888 | GNU C Library Buffer Overflow Vulnerability | kev | `cve-2023-4911` | code | 1.0 |
+| 5889 | Citrix NetScaler ADC and NetScaler Gateway Buffer Overflow Vulnerability | kev | `cve-2023-4966` | code | 1.0 |
+| 5890 | FXC AE1021, AE1021PE OS Command Injection Vulnerability | kev | `cve-2023-49897` | code | 1.0 |
+| 5891 | TP-Link TL-WR841N Authentication Bypass by Spoofing Vulnerability | kev | `cve-2023-50224` | code | 1.0 |
+| 5892 | Digiever DS-2105 Pro Missing Authorization Vulnerability | kev | `cve-2023-52163` | code | 1.0 |
+| 5893 | Google Chromium libvpx Heap Buffer Overflow Vulnerability | kev | `cve-2023-5217` | code | 1.0 |
+| 5894 | Roundcube Webmail Persistent Cross-Site Scripting (XSS) Vulnerability | kev | `cve-2023-5631` | code | 1.0 |
+| 5895 | Google Skia Integer Overflow Vulnerability | kev | `cve-2023-6345` | code | 1.0 |
+| 5896 | Unitronics Vision PLC and HMI Insecure Default Password Vulnerability | kev | `cve-2023-6448` | code | 1.0 |
+| 5897 | Citrix NetScaler ADC and NetScaler Gateway Code Injection Vulnerability | kev | `cve-2023-6548` | code | 1.0 |
+| 5898 | Citrix NetScaler ADC and NetScaler Gateway Buffer Overflow Vulnerability | kev | `cve-2023-6549` | code | 1.0 |
+| 5899 | Google Chromium WebRTC Heap Buffer Overflow Vulnerability | kev | `cve-2023-7024` | code | 1.0 |
+| 5900 | GitLab Community and Enterprise Editions Improper Access Control Vulnerability | kev | `cve-2023-7028` | code | 1.0 |
+| 5901 | Spreadsheet::ParseExcel Remote Code Execution Vulnerability | kev | `cve-2023-7101` | code | 1.0 |
+| 5902 | Palo Alto Networks PAN-OS Management Interface Authentication Bypass Vulnerability | kev | `cve-2024-0012` | code | 1.0 |
+| 5903 | Google Chromium V8 Out-of-Bounds Memory Access Vulnerability | kev | `cve-2024-0519` | code | 1.0 |
+| 5904 | D-Link DIR-859 Router Path Traversal Vulnerability | kev | `cve-2024-0769` | code | 1.0 |
+| 5905 | Synology DiskStation Manager (DSM) Improper Encoding or Escaping of Output Vulnerability | kev | `cve-2024-10441` | code | 1.0 |
+| 5906 | Linux Kernel Use-After-Free Vulnerability | kev | `cve-2024-1086` | code | 1.0 |
+| 5907 | GeoVision Devices OS Command Injection Vulnerability | kev | `cve-2024-11120` | code | 1.0 |
+| 5908 | MDaemon Email Server Cross-Site Scripting (XSS) Vulnerability | kev | `cve-2024-11182` | code | 1.0 |
+| 5909 | Zyxel Multiple Firewalls Path Traversal Vulnerability | kev | `cve-2024-11667` | code | 1.0 |
+| 5910 | ProjectSend Improper Authentication Vulnerability | kev | `cve-2024-11680` | code | 1.0 |
+| 5911 | Progress Kemp LoadMaster OS Command Injection Vulnerability | kev | `cve-2024-1212` | code | 1.0 |
+| 5912 | BeyondTrust Privileged Remote Access (PRA) and Remote Support (RS) Command Injection Vulnerability | kev | `cve-2024-12356` | code | 1.0 |
+| 5913 | BeyondTrust Privileged Remote Access (PRA) and Remote Support (RS) OS Command Injection Vulnerability | kev | `cve-2024-12686` | code | 1.0 |
+| 5914 | DrayTek Vigor Routers OS Command Injection Vulnerability | kev | `cve-2024-12987` | code | 1.0 |
+| 5915 | Ivanti Endpoint Manager (EPM) Absolute Path Traversal Vulnerability | kev | `cve-2024-13159` | code | 1.0 |
+| 5916 | Ivanti Endpoint Manager (EPM) Absolute Path Traversal Vulnerability | kev | `cve-2024-13160` | code | 1.0 |
+| 5917 | Ivanti Endpoint Manager (EPM) Absolute Path Traversal Vulnerability | kev | `cve-2024-13161` | code | 1.0 |
+| 5918 | ConnectWise ScreenConnect Path Traversal Vulnerability | kev | `cve-2024-1708` | code | 1.0 |
+| 5919 | ConnectWise ScreenConnect Authentication Bypass Vulnerability | kev | `cve-2024-1709` | code | 1.0 |
+| 5920 | Cisco ASA and FTD Denial of Service Vulnerability | kev | `cve-2024-20353` | code | 1.0 |
+| 5921 | Cisco ASA and FTD Privilege Escalation Vulnerability | kev | `cve-2024-20359` | code | 1.0 |
+| 5922 | Cisco NX-OS Command Injection Vulnerability | kev | `cve-2024-20399` | code | 1.0 |
+| 5923 | Cisco Smart Licensing Utility Static Credential Vulnerability | kev | `cve-2024-20439` | code | 1.0 |
+| 5924 | Cisco ASA and FTD Denial-of-Service Vulnerability | kev | `cve-2024-20481` | code | 1.0 |
+| 5925 | Adobe ColdFusion Improper Access Control Vulnerability | kev | `cve-2024-20767` | code | 1.0 |
+| 5926 | Oracle Agile Product Lifecycle Management (PLM) Deserialization Vulnerability | kev | `cve-2024-20953` | code | 1.0 |
+| 5927 | Oracle WebLogic Server Unspecified Vulnerability | kev | `cve-2024-21182` | code | 1.0 |
+| 5928 | Oracle Agile Product Lifecycle Management (PLM) Incorrect Authorization Vulnerability | kev | `cve-2024-21287` | code | 1.0 |
+| 5929 | Microsoft Windows Kernel Exposed IOCTL with Insufficient Access Control Vulnerability | kev | `cve-2024-21338` | code | 1.0 |
+| 5930 | Microsoft Windows SmartScreen Security Feature Bypass Vulnerability | kev | `cve-2024-21351` | code | 1.0 |
+| 5931 | Microsoft Exchange Server Privilege Escalation Vulnerability | kev | `cve-2024-21410` | code | 1.0 |
+| 5932 | Microsoft Windows Internet Shortcut Files Security Feature Bypass Vulnerability | kev | `cve-2024-21412` | code | 1.0 |
+| 5933 | Microsoft Outlook Improper Input Validation Vulnerability | kev | `cve-2024-21413` | code | 1.0 |
+| 5934 | Fortinet FortiOS Out-of-Bound Write Vulnerability | kev | `cve-2024-21762` | code | 1.0 |
+| 5935 | Ivanti Connect Secure and Policy Secure Command Injection Vulnerability | kev | `cve-2024-21887` | code | 1.0 |
+| 5936 | Ivanti Connect Secure, Policy Secure, and Neurons Server-Side Request Forgery (SSRF) Vulnerability | kev | `cve-2024-21893` | code | 1.0 |
+| 5937 | Fortinet Multiple Products Format String Vulnerability | kev | `cve-2024-23113` | code | 1.0 |
+| 5938 | Apple Multiple Products WebKit Type Confusion Vulnerability | kev | `cve-2024-23222` | code | 1.0 |
+| 5939 | Apple Multiple Products Memory Corruption Vulnerability | kev | `cve-2024-23225` | code | 1.0 |
+| 5940 | Apple Multiple Products Memory Corruption Vulnerability | kev | `cve-2024-23296` | code | 1.0 |
+| 5941 | Rejetto HTTP File Server Improper Neutralization of Special Elements Used in a Template Engine Vulnerability | kev | `cve-2024-23692` | code | 1.0 |
+| 5942 | Jenkins Command Line Interface (CLI) Path Traversal Vulnerability | kev | `cve-2024-23897` | code | 1.0 |
+| 5943 | Check Point Quantum Security Gateways Information Disclosure Vulnerability | kev | `cve-2024-24919` | code | 1.0 |
+| 5944 | Microsoft Windows Error Reporting Service Improper Privilege Management Vulnerability | kev | `cve-2024-26169` | code | 1.0 |
+| 5945 | JetBrains TeamCity Authentication Bypass Vulnerability | kev | `cve-2024-27198` | code | 1.0 |
+| 5946 | JetBrains TeamCity Relative Path Traversal Vulnerability | kev | `cve-2024-27199` | code | 1.0 |
+| 5947 | Apache HugeGraph-Server Improper Access Control Vulnerability | kev | `cve-2024-27348` | code | 1.0 |
+| 5948 | Synacor Zimbra Collaboration Suite (ZCS) Cross-Site Scripting (XSS) Vulnerability | kev | `cve-2024-27443` | code | 1.0 |
+| 5949 | Apple Multiple Products Improper Authentication Vulnerability | kev | `cve-2024-27834` | code | 1.0 |
+| 5950 | SolarWinds Web Help Desk Deserialization of Untrusted Data Vulnerability | kev | `cve-2024-28986` | code | 1.0 |
+| 5951 | SolarWinds Web Help Desk Hardcoded Credential Vulnerability | kev | `cve-2024-28987` | code | 1.0 |
+| 5952 | SolarWinds Serv-U Path Traversal Vulnerability | kev | `cve-2024-28995` | code | 1.0 |
+| 5953 | Microsoft .NET Framework Information Disclosure Vulnerability | kev | `cve-2024-29059` | code | 1.0 |
+| 5954 | Android Pixel Information Disclosure Vulnerability | kev | `cve-2024-29745` | code | 1.0 |
+| 5955 | Android Pixel Privilege Escalation Vulnerability | kev | `cve-2024-29748` | code | 1.0 |
+| 5956 | Ivanti Endpoint Manager (EPM) SQL Injection Vulnerability | kev | `cve-2024-29824` | code | 1.0 |
+| 5957 | Microsoft SmartScreen Prompt Security Feature Bypass Vulnerability | kev | `cve-2024-29988` | code | 1.0 |
+| 5958 | Microsoft Windows MSHTML Platform Security Feature Bypass Vulnerability | kev | `cve-2024-30040` | code | 1.0 |
+| 5959 | Microsoft DWM Core Library Privilege Escalation Vulnerability | kev | `cve-2024-30051` | code | 1.0 |
+| 5960 | Microsoft Windows Kernel TOCTOU Race Condition Vulnerability | kev | `cve-2024-30088` | code | 1.0 |
+| 5961 | Apache OFBiz Path Traversal Vulnerability | kev | `cve-2024-32113` | code | 1.0 |
+| 5962 | D-Link Multiple NAS Devices Use of Hard-Coded Credentials Vulnerability | kev | `cve-2024-3272` | code | 1.0 |
+| 5963 | D-Link Multiple NAS Devices Command Injection Vulnerability | kev | `cve-2024-3273` | code | 1.0 |
+| 5964 | Android Pixel Privilege Escalation Vulnerability | kev | `cve-2024-32896` | code | 1.0 |
+| 5965 | Palo Alto Networks PAN-OS Malicious DNS Packet Vulnerability | kev | `cve-2024-3393` | code | 1.0 |
+| 5966 | Palo Alto Networks PAN-OS Command Injection Vulnerability | kev | `cve-2024-3400` | code | 1.0 |
+| 5967 | Adobe Commerce and Magento Open Source Improper Restriction of XML External Entity Reference (XXE) Vulnerability | kev | `cve-2024-34102` | code | 1.0 |
+| 5968 | Microsoft Windows Kernel-Mode Driver Untrusted Pointer Dereference Vulnerability | kev | `cve-2024-35250` | code | 1.0 |
+| 5969 | OSGeo GeoServer GeoTools Eval Injection Vulnerability | kev | `cve-2024-36401` | code | 1.0 |
+| 5970 | Android Kernel Remote Code Execution Vulnerability | kev | `cve-2024-36971` | code | 1.0 |
+| 5971 | Broadcom VMware vCenter Server Out-of-bounds Write Vulnerability | kev | `cve-2024-37079` | code | 1.0 |
+| 5972 | VMware ESXi Authentication Bypass Vulnerability | kev | `cve-2024-37085` | code | 1.0 |
+| 5973 | RoundCube Webmail Cross-Site Scripting (XSS) Vulnerability | kev | `cve-2024-37383` | code | 1.0 |
+| 5974 | Microsoft Windows Installer Improper Privilege Management Vulnerability | kev | `cve-2024-38014` | code | 1.0 |
+| 5975 | Microsoft Windows Hyper-V Privilege Escalation Vulnerability | kev | `cve-2024-38080` | code | 1.0 |
+| 5976 | Microsoft SharePoint Deserialization Vulnerability | kev | `cve-2024-38094` | code | 1.0 |
+| 5977 | Microsoft Windows Kernel Privilege Escalation Vulnerability | kev | `cve-2024-38106` | code | 1.0 |
+| 5978 | Microsoft Windows Power Dependency Coordinator Privilege Escalation Vulnerability | kev | `cve-2024-38107` | code | 1.0 |
+| 5979 | Microsoft Windows MSHTML Platform Spoofing Vulnerability | kev | `cve-2024-38112` | code | 1.0 |
+| 5980 | Microsoft Windows Scripting Engine Memory Corruption Vulnerability | kev | `cve-2024-38178` | code | 1.0 |
+| 5981 | Microsoft Project Remote Code Execution Vulnerability | kev | `cve-2024-38189` | code | 1.0 |
+| 5982 | Microsoft Windows Ancillary Function Driver for WinSock Privilege Escalation Vulnerability | kev | `cve-2024-38193` | code | 1.0 |
+| 5983 | Microsoft Windows SmartScreen Security Feature Bypass Vulnerability | kev | `cve-2024-38213` | code | 1.0 |
+| 5984 | Microsoft Windows Mark of the Web (MOTW) Protection Mechanism Failure Vulnerability | kev | `cve-2024-38217` | code | 1.0 |
+| 5985 | Microsoft Publisher Protection Mechanism Failure Vulnerability | kev | `cve-2024-38226` | code | 1.0 |
+| 5986 | Apache HTTP Server Improper Escaping of Output Vulnerability | kev | `cve-2024-38475` | code | 1.0 |
+| 5987 | VMware vCenter Server Heap-Based Buffer Overflow Vulnerability | kev | `cve-2024-38812` | code | 1.0 |
+| 5988 | VMware vCenter Server Privilege Escalation Vulnerability | kev | `cve-2024-38813` | code | 1.0 |
+| 5989 | Apache OFBiz Incorrect Authorization Vulnerability | kev | `cve-2024-38856` | code | 1.0 |
+| 5990 | Versa Director Dangerous File Type Upload Vulnerability | kev | `cve-2024-39717` | code | 1.0 |
+| 5991 | Twilio Authy Information Disclosure Vulnerability | kev | `cve-2024-39891` | code | 1.0 |
+| 5992 | CrushFTP VFS Sandbox Escape Vulnerability | kev | `cve-2024-4040` | code | 1.0 |
+| 5993 | Veeam Backup and Replication Deserialization Vulnerability | kev | `cve-2024-40711` | code | 1.0 |
+| 5994 | SonicWall SonicOS Improper Access Control Vulnerability | kev | `cve-2024-40766` | code | 1.0 |
+| 5995 | Zyxel DSL CPE OS Command Injection Vulnerability | kev | `cve-2024-40890` | code | 1.0 |
+| 5996 | Zyxel DSL CPE OS Command Injection Vulnerability | kev | `cve-2024-40891` | code | 1.0 |
+| 5997 | Mitel SIP Phones Argument Injection Vulnerability | kev | `cve-2024-41710` | code | 1.0 |
+| 5998 | Mitel MiCollab Path Traversal Vulnerability | kev | `cve-2024-41713` | code | 1.0 |
+| 5999 | RoundCube Webmail Cross-Site Scripting Vulnerability | kev | `cve-2024-42009` | code | 1.0 |
+| 6000 | Qualcomm Multiple Chipsets Use-After-Free Vulnerability | kev | `cve-2024-43047` | code | 1.0 |
+| 6001 | Android Framework Privilege Escalation Vulnerability | kev | `cve-2024-43093` | code | 1.0 |
+| 6002 | Microsoft Windows NTLMv2 Hash Disclosure Spoofing Vulnerability | kev | `cve-2024-43451` | code | 1.0 |
+| 6003 | Microsoft Windows MSHTML Platform Spoofing Vulnerability | kev | `cve-2024-43461` | code | 1.0 |
+| 6004 | Microsoft Configuration Manager SQL Injection Vulnerability | kev | `cve-2024-43468` | code | 1.0 |
+| 6005 | Microsoft Windows Management Console Remote Code Execution Vulnerability | kev | `cve-2024-43572` | code | 1.0 |
+| 6006 | Microsoft Windows MSHTML Platform Spoofing Vulnerability | kev | `cve-2024-43573` | code | 1.0 |
+| 6007 | Progress Telerik Report Server Authentication Bypass by Spoofing Vulnerability | kev | `cve-2024-4358` | code | 1.0 |
+| 6008 | Apple Multiple Products Code Execution Vulnerability | kev | `cve-2024-44308` | code | 1.0 |
+| 6009 | Apple Multiple Products Cross-Site Scripting (XSS) Vulnerability | kev | `cve-2024-44309` | code | 1.0 |
+| 6010 | Apache OFBiz Forced Browsing Vulnerability | kev | `cve-2024-45195` | code | 1.0 |
+| 6011 | Synacor Zimbra Collaboration Suite (ZCS) Command Execution Vulnerability | kev | `cve-2024-45519` | code | 1.0 |
+| 6012 | PHP-CGI OS Command Injection Vulnerability | kev | `cve-2024-4577` | code | 1.0 |
+| 6013 | Arm Mali GPU Kernel Driver Use-After-Free Vulnerability | kev | `cve-2024-4610` | code | 1.0 |
+| 6014 | Google Chromium Visuals Use-After-Free Vulnerability | kev | `cve-2024-4671` | code | 1.0 |
+| 6015 | Fortinet FortiManager Missing Authentication Vulnerability | kev | `cve-2024-47575` | code | 1.0 |
+| 6016 | Google Chromium V8 Out-of-Bounds Memory Write Vulnerability | kev | `cve-2024-4761` | code | 1.0 |
+| 6017 | NAKIVO Backup and Replication Absolute Path Traversal Vulnerability | kev | `cve-2024-48248` | code | 1.0 |
+| 6018 | ServiceNow Improper Input Validation Vulnerability | kev | `cve-2024-4879` | code | 1.0 |
+| 6019 | Progress WhatsUp Gold Path Traversal Vulnerability | kev | `cve-2024-4885` | code | 1.0 |
+| 6020 | Microsoft Partner Center Improper Access Control Vulnerability | kev | `cve-2024-49035` | code | 1.0 |
+| 6021 | Microsoft Windows Task Scheduler Privilege Escalation Vulnerability | kev | `cve-2024-49039` | code | 1.0 |
+| 6022 | Microsoft Windows Common Log File System (CLFS) Driver Heap-Based Buffer Overflow Vulnerability | kev | `cve-2024-49138` | code | 1.0 |
+| 6023 | Google Chromium V8 Type Confusion Vulnerability | kev | `cve-2024-4947` | code | 1.0 |
+| 6024 | Justice AV Solutions (JAVS) Viewer Installer Embedded Malicious Code Vulnerability | kev | `cve-2024-4978` | code | 1.0 |
+| 6025 | Linux Kernel Use of Uninitialized Resource Vulnerability | kev | `cve-2024-50302` | code | 1.0 |
+| 6026 | Aviatrix Controllers OS Command Injection Vulnerability | kev | `cve-2024-50603` | code | 1.0 |
+| 6027 | Cleo Multiple Products Unrestricted File Upload Vulnerability | kev | `cve-2024-50623` | code | 1.0 |
+| 6028 | CyberPanel Incorrect Default Permissions Vulnerability | kev | `cve-2024-51378` | code | 1.0 |
+| 6029 | CyberPanel Incorrect Default Permissions Vulnerability | kev | `cve-2024-51567` | code | 1.0 |
+| 6030 | ServiceNow Incomplete List of Disallowed Inputs Vulnerability | kev | `cve-2024-5217` | code | 1.0 |
+| 6031 | Google Chromium V8 Type Confusion Vulnerability | kev | `cve-2024-5274` | code | 1.0 |
+| 6032 | Linux Kernel Out-of-Bounds Write Vulnerability | kev | `cve-2024-53104` | code | 1.0 |
+| 6033 | Linux Kernel Out-of-Bounds Read Vulnerability | kev | `cve-2024-53150` | code | 1.0 |
+| 6034 | Linux Kernel Out-of-Bounds Access Vulnerability | kev | `cve-2024-53197` | code | 1.0 |
+| 6035 | SonicWall SonicOS SSLVPN Improper Authentication Vulnerability | kev | `cve-2024-53704` | code | 1.0 |
+| 6036 | AMI MegaRAC SPx Authentication Bypass by Spoofing Vulnerability | kev | `cve-2024-54085` | code | 1.0 |
+| 6037 | Mitel MiCollab Path Traversal Vulnerability | kev | `cve-2024-55550` | code | 1.0 |
+| 6038 | Fortinet FortiOS and FortiProxy Authentication Bypass Vulnerability | kev | `cve-2024-55591` | code | 1.0 |
+| 6039 | Cleo Multiple Products Unauthenticated File Upload Vulnerability | kev | `cve-2024-55956` | code | 1.0 |
+| 6040 | Craft CMS Code Injection Vulnerability | kev | `cve-2024-56145` | code | 1.0 |
+| 6041 | SimpleHelp Missing Authorization Vulnerability | kev | `cve-2024-57726` | code | 1.0 |
+| 6042 | SimpleHelp Path Traversal Vulnerability | kev | `cve-2024-57727` | code | 1.0 |
+| 6043 | SimpleHelp Path Traversal Vulnerability | kev | `cve-2024-57728` | code | 1.0 |
+| 6044 | Advantive VeraCore Unrestricted File Upload Vulnerability | kev | `cve-2024-57968` | code | 1.0 |
+| 6045 | Yiiframework Yii Improper Protection of Alternate Path Vulnerability | kev | `cve-2024-58136` | code | 1.0 |
+| 6046 | Palo Alto Networks Expedition Missing Authentication Vulnerability | kev | `cve-2024-5910` | code | 1.0 |
+| 6047 | GeoVision Devices OS Command Injection Vulnerability | kev | `cve-2024-6047` | code | 1.0 |
+| 6048 | Progress WhatsUp Gold SQL Injection Vulnerability | kev | `cve-2024-6670` | code | 1.0 |
+| 6049 | Kingsoft WPS Office Path Traversal Vulnerability | kev | `cve-2024-7262` | code | 1.0 |
+| 6050 | Samsung MagicINFO 9 Server Path Traversal Vulnerability | kev | `cve-2024-7399` | code | 1.0 |
+| 6051 | Ivanti Virtual Traffic Manager Authentication Bypass Vulnerability | kev | `cve-2024-7593` | code | 1.0 |
+| 6052 | TeamT5 ThreatSonar Anti-Ransomware Unrestricted Upload of File with Dangerous Type Vulnerability | kev | `cve-2024-7694` | code | 1.0 |
+| 6053 | Google Chromium V8 Inappropriate Implementation Vulnerability | kev | `cve-2024-7965` | code | 1.0 |
+| 6054 | Google Chromium V8 Type Confusion Vulnerability | kev | `cve-2024-7971` | code | 1.0 |
+| 6055 | Citrix Session Recording Improper Privilege Management Vulnerability | kev | `cve-2024-8068` | code | 1.0 |
+| 6056 | Citrix Session Recording Deserialization of Untrusted Data Vulnerability | kev | `cve-2024-8069` | code | 1.0 |
+| 6057 | Ivanti Cloud Services Appliance OS Command Injection Vulnerability | kev | `cve-2024-8190` | code | 1.0 |
+| 6058 | PTZOptics PT30X-SDI/NDI Cameras Authentication Bypass Vulnerability | kev | `cve-2024-8956` | code | 1.0 |
+| 6059 | PTZOptics PT30X-SDI/NDI Cameras OS Command Injection Vulnerability | kev | `cve-2024-8957` | code | 1.0 |
+| 6060 | Ivanti Cloud Services Appliance (CSA) Path Traversal Vulnerability | kev | `cve-2024-8963` | code | 1.0 |
+| 6061 | Ivanti Cloud Services Appliance (CSA) SQL Injection Vulnerability | kev | `cve-2024-9379` | code | 1.0 |
+| 6062 | Ivanti Cloud Services Appliance (CSA) OS Command Injection Vulnerability | kev | `cve-2024-9380` | code | 1.0 |
+| 6063 | Palo Alto Networks Expedition OS Command Injection Vulnerability | kev | `cve-2024-9463` | code | 1.0 |
+| 6064 | Palo Alto Networks Expedition SQL Injection Vulnerability | kev | `cve-2024-9465` | code | 1.0 |
+| 6065 | Palo Alto Networks PAN-OS Management Interface OS Command Injection Vulnerability | kev | `cve-2024-9474` | code | 1.0 |
+| 6066 | ScienceLogic SL1 Unspecified Vulnerability | kev | `cve-2024-9537` | code | 1.0 |
+| 6067 | Mozilla Firefox Use-After-Free Vulnerability | kev | `cve-2024-9680` | code | 1.0 |
+| 6068 | Palo Alto Networks PAN-OS Authentication Bypass Vulnerability | kev | `cve-2025-0108` | code | 1.0 |
+| 6069 | Palo Alto Networks PAN-OS File Read Vulnerability | kev | `cve-2025-0111` | code | 1.0 |
+| 6070 | Ivanti Connect Secure, Policy Secure, and ZTA Gateways Stack-Based Buffer Overflow Vulnerability | kev | `cve-2025-0282` | code | 1.0 |
+| 6071 | 7-Zip Mark of the Web Bypass Vulnerability | kev | `cve-2025-0411` | code | 1.0 |
+| 6072 | Trimble Cityworks Deserialization Vulnerability | kev | `cve-2025-0994` | code | 1.0 |
+| 6073 | Fortra GoAnywhere MFT Deserialization of Untrusted Data Vulnerability | kev | `cve-2025-10035` | code | 1.0 |
+| 6074 | Google Chromium V8 Type Confusion Vulnerability | kev | `cve-2025-10585` | code | 1.0 |
+| 6075 | Gladinet CentreStack and Triofox Files or Directories Accessible to External Parties Vulnerability | kev | `cve-2025-11371` | code | 1.0 |
+| 6076 | React Native Community CLI OS Command Injection Vulnerability | kev | `cve-2025-11953` | code | 1.0 |
+| 6077 | Gladinet Triofox Improper Access Control Vulnerability | kev | `cve-2025-12480` | code | 1.0 |
+| 6078 | Edimax IC-7100 IP Camera OS Command Injection Vulnerability | kev | `cve-2025-1316` | code | 1.0 |
+| 6079 | Google Chromium V8 Type Confusion Vulnerability | kev | `cve-2025-13223` | code | 1.0 |
+| 6080 | Google Chromium Out of Bounds Memory Access Vulnerability | kev | `cve-2025-14174` | code | 1.0 |
+| 6081 | Gladinet CentreStack and Triofox Hard Coded Cryptographic Vulnerability | kev | `cve-2025-14611` | code | 1.0 |
+| 6082 | WatchGuard Firebox Out of Bounds Write Vulnerability | kev | `cve-2025-14733` | code | 1.0 |
+| 6083 | MongoDB and MongoDB Server Improper Handling of Length Parameter Inconsistency Vulnerability | kev | `cve-2025-14847` | code | 1.0 |
+| 6084 | Notepad++ Download of Code Without Integrity Check Vulnerability | kev | `cve-2025-15556` | code | 1.0 |
+| 6085 | Broadcom Brocade Fabric OS Code Injection Vulnerability | kev | `cve-2025-1976` | code | 1.0 |
+| 6086 | Cisco Identity Services Engine Injection Vulnerability | kev | `cve-2025-20281` | code | 1.0 |
+| 6087 | Cisco Secure Firewall Adaptive Security Appliance (ASA) and Secure Firewall Threat Defense (FTD) Buffer Overflow Vulnerability | kev | `cve-2025-20333` | code | 1.0 |
+| 6088 | Cisco Identity Services Engine Injection Vulnerability | kev | `cve-2025-20337` | code | 1.0 |
+| 6089 | Cisco IOS and IOS XE Software SNMP Denial of Service and Remote Code Execution Vulnerability | kev | `cve-2025-20352` | code | 1.0 |
+| 6090 | Cisco Secure Firewall Adaptive Security (ASA) Appliance and Secure Firewall Threat Defense (FTD) Missing Authorization Vulnerability | kev | `cve-2025-20362` | code | 1.0 |
+| 6091 | Cisco Multiple Products Improper Input Validation Vulnerability | kev | `cve-2025-20393` | code | 1.0 |
+| 6092 | Samsung Mobile Devices Out-of-Bounds Write Vulnerability | kev | `cve-2025-21042` | code | 1.0 |
+| 6093 | Samsung Mobile Devices Out-of-Bounds Write Vulnerability | kev | `cve-2025-21043` | code | 1.0 |
+| 6094 | Microsoft Windows Hyper-V NT Kernel Integration VSP Heap-based Buffer Overflow Vulnerability | kev | `cve-2025-21333` | code | 1.0 |
+| 6095 | Microsoft Windows Hyper-V NT Kernel Integration VSP Use-After-Free Vulnerability | kev | `cve-2025-21334` | code | 1.0 |
+| 6096 | Microsoft Windows Hyper-V NT Kernel Integration VSP Use-After-Free Vulnerability | kev | `cve-2025-21335` | code | 1.0 |
+| 6097 | Microsoft Windows Storage Link Following Vulnerability | kev | `cve-2025-21391` | code | 1.0 |
+| 6098 | Microsoft Windows Ancillary Function Driver for WinSock Heap-Based Buffer Overflow Vulnerability | kev | `cve-2025-21418` | code | 1.0 |
+| 6099 | Qualcomm Multiple Chipsets Incorrect Authorization Vulnerability | kev | `cve-2025-21479` | code | 1.0 |
+| 6100 | Qualcomm Multiple Chipsets Incorrect Authorization Vulnerability | kev | `cve-2025-21480` | code | 1.0 |
+| 6101 | Juniper Junos OS Improper Isolation or Compartmentalization Vulnerability | kev | `cve-2025-21590` | code | 1.0 |
+| 6102 | VMware ESXi and Workstation TOCTOU Race Condition Vulnerability | kev | `cve-2025-22224` | code | 1.0 |
+| 6103 | VMware ESXi Arbitrary Write Vulnerability | kev | `cve-2025-22225` | code | 1.0 |
+| 6104 | VMware ESXi, Workstation, and Fusion Information Disclosure Vulnerability | kev | `cve-2025-22226` | code | 1.0 |
+| 6105 | Ivanti Connect Secure, Policy Secure, and ZTA Gateways Stack-Based Buffer Overflow Vulnerability | kev | `cve-2025-22457` | code | 1.0 |
+| 6106 | SonicWall SMA1000 Appliances Deserialization Vulnerability | kev | `cve-2025-23006` | code | 1.0 |
+| 6107 | Craft CMS Code Injection Vulnerability | kev | `cve-2025-23209` | code | 1.0 |
+| 6108 | Wazuh Server Deserialization of Untrusted Data Vulnerability | kev | `cve-2025-24016` | code | 1.0 |
+| 6109 | Microsoft Windows NTLM Hash Disclosure Spoofing Vulnerability | kev | `cve-2025-24054` | code | 1.0 |
+| 6110 | Apple Multiple Products Use-After-Free Vulnerability | kev | `cve-2025-24085` | code | 1.0 |
+| 6111 | Apple iOS and iPadOS Incorrect Authorization Vulnerability | kev | `cve-2025-24200` | code | 1.0 |
+| 6112 | Apple Multiple Products WebKit Out-of-Bounds Write Vulnerability | kev | `cve-2025-24201` | code | 1.0 |
+| 6113 | Fortinet FortiOS and FortiProxy Authentication Bypass Vulnerability | kev | `cve-2025-24472` | code | 1.0 |
+| 6114 | Apache Tomcat Path Equivalence Vulnerability | kev | `cve-2025-24813` | code | 1.0 |
+| 6115 | XWiki Platform Eval Injection Vulnerability | kev | `cve-2025-24893` | code | 1.0 |
+| 6116 | Microsoft Windows Win32k Use-After-Free Vulnerability | kev | `cve-2025-24983` | code | 1.0 |
+| 6117 | Microsoft Windows NTFS Information Disclosure Vulnerability | kev | `cve-2025-24984` | code | 1.0 |
+| 6118 | Microsoft Windows Fast FAT File System Driver Integer Overflow Vulnerability | kev | `cve-2025-24985` | code | 1.0 |
+| 6119 | Microsoft Power Pages Improper Access Control Vulnerability | kev | `cve-2025-24989` | code | 1.0 |
+| 6120 | Microsoft Windows Untrusted Pointer Dereference Vulnerability | kev | `cve-2025-24990` | code | 1.0 |
+| 6121 | Microsoft Windows NTFS Out-Of-Bounds Read Vulnerability | kev | `cve-2025-24991` | code | 1.0 |
+| 6122 | Microsoft Windows NTFS Heap-Based Buffer Overflow Vulnerability | kev | `cve-2025-24993` | code | 1.0 |
+| 6123 | Advantive VeraCore SQL Injection Vulnerability | kev | `cve-2025-25181` | code | 1.0 |
+| 6124 | Fortinet Multiple Products Heap-based Buffer Overflow Vulnerability | kev | `cve-2025-25249` | code | 1.0 |
+| 6125 | Fortinet FortiWeb SQL Injection Vulnerability | kev | `cve-2025-25257` | code | 1.0 |
+| 6126 | SolarWinds Web Help Desk Deserialization of Untrusted Data Vulnerability | kev | `cve-2025-26399` | code | 1.0 |
+| 6127 | Microsoft Windows Management Console (MMC) Improper Neutralization Vulnerability | kev | `cve-2025-26633` | code | 1.0 |
+| 6128 | Qualcomm Multiple Chipsets Use-After-Free Vulnerability | kev | `cve-2025-27038` | code | 1.0 |
+| 6129 | FreeType Out-of-Bounds Write Vulnerability | kev | `cve-2025-27363` | code | 1.0 |
+| 6130 | Kentico Xperience CMS Authentication Bypass Using an Alternate Path or Channel Vulnerability | kev | `cve-2025-2746` | code | 1.0 |
+| 6131 | Kentico Xperience CMS Authentication Bypass Using an Alternate Path or Channel Vulnerability | kev | `cve-2025-2747` | code | 1.0 |
+| 6132 | Kentico Xperience Path Traversal Vulnerability | kev | `cve-2025-2749` | code | 1.0 |
+| 6133 | SysAid On-Prem Improper Restriction of XML External Entity Reference Vulnerability | kev | `cve-2025-2775` | code | 1.0 |
+| 6134 | SysAid On-Prem Improper Restriction of XML External Entity Reference Vulnerability | kev | `cve-2025-2776` | code | 1.0 |
+| 6135 | Google Chromium Mojo Sandbox Escape Vulnerability | kev | `cve-2025-2783` | code | 1.0 |
+| 6136 | Synacor Zimbra Collaboration Suite (ZCS) Cross-site Scripting Vulnerability | kev | `cve-2025-27915` | code | 1.0 |
+| 6137 | Srimax Output Messenger Directory Traversal Vulnerability | kev | `cve-2025-27920` | code | 1.0 |
+| 6138 | D-Link DIR-823X Command Injection Vulnerability | kev | `cve-2025-29635` | code | 1.0 |
+| 6139 | Microsoft Windows Common Log File System (CLFS) Driver Use-After-Free Vulnerability | kev | `cve-2025-29824` | code | 1.0 |
+| 6140 | tj-actions/changed-files GitHub Action Embedded Malicious Code Vulnerability | kev | `cve-2025-30066` | code | 1.0 |
+| 6141 | reviewdog/action-setup GitHub Action Embedded Malicious Code Vulnerability | kev | `cve-2025-30154` | code | 1.0 |
+| 6142 | Microsoft Windows Scripting Engine Type Confusion Vulnerability | kev | `cve-2025-30397` | code | 1.0 |
+| 6143 | Microsoft Windows DWM Core Library Use-After-Free Vulnerability | kev | `cve-2025-30400` | code | 1.0 |
+| 6144 | Gladinet CentreStack and Triofox Use of Hard-coded Cryptographic Key Vulnerability | kev | `cve-2025-30406` | code | 1.0 |
+| 6145 | Vite Vitejs Improper Access Control Vulnerability | kev | `cve-2025-31125` | code | 1.0 |
+| 6146 | CrushFTP Authentication Bypass Vulnerability | kev | `cve-2025-31161` | code | 1.0 |
+| 6147 | Apple Multiple Products Memory Corruption Vulnerability | kev | `cve-2025-31200` | code | 1.0 |
+| 6148 | Apple Multiple Products Arbitrary Read and Write Vulnerability | kev | `cve-2025-31201` | code | 1.0 |
+| 6149 | Apple Multiple Products Buffer Overflow Vulnerability | kev | `cve-2025-31277` | code | 1.0 |
+| 6150 | SAP NetWeaver Unrestricted File Upload Vulnerability | kev | `cve-2025-31324` | code | 1.0 |
+| 6151 | Craft CMS Code Injection Vulnerability | kev | `cve-2025-32432` | code | 1.0 |
+| 6152 | Erlang Erlang/OTP SSH Server Missing Authentication for Critical Function Vulnerability | kev | `cve-2025-32433` | code | 1.0 |
+| 6153 | Sudo Inclusion of Functionality from Untrusted Control Sphere Vulnerability | kev | `cve-2025-32463` | code | 1.0 |
+| 6154 | Langflow Missing Authentication Vulnerability | kev | `cve-2025-3248` | code | 1.0 |
+| 6155 | Microsoft Windows Common Log File System (CLFS) Driver Use-After-Free Vulnerability | kev | `cve-2025-32701` | code | 1.0 |
+| 6156 | Microsoft Windows Common Log File System (CLFS) Driver Heap-Based Buffer Overflow Vulnerability | kev | `cve-2025-32706` | code | 1.0 |
+| 6157 | Microsoft Windows Ancillary Function Driver for WinSock Use-After-Free Vulnerability | kev | `cve-2025-32709` | code | 1.0 |
+| 6158 | Fortinet Multiple Products Stack-Based Buffer Overflow Vulnerability | kev | `cve-2025-32756` | code | 1.0 |
+| 6159 | Quest KACE Systems Management Appliance (SMA) Improper Authentication Vulnerability | kev | `cve-2025-32975` | code | 1.0 |
+| 6160 | Microsoft Windows External Control of File Name or Path Vulnerability | kev | `cve-2025-33053` | code | 1.0 |
+| 6161 | Microsoft Windows SMB Client Improper Access Control Vulnerability | kev | `cve-2025-33073` | code | 1.0 |
+| 6162 | Versa Concerto Improper Authentication Vulnerability | kev | `cve-2025-34026` | code | 1.0 |
+| 6163 | Commvault Command Center Path Traversal Vulnerability | kev | `cve-2025-34028` | code | 1.0 |
+| 6164 | Langflow Origin Validation Error Vulnerability | kev | `cve-2025-34291` | code | 1.0 |
+| 6165 | Craft CMS External Control of Assumed-Immutable Web Parameter Vulnerability | kev | `cve-2025-35939` | code | 1.0 |
+| 6166 | Hewlett Packard Enterprise (HPE) OneView Code Injection Vulnerability | kev | `cve-2025-37164` | code | 1.0 |
+| 6167 | Linux Kernel Time-of-Check Time-of-Use (TOCTOU) Race Condition Vulnerability | kev | `cve-2025-38352` | code | 1.0 |
+| 6168 | Commvault Web Server Unspecified Vulnerability | kev | `cve-2025-3928` | code | 1.0 |
+| 6169 | ConnectWise ScreenConnect Improper Authentication Vulnerability | kev | `cve-2025-3935` | code | 1.0 |
+| 6170 | Linux Kernel Improper Check for Unusual or Exceptional Conditions Vulnerability | kev | `cve-2025-39682` | code | 1.0 |
+| 6171 | Linux Kernel Race Condition Vulnerability | kev | `cve-2025-39964` | code | 1.0 |
+| 6172 | Smartbedded Meteobridge Command Injection Vulnerability | kev | `cve-2025-4008` | code | 1.0 |
+| 6173 | SolarWinds Web Help Desk Security Control Bypass Vulnerability | kev | `cve-2025-40536` | code | 1.0 |
+| 6174 | SolarWinds Web Help Desk Deserialization of Untrusted Data Vulnerability | kev | `cve-2025-40551` | code | 1.0 |
+| 6175 | SonicWall SMA1000 Missing Authorization Vulnerability | kev | `cve-2025-40602` | code | 1.0 |
+| 6176 | Broadcom VMware Aria Operations and VMware Tools Privilege Defined with Unsafe Actions Vulnerability | kev | `cve-2025-41244` | code | 1.0 |
+| 6177 | Danfoss AK-SM 800A Series Improper Authentication Vulnerability | kev | `cve-2025-41450` | code | 1.0 |
+| 6178 | Qualitia Active! Mail Stack-Based Buffer Overflow Vulnerability | kev | `cve-2025-42599` | code | 1.0 |
+| 6179 | SAP NetWeaver Improper Neutralization of Special Elements in Data Query Logic Vulnerability | kev | `cve-2025-42884` | code | 1.0 |
+| 6180 | SAP NetWeaver Deserialization Vulnerability | kev | `cve-2025-42999` | code | 1.0 |
+| 6181 | Apple Multiple Products Unspecified Vulnerability | kev | `cve-2025-43200` | code | 1.0 |
+| 6182 | Apple iOS, iPadOS, and macOS Out-of-Bounds Write Vulnerability | kev | `cve-2025-43300` | code | 1.0 |
+| 6183 | Apple Multiple Products Improper Locking Vulnerability | kev | `cve-2025-43510` | code | 1.0 |
+| 6184 | Apple Multiple Products Classic Buffer Overflow Vulnerability | kev | `cve-2025-43520` | code | 1.0 |
+| 6185 | Apple Multiple Products Use-After-Free WebKit Vulnerability | kev | `cve-2025-43529` | code | 1.0 |
+| 6186 | Ivanti Endpoint Manager Mobile (EPMM) Authentication Bypass Vulnerability | kev | `cve-2025-4427` | code | 1.0 |
+| 6187 | Ivanti Endpoint Manager Mobile (EPMM) Code Injection Vulnerability | kev | `cve-2025-4428` | code | 1.0 |
+| 6188 | Samsung MagicINFO 9 Server Path Traversal Vulnerability | kev | `cve-2025-4632` | code | 1.0 |
+| 6189 | TeleMessage TM SGNL Hidden Functionality Vulnerability | kev | `cve-2025-47729` | code | 1.0 |
+| 6190 | Wing FTP Server Improper Neutralization of Null Byte or NUL Character Vulnerability | kev | `cve-2025-47812` | code | 1.0 |
+| 6191 | Wing FTP Server Information Disclosure Vulnerability | kev | `cve-2025-47813` | code | 1.0 |
+| 6192 | IGEL OS Use of a Key Past its Expiration Date Vulnerability | kev | `cve-2025-47827` | code | 1.0 |
+| 6193 | Git Link Following Vulnerability | kev | `cve-2025-48384` | code | 1.0 |
+| 6194 | Android Runtime Use-After-Free Vulnerability | kev | `cve-2025-48543` | code | 1.0 |
+| 6195 | Android Framework Privilege Escalation Vulnerability | kev | `cve-2025-48572` | code | 1.0 |
+| 6196 | Android Framework Integer Overflow Vulnerability | kev | `cve-2025-48595` | code | 1.0 |
+| 6197 | Android Framework Information Disclosure Vulnerability | kev | `cve-2025-48633` | code | 1.0 |
+| 6198 | Synacor Zimbra Collaboration Suite (ZCS) Cross-site Scripting Vulnerability | kev | `cve-2025-48700` | code | 1.0 |
+| 6199 | CWP Control Web Panel OS Command Injection Vulnerability | kev | `cve-2025-48703` | code | 1.0 |
+| 6200 | TeleMessage TM SGNL Initialization of a Resource with an Insecure Default Vulnerability | kev | `cve-2025-48927` | code | 1.0 |
+| 6201 | TeleMessage TM SGNL Exposure of Core Dump File to an Unauthorized Control Sphere Vulnerability | kev | `cve-2025-48928` | code | 1.0 |
+| 6202 | RoundCube Webmail Deserialization of Untrusted Data Vulnerability | kev | `cve-2025-49113` | code | 1.0 |
+| 6203 | Microsoft SharePoint Code Injection Vulnerability | kev | `cve-2025-49704` | code | 1.0 |
+| 6204 | Microsoft SharePoint Improper Authentication Vulnerability | kev | `cve-2025-49706` | code | 1.0 |
+| 6205 | Dassault Systèmes DELMIA Apriso Deserialization of Untrusted Data Vulnerability | kev | `cve-2025-5086` | code | 1.0 |
+| 6206 | SmarterTools SmarterMail Unrestricted Upload of File with Dangerous Type Vulnerability | kev | `cve-2025-52691` | code | 1.0 |
+| 6207 | F5 BIG-IP Stack-Based Buffer Overflow Vulnerability | kev | `cve-2025-53521` | code | 1.0 |
+| 6208 | Sitecore Multiple Products Deserialization of Untrusted Data Vulnerability | kev | `cve-2025-53690` | code | 1.0 |
+| 6209 | Microsoft SharePoint Deserialization of Untrusted Data Vulnerability | kev | `cve-2025-53770` | code | 1.0 |
+| 6210 | Laravel Livewire Code Injection Vulnerability | kev | `cve-2025-54068` | code | 1.0 |
+| 6211 | Google Chromium V8 Out-of-Bounds Read and Write Vulnerability | kev | `cve-2025-5419` | code | 1.0 |
+| 6212 | Adobe Commerce and Magento Improper Input Validation Vulnerability | kev | `cve-2025-54236` | code | 1.0 |
+| 6213 | Adobe Experience Manager Forms Code Execution Vulnerability | kev | `cve-2025-54253` | code | 1.0 |
+| 6214 | CrushFTP Unprotected Alternate Channel Vulnerability | kev | `cve-2025-54309` | code | 1.0 |
+| 6215 | Prettier eslint-config-prettier Embedded Malicious Code Vulnerability | kev | `cve-2025-54313` | code | 1.0 |
+| 6216 | Trend Micro Apex One OS Command Injection Vulnerability | kev | `cve-2025-54948` | code | 1.0 |
+| 6217 | Meta Platforms WhatsApp Incorrect Authorization Vulnerability | kev | `cve-2025-55177` | code | 1.0 |
+| 6218 | Meta React Server Components Remote Code Execution Vulnerability | kev | `cve-2025-55182` | code | 1.0 |
+| 6219 | Citrix NetScaler ADC and Gateway Out-of-Bounds Read Vulnerability | kev | `cve-2025-5777` | code | 1.0 |
+| 6220 | Sangoma FreePBX Authentication Bypass Vulnerability | kev | `cve-2025-57819` | code | 1.0 |
+| 6221 | Fortinet FortiWeb OS Command Injection Vulnerability | kev | `cve-2025-58034` | code | 1.0 |
+| 6222 | OSGeo GeoServer Improper Restriction of XML External Entity Reference Vulnerability | kev | `cve-2025-58360` | code | 1.0 |
+| 6223 | Microsoft Windows Improper Access Control Vulnerability | kev | `cve-2025-59230` | code | 1.0 |
+| 6224 | Microsoft Windows Server Update Service (WSUS) Deserialization of Untrusted Data Vulnerability | kev | `cve-2025-59287` | code | 1.0 |
+| 6225 | ASUS Live Update Embedded Malicious Code Vulnerability | kev | `cve-2025-59374` | code | 1.0 |
+| 6226 | Libraesva Email Security Gateway Command Injection Vulnerability | kev | `cve-2025-59689` | code | 1.0 |
+| 6227 | Fortinet Multiple Products Improper Verification of Cryptographic Signature Vulnerability | kev | `cve-2025-59718` | code | 1.0 |
+| 6228 | Microsoft Windows Link Following Vulnerability | kev | `cve-2025-60710` | code | 1.0 |
+| 6229 | Fortinet Multiple Products Path Traversal Vulnerability | kev | `cve-2025-61624` | code | 1.0 |
+| 6230 | Oracle Fusion Middleware Missing Authentication for Critical Function Vulnerability | kev | `cve-2025-61757` | code | 1.0 |
+| 6231 | Oracle E-Business Suite Unspecified Vulnerability | kev | `cve-2025-61882` | code | 1.0 |
+| 6232 | Oracle E-Business Suite Server-Side Request Forgery (SSRF) Vulnerability | kev | `cve-2025-61884` | code | 1.0 |
+| 6233 | Motex LANSCOPE Endpoint Manager Improper Verification of Source of a Communication Channel Vulnerability | kev | `cve-2025-61932` | code | 1.0 |
+| 6234 | Dassault Systèmes DELMIA Apriso Code Injection Vulnerability | kev | `cve-2025-6204` | code | 1.0 |
+| 6235 | Dassault Systèmes DELMIA Apriso Missing Authorization Vulnerability | kev | `cve-2025-6205` | code | 1.0 |
+| 6236 | RARLAB WinRAR Path Traversal Vulnerability | kev | `cve-2025-6218` | code | 1.0 |
+| 6237 | Microsoft Windows Race Condition Vulnerability | kev | `cve-2025-62215` | code | 1.0 |
+| 6238 | Microsoft Windows Use After Free Vulnerability | kev | `cve-2025-62221` | code | 1.0 |
+| 6239 | Ray-Project Ray Code Injection Vulnerability | kev | `cve-2025-62593` | code | 1.0 |
+| 6240 | Sangoma FreePBX OS Command Injection Vulnerability | kev | `cve-2025-64328` | code | 1.0 |
+| 6241 | Fortinet FortiWeb Path Traversal Vulnerability | kev | `cve-2025-64446` | code | 1.0 |
+| 6242 | Citrix NetScaler ADC and Gateway Buffer Overflow Vulnerability | kev | `cve-2025-6543` | code | 1.0 |
+| 6243 | Google Chromium V8 Type Confusion Vulnerability | kev | `cve-2025-6554` | code | 1.0 |
+| 6244 | Google Chromium ANGLE and GPU Improper Input Validation Vulnerability | kev | `cve-2025-6558` | code | 1.0 |
+| 6245 | Synacor Zimbra Collaboration Suite (ZCS) Cross-Site Scripting Vulnerability | kev | `cve-2025-66376` | code | 1.0 |
+| 6246 | Array Networks ArrayOS AG OS Command Injection Vulnerability | kev | `cve-2025-66644` | code | 1.0 |
+| 6247 | Lantronix EDS5000 Code Injection Vulnerability | kev | `cve-2025-67038` | code | 1.0 |
+| 6248 | RoundCube Webmail Cross-site Scripting Vulnerability | kev | `cve-2025-68461` | code | 1.0 |
+| 6249 | n8n Improper Control of Dynamically-Managed Code Resources Vulnerability | kev | `cve-2025-68613` | code | 1.0 |
+| 6250 | Synacor Zimbra Collaboration Suite (ZCS) PHP Remote File Inclusion Vulnerability | kev | `cve-2025-68645` | code | 1.0 |
+| 6251 | Fortinet FortiOS Exposure of Sensitive Information to an Unauthorized Actor Vulnerability | kev | `cve-2025-68686` | code | 1.0 |
+| 6252 | Citrix NetScaler Memory Overflow Vulnerability | kev | `cve-2025-7775` | code | 1.0 |
+| 6253 | RARLAB WinRAR Path Traversal Vulnerability | kev | `cve-2025-8088` | code | 1.0 |
+| 6254 | Gogs Path Traversal Vulnerability | kev | `cve-2025-8110` | code | 1.0 |
+| 6255 | N-able N-Central Insecure Deserialization Vulnerability | kev | `cve-2025-8875` | code | 1.0 |
+| 6256 | N-able N-Central Command Injection Vulnerability | kev | `cve-2025-8876` | code | 1.0 |
+| 6257 | WatchGuard Firebox Out-of-Bounds Write Vulnerability | kev | `cve-2025-9242` | code | 1.0 |
+| 6258 | TP-Link Archer C7(EU) and TL-WR841N/ND(MS) OS Command Injection Vulnerability | kev | `cve-2025-9377` | code | 1.0 |
+| 6259 | Palo Alto Networks PAN-OS Authentication Bypass Vulnerability | kev | `cve-2026-0257` | code | 1.0 |
+| 6260 | Palo Alto Networks PAN-OS Out-of-bounds Write Vulnerability | kev | `cve-2026-0300` | code | 1.0 |
+| 6261 | Palo Alto Networks PAN-OS Code Injection Vulnerability | kev | `cve-2026-0322` | code | 1.0 |
+| 6262 | Langflow Inclusion of Functionality from Untrusted Control Sphere Vulnerability | kev | `cve-2026-0770` | code | 1.0 |
+| 6263 | Zammad GmbH Zammad Session Fixation Vulnerability | kev | `cve-2026-102489` | code | 1.0 |
+| 6264 | Zammad GmbH Zammad Improper Privilege Management Vulnerability | kev | `cve-2026-102490` | code | 1.0 |
+| 6265 | BeyondTrust Remote Support Authentication Bypass by Spoofing Vulnerability | kev | `cve-2026-102764` | code | 1.0 |
+| 6266 | GPUStack Improper Authentication Vulnerability | kev | `cve-2026-102895` | code | 1.0 |
+| 6267 | Hewlett Packard Enterprise (HPE) Juniper Session Smart Conductor and Session Smart Router OS Command Injection Vulnerability | kev | `cve-2026-103406` | code | 1.0 |
+| 6268 | Fortinet FortiMail Path Traversal Vulnerability | kev | `cve-2026-104286` | code | 1.0 |
+| 6269 | Ivanti Connect Secure Authentication Bypass by Spoofing Vulnerability | kev | `cve-2026-104935` | code | 1.0 |
+| 6270 | Ahsay AhsayCBS Improper Authentication Vulnerability | kev | `cve-2026-105133` | code | 1.0 |
+| 6271 | Ahsay AhsayCBS Command Injection Vulnerability | kev | `cve-2026-105134` | code | 1.0 |
+| 6272 | Ivanti Sentry OS Command Injection Vulnerability | kev | `cve-2026-10520` | code | 1.0 |
+| 6273 | EG Secure Solutions SiteGuard Server Edition OS Command Injection Vulnerability | kev | `cve-2026-106931` | code | 1.0 |
+| 6274 | PHP Memory Corruption Vulnerability | kev | `cve-2026-109618` | code | 1.0 |
+| 6275 | PHP Stale Internal Request-State Vulnerability | kev | `cve-2026-109619` | code | 1.0 |
+| 6276 | Collabora Online – Built-in CODE Server OS Command Injection Vulnerability | kev | `cve-2026-110447` | code | 1.0 |
+| 6277 | Siemens Software Center Uncontrolled Search Path Element Vulnerability | kev | `cve-2026-110936` | code | 1.0 |
+| 6278 | Ivanti Connect Secure Missing Authentication for Critical Function Vulnerability | kev | `cve-2026-111357` | code | 1.0 |
+| 6279 | Google Brotli Unchecked Return Value Vulnerability | kev | `cve-2026-111497` | code | 1.0 |
+| 6280 | Barracuda Networks Multiple Products OS Command Injection Vulnerability | kev | `cve-2026-111560` | code | 1.0 |
+| 6281 | Openwave Messaging Limited Webtop Media Transcoder Incorrect Resource Transfer Between Spheres Vulnerability | kev | `cve-2026-111793` | code | 1.0 |
+| 6282 | Arista VeloCloud Orchestrator SQL Injection Vulnerability | kev | `cve-2026-114625` | code | 1.0 |
+| 6283 | UnrealIRCd Improper Neutralization of Delimiters Vulnerability | kev | `cve-2026-114713` | code | 1.0 |
+| 6284 | Perforce Puppet Enterprise Deserialization of Untrusted Data Vulnerability | kev | `cve-2026-115731` | code | 1.0 |
+| 6285 | Google Chromium V8 Out-of-Bounds Read and Write Vulnerability | kev | `cve-2026-11645` | code | 1.0 |
+| 6286 | Barracuda Networks Email Security Gateway (ESG) Authentication Bypass Using an Alternate Path or Channel Vulnerability | kev | `cve-2026-116606` | code | 1.0 |
+| 6287 | SignalWire FreeSwitch Code Injection Vulnerability | kev | `cve-2026-116779` | code | 1.0 |
+| 6288 | Ivanti Connect Secure Generation of Predictable Numbers or Identifiers Vulnerability | kev | `cve-2026-118527` | code | 1.0 |
+| 6289 | WordPress WordPress Core Time-of-check Time-of-use (TOCTOU) Race Condition Vulnerability | kev | `cve-2026-119977` | code | 1.0 |
+| 6290 | Check Point Multiple Products Incorrect Permission Assignment for Critical Resource Vulnerability | kev | `cve-2026-123039` | code | 1.0 |
+| 6291 | OpenBSD OpenSSH Unexpected Status Code or Return Value Vulnerability | kev | `cve-2026-123158` | code | 1.0 |
+| 6292 | IBM Aspera Faspex Incorrect Authorization Vulnerability | kev | `cve-2026-123218` | code | 1.0 |
+| 6293 | VMWare vCenter Authentication Bypass Using an Alternate Path or Channel Vulnerability | kev | `cve-2026-123890` | code | 1.0 |
+| 6294 | Microsoft Office Outlook Missing User Interaction for Potentially Unsafe Action Vulnerability | kev | `cve-2026-124194` | code | 1.0 |
+| 6295 | Google Chromium Use-After-Free Vulnerability | kev | `cve-2026-125350` | code | 1.0 |
+| 6296 | PTC Windchill and FlexPLM Improper Input Validation Vulnerability | kev | `cve-2026-12569` | code | 1.0 |
+| 6297 | Ivanti Endpoint Manager Mobile (EPMM) Code Injection Vulnerability | kev | `cve-2026-1281` | code | 1.0 |
+| 6298 | Apache Roller Deserialization of Untrusted Data Vulnerability | kev | `cve-2026-129448` | code | 1.0 |
+| 6299 | Idunno AntiCsrf Deserialization of Untrusted Data Vulnerability | kev | `cve-2026-131914` | code | 1.0 |
+| 6300 | Drupal Core Remote Code Execution Vulnerability | kev | `cve-2026-132165` | code | 1.0 |
+| 6301 | Optimizely Web Experimentation External Control of Critical State Data Vulnerability | kev | `cve-2026-132224` | code | 1.0 |
+| 6302 | Mitel MiCollab Unrestricted Upload of File with Dangerous Type Vulnerability | kev | `cve-2026-133275` | code | 1.0 |
+| 6303 | Mitel MiCollab XML Injection Vulnerability | kev | `cve-2026-133303` | code | 1.0 |
+| 6304 | Mitel MiCollab Weak Authentication Vulnerability | kev | `cve-2026-133311` | code | 1.0 |
+| 6305 | Mitel MiCollab OS Command Injection Vulnerability | kev | `cve-2026-133323` | code | 1.0 |
+| 6306 | Mitel MiCollab Not Failing Securely Vulnerability | kev | `cve-2026-133324` | code | 1.0 |
+| 6307 | Vates Xen Orchestra Improper Validation of Specified Type of Input Vulnerability | kev | `cve-2026-133469` | code | 1.0 |
+| 6308 | Project MONAI MONAI Label Path Traversal Vulnerability | kev | `cve-2026-133968` | code | 1.0 |
+| 6309 | Ivanti Endpoint Manager Mobile (EPMM) Code Injection Vulnerability | kev | `cve-2026-1340` | code | 1.0 |
+| 6310 | N-able MailAssure (SpamExperts) Server-Side Request Forgery (SSRF) Vulnerability | kev | `cve-2026-134624` | code | 1.0 |
+| 6311 | SonicWall SMA1000 Appliances Server-Side Request Forgery Vulnerability | kev | `cve-2026-15409` | code | 1.0 |
+| 6312 | SonicWall SMA1000 Appliances Code Injection Vulnerability | kev | `cve-2026-15410` | code | 1.0 |
+| 6313 | Ivanti Endpoint Manager (EPM) Authentication Bypass Vulnerability | kev | `cve-2026-1603` | code | 1.0 |
+| 6314 | Check Point SmartConsole Improper Authentication Vulnerability | kev | `cve-2026-16232` | code | 1.0 |
+| 6315 | Arista VeloCloud Orchestrator On-Prem OS Command Injection Vulnerability | kev | `cve-2026-16812` | code | 1.0 |
+| 6316 | BeyondTrust Remote Support (RS) and Privileged Remote Access (PRA) OS Command Injection Vulnerability | kev | `cve-2026-1731` | code | 1.0 |
+| 6317 | N-able N-central Authentication Bypass Using an Alternate Path or Channel Vulnerability | kev | `cve-2026-18556` | code | 1.0 |
+| 6318 | N-able N-central Authentication Bypass Using an Alternate Path or Channel Vulnerability | kev | `cve-2026-18577` | code | 1.0 |
+| 6319 | Citrix NetScaler Authentication Bypass Using an Alternate Path or Channel Vulnerability | kev | `cve-2026-19490` | code | 1.0 |
+| 6320 | SonicWall SonicOS SSLVPN Use of Single-factor Authentication Vulnerability | kev | `cve-2026-19868` | code | 1.0 |
+| 6321 | Cisco Unified Communications Products Code Injection Vulnerability | kev | `cve-2026-20045` | code | 1.0 |
+| 6322 | Cisco Firewall Management Center Authentication Bypass Using an Alternate Path or Channel Vulnerability | kev | `cve-2026-20079` | code | 1.0 |
+| 6323 | Cisco Catalyst SD-WAN Manager Incorrect Use of Privileged APIs Vulnerability | kev | `cve-2026-20122` | code | 1.0 |
+| 6324 | Cisco Catalyst SD-WAN Controller and Manager Authentication Bypass Vulnerability | kev | `cve-2026-20127` | code | 1.0 |
+| 6325 | Cisco Catalyst SD-WAN Manager Storing Passwords in a Recoverable Format Vulnerability | kev | `cve-2026-20128` | code | 1.0 |
+| 6326 | Cisco Secure Firewall Management Center (FMC) Software and Cisco Security Cloud Control (SCC) Firewall Management Deserialization of Untrusted Data Vulnerability | kev | `cve-2026-20131` | code | 1.0 |
+| 6327 | Cisco Catalyst SD-WAN Manager Exposure of Sensitive Information to an Unauthorized Actor Vulnerability | kev | `cve-2026-20133` | code | 1.0 |
+| 6328 | Cisco Catalyst SD-WAN Controller Authentication Bypass Vulnerability | kev | `cve-2026-20182` | code | 1.0 |
+| 6329 | Cisco Unified Communications Manager Server-Side Request Forgery (SSRF) Vulnerability | kev | `cve-2026-20230` | code | 1.0 |
+| 6330 | Cisco Catalyst SD-WAN Manager Improper Encoding or Escaping of Output Vulnerability | kev | `cve-2026-20245` | code | 1.0 |
+| 6331 | Splunk Enterprise Missing Authentication for Critical Function Vulnerability | kev | `cve-2026-20253` | code | 1.0 |
+| 6332 | Cisco Catalyst SD-WAN Manager Directory or Path Traversal Vulnerability | kev | `cve-2026-20262` | code | 1.0 |
+| 6333 | Cisco Secure Firewall Management Center Use of Hard-coded Password Vulnerability | kev | `cve-2026-20316` | code | 1.0 |
+| 6334 | Cisco BroadWorks Improper Restriction of XML External Entity Reference Vulnerability | kev | `cve-2026-20320` | code | 1.0 |
+| 6335 | Cisco Secure Firewall Adaptive Security Appliance (ASA) and Secure Firewall Threat Defense (FTD) Heap Inspection Vulnerability | kev | `cve-2026-20349` | code | 1.0 |
+| 6336 | Apple Multiple Buffer Overflow Vulnerability | kev | `cve-2026-20700` | code | 1.0 |
+| 6337 | Microsoft Windows Information Disclosure Vulnerability | kev | `cve-2026-20805` | code | 1.0 |
+| 6338 | Microsoft SharePoint Deserialization of Untrusted Data Vulnerability | kev | `cve-2026-20963` | code | 1.0 |
+| 6339 | Qualcomm Multiple Chipsets Memory Corruption Vulnerability | kev | `cve-2026-21385` | code | 1.0 |
+| 6340 | Microsoft Office Security Feature Bypass Vulnerability | kev | `cve-2026-21509` | code | 1.0 |
+| 6341 | Microsoft Windows Shell Protection Mechanism Failure Vulnerability | kev | `cve-2026-21510` | code | 1.0 |
+| 6342 | Microsoft MSHTML Framework Protection Mechanism Failure Vulnerability | kev | `cve-2026-21513` | code | 1.0 |
+| 6343 | Microsoft Office Word Reliance on Untrusted Inputs in a Security Decision Vulnerability | kev | `cve-2026-21514` | code | 1.0 |
+| 6344 | Microsoft Windows Type Confusion Vulnerability | kev | `cve-2026-21519` | code | 1.0 |
+| 6345 | Microsoft Windows NULL Pointer Dereference Vulnerability | kev | `cve-2026-21525` | code | 1.0 |
+| 6346 | Microsoft Windows Improper Privilege Management Vulnerability | kev | `cve-2026-21533` | code | 1.0 |
+| 6347 | Atlassian Multiple Products Files or Directories Accessible to External Parties Vulnerability | kev | `cve-2026-21589` | code | 1.0 |
+| 6348 | Fortinet FortiClient EMS SQL Injection Vulnerability | kev | `cve-2026-21643` | code | 1.0 |
+| 6349 | Oracle HTTP Server and Oracle Weblogic Server Proxy Plug-in Improper Access Control Vulnerability | kev | `cve-2026-21962` | code | 1.0 |
+| 6350 | Broadcom VMware Aria Operations Command Injection Vulnerability | kev | `cve-2026-22719` | code | 1.0 |
+| 6351 | Dell RecoverPoint for Virtual Machines (RP4VMs) Use of Hard-coded Credentials Vulnerability | kev | `cve-2026-22769` | code | 1.0 |
+| 6352 | SmarterTools SmarterMail Authentication Bypass Using an Alternate Path or Channel Vulnerability | kev | `cve-2026-23760` | code | 1.0 |
+| 6353 | GNU InetUtils Argument Injection Vulnerability | kev | `cve-2026-24061` | code | 1.0 |
+| 6354 | Google Chromium CSS Use-After-Free Vulnerability | kev | `cve-2026-2441` | code | 1.0 |
+| 6355 | SmarterTools SmarterMail Missing Authentication for Critical Function Vulnerability | kev | `cve-2026-24423` | code | 1.0 |
+| 6356 | Fortinet Multiple Products Authentication Bypass Using an Alternate Path or Channel Vulnerability | kev | `cve-2026-24858` | code | 1.0 |
+| 6357 | Fortinet FortiSandbox OS Command Injection Vulnerability | kev | `cve-2026-25089` | code | 1.0 |
+| 6358 | Soliton Systems K.K FileZen OS Command Injection Vulnerability | kev | `cve-2026-25108` | code | 1.0 |
+| 6359 | SolarWinds Serv-U Uncontrolled Resource Consumption Vulnerability | kev | `cve-2026-28318` | code | 1.0 |
+| 6360 | Citrix NetScaler Out-of-Bounds Read Vulnerability | kev | `cve-2026-3055` | code | 1.0 |
+| 6361 | Linux Kernel Incorrect Resource Transfer Between Spheres Vulnerability | kev | `cve-2026-31431` | code | 1.0 |
+| 6362 | Microsoft SharePoint Server Improper Input Validation Vulnerability | kev | `cve-2026-32201` | code | 1.0 |
+| 6363 | Microsoft Windows Protection Mechanism Failure Vulnerability | kev | `cve-2026-32202` | code | 1.0 |
+| 6364 | Langflow Code Injection Vulnerability | kev | `cve-2026-33017` | code | 1.0 |
+| 6365 | Aquasecurity Trivy Embedded Malicious Code Vulnerability | kev | `cve-2026-33634` | code | 1.0 |
+| 6366 | Microsoft Internet Key Exchange (IKE) Service Extensions Double Free Vulnerability | kev | `cve-2026-33824` | code | 1.0 |
+| 6367 | Microsoft Defender Insufficient Granularity of Access Control Vulnerability | kev | `cve-2026-33825` | code | 1.0 |
+| 6368 | Apache ActiveMQ Improper Input Validation Vulnerability | kev | `cve-2026-34197` | code | 1.0 |
+| 6369 | Apache Tomcat Missing Encryption of Sensitive Data Vulnerability | kev | `cve-2026-34486` | code | 1.0 |
+| 6370 | Adobe Acrobat and Reader Prototype Pollution Vulnerability | kev | `cve-2026-34621` | code | 1.0 |
+| 6371 | Ubiquiti UniFi OS Improper Access Control Vulnerability | kev | `cve-2026-34908` | code | 1.0 |
+| 6372 | Ubiquiti UniFi OS Path Traversal Vulnerability | kev | `cve-2026-34909` | code | 1.0 |
+| 6373 | Ubiquiti UniFi OS Improper Input Validation Vulnerability | kev | `cve-2026-34910` | code | 1.0 |
+| 6374 | Trend Micro Apex One (On-Premise) Directory Traversal Vulnerability | kev | `cve-2026-34926` | code | 1.0 |
+| 6375 | TrueConf Client Download of Code Without Integrity Check Vulnerability | kev | `cve-2026-3502` | code | 1.0 |
+| 6376 | Oracle PeopleSoft Enterprise PeopleTools Missing Authentication for Critical Function Vulnerability | kev | `cve-2026-35273` | code | 1.0 |
+| 6377 | Fortinet FortiClient EMS Improper Access Control Vulnerability | kev | `cve-2026-35616` | code | 1.0 |
+| 6378 | Google Skia Out-of-Bounds Write Vulnerability | kev | `cve-2026-3909` | code | 1.0 |
+| 6379 | Google Chromium V8 Improper Restriction of Operations Within the Bounds of a Memory Buffer Vulnerability | kev | `cve-2026-3910` | code | 1.0 |
+| 6380 | Fortinet FortiSandbox OS Command Injection Vulnerability | kev | `cve-2026-39808` | code | 1.0 |
+| 6381 | Marimo Remote Code Execution Vulnerability | kev | `cve-2026-39987` | code | 1.0 |
+| 6382 | BerriAI LiteLLM Unprotected Alternate Channel Vulnerability | kev | `cve-2026-40217` | code | 1.0 |
+| 6383 | Microsoft Defender Link Following Vulnerability | kev | `cve-2026-41091` | code | 1.0 |
+| 6384 | Broadcom VMWare ESX Insufficient Logging Vulnerability | kev | `cve-2026-41709` | code | 1.0 |
+| 6385 | WebPros cPanel & WHM and WP2 (WordPress Squared) Missing Authentication for Critical Function Vulnerability | kev | `cve-2026-41940` | code | 1.0 |
+| 6386 | JFrog Artifactory Incorrect Authorization Vulnerability | kev | `cve-2026-42016` | code | 1.0 |
+| 6387 | JFrog Artifactory Improper Authentication Vulnerability | kev | `cve-2026-42018` | code | 1.0 |
+| 6388 | BerriAI LiteLLM SQL Injection Vulnerability | kev | `cve-2026-42208` | code | 1.0 |
+| 6389 | BerriAI LiteLLM Command Injection Vulnerability | kev | `cve-2026-42271` | code | 1.0 |
+| 6390 | Microsoft Exchange Server Cross-Site Scripting Vulnerability | kev | `cve-2026-42897` | code | 1.0 |
+| 6391 | Mirasvit Full Page Cache Warmer Deserialization of Untrusted Data Vulnerability | kev | `cve-2026-45247` | code | 1.0 |
+| 6392 | TanStack Unspecified Vulnerability | kev | `cve-2026-45321` | code | 1.0 |
+| 6393 | Microsoft Defender Denial of Service Vulnerability | kev | `cve-2026-45498` | code | 1.0 |
+| 6394 | Microsoft SharePoint Server Deserialization of Untrusted Data Vulnerability | kev | `cve-2026-45659` | code | 1.0 |
+| 6395 | Linux Kernel Missing Initialization of a Variable Vulnerability | kev | `cve-2026-46300` | code | 1.0 |
+| 6396 | Oracle E-Business Suite Improper Privilege Management Vulnerability | kev | `cve-2026-46817` | code | 1.0 |
+| 6397 | Nx Console Embedded Malicious Code Vulnerability | kev | `cve-2026-48027` | code | 1.0 |
+| 6398 | LiteSpeed cPanel Plugin Privilege Escalation Vulnerability | kev | `cve-2026-48172` | code | 1.0 |
+| 6399 | Adobe ColdFusion Path Traversal Vulnerability | kev | `cve-2026-48282` | code | 1.0 |
+| 6400 | Adobe Commerce and Magento Unrestricted Upload of File with Dangerous Type Vulnerability | kev | `cve-2026-48356` | code | 1.0 |
+| 6401 | SimpleHelp Authentication Bypass Vulnerability | kev | `cve-2026-48558` | code | 1.0 |
+| 6402 | Kludex Starlette HTTP Request/Response Smuggling Vulnerability | kev | `cve-2026-48710` | code | 1.0 |
+| 6403 | Widget Factory Joomla Content Editor Improper Access Control Vulnerability | kev | `cve-2026-48907` | code | 1.0 |
+| 6404 | JoomShaper SP Page Builder Unrestricted Upload of File with Dangerous Type Vulnerability | kev | `cve-2026-48908` | code | 1.0 |
+| 6405 | iCagenda Unrestricted Upload of File with Dangerous Type Vulnerability | kev | `cve-2026-48939` | code | 1.0 |
+| 6406 | Kestra OSS OS Command Injection Vulnerability | kev | `cve-2026-49869` | code | 1.0 |
+| 6407 | Microsoft SharePoint Deserialization of Untrusted Data Vulnerability | kev | `cve-2026-50522` | code | 1.0 |
+| 6408 | Check Point Security Gateway Improper Authentication Vulnerability | kev | `cve-2026-50751` | code | 1.0 |
+| 6409 | Google Dawn Use-After-Free Vulnerability | kev | `cve-2026-5281` | code | 1.0 |
+| 6410 | Linux Kernel Out-of-Bounds Write Vulnerability | kev | `cve-2026-53266` | code | 1.0 |
+| 6411 | Linux Kernel Unspecified Vulnerability | kev | `cve-2026-53362` | code | 1.0 |
+| 6412 | WSO2 Multiple Products Path Traversal Vulnerability | kev | `cve-2026-5430` | code | 1.0 |
+| 6413 | LiteSpeed cPanel Plugin UNIX Symbolic Link (Symlink) Following Vulnerability | kev | `cve-2026-54420` | code | 1.0 |
+| 6414 | Microsoft SharePoint Weak Authentication Vulnerability | kev | `cve-2026-55040` | code | 1.0 |
+| 6415 | Langflow Authorization Bypass Through User-Controlled Key Vulnerability | kev | `cve-2026-55255` | code | 1.0 |
+| 6416 | Microsoft Active Directory Federation Services Insufficient Granularity of Access Control Vulnerability | kev | `cve-2026-56155` | code | 1.0 |
+| 6417 | Microsoft SharePoint Server Missing Authentication for Critical Function Vulnerability | kev | `cve-2026-56164` | code | 1.0 |
+| 6418 | Joomlack Page Builder Improper Access Control Vulnerability | kev | `cve-2026-56290` | code | 1.0 |
+| 6419 | Balbooa Forms Unrestricted Upload of File with Dangerous Type Vulnerability | kev | `cve-2026-56291` | code | 1.0 |
+| 6420 | Microsoft SharePoint Deserialization of Untrusted Data Vulnerability | kev | `cve-2026-58644` | code | 1.0 |
+| 6421 | Google Pixel Improper Authorization Vulnerability | kev | `cve-2026-58704` | code | 1.0 |
+| 6422 | Broadcom VMware vCenter Path Traversal Vulnerability | kev | `cve-2026-59310` | code | 1.0 |
+| 6423 | BerriAI LiteLLM Improper Authentication Vulnerability | kev | `cve-2026-59822` | code | 1.0 |
+| 6424 | Gitea Code Injection Vulnerability | kev | `cve-2026-60004` | code | 1.0 |
+| 6425 | WordPress Core SQL Injection Vulnerability | kev | `cve-2026-60137` | code | 1.0 |
+| 6426 | WordPress Core Interpretation Conflict Vulnerability | kev | `cve-2026-63030` | code | 1.0 |
+| 6427 | JetBrains TeamCity Deserialization of Untrusted Data Vulnerability | kev | `cve-2026-63077` | code | 1.0 |
+| 6428 | MLflow Server-Side Request Forgery Vulnerability | kev | `cve-2026-64849` | code | 1.0 |
+| 6429 | Apple macOS Improper Authentication Vulnerability | kev | `cve-2026-65400` | code | 1.0 |
+| 6430 | Microsoft SharePoint Code Injection Vulnerability | kev | `cve-2026-65660` | code | 1.0 |
+| 6431 | JFrog Artifactory Improper Limitation of a Pathname to a Restricted Directory Vulnerability | kev | `cve-2026-66384` | code | 1.0 |
+| 6432 | MikroTik RouterOS Missing Authentication for Critical Function Vulnerability | kev | `cve-2026-67277` | code | 1.0 |
+| 6433 | Mikrotik RouterOS Improper Enforcement of Behavioral Workflow Vulnerability | kev | `cve-2026-67279` | code | 1.0 |
+| 6434 | Microsoft Windows Ancillary Function Driver for WinSock Use-After-Free Vulnerability | kev | `cve-2026-68820` | code | 1.0 |
+| 6435 | Ivanti Endpoint Manager Mobile (EPMM) Improper Input Validation Vulnerability | kev | `cve-2026-6973` | code | 1.0 |
+| 6436 | Adobe Commerce and Magento Incorrect Authorization Vulnerability | kev | `cve-2026-71362` | code | 1.0 |
+| 6437 | TrueConf Server Missing Authentication for Critical Function Vulnerability | kev | `cve-2026-72529` | code | 1.0 |
+| 6438 | TrueConf Server Code Injection Vulnerability | kev | `cve-2026-72530` | code | 1.0 |
+| 6439 | Zyxel GS1900 Series Switches Stack-Based Buffer Overflow Vulnerability | kev | `cve-2026-7273` | code | 1.0 |
+| 6440 | Metabase SQL Injection Vulnerability | kev | `cve-2026-72898` | code | 1.0 |
+| 6441 | Zimbra Collaboration Suite (ZCS) OS Command Injection Vulnerability | kev | `cve-2026-73570` | code | 1.0 |
+| 6442 | Arista Extensible Operating System Incomplete Comparison with Missing Factors Vulnerability | kev | `cve-2026-7473` | code | 1.0 |
+| 6443 | Adobe Commerce and Magento Improper Neutralization of Special Elements Used in a Template Engine Vulnerability | kev | `cve-2026-75650` | code | 1.0 |
+| 6444 | Cisco Secure Firewall ASA Software and Cisco Secure FTD Software Unchecked Return Value to NULL Pointer Dereference Vulnerability | kev | `cve-2026-76418` | code | 1.0 |
+| 6445 | Cisco Identity Services Engine Incorrect Use of Privileged APIs Vulnerability | kev | `cve-2026-76460` | code | 1.0 |
+| 6446 | Cisco Secure Email Gateway SQL Injection Vulnerability | kev | `cve-2026-76461` | code | 1.0 |
+| 6447 | Cisco Expressway Series Use of Hard-coded Credentials Vulnerability | kev | `cve-2026-76466` | code | 1.0 |
+| 6448 | Cisco Catalyst SD-WAN Manager Hex Encoding Vulnerability | kev | `cve-2026-76504` | code | 1.0 |
+| 6449 | Cisco Secure Email Gateway Relative Path Traversal Vulnerability | kev | `cve-2026-76519` | code | 1.0 |
+| 6450 | Progress LoadMaster Command Injection Vulnerability | kev | `cve-2026-8037` | code | 1.0 |
+| 6451 | PaperCut NG/MF Missing Authentication for Critical Function Vulnerability | kev | `cve-2026-81578` | code | 1.0 |
+| 6452 | Microsoft Windows Link Following Vulnerability | kev | `cve-2026-81963` | code | 1.0 |
+| 6453 | PaperCut NG/MF Unsafe Reflection Vulnerability | kev | `cve-2026-82078` | code | 1.0 |
+| 6454 | JFrog Artifactory Improper Authentication Vulnerability | kev | `cve-2026-82329` | code | 1.0 |
+| 6455 | SonicWall SMA1000 Appliances Server-Side Request Forgery Vulnerability | kev | `cve-2026-83548` | code | 1.0 |
+| 6456 | SonicWall SMA1000 Appliances OS Command Injection Vulnerability | kev | `cve-2026-83549` | code | 1.0 |
+| 6457 | Daemon Tools Lite Embedded Malicious Code Vulnerability | kev | `cve-2026-8398` | code | 1.0 |
+| 6458 | Citrix NetScaler ADC and NetScaler Gateway Improper Restriction of Operations within the Bounds of a Memory Buffer Vulnerability | kev | `cve-2026-8452` | code | 1.0 |
+| 6459 | ConnectWise ScreenConnect Improper Privilege Management and Missing Authorization Vulnerability | kev | `cve-2026-84869` | code | 1.0 |
+| 6460 | Google Chromium V8 Type Confusion Vulnerability | kev | `cve-2026-85046` | code | 1.0 |
+| 6461 | Check Point Multiple Products Improper Certificate Validation Vulnerability | kev | `cve-2026-85102` | code | 1.0 |
+| 6462 | GitLab Community Edition and Enterprise Edition Path Traversal Vulnerability | kev | `cve-2026-85706` | code | 1.0 |
+| 6463 | Microsoft Windows Heap-Based Buffer Overflow Vulnerability | kev | `cve-2026-85880` | code | 1.0 |
+| 6464 | MikroTik RouterOS Improper Neutralization of Argument Delimiters in a Command Vulnerability | kev | `cve-2026-86060` | code | 1.0 |
+| 6465 | N-able N-central Static Code Injection Vulnerability | kev | `cve-2026-86218` | code | 1.0 |
+| 6466 | Apple Multiple Products Out-of-Bounds Write Vulnerability | kev | `cve-2026-86950` | code | 1.0 |
+| 6467 | Google Chromium V8 Out of Bounds Write Vulnerability | kev | `cve-2026-87491` | code | 1.0 |
+| 6468 | Acronis Backup Incorrect Default Permissions Vulnerability | kev | `cve-2026-87886` | code | 1.0 |
+| 6469 | WordPress Core Remote File Inclusion Vulnerability | kev | `cve-2026-87902` | code | 1.0 |
+| 6470 | Citrix NetScaler Improper Input Validation Vulnerability | kev | `cve-2026-88771` | code | 1.0 |
+| 6471 | Citrix NetScaler Improper Restriction of Operations within the Bounds of a Memory Buffer Vulnerability | kev | `cve-2026-88772` | code | 1.0 |
+| 6472 | Citrix NetScaler Improper Restriction of Operations within the Bounds of a Memory Buffer Vulnerability | kev | `cve-2026-88779` | code | 1.0 |
+| 6473 | Apache Axis Unsafe Reflection Vulnerability | kev | `cve-2026-90436` | code | 1.0 |
+| 6474 | Vanderbilt University Research Electronic Data Capture (REDCap) Code Injection Vulnerability | kev | `cve-2026-90817` | code | 1.0 |
+| 6475 | Drupal Core SQL Injection Vulnerability | kev | `cve-2026-9082` | code | 1.0 |
+| 6476 | IBM Langflow Code Injection Vulnerability | kev | `cve-2026-9198` | code | 1.0 |
+| 6477 | Check Point Multiple Products Path Traversal Vulnerability | kev | `cve-2026-93616` | code | 1.0 |
+| 6478 | Arista VeloCloud Orchestrator Improper Input Validation Vulnerability | kev | `cve-2026-93952` | code | 1.0 |
+| 6479 | F5 BIG-IP APM Heap-based Buffer Overflow Vulnerability | kev | `cve-2026-94127` | code | 1.0 |
+| 6480 | Sangoma Switchvox SQL Injection Vulnerability | kev | `cve-2026-9586` | code | 1.0 |
+| 6481 | Plex Media Server Server-Side Request Forgery (SSRF) Vulnerability | kev | `cve-2026-96652` | code | 1.0 |
+| 6482 | Plex Media Server Improper Neutralization of Encoded URI Schemes in a Web Page Vulnerability | kev | `cve-2026-96654` | code | 1.0 |
+| 6483 | Plex Media Server Server-Side Request Forgery (SSRF) Vulnerability | kev | `cve-2026-96655` | code | 1.0 |
+| 6484 | Plex Media Server External Control of File Name or Path Vulnerability | kev | `cve-2026-96656` | code | 1.0 |
+| 6485 | Microsoft Windows Command Injection Vulnerability | kev | `cve-2026-96951` | code | 1.0 |
+| 6486 | GitLab Community Edition and Enterprise Edition Integer Overflow or Wraparound Vulnerability | kev | `cve-2026-97229` | code | 1.0 |
+| 6487 | AdBlock before 2.21 allows remote attackers to block arbitrary resources on arbitrary websites and to disable arbitrary blocking filters | nvd | `cve-2015-2692` | code | 1.0 |
+| 6488 | The Data Protection component in the VMware vSphere GUI in IBM Tivoli Storage Manager for Virtual Environments: Data Protection for VMware (aka Spectrum Protect | nvd | `cve-2015-7425` | code | 1.0 |
+| 6489 | The Data Protection extension in the VMware GUI in IBM Tivoli Storage Manager for Virtual Environments: Data Protection for VMware (aka Spectrum Protect for Vir | nvd | `cve-2015-7426` | code | 1.0 |
+| 6490 | The initialize method in the Histogram class in lib/colorscore/histogram.rb in the colorscore gem before 0.0.5 for Ruby allows context-dependent attackers to ex | nvd | `cve-2015-7541` | code | 1.0 |
+| 6491 | SearchBlox 8.3 before 8.3.1 allows remote attackers to write to the config file, and consequently cause a denial of service (application crash), via unspecified | nvd | `cve-2015-7919` | code | 1.0 |
+| 6492 | Adcon Telemetry A840 Telemetry Gateway Base Station has hardcoded credentials, which allows remote attackers to obtain administrative access via unspecified vec | nvd | `cve-2015-7930` | code | 1.0 |
+| 6493 | The PasswordReset.Controllers.ResetController.ChangePasswordIndex method in PasswordReset.dll in Dovestones AD Self Password Reset before 3.0.4 allows remote  | nvd | `cve-2015-8267` | code | 1.0 |
+| 6494 | Integer overflow in the ImageRegionReader::ReadIntoBuffer function in MediaStorageAndFileFormat/gdcmImageRegionReader.cxx in Grassroots DICOM (aka GDCM) before  | nvd | `cve-2015-8396` | code | 1.0 |
+| 6495 | Adobe Flash Player before 18.0.0 and 19.x and 20.x before 20.0.0 on Windows and OS X and before 11.2.202 on Linux, Adobe AIR before 20.0.0, Adob | nvd | `cve-2015-8459` | code | 1.0 |
+| 6496 | Local privilege escalation vulnerability in the Gentoo QEMU package before 2.5.0-r1 | nvd | `cve-2015-8556` | code | 1.0 |
+| 6497 | The idle stream handling in nghttp2 before 1.6.0 allows attackers to have unspecified impact via unknown vectors, aka a heap-use-after-free bug | nvd | `cve-2015-8659` | code | 1.0 |
+| 6498 | The multifilesystem storage backend in Radicale before 1.1 allows remote attackers to read or write to arbitrary files via a crafted component name | nvd | `cve-2015-8747` | code | 1.0 |
+| 6499 | SQL injection vulnerability in the Group Promotions module in the admin control panel in MyBB (aka MyBulletinBoard) before 1.6.18 and 1.8.x before 1.8.6 and MyB | nvd | `cve-2015-8974` | code | 1.0 |
+| 6500 | MailEnable before 8.60 allows XXE via an XML document in the request.aspx Options parameter | nvd | `cve-2015-9280` | code | 1.0 |
+| 6501 | MySQL for PCF tiles 1.7.x before 1.7.10 were discovered to log the AWS access key in plaintext. These credentials were logged to the Service Backup component lo | nvd | `cve-2016-0898` | code | 1.0 |
+| 6502 | An issue was discovered in Radisys MRF Web Panel (SWMS) 9.0.1. The MSM_MACRO_NAME POST parameter in /swms/ms.cgi was discovered to be vulnerable to OS command i | nvd | `cve-2016-10043` | code | 1.0 |
+| 6503 | Adobe Reader and Acrobat before 11.0.16, Acrobat and Acrobat Reader DC Classic before 15.006.30172, and Acrobat and Acrobat Reader DC Continuous before 15.016.2 | nvd | `cve-2016-1038` | code | 1.0 |
+| 6504 | Adobe Reader and Acrobat before 11.0.16, Acrobat and Acrobat Reader DC Classic before 15.006.30172, and Acrobat and Acrobat Reader DC Continuous before 15.016.2 | nvd | `cve-2016-1041` | code | 1.0 |
+| 6505 | Adobe Reader and Acrobat before 11.0.16, Acrobat and Acrobat Reader DC Classic before 15.006.30172, and Acrobat and Acrobat Reader DC Continuous before 15.016.2 | nvd | `cve-2016-1044` | code | 1.0 |
+| 6506 | The XML parser in Cisco Information Server (CIS) 6.2 allows remote attackers to read arbitrary files or cause a denial of service (CPU and memory consumption) v | nvd | `cve-2016-1343` | code | 1.0 |
+| 6507 | The filesystem storage backend in Radicale before 1.1 on Windows allows remote attackers to read or write to arbitrary files via a crafted path, as demonstrated | nvd | `cve-2016-1505` | code | 1.0 |
+| 6508 | Multiple unspecified vulnerabilities in the browser engine in Mozilla Firefox before 44.0 allow remote attackers to cause a denial of service (memory corruption | nvd | `cve-2016-1931` | code | 1.0 |
+| 6509 | HPE Operations Manager 8.x and 9.0 on Windows allows remote attackers to execute arbitrary commands via a crafted serialized Java object, related to the Apache  | nvd | `cve-2016-1985` | code | 1.0 |
+| 6510 | Pulse Connect Secure (PCS) 8.2 before 8.2r1, 8.1 before 8.1r2, 8.0 before 8.0r10, and 7.4 before 7.4r13.4 allow remote attackers to read sensitive system authen | nvd | `cve-2016-4787` | code | 1.0 |
+| 6511 | General Electric (GE) Bently Nevada 3500/22M USB with firmware before 5.0 and Bently Nevada 3500/22M Serial have open ports, which makes it easier for remote at | nvd | `cve-2016-5788` | code | 1.0 |
+| 6512 | IBM BigFix Platform could allow a remote attacker to execute arbitrary code on the system, caused by a use-after-free race condition. An attacker could exploit  | nvd | `cve-2016-6082` | code | 1.0 |
+| 6513 | VMware vRealize Operations (aka vROps) 6.x before 6.4.0 allows remote authenticated users to gain privileges, or halt and remove virtual machines, via unspecifi | nvd | `cve-2016-7457` | code | 1.0 |
+| 6514 | SQL injection vulnerability in core services in Intel Security McAfee ePolicy Orchestrator (ePO) 5.3.2 and earlier and 5.1.3 and earlier allows attackers to alt | nvd | `cve-2016-8027` | code | 1.0 |
+| 6515 | An issue was discovered in Schneider Electric ConneXium firewalls TCSEFEC23F3F20 all versions, TCSEFEC23F3F21 all versions, TCSEFEC23FCF20 all versions, TCSEFEC | nvd | `cve-2016-8352` | code | 1.0 |
+| 6516 | An issue was discovered in Moxa OnCell OnCellG3470A-LTE, AWK-1131A/3131A/4131A Series, AWK-3191 Series, AWK-5232/6232 Series, AWK-1121/1127 Series, WAC-1001 V2  | nvd | `cve-2016-8363` | code | 1.0 |
+| 6517 | IBM UrbanCode Deploy could allow a user to execute code using a specially crafted file upload that would replace code on the server. This code could be executed | nvd | `cve-2016-8938` | code | 1.0 |
+| 6518 | A hard-coded cryptographic key vulnerability was identified in Red Lion Controls Sixnet-Managed Industrial Switches running firmware Version 5.0.196 and Stride- | nvd | `cve-2016-9335` | code | 1.0 |
+| 6519 | An issue was discovered in Rockwell Automation Logix5000 Programmable Automation Controller FRN 16.00 through 21.00 (excluding all firmware versions prior to FR | nvd | `cve-2016-9343` | code | 1.0 |
+| 6520 | Vulnerability in the Oracle WebLogic Server component of Oracle Fusion Middleware (subcomponent: JNDI). Supported versions that are affected are 10.3.6.0 and 12 | nvd | `cve-2017-10137` | code | 1.0 |
+| 6521 | Vulnerability in the Oracle Identity Manager component of Oracle Fusion Middleware (subcomponent: Default Account). Supported versions that are affected are 11 | nvd | `cve-2017-10151` | code | 1.0 |
+| 6522 | Vulnerability in the Oracle Tuxedo component of Oracle Fusion Middleware (subcomponent: Core). Supported versions that are affected are 11.1.1, 12.1.1, 12.1.3 a | nvd | `cve-2017-10269` | code | 1.0 |
+| 6523 | Vulnerability in the Oracle Hospitality Reporting and Analytics component of Oracle Hospitality Applications (subcomponent: Report). Supported versions that are | nvd | `cve-2017-10402` | code | 1.0 |
+| 6524 | Vulnerability in the Oracle Hospitality Reporting and Analytics component of Oracle Hospitality Applications (subcomponent: Report). Supported versions that are | nvd | `cve-2017-10405` | code | 1.0 |
+| 6525 | Xen through 4.8.x mishandles page transfer, which allows guest OS users to obtain privileged host OS access, aka XSA-217 | nvd | `cve-2017-10912` | code | 1.0 |
+| 6526 | Xen through 4.8.x does not validate memory allocations during certain P2M operations, which allows guest OS users to obtain privileged host OS access, aka XSA-2 | nvd | `cve-2017-10918` | code | 1.0 |
+| 6527 | The grant-table feature in Xen through 4.8.x mishandles a GNTMAP_device_map and GNTMAP_host_map mapping, when followed by only a GNTMAP_host_map unmapping, whic | nvd | `cve-2017-10920` | code | 1.0 |
+| 6528 | The grant-table feature in Xen through 4.8.x does not ensure sufficient type counts for a GNTMAP_device_map and GNTMAP_host_map mapping, which allows guest OS u | nvd | `cve-2017-10921` | code | 1.0 |
+| 6529 | An issue was discovered in Adobe Connect 9.6.2 and earlier versions. A Server-Side Request Forgery (SSRF) vulnerability exists that could be abused to bypass ne | nvd | `cve-2017-11291` | code | 1.0 |
+| 6530 | An exploitable heap overflow vulnerability exists in the tinysvcmdns library version 2016-07-18. A specially crafted packet can make the library overwrite an ar | nvd | `cve-2017-12087` | code | 1.0 |
+| 6531 | A authentication bypass and execution of code vulnerability in HPE Integrated Lights-out 4 (iLO 4) version prior to 2.53 was found | nvd | `cve-2017-12542` | code | 1.0 |
+| 6532 | Analysis of the Bomgar Remote Support Portal JavaStart.jar Applet 52790 and earlier revealed that it is vulnerable to a path traversal vulnerability. The archiv | nvd | `cve-2017-12815` | code | 1.0 |
+| 6533 | Server Side Request Forgery vulnerability in Vebto Pixie Image Editor 1.4 and 1.7 allows remote attackers to disclose information or execute arbitrary code via  | nvd | `cve-2017-12905` | code | 1.0 |
+| 6534 | An Improper Authentication issue was discovered in iniNet Solutions iniNet Webserver, all versions prior to V2.02.0100. The webserver does not properly authenti | nvd | `cve-2017-13995` | code | 1.0 |
+| 6535 | EMC RSA Authentication Agent API 8.5 for C and RSA Authentication Agent SDK 8.6 for C allow attackers to bypass authentication, aka an "Error Handling Vulnerabi | nvd | `cve-2017-14378` | code | 1.0 |
+| 6536 | An exploitable OS Command Injection vulnerability exists in the Telnet, SSH, and console login functionality of Moxa AWK-3131A Industrial IEEE 802.11a/b/g/n wir | nvd | `cve-2017-14459` | code | 1.0 |
+| 6537 | An exploitable access control vulnerability exists in the data, program, and function file permissions functionality of Allen Bradley Micrologix 1400 Series B F | nvd | `cve-2017-14469` | code | 1.0 |
+| 6538 | An exploitable access control vulnerability exists in the data, program, and function file permissions functionality of Allen Bradley Micrologix 1400 Series B F | nvd | `cve-2017-14470` | code | 1.0 |
+| 6539 | An exploitable access control vulnerability exists in the data, program, and function file permissions functionality of Allen Bradley Micrologix 1400 Series B F | nvd | `cve-2017-14471` | code | 1.0 |
+| 6540 | An exploitable access control vulnerability exists in the data, program, and function file permissions functionality of Allen Bradley Micrologix 1400 Series B F | nvd | `cve-2017-14472` | code | 1.0 |
+| 6541 | An exploitable access control vulnerability exists in the data, program, and function file permissions functionality of Allen Bradley Micrologix 1400 Series B F | nvd | `cve-2017-14473` | code | 1.0 |
+| 6542 | The safe-eval module describes itself as a safer version of eval. By accessing the object constructors, un-sanitized user input can access the entire standard l | nvd | `cve-2017-16088` | code | 1.0 |
+| 6543 | A Buffer Overflow issue was discovered in Rockwell Automation Allen-Bradley MicroLogix 1400 Controllers, Series B and C Versions 21.002 and earlier. The stack-b | nvd | `cve-2017-16740` | code | 1.0 |
+| 6544 | hw/input/ps2.c in Qemu does not validate 'rptr' and 'count' values during guest migration, leading to out-of-bounds access | nvd | `cve-2017-16845` | code | 1.0 |
+| 6545 | A vulnerability in Juniper Networks NorthStar Controller Application prior to version 2.1.0 Service Pack 1 may allow an unauthenticated, unprivileged, network-b | nvd | `cve-2017-2320` | code | 1.0 |
+| 6546 | The Integrated User Firewall (UserFW) feature was introduced in Junos OS version 12.1X47-D10 on the Juniper SRX Series devices to provide simple integration of  | nvd | `cve-2017-2343` | code | 1.0 |
+| 6547 | An exploitable buffer overflow exists in the psnotifyd application of the Pharos PopUp printer client version 9.0. A specially crafted packet can be sent to the | nvd | `cve-2017-2785` | code | 1.0 |
+| 6548 | A buffer overflows exists in the psnotifyd application of the Pharos PopUp printer client version 9.0. A specially crafted packet can be sent to the victim's co | nvd | `cve-2017-2788` | code | 1.0 |
+| 6549 | Adobe Digital Editions versions 4.5.4 and earlier have an exploitable memory corruption vulnerability in the PDF runtime engine. Successful exploitation could l | nvd | `cve-2017-3088` | code | 1.0 |
+| 6550 | Vulnerability in the Primavera P6 Enterprise Project Portfolio Management component of Oracle Primavera Products Suite (subcomponent: Web Access). Supported ver | nvd | `cve-2017-3324` | code | 1.0 |
+| 6551 | Vulnerability in the Solaris component of Oracle Sun Systems Products Suite (subcomponent: Kernel RPC). For supported versions that are affected see note. Easil | nvd | `cve-2017-3623` | code | 1.0 |
+| 6552 | A vulnerability in the web-based GUI of Cisco Prime Home could allow an unauthenticated, remote attacker to bypass authentication and execute actions with admin | nvd | `cve-2017-3791` | code | 1.0 |
+| 6553 | An issue was discovered in Carlo Gavazzi VMU-C EM prior to firmware Version A11_U05, and VMU-C PV prior to firmware Version A17. Successful exploitation of this | nvd | `cve-2017-5145` | code | 1.0 |
+| 6554 | When executing a program via the bubblewrap sandbox, the nonpriv session can escape to the parent session by using the TIOCSTI ioctl to push characters into the | nvd | `cve-2017-5226` | code | 1.0 |
+| 6555 | The Symantec Messaging Gateway can encounter an issue of remote code execution, which describes a situation whereby an individual may obtain the ability to exec | nvd | `cve-2017-6326` | code | 1.0 |
+| 6556 | Zoho ManageEngine Desktop Central before build 100082 allows remote attackers to obtain control over all connected active desktops via unspecified vectors | nvd | `cve-2017-7213` | code | 1.0 |
+| 6557 | Uploaded XML documents were not correctly validated in Apache OpenMeetings 3.1.0 | nvd | `cve-2017-7664` | code | 1.0 |
+| 6558 | In SolarWinds Log & Event Manager (LEM) before 6.3.1 Hotfix 4, a menu system is encountered when the SSH service is accessed with "cmc" and "password" (the defa | nvd | `cve-2017-7722` | code | 1.0 |
+| 6559 | An Improper Access Control issue was discovered in Schweitzer Engineering Laboratories (SEL) SEL-3620 and SEL-3622 Security Gateway Versions R202 and, R203, R20 | nvd | `cve-2017-7928` | code | 1.0 |
+| 6560 | Zyxel WRE6505 devices have a default TELNET password of 1234 for the root and admin accounts, which makes it easier for remote attackers to conduct DNS hijackin | nvd | `cve-2017-7964` | code | 1.0 |
+| 6561 | www.modified-shop.org modified eCommerce Shopsoftware 2.0.2 rev 10690 has XXE in api/it-recht-kanzlei/api-it-recht-kanzlei.php | nvd | `cve-2017-8110` | code | 1.0 |
+| 6562 | An issue was discovered on Accellion FTA devices before FTA_9_12_180. Because a regular expression (intended to match local https URLs) lacks an initial ^ chara | nvd | `cve-2017-8794` | code | 1.0 |
+| 6563 | A vulnerability in the Secure Sockets Layer (SSL) VPN functionality of the Cisco Adaptive Security Appliance (ASA) Software could allow an unauthenticated, remo | nvd | `cve-2018-0101` | code | 1.0 |
+| 6564 | A vulnerability in Cisco Digital Network Architecture (DNA) Center could allow an unauthenticated, remote attacker to log in to an affected system by using an a | nvd | `cve-2018-0222` | code | 1.0 |
+| 6565 | A vulnerability in the container management subsystem of Cisco Digital Network Architecture (DNA) Center could allow an unauthenticated, remote attacker to bypa | nvd | `cve-2018-0268` | code | 1.0 |
+| 6566 | I Librarian I-librarian version 4.8 and earlier contains a XML External Entity (XXE) vulnerability in line 154 of importmetadata.php(simplexml_load_string) that | nvd | `cve-2018-1000124` | code | 1.0 |
+| 6567 | Eclipse RDF4j version < 2.4.0 Milestone 2 contains a XML External Entity (XXE) vulnerability in RDF4j XML parser parsing RDF files that can result in the disclo | nvd | `cve-2018-1000644` | code | 1.0 |
+| 6568 | Stroom version <5.4.5 contains a XML External Entity (XXE) vulnerability in XML Parser that can result in disclosure of confidential data, denial of service, se | nvd | `cve-2018-1000651` | code | 1.0 |
+| 6569 | JabRef version <=4.3.1 contains a XML External Entity (XXE) vulnerability in MsBibImporter XML Parser that can result in disclosure of confidential data, denial | nvd | `cve-2018-1000652` | code | 1.0 |
+| 6570 | neo4j-contrib neo4j-apoc-procedures version before commit 45bc09c contains a XML External Entity (XXE) vulnerability in XML Parser that can result in Disclosure | nvd | `cve-2018-1000820` | code | 1.0 |
+| 6571 | MicroMathematics version before commit 5c05ac8 contains a XML External Entity (XXE) vulnerability in SMathStudio files that can result in Disclosure of confiden | nvd | `cve-2018-1000821` | code | 1.0 |
+| 6572 | codelibs fess version before commit faa265b contains a XML External Entity (XXE) vulnerability in GSA XML file parser that can result in Disclosure of confident | nvd | `cve-2018-1000822` | code | 1.0 |
+| 6573 | exist version <= 5.0.0-RC4 contains a XML External Entity (XXE) vulnerability in XML Parser for REST Server that can result in Disclosure of confidential data,  | nvd | `cve-2018-1000823` | code | 1.0 |
+| 6574 | FreeCol version <= nightly-2018-08-22 contains a XML External Entity (XXE) vulnerability in FreeColXMLReader parser that can result in Disclosure of confidentia | nvd | `cve-2018-1000825` | code | 1.0 |
+| 6575 | XR3Player version <= V3.124 contains a XML External Entity (XXE) vulnerability in Playlist parser that can result in Disclosure of confidential data, denial of  | nvd | `cve-2018-1000830` | code | 1.0 |
+| 6576 | K9Mail version <= v5.600 contains a XML External Entity (XXE) vulnerability in WebDAV response parser that can result in Disclosure of confidential data, denial | nvd | `cve-2018-1000831` | code | 1.0 |
+| 6577 | KeePassDX version <= 2.5.0.0beta17 contains a XML External Entity (XXE) vulnerability in kdbx file parser that can result in Disclosure of confidential data, de | nvd | `cve-2018-1000835` | code | 1.0 |
+| 6578 | UML Designer version <= 8.0.0 contains a XML External Entity (XXE) vulnerability in XML parser for plugins that can result in Disclosure of confidential data, d | nvd | `cve-2018-1000837` | code | 1.0 |
+| 6579 | autopsy version <= 4.9.0 contains a XML External Entity (XXE) vulnerability in CaseMetadata XML Parser that can result in Disclosure of confidential data, denia | nvd | `cve-2018-1000838` | code | 1.0 |
+| 6580 | A vulnerability in Trend Micro Control Manager (versions 6.0 and 7.0) could allow an attacker to conduct a server-side request forgery (SSRF) attack on vulnerab | nvd | `cve-2018-10511` | code | 1.0 |
+| 6581 | Stack-based buffer overflow in Activision Infinity Ward Call of Duty Modern Warfare 2 before 2018-04-26 allows remote attackers to execute arbitrary code via cr | nvd | `cve-2018-10718` | code | 1.0 |
+| 6582 | A SQL injection vulnerability in the web administration and quarantine components of Micro Focus Secure Messaging Gateway allows an unauthenticated remote attac | nvd | `cve-2018-12464` | code | 1.0 |
+| 6583 | A vulnerability has been identified in TIM 1531 IRC (All version < V2.0). The devices was missing proper authentication on port 102/tcp, although configured. Su | nvd | `cve-2018-13816` | code | 1.0 |
+| 6584 | FasterXML jackson-databind 2.x before 2.9.7 might allow remote attackers to conduct server-side request forgery (SSRF) attacks by leveraging failure to block th | nvd | `cve-2018-14721` | code | 1.0 |
+| 6585 | A command injection vulnerability in the apex-publish-static-files npm module version <2.0.1 which allows arbitrary shell command execution through a maliciousl | nvd | `cve-2018-16462` | code | 1.0 |
+| 6586 | In FreeBSD before 11.2-STABLE(r341486) and 11.2-RELEASE-p6, insufficient bounds checking in one of the device models provided by bhyve can permit a guest operat | nvd | `cve-2018-17160` | code | 1.0 |
+| 6587 | IBM Security Access Manager Appliance 9.0.4 and 9.0.5 could allow remote code execution when Advanced Access Control or Federation services are running. IBM | nvd | `cve-2018-1722` | code | 1.0 |
+| 6588 | An earlier fix for an Inter-process Communication (IPC) vulnerability, CVE-2011-3079, added authentication to communication between IPC endpoints and server par | nvd | `cve-2018-18505` | code | 1.0 |
+| 6589 | Sandboxie 5.26 allows a Sandbox Escape via an "import os" statement, followed by os.system("cmd") or os.system("powershell"), within a .py file. NOTE: the vendo | nvd | `cve-2018-18748` | code | 1.0 |
+| 6590 | The Kubernetes integration in GitLab Enterprise Edition 11.x before 11.2.8, 11.3.x before 11.3.9, and 11.4.x before 11.4.4 has SSRF | nvd | `cve-2018-18843` | code | 1.0 |
+| 6591 | mPDF through 7.1.6, if deployed as a web application that accepts arbitrary HTML, allows SSRF, as demonstrated by a '<img src="http://192.168' substring that tr | nvd | `cve-2018-19047` | code | 1.0 |
+| 6592 | An issue was discovered in the MQTT server in Contiki-NG before 4.2. The function parse_publish_vhdr() that parses MQTT PUBLISH messages with a variable length  | nvd | `cve-2018-19417` | code | 1.0 |
+| 6593 | Vulnerability in the Sun ZFS Storage Appliance Kit (AK) component of Oracle Sun Systems Products Suite (subcomponent: Core Services). The supported version that | nvd | `cve-2018-2611` | code | 1.0 |
+| 6594 | Vulnerability in the Oracle GoldenGate component of Oracle GoldenGate (subcomponent: Monitoring Manager). Supported versions that are affected are 12.1.2, 1 | nvd | `cve-2018-2913` | code | 1.0 |
+| 6595 | Incorrect parsing in url-parse <1.4.3 returns wrong hostname which leads to multiple vulnerabilities such as SSRF, Open Redirect, Bypass Authentication Protocol | nvd | `cve-2018-3774` | code | 1.0 |
+| 6596 | An exploitable vulnerability exists in the REST parser of video-core's HTTP server of the Samsung SmartThings Hub STH-ETH-250 - Firmware version 0.20.17. The vi | nvd | `cve-2018-3907` | code | 1.0 |
+| 6597 | An exploitable heap overflow vulnerability exists in the WkbProgramLow function of WibuKey Network server management, version 6.40.2402.500. A specially crafted | nvd | `cve-2018-3991` | code | 1.0 |
+| 6598 | An issue was discovered in certain Apple products. macOS before 10.13.3 is affected. The issue involves the "Sandbox" component. It allows bypass of a sandbox p | nvd | `cve-2018-4091` | code | 1.0 |
+| 6599 | An issue was discovered in certain Apple products. macOS before 10.13.5 is affected. The issue involves the "Grand Central Dispatch" component. It allows attack | nvd | `cve-2018-4229` | code | 1.0 |
+| 6600 | An issue was discovered in Adobe Acrobat Reader 2018.009.20050 and earlier versions, 2017.011.30070 and earlier versions, 2015.006.30394 and earlier versions. T | nvd | `cve-2018-4872` | code | 1.0 |
+| 6601 | Authentication Bypass vulnerability in the administrative user interface in McAfee Web Gateway 7.8.1 through 7.8.1 allows remote attackers to execute arbitr | nvd | `cve-2018-6667` | code | 1.0 |
+| 6602 | Stack-based Buffer Overflow vulnerability in libUPnPHndlr.so in Belkin Wemo Insight Smart Plug allows remote attackers to bypass local security protection via a | nvd | `cve-2018-6692` | code | 1.0 |
+| 6603 | The VMware AirWatch Agent for Android prior to 8.2 and AirWatch Agent for Windows Mobile prior to 6.5.2 contain a remote code execution vulnerability in real ti | nvd | `cve-2018-6968` | code | 1.0 |
+| 6604 | Juniper ATP ships with hard coded credentials in the Web Collector instance which gives an attacker the ability to take full control of any installation of the  | nvd | `cve-2019-0020` | code | 1.0 |
+| 6605 | Juniper ATP ships with hard coded credentials in the Cyphort Core instance which gives an attacker the ability to take full control of any installation of the s | nvd | `cve-2019-0022` | code | 1.0 |
+| 6606 | Zoho ManageEngine ADSelfService Plus 5.x before build 5703 has SSRF | nvd | `cve-2019-3905` | code | 1.0 |
+| 6607 | Multiple use-after-free vulnerabilities in vnc.c in the VNC server in QEMU 0.10.6 and earlier might allow guest OS users to execute arbitrary code on the host O | nvd | `cve-2009-3616` | code | 1.0 |
+| 6608 | The VMX process in VMware ESXi 3.5 through 4.1 and ESX 3.5 through 4.1 does not properly handle RPC commands, which allows guest OS users to cause a denial of s | nvd | `cve-2012-1516` | code | 1.0 |
+| 6609 | The portal client in IBM Tivoli Monitoring (ITM) 6.2.2 through FP9, 6.2.3 through FP5, and 6.3.0 through FP6 allows remote authenticated users to gain privilege | nvd | `cve-2015-7411` | code | 1.0 |
+| 6610 | eWON devices with firmware before 10.1s0 omit RBAC for I/O server information and status requests, which allows remote attackers to obtain sensitive information | nvd | `cve-2015-7926` | code | 1.0 |
+| 6611 | The GMS ViewPoint (GMSVP) web application in Dell SonicWALL GMS, Analyzer, and UMA EM5000 7.2, 8.0, and 8.1 before Hotfix 168056 allows remote authenticated use | nvd | `cve-2016-2396` | code | 1.0 |
+| 6612 | lshell 0.9.16 allows remote authenticated users to break out of a limited shell and execute arbitrary commands | nvd | `cve-2016-6902` | code | 1.0 |
+| 6613 | lshell 0.9.16 allows remote authenticated users to break out of a limited shell and execute arbitrary commands | nvd | `cve-2016-6903` | code | 1.0 |
+| 6614 | An issue was discovered in Smiths-Medical CADD-Solis Medication Safety Software, Version 1.0; 2.0; 3.0; and 3.1. CADD-Solis Medication Safety Software grants an | nvd | `cve-2016-8355` | code | 1.0 |
+| 6615 | Remote Command Execution in com.trend.iwss.gui.servlet.ManagePatches in Trend Micro Interscan Web Security Virtual Appliance (IWSVA) version 6.5-SP2_Build_Linux | nvd | `cve-2016-9269` | code | 1.0 |
+| 6616 | PricewaterhouseCoopers (PwC) ACE-ABAP 8.10.304 for SAP Security allows remote authenticated users to conduct ABAP injection attacks and execute arbitrary code v | nvd | `cve-2016-9832` | code | 1.0 |
+| 6617 | Vulnerability in the OJVM component of Oracle Database Server. Supported versions that are affected are 11.2.0, 12.1.0 and 12.2.0. Easily exploitable vuln | nvd | `cve-2017-10202` | code | 1.0 |
+| 6618 | Vulnerability in the Oracle Tuxedo component of Oracle Fusion Middleware (subcomponent: Core). Supported versions that are affected are 11.1.1, 12.1.1, 12.1.3 a | nvd | `cve-2017-10272` | code | 1.0 |
+| 6619 | Vulnerability in the Oracle WebLogic Server component of Oracle Fusion Middleware (subcomponent: WLS - Web Services). The supported version that is affected are | nvd | `cve-2017-10352` | code | 1.0 |
+| 6620 | Vulnerability in the Oracle Hospitality Cruise AffairWhere component of Oracle Hospitality Applications (subcomponent: AffairWhere). Supported versions that are | nvd | `cve-2017-10396` | code | 1.0 |
+| 6621 | Vulnerability in the Oracle Hospitality Reporting and Analytics component of Oracle Hospitality Applications (subcomponent: iQuery). Supported versions that are | nvd | `cve-2017-10404` | code | 1.0 |
+| 6622 | A vulnerability in the web console of the Cisco Cloud Services Platform (CSP) 2100 could allow an authenticated, remote attacker to interact maliciously with th | nvd | `cve-2017-12251` | code | 1.0 |
+| 6623 | IBM Security Guardium 10.0 could allow a remote authenticated attacker to execute arbitrary commands on the system. By sending a specially-crafted request, an a | nvd | `cve-2017-1253` | code | 1.0 |
+| 6624 | Remote enabling and disabling admin interface in Gemalto's HASP SRM, Sentinel HASP and Sentinel LDK products prior to Sentinel LDK RTE version 7.55 leads to new | nvd | `cve-2017-12822` | code | 1.0 |
+| 6625 | XML external entity (XXE) vulnerability in the import package functionality of the deployment module in Lansweeper before 6.0.100 allows remote authenticated | nvd | `cve-2017-13706` | code | 1.0 |
+| 6626 | An exploitable buffer overflow vulnerability exists in Insteon Hub running firmware version 1012. The HTTP server implementation incorrectly handles the URL par | nvd | `cve-2017-14444` | code | 1.0 |
+| 6627 | An exploitable buffer overflow vulnerability exists in Insteon Hub running firmware version 1012. The HTTP server implementation incorrectly handles the host pa | nvd | `cve-2017-14445` | code | 1.0 |
+| 6628 | An exploitable stack-based buffer overflow vulnerability exists in Insteon Hub running firmware version 1012. The HTTP server implementation unsafely extracts p | nvd | `cve-2017-14446` | code | 1.0 |
+| 6629 | An attacker could send an authenticated HTTP request to trigger this vulnerability in Insteon Hub running firmware version 1012. At 0x9d01bad0 the value for the | nvd | `cve-2017-16338` | code | 1.0 |
+| 6630 | An attacker could send an authenticated HTTP request to trigger this vulnerability in Insteon Hub running firmware version 1012. At 0x9d01bb1c the value for the | nvd | `cve-2017-16339` | code | 1.0 |
+| 6631 | An attacker could send an authenticated HTTP request to trigger this vulnerability in Insteon Hub running firmware version 1012. At 0x9d01c0e8 the value for the | nvd | `cve-2017-16340` | code | 1.0 |
+| 6632 | An attacker could send an authenticated HTTP request to trigger this vulnerability in Insteon Hub running firmware version 1012. At 0x9d01c224 the value for the | nvd | `cve-2017-16341` | code | 1.0 |
+| 6633 | An attacker could send an authenticated HTTP request to trigger this vulnerability in Insteon Hub running firmware version 1012. At 0x9d01c254 the value for the | nvd | `cve-2017-16342` | code | 1.0 |
+| 6634 | An attacker could send an authenticated HTTP request to trigger this vulnerability in Insteon Hub running firmware version 1012. At 0x9d01c284 the value for the | nvd | `cve-2017-16343` | code | 1.0 |
+| 6635 | An attacker could send an authenticated HTTP request to trigger this vulnerability in Insteon Hub running firmware version 1012. At 0x9d01c2c8 the value for the | nvd | `cve-2017-16344` | code | 1.0 |
+| 6636 | An attacker could send an authenticated HTTP request to trigger this vulnerability in Insteon Hub running firmware version 1012. At 0x9d01c318 the value for the | nvd | `cve-2017-16345` | code | 1.0 |
+| 6637 | An attacker could send an authenticated HTTP request to trigger this vulnerability in Insteon Hub running firmware version 1012. At 0x9d01c368 the value for the | nvd | `cve-2017-16346` | code | 1.0 |
+| 6638 | An attacker could send an authenticated HTTP request to trigger this vulnerability in Insteon Hub running firmware version 1012. At 0x9d01e7d4 the value for the | nvd | `cve-2017-16347` | code | 1.0 |
+| 6639 | A design flaw issue was found in the Red Hat OpenStack Platform director use of TripleO to enable libvirtd based live-migration. Libvirtd is deployed by default | nvd | `cve-2017-2637` | code | 1.0 |
+| 6640 | Vulnerability in the Primavera P6 Enterprise Project Portfolio Management component of Oracle Primavera Products Suite (subcomponent: Web Access (Apache Commons | nvd | `cve-2017-3503` | code | 1.0 |
+| 6641 | Vulnerability in the Oracle Identity Manager component of Oracle Fusion Middleware (subcomponent: Rules Engine). The supported version that is affected is 11.1 | nvd | `cve-2017-3553` | code | 1.0 |
+| 6642 | The drag-and-drop (DnD) function in VMware Workstation 12.x before version 12.5.4 and Fusion 8.x before version 8.5.5 has an out-of-bounds memory access vulnera | nvd | `cve-2017-4901` | code | 1.0 |
+| 6643 | The WHMCS Reseller Module V2 2.0.2 in Softaculous Virtualizor before 2.9.1 does not verify the user correctly, which allows remote authenticated users to cont | nvd | `cve-2017-6513` | code | 1.0 |
+| 6644 | NfSen before 1.3.8 allows remote attackers to execute arbitrary OS commands via shell metacharacters in the customfmt parameter (aka the "Custom output format"  | nvd | `cve-2017-7175` | code | 1.0 |
+| 6645 | TP-Link C2 and C20i devices through firmware 0.9.1 4.2 v0032.0 Build 160706 Rel.37961n allow remote code execution with a single HTTP request by placing shell c | nvd | `cve-2017-8220` | code | 1.0 |
+| 6646 | A vulnerability in the role-based resource checking functionality of the Cisco Unified Computing System (UCS) Director could allow an authenticated, remote atta | nvd | `cve-2018-0238` | code | 1.0 |
+| 6647 | An issue was discovered in MyBiz MyProcureNet 5.0.0. A malicious file can be uploaded to the webserver by an attacker. It is possible for an attacker to upload  | nvd | `cve-2018-11091` | code | 1.0 |
+| 6648 | An issue was discovered in Xen 4.7 through 4.10.x. libxl fails to pass the readonly flag to qemu when setting up a SCSI disk, due to what was probably an errone | nvd | `cve-2018-12892` | code | 1.0 |
+| 6649 | In OnlineJudge 2.0, the sandbox has an incorrect access control vulnerability that can write a file anywhere. A user can write a directory listing to /tmp, and  | nvd | `cve-2018-16367` | code | 1.0 |
+| 6650 | A sandbox escape issue was discovered in VyOS 1.1.8. It provides a restricted management shell for operator users to administer the device. By issuing various s | nvd | `cve-2018-18555` | code | 1.0 |
+| 6651 | A privilege escalation issue was discovered in VyOS 1.1.8. The default configuration also allows operator users to execute the pppd binary with elevated (sudo)  | nvd | `cve-2018-18556` | code | 1.0 |
+| 6652 | A vulnerability was discovered in the Java VM component of Oracle Database Server. Supported versions that are affected are 11.2.0, 12.1.0, 12.2.0 and 18 | nvd | `cve-2018-3110` | code | 1.0 |
+| 6653 | An exploitable vulnerability exists in the smart cameras RTSP configuration of the Samsung SmartThings Hub STH-ETH-250 - Firmware version 0.20.17. The device in | nvd | `cve-2018-3856` | code | 1.0 |
+| 6654 | On Samsung SmartThings Hub STH-ETH-250 devices with firmware version 0.20.17, the video-core process incorrectly extracts fields from a user-controlled JSON pay | nvd | `cve-2018-3863` | code | 1.0 |
+| 6655 | An exploitable buffer overflow vulnerability exists in the samsungWifiScan handler of video-core's HTTP server of Samsung SmartThings Hub STH-ETH-250 - Firmware | nvd | `cve-2018-3866` | code | 1.0 |
+| 6656 | An exploitable stack-based buffer overflow vulnerability exists in the samsungWifiScan callback notification of video-core's HTTP server of Samsung SmartThings  | nvd | `cve-2018-3867` | code | 1.0 |
+| 6657 | An exploitable buffer overflow vulnerability exists in the credentials handler of video-core's HTTP server of Samsung SmartThings Hub STH-ETH-250 - Firmware ver | nvd | `cve-2018-3872` | code | 1.0 |
+| 6658 | An exploitable buffer overflow vulnerability exists in the credentials handler of video-core's HTTP server of Samsung SmartThings Hub STH-ETH-250-Firmware versi | nvd | `cve-2018-3873` | code | 1.0 |
+| 6659 | An exploitable buffer overflow vulnerability exists in the credentials handler of video-core's HTTP server of Samsung SmartThings Hub STH-ETH-250-Firmware versi | nvd | `cve-2018-3874` | code | 1.0 |
+| 6660 | An exploitable buffer overflow vulnerability exists in the credentials handler of video-core's HTTP server of Samsung SmartThings Hub STH-ETH-250-Firmware versi | nvd | `cve-2018-3875` | code | 1.0 |
+| 6661 | An exploitable buffer overflow vulnerability exists in the credentials handler of video-core's HTTP server of Samsung SmartThings Hub STH-ETH-250-Firmware versi | nvd | `cve-2018-3877` | code | 1.0 |
+| 6662 | Multiple exploitable buffer overflow vulnerabilities exist in the credentials handler of video-core's HTTP server of Samsung SmartThings Hub STH-ETH-250 devices | nvd | `cve-2018-3878` | code | 1.0 |
+| 6663 | An exploitable stack-based buffer overflow vulnerability exists in the database 'find-by-cameraId' functionality of video-core's HTTP server of Samsung SmartThi | nvd | `cve-2018-3880` | code | 1.0 |
+| 6664 | An exploitable buffer overflow vulnerability exists in the camera "replace" feature of video-core's HTTP server of Samsung SmartThings Hub STH-ETH-250 devices w | nvd | `cve-2018-3902` | code | 1.0 |
+| 6665 | On Samsung SmartThings Hub STH-ETH-250 devices with firmware version 0.20.17, the video-core process incorrectly extracts fields from a user-controlled JSON pay | nvd | `cve-2018-3903` | code | 1.0 |
+| 6666 | An exploitable buffer overflow vulnerability exists in the camera 'update' feature of video-core's HTTP server of Samsung SmartThings Hub STH-ETH-250 - Firmware | nvd | `cve-2018-3904` | code | 1.0 |
+| 6667 | An exploitable buffer overflow vulnerability exists in the camera "create" feature of video-core's HTTP server of Samsung SmartThings Hub STH-ETH-250 devices wi | nvd | `cve-2018-3905` | code | 1.0 |
+| 6668 | On Samsung SmartThings Hub STH-ETH-250 devices with firmware version 0.20.17, the video-core process insecurely extracts the fields from the "shard" table of it | nvd | `cve-2018-3917` | code | 1.0 |
+| 6669 | An exploitable stack-based buffer overflow vulnerability exists in the retrieval of database fields in video-core's HTTP server of Samsung SmartThings Hub STH-E | nvd | `cve-2018-3919` | code | 1.0 |
+| 6670 | In browser editing in Atlassian Bitbucket Server from version 4.13.0 before 5.4.8 (the fixed version for 4.13.0 through 5.4.7), 5.5.0 before 5.5.8 (the fixed ve | nvd | `cve-2018-5225` | code | 1.0 |
+| 6671 | The default permissions of /dev/kmem in Linux versions before 2.0.36 allows IP spoofing | nvd | `cve-1999-0426` | code | 1.0 |
+| 6672 | VAXstations running Open VMS 5.3 through 5.5-2 with VMS DECwindows or MOTIF do not properly disable access to user accounts that exceed the break-in limit thres | nvd | `cve-1999-1324` | code | 1.0 |
+| 6673 | CGI Script Center News Update 1.1 does not properly validate the original news administration password during a password change operation, which allows remote a | nvd | `cve-2000-0944` | code | 1.0 |
+| 6674 | The default configuration for the domain name resolver for Microsoft Windows 98, NT 4.0, 2000, and XP sets the QueryIpMatching parameter to 0, which causes Wind | nvd | `cve-2000-1218` | code | 1.0 |
+| 6675 | Buffer overflow in FTP server in HPUX 11 allows remote attackers to execute arbitrary commands by creating a long pathname and calling the STAT command, which u | nvd | `cve-2001-0248` | code | 1.0 |
+| 6676 | Heap overflow in FTP daemon in Solaris 8 allows remote attackers to execute arbitrary commands by creating a long pathname and calling the LIST command, which u | nvd | `cve-2001-0249` | code | 1.0 |
+| 6677 | Lightwave ConsoleServer 3200 does not disconnect users after unsuccessful login attempts, which could allow remote attackers to conduct brute force password gue | nvd | `cve-2001-0395` | code | 1.0 |
+| 6678 | Format string vulnerability in Infodrom cfingerd 1.4.3 and earlier allows a remote attacker to gain additional privileges via a malformed ident reply that is pa | nvd | `cve-2001-0609` | code | 1.0 |
+| 6679 | Apache on MacOS X Client 10.0.3 with the HFS+ file system allows remote attackers to bypass access restrictions via a URL that contains some characters whose ca | nvd | `cve-2001-0766` | code | 1.0 |
+| 6680 | Knox Arkeia server 4.2, and possibly other versions, uses a constant salt when encrypting passwords using the crypt() function, which makes it easier for an att | nvd | `cve-2001-0967` | code | 1.0 |
+| 6681 | Symantec LiveUpdate before 1.6 does not use cryptography to ensure the integrity of download files, which allows remote attackers to execute arbitrary code via  | nvd | `cve-2001-1125` | code | 1.0 |

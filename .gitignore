@@ -77,3 +77,5 @@ benchmark-results/
 /desktop/windows/bin/
 /desktop/windows/obj/
 
+# CVE arsenal raw feeds: 1.9MB KEV + 30MB NVD JSON, refetchable via tools/fetch_cve_feeds.py
+knowledge/absorb/cve-arsenal/*.json
