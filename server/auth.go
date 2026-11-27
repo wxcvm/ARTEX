@@ -267,6 +267,7 @@ func (s *Server) requireAuth(h http.Handler) http.Handler {
 // frontend ships the user to /setup to set a password (login/page.tsx); wrapping a
 // database outage in a 200 pushes the user toward overwriting the existing password.
 func (s *Server) authStatus(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Cache-Control", "no-store")
 	pg := s.pg(w)
 	if pg == nil {
 		return
@@ -281,6 +282,7 @@ func (s *Server) authStatus(w http.ResponseWriter, r *http.Request) {
 
 // POST /api/auth/init — sets the password for the first time; rejected if already set.
 func (s *Server) authInit(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Cache-Control", "no-store")
 	pg := s.pg(w)
 	if pg == nil {
 		return
@@ -339,6 +341,7 @@ func (s *Server) authInit(w http.ResponseWriter, r *http.Request) {
 // token (this route is under /api/auth/* which requireAuth exempts, so the token
 // is validated here) AND the current password.
 func (s *Server) authChangePassword(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Cache-Control", "no-store")
 	pg := s.pg(w)
 	if pg == nil {
 		return
@@ -390,6 +393,7 @@ func (s *Server) authChangePassword(w http.ResponseWriter, r *http.Request) {
 
 // POST /api/auth/login — validates username/password and returns a JWT.
 func (s *Server) authLogin(w http.ResponseWriter, r *http.Request) {
+	w.Header().Set("Cache-Control", "no-store")
 	pg := s.pg(w)
 	if pg == nil {
 		return
