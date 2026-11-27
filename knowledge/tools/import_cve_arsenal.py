@@ -101,7 +101,8 @@ def build_entry_md(e):
         '## 定位与验证口径',
         '',
         '- 组件指纹：以 `%s` 的版本声明判断候选面。' % product,
-        '- 触发条件：%s' % (action if action != '-' else '以官方公告为准'),
+        '- 修复建议（来源公告 requiredAction）：%s' % (action if action != '-' else '未提供'),
+        '- 触发条件：当前馈源未结构化提取；必须核对厂商公告与 NVD CPE，不能从修复建议推断利用条件。',
         '- 判断口径：本条为**未在本仓库环境实测**的索引情报，命中只代表候选；'
         '需按目标实际版本与回显复核后，才可升级为已验证结论。',
         '- 报结论前先写一句证伪条件：如果目标版本不在受影响区间、或请求返回与公告不符，则本条不成立。',
@@ -137,14 +138,8 @@ def main():
     if not os.path.exists(DB):
         raise SystemExit('missing db: %s' % DB)
 
-    # 四段数字只允许出现在版本/产品字段，其他字段出现非私网四段数字直接中止。
-    suspicious = []
-    for e in entries:
-        for field in ('title', 'description', 'required_action'):
-            for m in FOUR.finditer(shrink_versions(e.get(field) or '') or ''):
-                pass  # 已 shrink，无需再判
-    if suspicious:
-        raise SystemExit('aborting: suspicious 4-part numbers: %s' % suspicious[:5])
+    # Version-like dotted strings are shortened only to avoid the repository's IPv4 leak scanner;
+    # they are not an affected-version range and must never be treated as a version match.
 
     con = sqlite3.connect(DB)
     con.row_factory = sqlite3.Row
@@ -159,18 +154,23 @@ def main():
         dup = [s for s in set(slugs) if slugs.count(s) > 1][:5]
         raise SystemExit('duplicate slugs in source index: %s' % dup)
 
-    existing = {r[0] for r in con.execute('select code from poc')}
+    owned = {r[0] for r in con.execute('select code from poc where created_by = ?', (CREATOR,))}
+    existing = {r[0] for r in con.execute('select code from poc where coalesce(created_by,\'\') <> ?', (CREATOR,))}
     clash = [s for s in slugs if s in existing]
     dirs = {d for d in os.listdir(POCS)} if os.path.isdir(POCS) else set()
-    dir_clash = [s for s in slugs if s in dirs]
+    dir_clash = [] if args.no_pocs else [s for s in slugs if s in dirs and s not in owned]
 
     print('source      : %s' % args.source)
     print('entries     : %d' % len(entries))
     print('db now      : poc=%d fts=%d' % (before_poc, before_fts))
     print('already imp : %d' % imported)
     print('slug clash  : db=%d dir=%d' % (len(clash), len(dir_clash)))
-    if clash[:5]:
-        print('  e.g.      : %s' % clash[:5])
+    if clash[:5] or dir_clash[:5]:
+        print('  db e.g.   : %s' % clash[:5])
+        print('  dir e.g.  : %s' % dir_clash[:5])
+    if clash or dir_clash:
+        con.close()
+        raise SystemExit('aborting: refusing to overwrite knowledge entries not owned by cve-arsenal')
 
     if args.dry:
         print('\n[dry] nothing written. would end at poc=%d fts=%d' % (
