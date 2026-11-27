@@ -21,6 +21,9 @@ type composeProfile struct {
         SecurityOpt []string `yaml:"security_opt"`
         Pid string `yaml:"pid"`
         Tmpfs []string `yaml:"tmpfs"`
+        MemLimit string `yaml:"mem_limit"`
+        MemswapLimit string `yaml:"memswap_limit"`
+        PidsLimit string `yaml:"pids_limit"`
     } `yaml:"services"`
     Networks map[string]struct {
         Internal bool `yaml:"internal"`
@@ -136,4 +139,15 @@ func TestRunnerComposeProfilesKeepExecutorConstrained(t *testing.T) {
 func containsString(items []string, want string) bool {
 	for _, item := range items { if item == want { return true } }
 	return false
+}
+
+func TestDefaultComposeHasResourceCeilings(t *testing.T) {
+    data, err := os.ReadFile(filepath.Join("..", "docker-compose.yml"))
+    if err != nil { t.Fatal(err) }
+    var profile composeProfile
+    if err := yaml.Unmarshal(data, &profile); err != nil { t.Fatal(err) }
+    app, ok := profile.Services["artex"]
+    if !ok || app.MemLimit == "" || app.MemswapLimit != app.MemLimit || app.PidsLimit == "" {
+        t.Fatalf("default ARTEX container must have memory, no-swap and PID ceilings: %+v", app)
+    }
 }
