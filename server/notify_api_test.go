@@ -764,6 +764,11 @@ func TestNotifyNoDeepLinkWithoutBaseURL(t *testing.T) {
 // retry attempts**; ④ running another round sends the remainder (no deadlock).
 func TestNotifyDigestSegmentsAndDefersRemainder(t *testing.T) {
 	f := newNotifyFixture(t)
+	// This test drives exactly one digest round manually. Disable the periodic
+	// notifier started by server.New so it cannot consume a batch concurrently.
+	if err := f.pg.SetBool(settingNotifyEnabled, false); err != nil {
+		t.Fatal(err)
+	}
 	hook := newFakeWebhook(t)
 	// Use WeCom: its 4096-byte markdown limit is the tightest of the six channels.
 	chID := f.createChannel(t, map[string]any{
