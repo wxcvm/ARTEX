@@ -3,6 +3,7 @@ package agent
 import (
 	"context"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"strconv"
 	"strings"
@@ -1395,7 +1396,7 @@ func (t *ToolSet) addFinding() actool.CoreTool {
 		"vulnclass": str("vulnerability class"), "name": str("vulnerability name"), "severity": str("critical|high|medium|low"), "summary": str("finding summary"),
 		"intent_id": idp("the current task's intent id"), "asset_ids": map[string]any{"type": "array", "items": map[string]any{"type": "integer"}, "description": "affected asset ids"},
 		"evidence":         str("evidence/PoC text"),
-		"evidence_hint_id": idp("optional: the hint node ID in this task corresponding to this finding; automatically carries its structured traffic_refs; cannot reference an inherited hint or another finding's hint"),
+		"evidence_hint_id": idp("optional: the local hint node ID corresponding to this finding; carries its structured traffic_refs. Stale, deleted, inherited or non-hint IDs are ignored with an explanatory note; the finding is still recorded without those hint refs."),
 		"traffic_refs": map[string]any{"type": "array", "description": "optional; for HTTP/HTTPS findings, first search and verify entry by entry that the requests/responses actually support the finding's conclusion, then fill in real IDs in reproduction order. For TCP and other non-HTTP findings, or when nothing was captured or no exact record is found, omit or pass [] — it does not block reporting; explain why in evidence and provide other verifiable evidence. Don't guess IDs, infer association by domain/time, or re-probe just to pad the packet count. Roles: baseline = normal control / proof = vulnerability proof / verification = supplementary verification / supporting = auxiliary evidence.",
 			"items": obj(map[string]any{"traffic_id": str("a real traffic ID returned by traffic_search"), "role": map[string]any{"type": "string", "enum": []string{"baseline", "proof", "verification", "supporting"}}, "note": str("how this traffic supports the finding's conclusion")}, "traffic_id")},
 	}, "vulnclass", "severity", "summary"), func(ctx context.Context, in json.RawMessage) (actool.Result, error) {
@@ -1421,12 +1422,21 @@ func (t *ToolSet) addFinding() actool.CoreTool {
 		if !findingTrafficBindingEnabled() {
 			a.TrafficRefs, a.EvidenceHintID = nil, nil
 		}
-		if len(a.EvidenceHintID) > 0 && pid(a.EvidenceHintID) <= 0 {
-			return actool.Errorf("evidence_hint_id must be a valid hint node ID; omit it when there is no handover hint"), nil
-		}
-		refs, err := t.findingRefsFromHint(pid(a.EvidenceHintID), a.TrafficRefs)
+		hintID := pid(a.EvidenceHintID)
+		var ignoredHintNote string
+		refs, err := t.findingRefsFromHint(hintID, a.TrafficRefs)
 		if err != nil {
-			return actool.Errorf(err.Error()), nil
+			if errors.Is(err, errEvidenceHintNotFound) {
+				// The hint is optional handoff metadata. Preserve the finding and
+				// any independently validated explicit refs when the hint is stale.
+				refs, err = db.NormalizeTrafficRefs(a.TrafficRefs)
+				if err != nil {
+					return actool.Errorf(err.Error()), nil
+				}
+				ignoredHintNote = fmt.Sprintf("Ignored stale or non-local evidence_hint_id=%d; finding recorded without hint references.", hintID)
+			} else {
+				return actool.Errorf(err.Error()), nil
+			}
 		}
 		input := db.RecordFindingInput{TaskID: t.taskID, ExplorationID: t.ts.ID(), IntentID: pid(a.IntentID), VulnClass: a.VulnClass, Name: a.Name, Severity: a.Severity, Summary: a.Summary, Evidence: a.Evidence, Worker: t.worker, AssetIDs: pidList(a.AssetIDs)}
 		var recorded *db.RecordedFinding
@@ -1465,6 +1475,13 @@ func (t *ToolSet) addFinding() actool.CoreTool {
 			result.EvidenceNote = "Finding saved without bound traffic. TCP/no-packet cases can proceed normally; if you already have verified HTTP traffic, bind it via the available bind_finding_traffic or the findings page before finishing the evidence handover. Do not create the finding again."
 			if !findingTrafficBindingEnabled() {
 				result.EvidenceNote = "Finding saved. Automatic agent traffic binding is off; you can link traffic manually on the page."
+			}
+		}
+		if ignoredHintNote != "" {
+			if result.EvidenceNote != "" {
+				result.EvidenceNote = ignoredHintNote + " " + result.EvidenceNote
+			} else {
+				result.EvidenceNote = ignoredHintNote
 			}
 		}
 		raw, _ := json.Marshal(result)
