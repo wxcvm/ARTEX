@@ -17,9 +17,10 @@ type journaledTool struct {
 	actool.CoreTool
 	pg       *db.DB
 	fallback agent.RunInfo
+	agentKey string
 }
 
-func journalTaskTools(tools []actool.CoreTool, pg *db.DB, fallback agent.RunInfo) []actool.CoreTool {
+func journalTaskTools(tools []actool.CoreTool, pg *db.DB, fallback agent.RunInfo, agentKey string) []actool.CoreTool {
 	if len(tools) == 0 || pg == nil {
 		return tools
 	}
@@ -29,7 +30,7 @@ func journalTaskTools(tools []actool.CoreTool, pg *db.DB, fallback agent.RunInfo
 			out[i] = tool
 			continue
 		}
-		out[i] = &journaledTool{CoreTool: tool, pg: pg, fallback: fallback}
+		out[i] = &journaledTool{CoreTool: tool, pg: pg, fallback: fallback, agentKey: agentKey}
 	}
 	return out
 }
@@ -41,9 +42,6 @@ func (t *journaledTool) Call(ctx context.Context, input json.RawMessage, tc *act
 	} else {
 		if ri.SessionID == "" {
 			ri.SessionID = t.fallback.SessionID
-		}
-		if ri.AgentKey == "" {
-			ri.AgentKey = t.fallback.AgentKey
 		}
 	}
 	if ri.TaskID <= 0 || t.pg == nil || t.CoreTool.IsReadOnly(input) {
@@ -59,14 +57,11 @@ func (t *journaledTool) Call(ctx context.Context, input json.RawMessage, tc *act
 	if ri.SessionID == "" {
 		return actool.Result{}, fmt.Errorf("durable tool execution requires a task session id")
 	}
-	if ri.AgentKey == "" {
-		ri.AgentKey = t.fallback.AgentKey
-	}
 	sum := sha256.Sum256(append(append([]byte(t.Name()), 0), input...))
 	req := db.ToolExecutionRequest{
 		TaskID: owner.TaskID, RunID: owner.RunID, OwnerEpoch: owner.Epoch,
 		IntentID: ri.IntentID, SessionID: ri.SessionID, ToolUseID: tc.ToolUseID,
-		ToolKey: t.Name(), AgentKey: ri.AgentKey, InputHash: hex.EncodeToString(sum[:]),
+		ToolKey: t.Name(), AgentKey: t.agentKey, InputHash: hex.EncodeToString(sum[:]),
 	}
 	cached, replay, err := t.pg.BeginToolExecution(req)
 	if err != nil {
