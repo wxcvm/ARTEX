@@ -14,6 +14,13 @@ type composeProfile struct {
         Networks []string          `yaml:"networks"`
         Environment map[string]string `yaml:"environment"`
         Ports []any `yaml:"ports"`
+        ReadOnly bool `yaml:"read_only"`
+        Privileged bool `yaml:"privileged"`
+        CapDrop []string `yaml:"cap_drop"`
+        CapAdd []string `yaml:"cap_add"`
+        SecurityOpt []string `yaml:"security_opt"`
+        Pid string `yaml:"pid"`
+        Tmpfs []string `yaml:"tmpfs"`
     } `yaml:"services"`
     Networks map[string]struct {
         Internal bool `yaml:"internal"`
@@ -86,4 +93,47 @@ func TestModeBExampleHasChainedExitWithoutDirectFallback(t *testing.T) {
     if len(profile.Rules) != 1 || profile.Rules[0] != "MATCH,vps1" {
         t.Fatalf("unexpected fallback or bypass rules: %+v", profile.Rules)
     }
+}
+
+func TestRunnerComposeProfilesKeepExecutorConstrained(t *testing.T) {
+	for _, tc := range []struct {
+		name string
+		file string
+		services []string
+	}{
+		{"runner", "docker-compose.runner.yml", []string{"tool-runner", "tool-executor", "artex-proxy-relay"}},
+		{"mode-b", "docker-compose.mode-b.yml", []string{"tool-runner", "tool-executor", "mode-b-egress"}},
+	} {
+		t.Run(tc.name, func(t *testing.T) {
+			data, err := os.ReadFile(filepath.Join("..", tc.file))
+			if err != nil { t.Fatal(err) }
+			var profile composeProfile
+			if err := yaml.Unmarshal(data, &profile); err != nil { t.Fatal(err) }
+			for _, name := range tc.services {
+				svc, ok := profile.Services[name]
+				if !ok { t.Fatalf("missing service %q", name) }
+				if !svc.ReadOnly { t.Errorf("%s must have a read-only root filesystem", name) }
+				if svc.Privileged { t.Errorf("%s must never run privileged", name) }
+				if svc.Pid == "host" { t.Errorf("%s must not share the host PID namespace", name) }
+				if !containsString(svc.CapDrop, "ALL") { t.Errorf("%s must drop all capabilities by default: %v", name, svc.CapDrop) }
+				if !containsString(svc.SecurityOpt, "no-new-privileges:true") {
+					t.Errorf("%s must enforce no-new-privileges: %v", name, svc.SecurityOpt)
+				}
+			}
+			executor := profile.Services["tool-executor"]
+			if !containsString(executor.Tmpfs, "/tmp:rw,nosuid,size=1g") {
+				t.Errorf("tool-executor must use a bounded nosuid /tmp tmpfs: %v", executor.Tmpfs)
+			}
+			for _, key := range []string{"ARTEX_PG_DSN", "ARTEX_JWT_KEY_DIR", "ARTEX_LLM_SECRET_KEY", "OPENAI_API_KEY", "ANTHROPIC_API_KEY", "ARTEX_SETUP_TOKEN"} {
+				if _, ok := executor.Environment[key]; ok {
+					t.Errorf("tool-executor must not receive controller secret %s", key)
+				}
+			}
+		})
+	}
+}
+
+func containsString(items []string, want string) bool {
+	for _, item := range items { if item == want { return true } }
+	return false
 }
