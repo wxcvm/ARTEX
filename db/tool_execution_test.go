@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"reflect"
 	"testing"
 	"time"
 )
@@ -43,17 +44,20 @@ func TestToolExecutionJournalReplaysOnlyCompletedMatchingCalls(t *testing.T) {
 	if err := d.CompleteToolExecution(req, stored); err != nil {
 		t.Fatalf("complete: %v", err)
 	}
-	var storedTool, storedHash string
-	if err := d.QueryRow(`SELECT tool_key,input_hash FROM tool_executions WHERE task_id=$1 AND session_id=$2 AND tool_use_id=$3`, taskID, req.SessionID, req.ToolUseID).Scan(&storedTool, &storedHash); err != nil {
-		t.Fatal(err)
-	}
-	t.Logf("journal identity: stored tool=%q hash=%q; request tool=%q hash=%q", storedTool, storedHash, req.ToolKey, req.InputHash)
-	if err := d.CompleteToolExecution(req, stored); err != nil {
-		t.Fatalf("idempotent complete replay: %v", err)
+	reformatted := json.RawMessage(`{ "content" : [ { "text" : "inserted", "type" : "text" } ] }`)
+	if err := d.CompleteToolExecution(req, reformatted); err != nil {
+		t.Fatalf("idempotent complete replay with JSONB normalization: %v", err)
 	}
 	result, replay, err := d.BeginToolExecution(req)
-	if err != nil || !replay || string(result) != string(stored) {
-		t.Fatalf("completed call was not replayed exactly: result=%s replay=%v err=%v", result, replay, err)
+	var got, want any
+	if err == nil {
+		err = json.Unmarshal(result, &got)
+	}
+	if err == nil {
+		err = json.Unmarshal(stored, &want)
+	}
+	if err != nil || !replay || !reflect.DeepEqual(got, want) {
+		t.Fatalf("completed call was not replayed semantically: result=%s replay=%v err=%v", result, replay, err)
 	}
 	conflict := req
 	conflict.InputHash = fmt.Sprintf("%064x", inputHashForTest("asset-b"))
