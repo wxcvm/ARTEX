@@ -60,3 +60,11 @@
 来源：[BaaRai/ARTEX PR #526](https://github.com/BaaRai/ARTEX/commit/1f558d8681be3f55cfcd2e296e21af2fcfbe570a)。
 
 连接测试必须是纯文本探测：显式传空工具列表、禁用 SDK 后台任务工具，并拒绝模型返回工具调用或 tool_use/tool_calls 结束原因（即使同时带有文本）。本 fork 采用该约束，并用流式/非流式假服务回归测试覆盖。该路径不得执行文件、Shell、后台任务或任何外部工具。
+
+
+## Planner empty-context guard (2026-11-27)
+
+- Planner rounds now resolve the task goal from the explicit argument, persisted root goal, or first non-empty goal node, in that order.
+- A nil exploration store or a task with no usable goal context is rejected before compaction or model invocation and emits an error activity; database read errors propagate.
+- The graph overview omits blank goal nodes and empty root fields so the planner cannot mistake placeholder data for a real objective.
+- Regression tests cover nil stores, empty roots, blank goal nodes, and trimmed non-empty goal fallback.
