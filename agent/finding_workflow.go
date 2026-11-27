@@ -2,6 +2,7 @@ package agent
 
 import (
 	"encoding/json"
+	"errors"
 	"fmt"
 
 	"github.com/Autumn-27/artex/db"
@@ -53,7 +54,7 @@ func findingWorkflowTools(agentKey string, tools []actool.CoreTool) ([]actool.Co
 		note := ""
 		switch tool.Name() {
 		case "report_finding":
-			note = "\nBy default the report agent verifies and binds traffic before writing the report. The reporter keeps verification commands, key output, any known real traffic IDs and their purpose in evidence, so the report agent can check them against the execution records; no extra packet capture is needed for binding. Explicit immediate binding is still supported: traffic_refs or evidence_hint_id may submit already-verified references, the latter reading the structured references of the given hint in this task; if either is invalid the whole report fails. TCP / no-capture cases do not need these optional parameters. The returned finding_id and finding_node_id denote the standalone record and the exploration node respectively."
+			note = "\nBy default the report agent verifies and binds traffic before writing the report. The reporter keeps verification commands, key output, any known real traffic IDs and their purpose in evidence, so the report agent can check them against the execution records; no extra packet capture is needed for binding. Explicit immediate binding is still supported: traffic_refs or evidence_hint_id may submit already-verified references, the latter reading the structured references of the given hint in this task; invalid traffic_refs still fail; a stale/non-hint evidence_hint_id is ignored with an explanatory note so it cannot discard the finding. TCP / no-capture cases do not need these optional parameters. The returned finding_id and finding_node_id denote the standalone record and the exploration node respectively."
 		case "add_hint", "add_task_hint":
 			note = "\nWhen handing off a confirmed vulnerability, keep the verified traffic's IDs, purpose, notes, and order in the corresponding hint's traffic_refs (top-level for a single hint, inside the corresponding hints element for a batch), and state in text exactly which vulnerability it proves. The caller must not hand off only text while dropping existing traffic references. Unverified candidates must not be passed as evidence."
 		case "get_finding_traffic", "bind_finding_traffic", "list_findings", "list_task_findings", "node_detail", "get_task_node_detail", "update_finding_report":
@@ -107,6 +108,8 @@ func HintTrafficSchema() map[string]any {
 	return map[string]any{"type": "array", "description": "Optional: verified traffic references corresponding to the specific vulnerability in this hint, order preserved; after handoff, report_finding can carry these references via evidence_hint_id.", "items": obj(map[string]any{"traffic_id": str("real traffic ID"), "role": str("baseline / proof / verification / supporting"), "note": str("which conclusion this traffic supports")}, "traffic_id")}
 }
 
+var errEvidenceHintNotFound = errors.New("evidence_hint_id is not a local hint node")
+
 func (t *ToolSet) findingRefsFromHint(hintID int64, explicit []db.TrafficRef) ([]db.TrafficRef, error) {
 	if hintID <= 0 {
 		return db.NormalizeTrafficRefs(explicit)
@@ -116,7 +119,7 @@ func (t *ToolSet) findingRefsFromHint(hintID int64, explicit []db.TrafficRef) ([
 		return nil, err
 	}
 	if n == nil || n.Kind != db.KindHint {
-		return nil, fmt.Errorf("evidence_hint_id=%d must be a hint node of this task (inherited hints cannot be bound directly)", hintID)
+		return nil, fmt.Errorf("%w: evidence_hint_id=%d must be a hint node of this task (inherited hints cannot be bound directly)", errEvidenceHintNotFound, hintID)
 	}
 	var payload struct {
 		Refs []db.TrafficRef `json:"traffic_refs"`
