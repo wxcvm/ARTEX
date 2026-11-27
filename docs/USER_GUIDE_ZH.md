@@ -642,7 +642,9 @@ scripts/backup.sh --with-data
 scripts/backup.sh --keep 7
 ```
 
-`--with-data` 保存数据库转储和 `data/` 压缩包；默认备份位置为 `backups/`。数据库恢复须在确认目标数据库与备份文件匹配后执行，可参考 [README 备份章节](../README.md#backups) 里的 `gunzip | docker compose exec -T postgres psql ...` 示例。**不要误用 `docker compose down -v`：`-v` 会移除数据库卷**。
+`--with-data` 保存数据库转储和 `data/` 压缩包；默认备份位置为 `backups/`。这不是完整实例迁移包：外部配置、单独挂载的 `keys/` 及原始模型密钥加密密钥需要分别安全保存，不要将加密密钥与数据库转储一起存放。备份数据库与文件之前应停止 ARTEX 应用写入，避免两者状态不一致。
+
+恢复时先在独立、空白的 PostgreSQL 数据库中验证备份，保留原库及文件，切勿直接覆盖现有实例。参考 [README 备份章节](../README.md#backups) 的压缩校验、事务恢复与遇错停止示例。确认数据库、文件及应用版本兼容后再切换。**不要误用 `docker compose down -v`：`-v` 会移除数据库卷**。
 
 ## 12. 常见问题与检查清单
 

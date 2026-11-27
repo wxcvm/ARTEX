@@ -11,9 +11,8 @@
 #   --output-dir   where to write (default backups/, relative to the repo root)
 #
 # The database dump runs inside the postgres compose service, so no psql client
-# is needed on the host. Restore:
-#   gunzip -c backups/artex-db-<ts>.sql.gz | docker compose exec -T postgres \
-#     psql -U "$POSTGRES_USER" -d "$POSTGRES_DB"
+# is needed on the host. For isolated, empty-database restore and separately
+# protected configuration/key backups, see the README Backups section.
 set -euo pipefail
 cd "$(dirname "$0")/.."
 
@@ -31,7 +30,10 @@ while [ $# -gt 0 ]; do
     *) echo "unknown option: $1" >&2; usage >&2; exit 2 ;;
   esac
 done
-case "$KEEP" in (*[!0-9]*|'') echo "--keep must be a positive integer" >&2; exit 2 ;; esac
+if ! [[ "$KEEP" =~ ^[1-9][0-9]{0,8}$ ]]; then
+  echo "--keep must be an integer between 1 and 999999999 (without leading zeros)" >&2
+  exit 2
+fi
 
 # Compose reads .env for credentials; source it for the dump command too.
 if [ -f .env ]; then
@@ -43,34 +45,52 @@ fi
 PGUSER_NAME="${POSTGRES_USER:-artex}"
 PGDATABASE_NAME="${POSTGRES_DB:-artex}"
 
+# Dumps may include credentials and private task data. Restrict new files
+# and directories even when the caller has a permissive umask.
+umask 077
 mkdir -p "$OUTPUT_DIR"
 TS=$(date -u +%Y%m%dT%H%M%SZ)
 DB_OUT="$OUTPUT_DIR/artex-db-$TS.sql.gz"
-if [ -e "$DB_OUT" ]; then
-  echo "refusing to overwrite $DB_OUT" >&2
+# Stage privately on the destination filesystem. Publish only validated files,
+# and never overwrite a completed backup with the same timestamp.
+STAGE=$(mktemp -d "$OUTPUT_DIR/.artex-backup.XXXXXXXX")
+trap 'rm -rf -- "$STAGE"' EXIT
+trap 'exit 130' INT
+trap 'exit 143' TERM
+DB_TMP="$STAGE/database.sql.gz"
+DATA_OUT="$OUTPUT_DIR/artex-data-$TS.tar.gz"
+DATA_TMP="$STAGE/data.tar.gz"
+if [ -e "$DB_OUT" ] || { [ "$WITH_DATA" -eq 1 ] && [ -e "$DATA_OUT" ]; }; then
+  echo "refusing to overwrite an existing backup for $TS" >&2
   exit 1
 fi
 
-if ! docker compose exec -T postgres pg_dump -U "$PGUSER_NAME" "$PGDATABASE_NAME" | gzip > "$DB_OUT"; then
-  rm -f "$DB_OUT"
+if ! docker compose exec -T postgres pg_dump -U "$PGUSER_NAME" "$PGDATABASE_NAME" | gzip > "$DB_TMP"; then
   echo "pg_dump failed (is the stack running?)" >&2
   exit 1
 fi
-gzip -t "$DB_OUT"
-echo "wrote $DB_OUT ($(du -h "$DB_OUT" | cut -f1))"
+gzip -t "$DB_TMP"
 
 if [ "$WITH_DATA" -eq 1 ]; then
-  DATA_OUT="$OUTPUT_DIR/artex-data-$TS.tar.gz"
-  # data/ contains files written by the container (root); unreadable ones make
-  # tar exit 2. Fail loudly rather than ship a partial archive.
-  if ! tar -czf "$DATA_OUT" data 2>"$OUTPUT_DIR/.tar.err"; then
-    rm -f "$DATA_OUT"
-    echo "data archive failed (run as root so container-written files are readable):" >&2
-    head -5 "$OUTPUT_DIR/.tar.err" >&2
-    rm -f "$OUTPUT_DIR/.tar.err"
+  if ! tar -czf "$DATA_TMP" data 2>"$STAGE/tar.err"; then
+    echo "data archive failed (check file access and whether data is changing):" >&2
+    head -5 "$STAGE/tar.err" >&2
     exit 1
   fi
-  rm -f "$OUTPUT_DIR/.tar.err"
+  gzip -t "$DATA_TMP"
+fi
+
+# Hard links publish complete files without a check-then-overwrite race.
+# If the destination does not support hard links, fail without pruning.
+ln -T -- "$DB_TMP" "$DB_OUT"
+if [ "$WITH_DATA" -eq 1 ]; then
+  if ! ln -T -- "$DATA_TMP" "$DATA_OUT"; then
+    rm -f -- "$DB_OUT"
+    exit 1
+  fi
+fi
+echo "wrote $DB_OUT ($(du -h "$DB_OUT" | cut -f1))"
+if [ "$WITH_DATA" -eq 1 ]; then
   echo "wrote $DATA_OUT ($(du -h "$DATA_OUT" | cut -f1))"
 fi
 
