@@ -21,6 +21,10 @@ class BackupTest(unittest.TestCase):
         docker = self.root / "bin" / "docker"
         docker.write_text("#!/bin/sh\nprintf 'synthetic dump\\n'\n")
         docker.chmod(0o700)
+        # Simulate BSD/macOS ln: reject GNU-only -T and delegate portable calls.
+        ln = self.root / "bin" / "ln"
+        ln.write_text("#!/bin/sh\nfor arg in \"$@\"; do [ \"$arg\" = \"-T\" ] && exit 64; done\nexec /bin/ln \"$@\"\n")
+        ln.chmod(0o700)
         (self.root / "data").mkdir()
         (self.root / "data" / "fixture.txt").write_text("synthetic")
         self.env = dict(os.environ)
@@ -43,6 +47,18 @@ class BackupTest(unittest.TestCase):
         dump = next(out.glob("artex-db-*.sql.gz"))
         with gzip.open(dump, "rt") as stream:
             self.assertEqual(stream.read(), "synthetic dump\n")
+
+    def test_existing_backup_is_never_overwritten(self):
+        out = self.root / "backups"
+        out.mkdir()
+        date = self.root / "bin" / "date"
+        date.write_text("#!/bin/sh\nprintf '20261127T000000Z\\n'\n")
+        date.chmod(0o700)
+        existing = out / "artex-db-20261127T000000Z.sql.gz"
+        existing.write_bytes(b"original backup")
+        result = self.backup("--keep", "1")
+        self.assertNotEqual(result.returncode, 0)
+        self.assertEqual(existing.read_bytes(), b"original backup")
 
     def test_invalid_retention_does_not_touch_existing_backup(self):
         out = self.root / "backups"
