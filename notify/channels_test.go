@@ -329,7 +329,7 @@ func TestEmailMessageIsWellFormed(t *testing.T) {
 	if err != nil {
 		t.Fatalf("failed to build the email: %v", err)
 	}
-	if !strings.HasPrefix(msg, "From: artex@example.com\r\n") {
+	if !strings.Contains(msg, "From: artex@example.com\r\n") {
 		t.Fatalf("bad From header:\n%s", msg)
 	}
 	if !strings.Contains(msg, "To: a@example.com, b@example.com\r\n") {

@@ -5,6 +5,7 @@ import (
 	"context"
 
 	"net"
+	"net/mail"
 	"strings"
 	"sync"
 	"testing"
@@ -347,4 +348,32 @@ func TestFilterValidateIsWriteTimeOnly(t *testing.T) {
 	}
 	// And the channel can still judge events (no panic, no blocking).
 	_ = Match(f, Snapshot{Kind: EventFindingCreated, Severity: "critical"})
+}
+
+func TestEmailMessageStandardHeaders(t *testing.T) {
+	ids := make(map[string]bool)
+	for i := 0; i < 2; i++ {
+		raw, err := buildEmailMessage("ARTEX <artex@example.com>", []string{"recipient@example.com"}, singleMsg())
+		if err != nil { t.Fatal(err) }
+		msg, err := mail.ReadMessage(strings.NewReader(raw))
+		if err != nil { t.Fatal(err) }
+		if _, err := msg.Header.Date(); err != nil { t.Fatal(err) }
+		id := msg.Header.Get("Message-ID")
+		if id == "" || ids[id] { t.Fatalf("missing or repeated Message-ID: %q", id) }
+		ids[id] = true
+		if msg.Header.Get("From") != "artex@example.com" { t.Fatal("sender not normalized") }
+	}
+}
+
+func TestEmailRejectsInvalidAddresses(t *testing.T) {
+	for _, tc := range []struct{ from, to string }{
+		{"not an address", "recipient@example.com"},
+		{"sender@example.com", "not an address"},
+		{"sender\r\n@example.com", "recipient@example.com"},
+		{"sender@example.com", "recipient\r\n@example.com"},
+	} {
+		cfg := map[string]any{"host":"smtp.example.com", "port":float64(587), "from":tc.from, "to":[]any{tc.to}}
+		if err := (emailChannel{}).Validate(cfg); err == nil { t.Fatal("invalid address accepted") }
+		if _, err := buildEmailMessage(tc.from, []string{tc.to}, singleMsg()); err == nil { t.Fatal("invalid message accepted") }
+	}
 }

@@ -2,12 +2,14 @@ package notify
 
 import (
 	"context"
+	"crypto/rand"
 	"crypto/tls"
 	"encoding/base64"
 	"errors"
 	"fmt"
 	"mime"
 	"net"
+	"net/mail"
 	"net/smtp"
 	"strconv"
 	"strings"
@@ -57,7 +59,32 @@ func (emailChannel) Validate(cfg map[string]any) error {
 	if len(cfgStrings(cfg, "to")) == 0 {
 		return errors.New("at least one recipient address is required")
 	}
-	return nil
+	_, _, err := emailMailboxes(cfgString(cfg, "from"), cfgStrings(cfg, "to"))
+	return err
+}
+
+// emailMailboxes validates single mailbox addresses and rejects header line breaks.
+// Use the same normalized mailbox for the SMTP envelope and message headers.
+func emailMailboxes(from string, to []string) (string, []string, error) {
+	parse := func(raw string) (string, error) {
+		if strings.ContainsAny(raw, "\r\n") {
+			return "", errors.New("invalid email address")
+		}
+		a, err := mail.ParseAddress(raw)
+		if err != nil || strings.ContainsAny(a.Address, "\r\n") {
+			return "", errors.New("invalid email address")
+		}
+		return a.Address, nil
+	}
+	sender, err := parse(from)
+	if err != nil { return "", nil, errors.New("invalid sender address") }
+	recipients := make([]string, 0, len(to))
+	for _, raw := range to {
+		address, err := parse(raw)
+		if err != nil { return "", nil, errors.New("invalid recipient address") }
+		recipients = append(recipients, address)
+	}
+	return sender, recipients, nil
 }
 
 func (c emailChannel) Send(ctx context.Context, cfg map[string]any, m Message) (int, error) {
@@ -66,8 +93,10 @@ func (c emailChannel) Send(ctx context.Context, cfg map[string]any, m Message) (
 	}
 	host := cfgString(cfg, "host")
 	port := cfgInt(cfg, "port")
-	from := cfgString(cfg, "from")
-	to := cfgStrings(cfg, "to")
+	from, to, err := emailMailboxes(cfgString(cfg, "from"), cfgStrings(cfg, "to"))
+	if err != nil {
+		return 0, Permanent(err)
+	}
 	username := cfgString(cfg, "username")
 	password := cfgString(cfg, "password")
 	implicitTLS := cfgBool(cfg, "tls")
@@ -217,7 +246,13 @@ func smtpReplyCode(text string) int {
 // over-long lines; second, base64 never produces a line starting with ".",
 // avoiding SMTP dot-stuffing entirely.
 func buildEmailMessage(from string, to []string, m Message) (string, error) {
+	from, to, err := emailMailboxes(from, to)
+	if err != nil { return "", err }
+	var id [16]byte
+	if _, err := rand.Read(id[:]); err != nil { return "", err }
 	var b strings.Builder
+	fmt.Fprintf(&b, "Date: %s\r\n", time.Now().Format(time.RFC1123Z))
+	fmt.Fprintf(&b, "Message-ID: <%x@artex.invalid>\r\n", id)
 	fmt.Fprintf(&b, "From: %s\r\n", from)
 	fmt.Fprintf(&b, "To: %s\r\n", strings.Join(to, ", "))
 	// A non-ASCII subject must be RFC 2047 encoded, otherwise clients display it
