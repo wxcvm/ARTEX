@@ -34,13 +34,18 @@ func meterTool(t actool.CoreTool, recorder toolUsageRecorder, toolKey, agentKey 
 }
 
 func (m *meteredTool) Call(ctx context.Context, input json.RawMessage, tc *actool.ToolContext) (actool.Result, error) {
+	ri := agent.RunInfoFrom(ctx)
+	if ri.TaskID == 0 {
+		ri = m.ri
+	}
+	toolUseID := ""
+	if tc != nil {
+		toolUseID = tc.ToolUseID
+	}
 	if err := m.recorder.InsertToolUsage(&db.ToolUsage{
-		ToolKey:       m.toolKey,
-		AgentKey:      m.agentKey,
-		TaskID:        m.ri.TaskID,
-		ExplorationID: m.ri.ExplorationID,
-		IntentID:      m.ri.IntentID,
-		SessionID:     m.ri.SessionID,
+		ToolKey: m.toolKey, AgentKey: m.agentKey, TaskID: ri.TaskID,
+		ExplorationID: ri.ExplorationID, IntentID: ri.IntentID, SessionID: ri.SessionID,
+		ToolUseID: toolUseID,
 	}); err != nil {
 		log.Printf("[toolusage] insert %s: %v", m.toolKey, err)
 	}

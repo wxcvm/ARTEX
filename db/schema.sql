@@ -983,10 +983,15 @@ CREATE TABLE IF NOT EXISTS tool_usage (
     task_id        BIGINT,
     exploration_id BIGINT,
     intent_id      BIGINT,
-    session_id     TEXT
+    session_id     TEXT,
+    tool_use_id    TEXT
 );
+ALTER TABLE tool_usage ADD COLUMN IF NOT EXISTS tool_use_id TEXT;
 CREATE INDEX IF NOT EXISTS idx_tool_usage_tool ON tool_usage(tool_key, ts DESC);
 CREATE INDEX IF NOT EXISTS idx_tool_usage_task ON tool_usage(task_id);
+CREATE UNIQUE INDEX IF NOT EXISTS idx_tool_usage_task_session_call
+    ON tool_usage(task_id, session_id, tool_use_id)
+    WHERE task_id IS NOT NULL AND session_id IS NOT NULL AND tool_use_id IS NOT NULL;
 
 -- =====================================================================
 -- H. Built-in tool catalog
@@ -1743,3 +1748,29 @@ CREATE TABLE IF NOT EXISTS task_budget_calls (
 );
 CREATE INDEX IF NOT EXISTS idx_task_budget_calls_unresolved
     ON task_budget_calls(task_id,run_id) WHERE state <> 'settled';
+
+-- Side-effecting tool calls are keyed by the stable provider tool_use_id. A
+-- running row is never replayed: owner release/takeover turns it UNKNOWN.
+CREATE TABLE IF NOT EXISTS tool_executions (
+    task_id       BIGINT NOT NULL REFERENCES tasks(id) ON DELETE CASCADE,
+    run_id        TEXT NOT NULL,
+    owner_epoch   BIGINT NOT NULL CHECK (owner_epoch > 0),
+    intent_id     BIGINT NOT NULL DEFAULT 0,
+    session_id    TEXT NOT NULL CHECK (length(session_id) BETWEEN 1 AND 256),
+    tool_use_id   TEXT NOT NULL CHECK (length(tool_use_id) BETWEEN 1 AND 128),
+    tool_key      TEXT NOT NULL,
+    agent_key     TEXT NOT NULL DEFAULT '',
+    input_hash    TEXT NOT NULL CHECK (length(input_hash) = 64),
+    state         TEXT NOT NULL DEFAULT 'running'
+                  CHECK (state IN ('running','done','unknown')),
+    result        JSONB,
+    error         TEXT NOT NULL DEFAULT '',
+    started_at    TIMESTAMPTZ NOT NULL DEFAULT now(),
+    finished_at   TIMESTAMPTZ,
+    PRIMARY KEY (task_id,session_id,tool_use_id),
+    FOREIGN KEY (task_id,run_id) REFERENCES task_budget_runs(task_id,run_id) ON DELETE CASCADE,
+    CHECK ((state = 'done' AND result IS NOT NULL AND finished_at IS NOT NULL)
+        OR (state <> 'done' AND result IS NULL))
+);
+CREATE INDEX IF NOT EXISTS idx_tool_executions_unresolved
+    ON tool_executions(task_id,run_id) WHERE state <> 'done';

@@ -42,3 +42,28 @@ func TestToolUsageLedger(t *testing.T) {
 		t.Errorf("%s calls: want 1, got %d", toolB, got)
 	}
 }
+
+func TestToolUsageDeduplicatesStableToolUseID(t *testing.T) {
+	d, taskID := budgetJournalTestTask(t)
+	row := &ToolUsage{
+		ToolKey: "insert_assets", AgentKey: "worker", TaskID: taskID,
+		ExplorationID: 1, IntentID: 7, SessionID: "session-tool-usage",
+		ToolUseID: "tool-use-stable",
+	}
+	if err := d.InsertToolUsage(row); err != nil {
+		t.Fatal(err)
+	}
+	if err := d.InsertToolUsage(row); err != nil {
+		t.Fatal(err)
+	}
+	var count int
+	if err := d.QueryRow(`SELECT COUNT(*) FROM tool_usage
+WHERE task_id=$1 AND session_id=$2 AND tool_use_id=$3`,
+		taskID, row.SessionID, row.ToolUseID).Scan(&count); err != nil {
+		t.Fatal(err)
+	}
+	if count != 1 {
+		t.Fatalf("duplicate replay created %d usage rows; want 1", count)
+	}
+}
+
