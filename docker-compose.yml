@@ -38,6 +38,11 @@ services:
       ARTEX_PURGE_INTEL_TOKEN: ${ARTEX_PURGE_INTEL_TOKEN:-}
       ARTEX_PURGE_INTEL_COMPANY_ID: ${ARTEX_PURGE_INTEL_COMPANY_ID:-}
       ARTEX_LLM_SECRET_KEY: ${ARTEX_LLM_SECRET_KEY:-}
+    # Container guard for the default (non-isolated) execution mode.
+    # memswap_limit == mem_limit disables container swap; adjust on small hosts.
+    mem_limit: ${ARTEX_MEMORY_LIMIT:-4g}
+    memswap_limit: ${ARTEX_MEMORY_LIMIT:-4g}
+    pids_limit: ${ARTEX_PIDS_LIMIT:-512}
     ports:
       - "${ARTEX_BIND:-127.0.0.1}:8787:8787"
       - "127.0.0.1:8788:8788"
