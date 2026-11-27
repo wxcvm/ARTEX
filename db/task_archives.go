@@ -271,6 +271,11 @@ LIMIT 1`, taskID).Scan(&dependent)
 		}
 		sources = append(sources, id)
 	}
+	// Rows.Close may return nil after Next has already closed rows on error.
+	if err := rows.Err(); err != nil {
+		rows.Close()
+		return nil, err
+	}
 	if err := rows.Close(); err != nil {
 		return nil, err
 	}
