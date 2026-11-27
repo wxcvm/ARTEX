@@ -10,6 +10,7 @@ import (
 	"encoding/json"
 	"errors"
 	"fmt"
+	"io"
 	"net"
 	"net/http"
 	"os"
@@ -19,6 +20,11 @@ import (
 	"time"
 
 	"github.com/Autumn-27/norma/tool"
+)
+
+const (
+	maxRunnerRequestBytes = 8 << 20
+	maxRunnerSessionBytes = 128
 )
 
 type Request struct {
@@ -101,11 +107,42 @@ func (s *Service) Close() {
 	}
 }
 
+func decodeRunnerRequest(w http.ResponseWriter, r *http.Request, dst any) error {
+	r.Body = http.MaxBytesReader(w, r.Body, maxRunnerRequestBytes)
+	decoder := json.NewDecoder(r.Body)
+	if err := decoder.Decode(dst); err != nil {
+		return err
+	}
+	if err := decoder.Decode(&struct{}{}); err != io.EOF {
+		if err == nil {
+			return errors.New("multiple JSON values")
+		}
+		return err
+	}
+	return nil
+}
+
+func runnerRequestErrorStatus(err error) int {
+	var maxErr *http.MaxBytesError
+	if errors.As(err, &maxErr) {
+		return http.StatusRequestEntityTooLarge
+	}
+	return http.StatusBadRequest
+}
+
+func validRunnerSession(session string) bool {
+	return session != "" && len(session) <= maxRunnerSessionBytes
+}
+
 func (s *Service) handleClose(w http.ResponseWriter, r *http.Request) {
 	var req struct {
 		Session string `json:"session"`
 	}
-	if err := json.NewDecoder(r.Body).Decode(&req); err != nil || req.Session == "" {
+	if err := decodeRunnerRequest(w, r, &req); err != nil {
+		http.Error(w, "invalid session request", runnerRequestErrorStatus(err))
+		return
+	}
+	if !validRunnerSession(req.Session) {
 		http.Error(w, "invalid session", http.StatusBadRequest)
 		return
 	}
@@ -115,11 +152,11 @@ func (s *Service) handleClose(w http.ResponseWriter, r *http.Request) {
 
 func (s *Service) handleCall(w http.ResponseWriter, r *http.Request) {
 	var req Request
-	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
-		http.Error(w, "invalid tool request", http.StatusBadRequest)
+	if err := decodeRunnerRequest(w, r, &req); err != nil {
+		http.Error(w, "invalid tool request", runnerRequestErrorStatus(err))
 		return
 	}
-	if req.Session == "" {
+	if !validRunnerSession(req.Session) {
 		http.Error(w, "invalid session", http.StatusBadRequest)
 		return
 	}
@@ -148,8 +185,6 @@ func (s *Service) handleCall(w http.ResponseWriter, r *http.Request) {
 		Env:            env,
 		Tasks:          m,
 	}
-	// Preserve the controller's existing SDK opt-outs even though the
-	// runner does not inherit control-plane environment variables.
 	if req.DisableBackground || (req.DisableInteractive && strings.HasPrefix(req.Name, "shell_")) {
 		tc.Tasks = nil
 	}

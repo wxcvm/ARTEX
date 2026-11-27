@@ -3,6 +3,7 @@ package toolrunner
 import (
 	"context"
 	"encoding/json"
+	"net/http"
 	"net/http/httptest"
 	"os"
 	"path/filepath"
@@ -306,5 +307,48 @@ func TestRunnerBrokerForwardsOnlyTheScopedEgressProbe(t *testing.T) {
 		case <-time.After(5 * time.Second):
 			t.Fatal("runner broker/executor did not stop")
 		}
+	}
+}
+
+func TestRunnerRejectsOversizedAndMalformedRequests(t *testing.T) {
+	s := NewService()
+	defer s.Close()
+	oversized := "{\"session\":\"bounded\",\"name\":\"Bash\",\"input\":\"" + strings.Repeat("x", maxRunnerRequestBytes) + "\"}"
+	w := httptest.NewRecorder()
+	s.Handler().ServeHTTP(w, httptest.NewRequest("POST", "/call", strings.NewReader(oversized)))
+	if w.Code != http.StatusRequestEntityTooLarge {
+		t.Fatalf("oversized call status=%d, want 413", w.Code)
+	}
+	w = httptest.NewRecorder()
+	s.Handler().ServeHTTP(w, httptest.NewRequest("POST", "/call", strings.NewReader("{\"session\":\"ok\",\"name\":\"Bash\",\"input\":{}} {}")))
+	if w.Code != http.StatusBadRequest {
+		t.Fatalf("multiple JSON values status=%d, want 400", w.Code)
+	}
+	if len(s.sessions) != 0 {
+		t.Fatalf("invalid requests created sessions: %d", len(s.sessions))
+	}
+}
+
+func TestRunnerBoundsSessionIdentifiers(t *testing.T) {
+	s := NewService()
+	defer s.Close()
+	longID := strings.Repeat("s", maxRunnerSessionBytes+1)
+	for _, tc := range []struct {
+		path, body string
+	}{
+		{"/call", "{\"session\":\"" + longID + "\",\"name\":\"Bash\",\"input\":{}}"},
+		{"/close", "{\"session\":\"" + longID + "\"}"},
+	} {
+		w := httptest.NewRecorder()
+		s.Handler().ServeHTTP(w, httptest.NewRequest("POST", tc.path, strings.NewReader(tc.body)))
+		if w.Code != http.StatusBadRequest {
+			t.Errorf("%s status=%d, want 400", tc.path, w.Code)
+		}
+	}
+	if len(s.sessions) != 0 {
+		t.Fatalf("invalid session identifiers created managers: %d", len(s.sessions))
+	}
+	if !validRunnerSession("unit-test-session") || validRunnerSession("") || validRunnerSession(longID) {
+		t.Fatal("session identifier validation is inconsistent")
 	}
 }
