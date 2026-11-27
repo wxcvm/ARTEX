@@ -511,16 +511,29 @@ func buildCompressionInput(g *coldGraph, b block, nodeByID map[int64]*db.Node) s
 	return sb.String()
 }
 
-// compress runs the §4 body LLM call on one block. Uses the same model the agent
-// runs on; thinking disabled (a pure summarization step).
+// isThinkingBetweenToolsError recognizes Anthropic's validation error for
+// models that reject thinking.type="disabled" and require "between_tools".
+func isThinkingBetweenToolsError(err error) bool {
+	if err == nil {
+		return false
+	}
+	msg := strings.ToLower(err.Error())
+	return strings.Contains(msg, "between_tools") && strings.Contains(msg, "thinking")
+}
+
+// compress runs the §4 body LLM call on one block. It does not force a
+// thinking mode: the provider's working profile settings remain authoritative.
 func (c *Compactor) compress(ctx context.Context, g *coldGraph, b block, nodeByID map[int64]*db.Node) (string, error) {
 	req := llm.CompletionRequest{
 		System:    []string{compressionSystemPrompt},
 		Messages:  []llm.Message{llm.UserText(buildCompressionInput(g, b, nodeByID))},
 		MaxTokens: 1500,
-		Thinking:  "disabled",
 	}
 	msg, _, _, err := c.prov.Complete(ctx, req)
+	if err != nil && isThinkingBetweenToolsError(err) {
+		req.Thinking = "between_tools"
+		msg, _, _, err = c.prov.Complete(ctx, req)
+	}
 	if err != nil {
 		return "", err
 	}
