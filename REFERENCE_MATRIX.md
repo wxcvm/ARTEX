@@ -53,3 +53,10 @@
 - 本次通过 Compose 静态回归测试锁定上述现有控制，防止后续配置误删。默认非隔离 Compose/native 部署不因此自动获得相同隔离级别；部署文档应明确 opt-in runner 的边界。
 
 状态：已核查；容器级控制已采用；逐任务身份降权保留为独立设计缺口。
+
+
+## BaaRai/ARTEX 模型连接测试安全对照（2026-11-27）
+
+来源：[BaaRai/ARTEX PR #526](https://github.com/BaaRai/ARTEX/commit/1f558d8681be3f55cfcd2e296e21af2fcfbe570a)。
+
+连接测试必须是纯文本探测：显式传空工具列表、禁用 SDK 后台任务工具，并拒绝模型返回工具调用或 tool_use/tool_calls 结束原因（即使同时带有文本）。本 fork 采用该约束，并用流式/非流式假服务回归测试覆盖。该路径不得执行文件、Shell、后台任务或任何外部工具。
