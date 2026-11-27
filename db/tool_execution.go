@@ -15,6 +15,37 @@ var (
 	ErrToolExecutionConflict  = errors.New("tool use id was reused with different tool input")
 )
 
+// sameToolResult compares JSON values rather than their byte representation.
+// PostgreSQL JSONB normalizes whitespace and object key order on storage.
+func sameToolResult(a, b []byte) bool {
+	decode := func(raw []byte) (any, error) {
+		decoder := json.NewDecoder(bytes.NewReader(raw))
+		decoder.UseNumber()
+		var value any
+		if err := decoder.Decode(&value); err != nil {
+			return nil, err
+		}
+		return value, nil
+	}
+	left, err := decode(a)
+	if err != nil {
+		return false
+	}
+	right, err := decode(b)
+	if err != nil {
+		return false
+	}
+	leftJSON, err := json.Marshal(left)
+	if err != nil {
+		return false
+	}
+	rightJSON, err := json.Marshal(right)
+	if err != nil {
+		return false
+	}
+	return bytes.Equal(leftJSON, rightJSON)
+}
+
 type ToolExecutionRequest struct {
 	TaskID     int64
 	RunID      string
@@ -172,7 +203,7 @@ FROM tool_executions WHERE task_id=$1 AND session_id=$2 AND tool_use_id=$3 FOR U
 		return ErrToolExecutionConflict
 	}
 	if state == "done" {
-		if !bytes.Equal(existing, result) {
+		if !sameToolResult(existing, result) {
 			return ErrToolExecutionConflict
 		}
 		return tx.Commit()
