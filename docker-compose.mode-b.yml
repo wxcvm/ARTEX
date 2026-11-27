@@ -11,6 +11,9 @@ services:
       # Rewrites the existing localhost:8788 tool proxy to the isolated gateway.
       # The standard traffic-recording relay is intentionally not connected.
       ARTEX_RUNNER_PROXY_ADDR: http://mode-b-egress:7890
+    mem_limit: ${ARTEX_CONTROLLER_MEMORY_LIMIT:-1g}
+    memswap_limit: ${ARTEX_CONTROLLER_MEMORY_LIMIT:-1g}
+    pids_limit: ${ARTEX_CONTROLLER_PIDS_LIMIT:-256}
     volumes:
       - runner_socket:/run/artex-runner
     depends_on:
@@ -35,6 +38,9 @@ services:
     read_only: true
     cap_drop: [ALL]
     security_opt: ["no-new-privileges:true"]
+    mem_limit: 256m
+    memswap_limit: 256m
+    pids_limit: 128
     networks: [runner-control]
     healthcheck:
       test: ["CMD-SHELL", "test -S /run/artex-runner/runner.sock"]
@@ -72,6 +78,9 @@ services:
     tmpfs: ["/tmp:rw,nosuid,size=1g"]
     cap_drop: [ALL]
     security_opt: ["no-new-privileges:true"]
+    mem_limit: ${ARTEX_EXECUTOR_MEMORY_LIMIT:-4g}
+    memswap_limit: ${ARTEX_EXECUTOR_MEMORY_LIMIT:-4g}
+    pids_limit: ${ARTEX_EXECUTOR_PIDS_LIMIT:-512}
     networks: [runner-execution]
     healthcheck:
       test: ["CMD-SHELL", "test -S /run/artex-executor/executor.sock"]
@@ -92,6 +101,9 @@ services:
     tmpfs: ["/tmp:rw,nosuid,size=64m"]
     cap_drop: [ALL]
     security_opt: ["no-new-privileges:true"]
+    mem_limit: 512m
+    memswap_limit: 512m
+    pids_limit: 128
     networks: [runner-execution, mode-b-uplink]
     restart: unless-stopped
 
