@@ -23,7 +23,7 @@ type composeProfile struct {
         Tmpfs []string `yaml:"tmpfs"`
         MemLimit string `yaml:"mem_limit"`
         MemswapLimit string `yaml:"memswap_limit"`
-        PidsLimit string `yaml:"pids_limit"`
+        PidsLimit any `yaml:"pids_limit"`
     } `yaml:"services"`
     Networks map[string]struct {
         Internal bool `yaml:"internal"`
@@ -123,6 +123,10 @@ func TestRunnerComposeProfilesKeepExecutorConstrained(t *testing.T) {
 					t.Errorf("%s must enforce no-new-privileges: %v", name, svc.SecurityOpt)
 				}
 			}
+			controller := profile.Services["artex"]
+			if controller.MemLimit == "" || controller.MemswapLimit != controller.MemLimit || controller.PidsLimit == nil {
+				t.Errorf("controller must have memory, no-swap and PID ceilings: %+v", controller)
+			}
 			executor := profile.Services["tool-executor"]
 			if !containsString(executor.Tmpfs, "/tmp:rw,nosuid,size=1g") {
 				t.Errorf("tool-executor must use a bounded nosuid /tmp tmpfs: %v", executor.Tmpfs)
@@ -147,7 +151,7 @@ func TestDefaultComposeHasResourceCeilings(t *testing.T) {
     var profile composeProfile
     if err := yaml.Unmarshal(data, &profile); err != nil { t.Fatal(err) }
     app, ok := profile.Services["artex"]
-    if !ok || app.MemLimit == "" || app.MemswapLimit != app.MemLimit || app.PidsLimit == "" {
+    if !ok || app.MemLimit == "" || app.MemswapLimit != app.MemLimit || app.PidsLimit == nil {
         t.Fatalf("default ARTEX container must have memory, no-swap and PID ceilings: %+v", app)
     }
 }
