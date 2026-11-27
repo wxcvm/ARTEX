@@ -49,6 +49,7 @@ PGDATABASE_NAME="${POSTGRES_DB:-artex}"
 # and directories even when the caller has a permissive umask.
 umask 077
 mkdir -p "$OUTPUT_DIR"
+case "$OUTPUT_DIR" in /*) ;; *) OUTPUT_DIR="./$OUTPUT_DIR" ;; esac
 TS=$(date -u +%Y%m%dT%H%M%SZ)
 DB_OUT="$OUTPUT_DIR/artex-db-$TS.sql.gz"
 # Stage privately on the destination filesystem. Publish only validated files,
@@ -80,14 +81,38 @@ if [ "$WITH_DATA" -eq 1 ]; then
   gzip -t "$DATA_TMP"
 fi
 
-# Hard links publish complete files without a check-then-overwrite race.
-# If the destination does not support hard links, fail without pruning.
-ln -T -- "$DB_TMP" "$DB_OUT"
-if [ "$WITH_DATA" -eq 1 ]; then
-  if ! ln -T -- "$DATA_TMP" "$DATA_OUT"; then
-    rm -f -- "$DB_OUT"
-    exit 1
+# A same-filesystem hard link publishes a complete file and fails if a file
+# already occupies the destination. Avoid GNU-only ln -T so BSD/macOS work too.
+publish_backup() {
+  local source="$1" destination="$2" nested
+  if [ -e "$destination" ] || [ -L "$destination" ]; then
+    echo "refusing to overwrite existing backup: $destination" >&2
+    return 1
   fi
+  if ! ln "$source" "$destination"; then
+    return 1
+  fi
+  # BSD ln treats an existing directory as a target directory. Detect that
+  # case (including a raced-in symlink to a directory) and remove only the
+  # hard link we may have created inside it.
+  if [ -d "$destination" ] || [ -L "$destination" ] ||
+     [ ! -f "$destination" ] || [ ! "$source" -ef "$destination" ]; then
+    nested="$destination/$(basename "$source")"
+    if [ -f "$nested" ] && [ "$source" -ef "$nested" ]; then
+      rm -f -- "$nested"
+    fi
+    echo "backup destination is not a regular file: $destination" >&2
+    return 1
+  fi
+}
+if ! publish_backup "$DB_TMP" "$DB_OUT"; then
+  echo "could not publish database backup" >&2
+  exit 1
+fi
+if [ "$WITH_DATA" -eq 1 ] && ! publish_backup "$DATA_TMP" "$DATA_OUT"; then
+  rm -f -- "$DB_OUT"
+  echo "could not publish data backup" >&2
+  exit 1
 fi
 echo "wrote $DB_OUT ($(du -h "$DB_OUT" | cut -f1))"
 if [ "$WITH_DATA" -eq 1 ]; then
