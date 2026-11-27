@@ -192,6 +192,8 @@ docker compose up -d          # uses the local fork image (artex:local by defaul
 
 The image already includes common tools (ripgrep/curl/vim/npm/nmap…); `./skills` and `./data` are persisted via bind mounts.
 
+**Container resource ceilings:** the default ARTEX container is limited to 4 GiB RAM and 512 processes/threads, with container swap disabled. PostgreSQL is not covered by these limits. Tune `ARTEX_MEMORY_LIMIT` and `ARTEX_PIDS_LIMIT` in `.env` for the host and leave headroom for PostgreSQL and the OS. With the isolated runner or Mode B Compose overlay, the controller defaults to 1 GiB / 256 PIDs and the separate tool executor to 4 GiB / 512 PIDs; tune `ARTEX_CONTROLLER_*` and `ARTEX_EXECUTOR_*` independently. Recreate the affected containers after changing limits. These are container ceilings, not per-command memory limits.
+
 For remote MCP, you can choose `http` (Streamable HTTP) or `sse` (legacy SSE) in system settings.
 Legacy SSE servers usually establish the event stream with `GET /sse`, then receive JSON-RPC requests via the
 `/message?sessionId=...` returned by the server; when configuring, set the URL to `/sse` and the request header as
