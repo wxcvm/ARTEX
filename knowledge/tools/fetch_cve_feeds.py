@@ -44,14 +44,15 @@ def fetch(url, timeout=90):
 
 def load_kev(offline):
     path = os.path.join(OUT, 'kev.json')
-    if offline or not os.path.exists(path):
-        if offline:
+    if offline:
+        if not os.path.exists(path):
             raise SystemExit('offline mode but %s missing' % path)
+    else:
         raw = fetch(KEV_URL)
         os.makedirs(OUT, exist_ok=True)
         with open(path, 'wb') as f:
             f.write(raw)
-        print('kev.json    : %d bytes (fetched)' % len(raw))
+        print('kev.json    : %d bytes (refreshed)' % len(raw))
     with open(path, encoding='utf-8') as f:
         return json.load(f)
 
