@@ -41,3 +41,15 @@
 - **身份**：AntiFox 多用户 RBAC、token_version、滑动续期与角色权限映射与 ARTEX 单管理员及专用 Purge/隐私桥凭证不同；不在未授权情况下改变既有认证行为，完整 RBAC 另行评估。
 - **审计**：AntiFox 持久化登录/平台操作日志与 ARTEX 现有任务 guard 审计、模型出站审计、工具使用账本不同。暂不重复记录请求正文/密钥或扩大日志范围。
 - **运行时**：AntiFox 的 `engine/harness/streaming.go` 和 `server/engine.go` 属于另一套 harness/runtime；ARTEX 当前使用 Norma、任务级取消原因、模型预算及 lifecycle 回归测试。不整仓替换，后续按流式事件和取消/恢复契约逐项对照。
+
+
+## BaaRai/ARTEX 执行器权限边界对照（2026-11-27）
+
+来源：[BaaRai/ARTEX PR #510](https://github.com/BaaRai/ARTEX/pull/510)，固定上游实现提交 `b6748f8ec08ec61c80b6c251491d8da76c83c315`。
+
+- 上游为 Linux 执行 shim 增加 fail-closed 身份切换与 `PR_SET_NO_NEW_PRIVS`，并用 `runtime.LockOSThread` 保证设置线程标志的线程继续执行 `exec`。
+- 本 fork 的 opt-in `docker-compose.runner.yml` 和 `docker-compose.mode-b.yml` 已在 broker、executor 与 egress 边界采用容器级 `no-new-privileges:true`、`cap_drop: ALL` 和只读根文件系统；executor 仅挂载任务/会话目录，不获得 PostgreSQL、JWT 或模型密钥。
+- 这不是逐任务 UID/GID 降权的等价实现：容器内执行器目前仍使用镜像默认用户。PR #510 的每线程 shim 机制不直接移植，因为当前 fork 使用独立 toolrunner 容器与 Norma 工具管理器，执行边界不同。
+- 本次通过 Compose 静态回归测试锁定上述现有控制，防止后续配置误删。默认非隔离 Compose/native 部署不因此自动获得相同隔离级别；部署文档应明确 opt-in runner 的边界。
+
+状态：已核查；容器级控制已采用；逐任务身份降权保留为独立设计缺口。
