@@ -53,3 +53,12 @@
 - 本次通过 Compose 静态回归测试锁定上述现有控制，防止后续配置误删。默认非隔离 Compose/native 部署不因此自动获得相同隔离级别；部署文档应明确 opt-in runner 的边界。
 
 状态：已核查；容器级控制已采用；逐任务身份降权保留为独立设计缺口。
+
+
+## BaaRai/ARTEX Goal Decomposer / Planner Contract（2026-11-27）
+
+来源：[BaaRai/ARTEX commit 01424b685e7493ca823f753db4d98dbdd133e080](https://github.com/BaaRai/ARTEX/commit/01424b685e7493ca823f753db4d98dbdd133e080)。
+
+- 本 fork 吸收 Planner 的空上下文保护：必须有非空任务目标或至少一个非空 goal node；nil store / 空上下文会返回明确错误并写入错误 activity，不再盲目进入规划。
+- graph_overview 过滤空白 goal 文本，避免空目标污染 planner prompt。
+- 本次暂不吸收上游“结构化 set_goals 一次严格重试后仍失败即将整个任务置为 failed”的生命周期变更；现有任务创建仍保留原始目标回退，以免一次模型格式错误直接丢弃用户任务。该契约单独评估。
