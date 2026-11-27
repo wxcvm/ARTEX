@@ -25,6 +25,7 @@ import shutil
 import sqlite3
 import sys
 import time
+import tempfile
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 KB = os.path.dirname(HERE)
@@ -35,10 +36,8 @@ SOURCE = os.path.join(KB, 'absorb', 'fujiang', 'fujiang-0.20.13-index.json')
 CREATOR = 'fujiang-import'
 UPSTREAM = 'FJNB5/fujiang-pojia@cf086fc'
 
-# 版本号里的四段以上数字会被 tools/scan_sensitive.py 的 IPv4 正则当成公网 IP；
-# WebLogic 那种五段版本号即使加 `v` 前缀也绕不过（第一个点之后仍构成四段）。
-# 处理方式：4 段及以上的版本串截到前三段（分支级），完整串留在 source_url 指向的上游。
-# 回环/私网/链路本地常量原样保留 —— 它们是探测目标，不是版本号。
+# 在非版本字段中发现四段数字时只作来源异常检查；不截断已知厂商版本。
+# 漏洞适用性依赖完整的四段/五段构建号，不能为迎合 IP 扫描器损失精度。
 FOUR = re.compile(r'\b(?:\d{1,3}\.){3,}\d{1,3}\b')
 
 # 与 tools/scan_sensitive.py 的 BENIGN_PREFIX 对齐：回环、私网、链路本地、文档保留段。
@@ -61,25 +60,6 @@ def is_benign_addr(ip):
     return False
 
 
-def shrink_versions(s):
-    """把 X.Y.Z.W[...] 形态截成 X.Y.Z，避开 scan_sensitive 的 IP 误判。"""
-    def rep(m):
-        v = m.group(0)
-        if is_benign_addr(v):
-            return v
-        return '.'.join(v.split('.')[:3])
-    return FOUR.sub(rep, s or '')
-
-
-
-def dedupe_adjacent(s):
-    """`12.2.1、12.2.1` -> `12.2.1`：截断到分支级后可能产生相邻重复。"""
-    prev = None
-    while prev != s:
-        prev = s
-        s = re.sub(r'(?<![\w.])([\w.]+)、\1(?![\w.])', r'\1', s)
-    return s
-
 def load():
     with open(SOURCE, encoding='utf-8') as f:
         payload = json.load(f)
@@ -101,8 +81,8 @@ def build_entry_md(e):
     ports = join_ports(e['ports']) or '-'
     kws = ', '.join(e['keywords']) or '-'
     trigger = e.get('entry') or '-'
-    product = shrink_versions(e['product']) or '-'
-    versions = dedupe_adjacent(shrink_versions(e['versions'])) or '-'
+    product = e['product'] or '-'
+    versions = e['versions'] or '-'
     lines = [
         '# ' + e['title'],
         '',
@@ -201,10 +181,16 @@ def main():
         con.close()
         return 0
 
-    # 备份
+    # 在临时副本中构建数据库和 Markdown；正式文件仅在验证后替换。
+    con.close()
+    tmp = tempfile.TemporaryDirectory(prefix='.fujiang-import-', dir=KB)
+    staged_db = os.path.join(tmp.name, 'knowledge.db')
+    shutil.copy2(DB, staged_db)
+    con = sqlite3.connect(staged_db)
+    con.row_factory = sqlite3.Row
     bak = DB + '.bak-' + time.strftime('%Y%m%d-%H%M%S')
     shutil.copy2(DB, bak)
-    print('\nbackup      : %s' % bak)
+    print('backup      : %s' % bak)
 
     written_docs = 0
     try:
@@ -218,7 +204,7 @@ def main():
             md = build_entry_md(e)
             rel = '%s/entry.md' % e['slug']
             if not args.no_pocs:
-                d = os.path.join(POCS, e['slug'])
+                d = os.path.join(tmp.name, 'docs', e['slug'])
                 os.makedirs(d, exist_ok=True)
                 with open(os.path.join(d, 'entry.md'), 'w', encoding='utf-8', newline='\n') as f:
                     f.write(md)
@@ -250,8 +236,9 @@ def main():
         con.commit()
     except Exception:
         con.rollback()
-        print('\nFAILED — rolled back. db untouched; backup at %s' % bak)
+        print('\nFAILED — rolled back. original db/docs untouched; backup at %s' % bak)
         con.close()
+        tmp.cleanup()
         raise
 
     after_poc = con.execute('select count(*) from poc').fetchone()[0]
@@ -274,7 +261,37 @@ def main():
 
     con.close()
     if bad:
+        tmp.cleanup()
         raise SystemExit('FTS out of sync for %d imported rows' % bad)
+
+    # 按文件备份旧 docs 后逐个替换，最后替换 DB。常规写入错误可恢复原状。
+    # 意外断电/kill 无法跨文件保证事务性：保留 DB .bak，重跑导入即可恢复一致。
+    published = []
+    try:
+        if not args.no_pocs:
+            for e in entries:
+                slug = e['slug']
+                dst = os.path.join(POCS, slug, 'entry.md')
+                staged = os.path.join(tmp.name, 'docs', slug, 'entry.md')
+                old = os.path.join(tmp.name, 'old', slug, 'entry.md')
+                os.makedirs(os.path.dirname(dst), exist_ok=True)
+                if os.path.exists(dst):
+                    os.makedirs(os.path.dirname(old), exist_ok=True)
+                    shutil.copy2(dst, old)
+                else:
+                    old = None
+                os.replace(staged, dst)
+                published.append((dst, old))
+        os.replace(staged_db, DB)
+    except Exception:
+        for dst, old in reversed(published):
+            if old:
+                os.replace(old, dst)
+            elif os.path.exists(dst):
+                os.remove(dst)
+        raise
+    finally:
+        tmp.cleanup()
     return 0
 
 
